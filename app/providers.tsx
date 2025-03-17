@@ -1,6 +1,6 @@
 'use client'
 
-import ModalContainer from '@/components/modal/BaseModal';
+import BaseModal from '@/components/modal/BaseModal';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState, useEffect } from 'react'
@@ -74,7 +74,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         <AnimatePresence mode="wait">
           {children}
         </AnimatePresence>
-        {/* <ModalContainer /> */}
+        <BaseModal />
       </SkeletonThemeProvider>
     </QueryClientProvider>
   )

@@ -1,6 +1,7 @@
 import { create } from 'zustand'
+import { Character } from './useStoreData'
 
-type ModalType = 'wallet' | 'token' | 'network' | 'provider' | 'slippage' | 'liquidity'
+type ModalType = 'wallet' | 'token' | 'network' | 'provider' | 'slippage' | 'liquidity' | 'character'
 
 interface ModalState {
   isOpen: boolean
@@ -8,6 +9,8 @@ interface ModalState {
   openModal: (type: ModalType, props?: Record<string, any>) => void
   closeModal: () => void
   modalProps: any
+  selectedCharacter: Character | null
+  setSelectedCharacter: (character: Character | null) => void
 }
 
 export const useModalStore = create<ModalState>((set) => ({
@@ -16,4 +19,6 @@ export const useModalStore = create<ModalState>((set) => ({
   openModal: (type, props) => set({ isOpen: true, modalType: type, modalProps: props }),
   closeModal: () => set({ isOpen: false, modalType: null }),
   modalProps: {},
+  selectedCharacter: null,
+  setSelectedCharacter: (character) => set({ selectedCharacter: character }),
 })) 

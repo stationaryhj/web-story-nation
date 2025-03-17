@@ -2,11 +2,11 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faComment, faFire } from '@fortawesome/free-solid-svg-icons'
 import { Character } from '@/store/useStoreData'
 import { CardTransition } from '@/components/ui/motion/PageTransition'
+import { useModalStore } from '@/store/useStoreModal'
 
 interface CardProps {
   character: Character;
@@ -15,11 +15,21 @@ interface CardProps {
 
 export default function Card({ character, index = 0 }: CardProps) {
   const { id, name, description, imageUrl, commentCount, hashtags, isAdult, creator } = character
+  const { openModal, setSelectedCharacter } = useModalStore()
+  
+  // 카드 클릭 시 캐릭터 모달 열기
+  const handleCardClick = () => {
+    setSelectedCharacter(character)
+    openModal('character')
+  }
   
   return (
     <CardTransition index={index}>
-      <div className="group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-dark-background-light dark:border dark:border-dark-secondary-200/10">
-        <Link href={`/character/${id}`} className="block">
+      <div 
+        className="group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-dark-background-light dark:border dark:border-dark-secondary-200/10 cursor-pointer"
+        onClick={handleCardClick}
+      >
+        <div className="block">
           <div className="relative aspect-[3/4] overflow-hidden rounded-t-xl">
             <Image
               src={imageUrl}
@@ -90,7 +100,7 @@ export default function Card({ character, index = 0 }: CardProps) {
               </div>
             </div>
           </div>
-        </Link>
+        </div>
       </div>
     </CardTransition>
   )

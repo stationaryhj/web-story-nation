@@ -1,11 +1,11 @@
 'use client'
 
 import { useModalStore } from '@/store/useStoreModal'
-import TokenModal from './TokenModal'
+import CharactorModal from './CharactorModal'
 
-const MODAL_COMPONENTS = {
-  token: TokenModal,
-
+// 모달 컴포넌트 맵
+const MODAL_COMPONENTS: Record<string, React.ComponentType<any>> = {
+  character: CharactorModal,
 }
 
 export default function BaseModal() {
@@ -14,5 +14,7 @@ export default function BaseModal() {
   if (!isOpen || !modalType) return null
   
   const ModalComponent = MODAL_COMPONENTS[modalType]
+  if (!ModalComponent) return null
+  
   return <ModalComponent isOpen={isOpen} onClose={closeModal} {...modalProps} />
 } 
