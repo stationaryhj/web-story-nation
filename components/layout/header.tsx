@@ -27,7 +27,7 @@ export default function Header() {
   // 네비게이션 링크
   const navLinks = [
     { href: '/', label: '홈' },
-    { href: '/chat', label: '대화' },
+    { href: '/chat-list', label: '대화' },
     { href: '/my-characters', label: '내 캐릭터' },
     { href: '/my', label: 'My' }
   ]

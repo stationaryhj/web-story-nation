@@ -95,7 +95,7 @@ export default function ChatDetailPage() {
         {/* 채팅 헤더 */}
         <div className="bg-white dark:bg-dark-background-light shadow-sm">
           <div className="container mx-auto px-4 py-3 flex items-center">
-            <Link href="/chat" className="mr-4 text-secondary-500 dark:text-dark-secondary-500 hover:text-primary-500 dark:hover:text-dark-primary-600">
+            <Link href="/chat-list" className="mr-4 text-secondary-500 dark:text-dark-secondary-500 hover:text-primary-500 dark:hover:text-dark-primary-600">
               <FontAwesomeIcon icon={faArrowLeft} />
             </Link>
             
