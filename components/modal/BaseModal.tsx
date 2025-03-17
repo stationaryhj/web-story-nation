@@ -2,10 +2,12 @@
 
 import { useModalStore } from '@/store/useStoreModal'
 import CharactorModal from './CharactorModal'
+import LoginModal from './LoginModal'
 
 // 모달 컴포넌트 맵
 const MODAL_COMPONENTS: Record<string, React.ComponentType<any>> = {
   character: CharactorModal,
+  login: LoginModal,
 }
 
 export default function BaseModal() {

@@ -16,6 +16,7 @@ import {
 import { useThemeStore } from '@/store/useStoreData'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FadeIn } from '@/components/ui/motion/PageTransition'
+import { useModalStore } from '@/store/useStoreModal'
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -23,6 +24,7 @@ export default function Header() {
   const [mounted, setMounted] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [activeLink, setActiveLink] = useState('/')
+  const { openModal } = useModalStore()
   
   // 네비게이션 링크
   const navLinks = [
@@ -164,12 +166,12 @@ export default function Header() {
             </motion.button>
           ) : (
             <FadeIn>
-              <Link 
-                href="/login" 
+              <button 
+                onClick={() => openModal('login')}
                 className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
               >
                 로그인
-              </Link>
+              </button>
             </FadeIn>
           )}
         </div>

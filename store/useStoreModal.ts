@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { Character } from './useStoreData'
 
-type ModalType = 'wallet' | 'token' | 'network' | 'provider' | 'slippage' | 'liquidity' | 'character'
+type ModalType = 'wallet' | 'token' | 'network' | 'provider' | 'slippage' | 'liquidity' | 'character' | 'login'
 
 interface ModalState {
   isOpen: boolean
