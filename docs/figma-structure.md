@@ -1,0 +1,8167 @@
+- Document
+	- Page 1
+		- 제타
+			- image 1
+			- image 2
+			- image 3
+			- image 4
+			- image 5
+			- image 6
+			- image 7
+			- image 8
+			- image 9
+			- image 10
+			- image 11
+			- image 12
+			- image 13
+			- image 14
+			- image 15
+			- image 16
+			- image 17
+			- image 18
+			- image 19
+			- image 20
+			- image 21
+			- image 22
+			- image 23
+			- image 24
+			- image 25
+			- image 26
+			- image 27
+			- image 28
+			- image 29
+			- image 30
+			- image 31
+			- image 32
+			- image 33
+			- image 34
+			- KakaoTalk_20250310_172217100_02
+			- KakaoTalk_20250310_172217100_03
+			- KakaoTalk_20250310_172217100_04
+			- KakaoTalk_20250310_172217100_05
+			- KakaoTalk_20250310_172217100_06
+			- KakaoTalk_20250310_172217100_07
+			- KakaoTalk_20250310_172217100_08
+			- KakaoTalk_20250310_172217100_09
+			- KakaoTalk_20250310_172217100
+			- KakaoTalk_20250310_172217100_01
+			- image 35
+			- image 36
+		- 케이브덕
+			- image 37
+			- image 38
+			- image 39
+			- image 40
+			- image 41
+			- image 42
+			- image 43
+			- image 44
+			- image 45
+			- image 46
+			- image 47
+			- image 48
+			- image 49
+			- image 50
+			- image 51
+			- image 52
+			- image 53
+		- 와이어프레임
+			- image 43
+			- image 44
+			- image 45
+			- image 46
+			- image 47
+			- image 48
+			- image 49
+			- image 50
+			- image 51
+			- image 52
+			- image 53
+			- Frame 128
+				- StoryNation
+					• StoryNation
+				- 태그 선택
+					• 태그 선택
+				- Rectangle 2
+				- Rectangle 3
+				- 검색
+					• 검색
+				- Group 1
+					- Rectangle 4
+					- #집착
+						• #집착
+					- #집착 #BL
+						• #집착 #BL
+				- Group 2
+					- Rectangle 4
+					- #BL
+						• #BL
+				- Group 6
+					- Rectangle 4
+					- #동거
+						• #동거
+				- Group 7
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 8
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 9
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 10
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 11
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 12
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 13
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 14
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 15
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 16
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 17
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 3
+					- Rectangle 4
+					- #로맨스
+						• #로맨스
+				- Group 4
+					- Rectangle 4
+					- #중세 판타지
+						• #중세 판타지
+				- Group 5
+					- Rectangle 4
+					- #남매/형제/자매
+						• #남매/형제/자매
+				- Vector
+				- fluent:radio-button-16-filled
+				- Group 18
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 23
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 36
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 19
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 24
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 37
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 20
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 25
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 38
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 21
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 26
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 39
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 22
+					- Rectangle 6
+					- Rectangle 12
+					- Rectangle 14
+					- Rectangle 11
+					- Rectangle 13
+					- Rectangle 15
+					- Vector
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Vector
+				- Group 32
+					- Rectangle 16
+					- 추천
+						• 추천
+				- Group 33
+					- Rectangle 16
+					- 남성
+						• 남성
+				- Group 34
+					- Rectangle 16
+					- 여성
+						• 여성
+				- Group 35
+					- Rectangle 16
+					- 성별모름
+						• 성별모름
+				- Group 27
+					- Rectangle 4
+					- 인기순
+						• 인기순
+				- Rectangle 42
+				- 홈
+					• 홈
+				- 대화
+					• 대화
+				- 만들기
+					• 만들기
+				- 내 캐릭터
+					• 내 캐릭터
+				- Live
+					• Live
+				- My
+					• My
+				- Group 99
+					- 짜릿모드
+						• 짜릿모드
+					- Group 98
+						- Rectangle 5
+						- Vector
+					- Line 1
+					- Vector
+					- Group
+						- Vector
+						- Vector
+						- Vector
+						- Vector
+						- Vector
+					- Vector
+					- Vector
+			- Frame 127
+				- StoryNation
+					• StoryNation
+				- 태그 선택
+					• 태그 선택
+				- Rectangle 2
+				- Rectangle 3
+				- 검색
+					• 검색
+				- Group 1
+					- Rectangle 4
+					- #집착
+						• #집착
+				- Group 40
+					- Rectangle 4
+					- #집착
+						• #집착
+				- Group 57
+					- Rectangle 4
+					- #집착
+						• #집착
+				- Group 74
+					- Rectangle 4
+					- #집착
+						• #집착
+				- Group 2
+					- Rectangle 4
+					- #BL
+						• #BL
+				- Group 41
+					- Rectangle 4
+					- #BL
+						• #BL
+				- Group 58
+					- Rectangle 4
+					- #BL
+						• #BL
+				- Group 75
+					- Rectangle 4
+					- #BL
+						• #BL
+				- Group 6
+					- Rectangle 4
+					- #동거
+						• #동거
+				- Group 42
+					- Rectangle 4
+					- #동거
+						• #동거
+				- Group 59
+					- Rectangle 4
+					- #동거
+						• #동거
+				- Group 76
+					- Rectangle 4
+					- #동거
+						• #동거
+				- Group 7
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 43
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 60
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 77
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 8
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 44
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 61
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 78
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 9
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 45
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 62
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 79
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 10
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 46
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 63
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 80
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 11
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 47
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 64
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 81
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 12
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 48
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 65
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 82
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 13
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 49
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 66
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 83
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 14
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 50
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 67
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 84
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 15
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 51
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 68
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 85
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 16
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 52
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 69
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 86
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 17
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 53
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 70
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 87
+					- Rectangle 4
+					- #연인
+						• #연인
+				- Group 3
+					- Rectangle 4
+					- #로맨스
+						• #로맨스
+				- Group 54
+					- Rectangle 4
+					- #로맨스
+						• #로맨스
+				- Group 71
+					- Rectangle 4
+					- #로맨스
+						• #로맨스
+				- Group 88
+					- Rectangle 4
+					- #로맨스
+						• #로맨스
+				- Group 4
+					- Rectangle 4
+					- #중세 판타지
+						• #중세 판타지
+				- Group 55
+					- Rectangle 4
+					- #중세 판타지
+						• #중세 판타지
+				- Group 72
+					- Rectangle 4
+					- #중세 판타지
+						• #중세 판타지
+				- Group 89
+					- Rectangle 4
+					- #중세 판타지
+						• #중세 판타지
+				- Group 5
+					- Rectangle 4
+					- #남매/형제/자매
+						• #남매/형제/자매
+				- Group 56
+					- Rectangle 4
+					- #남매/형제/자매
+						• #남매/형제/자매
+				- Group 73
+					- Rectangle 4
+					- #남매/형제/자매
+						• #남매/형제/자매
+				- Group 90
+					- Rectangle 4
+					- #남매/형제/자매
+						• #남매/형제/자매
+				- Vector
+				- fluent:radio-button-16-filled
+				- Group 18
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 23
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 36
+					- Vector
+				- Group 19
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 24
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 37
+					- Vector
+				- Group 20
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 25
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 38
+					- Vector
+				- Group 21
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 26
+					- Rectangle 6
+					- Rectangle 11
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Group 39
+					- Vector
+				- Group 22
+					- Rectangle 6
+					- Rectangle 12
+					- Rectangle 11
+					- Rectangle 13
+					- Vector
+					- Vector
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 캐릭터 이미지
+						• 캐릭터 이미지
+					- 151
+						• 151
+					- 151
+						• 151
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- 캐릭터 이름
+						• 캐릭터 이름
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- #해시태그 #해시태그 #해시태그 #해시태그
+						• #해시태그 #해시태그 #해시태그
+						• #해시태그
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+					- 19
+						• 19
+					- Ellipse 1
+				- Vector
+				- Group 32
+					- Rectangle 16
+					- 추천
+						• 추천
+				- Group 33
+					- Rectangle 16
+					- 남성
+						• 남성
+				- Group 34
+					- Rectangle 16
+					- 여성
+						• 여성
+				- Group 35
+					- Rectangle 16
+					- 성별모름
+						• 성별모름
+				- Group 27
+					- Rectangle 4
+					- 인기순
+						• 인기순
+				- Group 92
+					- Rectangle 4
+					- 최신순
+						• 최신순
+				- Rectangle 42
+				- Group 99
+					- 짜릿모드
+						• 짜릿모드
+					- Group 98
+						- Rectangle 5
+						- Vector
+					- Line 1
+					- Vector
+					- Group
+						- Vector
+						- Vector
+						- Vector
+						- Vector
+						- Vector
+					- Vector
+					- Vector
+			- 홈
+				• 홈
+			- 대화
+				• 대화
+			- 만들기
+				• 만들기
+			- 내 캐릭터
+				• 내 캐릭터
+			- Live
+				• Live
+			- My
+				• My
+			- Chat_main
+			
+![103:536](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/015bdd44-a244-4f0c-9008-a3e2052a1439)
+Local file: docs/figma_img/103_536.png
+				- frame
+				- Header
+					- header
+					- Header_tab
+						- Home_tab
+							• 홈
+						- Chat_tab
+							• 대화
+						- MyCharacter_tab
+							• 내 캐릭터
+						- LiveChat_tab
+						- My_tab
+							• My
+					- Header_button
+						- AgeVerification_button
+							- 짜릿모드
+								• 짜릿모드
+							- 짜릿모드 On,Off버튼
+								- Rectangle 5
+								- Vector
+						- Line 1
+						- alarm_button
+						- shop_button
+							- Vector
+							- Vector
+							- Vector
+							- Vector
+							- Vector
+						- setting_button
+						- login_button
+					- Header_logo
+						• StoryNation
+				- main
+					- card
+						- card_info_name
+							• 캐릭터 이름
+						- card_time_history
+							• 오전 11:56
+						- card_info_chat
+							• 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지
+						- card_image
+							- Ellipse 2
+							- 캐릭터 이미지
+								• 캐릭터
+								• 이미지
+						- frame
+					- card
+						- card_info_name
+							• 캐릭터 이름
+						- card_time_history
+							• 오전 11:56
+						- card_info_chat
+							• 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지
+						- card_image
+							- Ellipse 2
+							- 캐릭터 이미지
+								• 캐릭터
+								• 이미지
+						- frame
+					- card
+						- card_info_name
+							• 캐릭터 이름
+						- card_time_history
+							• 오전 11:56
+						- card_info_chat
+							• 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지
+						- card_image
+							- Ellipse 2
+							- 캐릭터 이미지
+								• 캐릭터
+								• 이미지
+						- frame
+					- card
+						- card_info_name
+							• 캐릭터 이름
+						- card_time_history
+							• 오전 11:56
+						- card_info_chat
+							• 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지
+						- card_image
+							- Ellipse 2
+							- 캐릭터 이미지
+								• 캐릭터
+								• 이미지
+						- frame
+				- nav
+					- nav_notice_list
+						- Rectangle 16
+						- 대화
+							• 대화
+					- nav_button_all
+						- Rectangle 16
+						- 모든 대화
+							• 모든 대화
+					- nav_button_favorites
+						- Rectangle 16
+						- 즐겨찾기
+							• 즐겨찾기
+					- nav_button_sorting
+						- Rectangle 16
+						- 최근대화순
+							• 최근대화순
+					- nav_search_bar
+						- Rectangle 2
+						- 캐릭터 이름 으로 검색
+							• 캐릭터 이름 으로 검색
+					- nav_button_search
+						- Rectangle 125
+						- 검색
+							• 검색
+				- Rectangle 48
+				- popup
+					- frame
+					- popup_notice
+						- 삭제된 채팅 내용은 복구할 수 없습니다. 그래도 삭제하시겠습니까?
+							• 삭제된 채팅 내용은 복구할 수 없습니다.
+							• 그래도 삭제하시겠습니까?
+					- popup_button_cancel
+						- 취소
+							• 취소
+						- Rectangle 40
+					- popup_button_delete
+						- 삭제
+							• 삭제
+						- Rectangle 41
+			- Chat_main
+			
+![103:629](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/9857b581-9559-4f5c-a669-64b903b51059)
+Local file: docs/figma_img/103_629.png
+				- Home
+				
+![103:630](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/9fa1e56c-f43d-4e3a-8efd-1a35b6e184f9)
+Local file: docs/figma_img/103_630.png
+					- frame
+					- main
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- Category
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+					- nav
+						- input
+							- Search_bar
+							- Search_button
+								- Rectangle 3
+								- 검색
+									• 검색
+						- category_filter
+							- Filter_male
+								- 버튼
+								- 남성
+									• 남성
+							- Filter_recommended
+								- 버튼
+								- 추천
+									• 추천
+							- Filter_Female
+								- 버튼
+								- 여성
+									• 여성
+							- Filter_Unspecified
+								- 버튼
+								- 성별모름
+									• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+						- Header_logo
+							• StoryNation
+				- popup_chat
+					- backdrop
+					- frame
+					- aside
+						- card_frame
+						- card_image
+							- Rectangle 25
+							- 캐릭터 이미지
+								• 캐릭터 이미지
+					- main
+						- frame
+						- main_chat
+							- main_chat_bar
+								- Rectangle 23
+								- 대사를 입력하세요. 예) 안녕! 뭐해?
+									• 대사를 입력하세요. 예) 안녕! 뭐해?
+							- main_chat_button_action
+								• *
+							- main_chat_message
+								• 첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지
+							- main_chat_button_send
+								- Rectangle 29
+								- Vector
+					- header
+						- header_profile
+							- profile_name
+								• 캐릭터 이름
+							- profile_hash_tag
+								• #태그 #태그
+								• #태그 #태그
+							- profile_button_detail
+								• >
+							- profile_button_back
+								• >
+							- profile_image
+								- Ellipse 2
+								- 캐릭터 이미지
+									• 캐릭터
+									• 이미지
+						- header_info
+							- header_info_paid_currency
+								- 600
+									• 600
+								- Group
+									- Vector
+									- Vector
+							- header_info_free_reward
+								- Vector
+								- 121
+									• 121
+							- header_info_button_mode
+								- 짜릿모드2
+									• 짜릿모드2
+								- Vector
+							- header_info_button_more
+				- backdrop
+				- popup_mode_select
+					- frame
+					- header
+						- Rectangle 32
+						- header_notice
+							• 채팅 모드 선택
+					- main
+						- card
+							- frame
+							- card_mode_desc
+								• 가성비모드_Gemini 1.5 Flash
+								• 합리적으로 즐기는 간단한 상황극!
+							- card_count_cost
+								• 1
+							- card_notice_cost
+								• 메세지당
+							- card_icon
+								- Vector
+								- Vector
+							- card_button_select
+							- card_notice_select
+						- card
+							- frame
+							- card_mode_desc
+								• 스토리모드_Sonnet 3.5 v2
+								• 상세한 묘사가 가능한 고품질 채팅!
+							- card_count_cost
+								• 7
+							- card_notice_cost
+								• 메세지당
+							- card_icon
+								- Vector
+								- Vector
+							- card_button_select
+							- card_notice_select
+						- card
+							- frame
+							- card_mode_desc
+								• 짜릿 모드 1.0 Gemini 1.5 Pro
+								• 성인을 위한 자유로운 묘사 가능!
+							- card_count_cost
+								• 4
+							- card_notice_cost
+								• 메세지당
+							- card_icon
+								- Vector
+								- Vector
+							- card_button_select
+							- card_notice_select
+						- card
+							- frame
+							- card_mode_desc
+								• 짜릿 모드 2.0 Sonnet 3.5 v2
+								• 보다 풍부한 표현력의 짜릿 모드!
+							- card_count_cost
+								• 7
+							- card_notice_cost
+								• 메세지당
+							- card_icon
+								- Vector
+								- Vector
+							- card_button_select
+							- card_notice_select
+			- Chat_main
+			
+![103:1167](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/24a66e97-1923-48f7-a5fb-6589d133f40d)
+Local file: docs/figma_img/103_1167.png
+				- Home
+				
+![103:1168](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/13a983ae-8767-4963-a83f-43c0a27cd285)
+Local file: docs/figma_img/103_1168.png
+					- frame
+					- main
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- Category
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+					- nav
+						- input
+							- Search_bar
+							- Search_button
+								- Rectangle 3
+								- 검색
+									• 검색
+						- category_filter
+							- Filter_male
+								- 버튼
+								- 남성
+									• 남성
+							- Filter_recommended
+								- 버튼
+								- 추천
+									• 추천
+							- Filter_Female
+								- 버튼
+								- 여성
+									• 여성
+							- Filter_Unspecified
+								- 버튼
+								- 성별모름
+									• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+						- Header_logo
+							• StoryNation
+				- popup_chat
+					- backdrop
+					- frame
+					- aside
+						- card_frame
+						- card_image
+							- Rectangle 25
+							- 캐릭터 이미지
+								• 캐릭터 이미지
+					- main
+						- frame
+						- main_chat
+							- main_chat_bar
+								- Rectangle 23
+								- 대사를 입력하세요. 예) 안녕! 뭐해?
+									• 대사를 입력하세요. 예) 안녕! 뭐해?
+							- main_chat_button_action
+								• *
+							- main_chat_message
+								• 첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지
+							- main_chat_button_send
+								- Rectangle 29
+								- Vector
+					- header
+						- header_profile
+							- profile_name
+								• 캐릭터 이름
+							- profile_hash_tag
+								• #태그 #태그
+								• #태그 #태그
+							- profile_button_detail
+								• >
+							- profile_button_back
+								• >
+							- profile_image
+								- Ellipse 2
+								- 캐릭터 이미지
+									• 캐릭터
+									• 이미지
+						- header_info
+							- header_info_paid_currency
+								- 600
+									• 600
+								- Group
+									- Vector
+									- Vector
+							- header_info_free_reward
+								- Vector
+								- 121
+									• 121
+							- header_info_button_mode
+								- 짜릿모드2
+									• 짜릿모드2
+								- Vector
+							- header_info_button_more
+				- backdrop
+			- popup
+				- frame
+				- popup_notice
+					- 삭제된 채팅 내용은 복구할 수 없습니다. 그래도 삭제하시겠습니까?
+						• 삭제된 채팅 내용은 복구할 수 없습니다.
+						• 그래도 삭제하시겠습니까?
+				- popup_button_cancel
+					- 취소
+						• 취소
+					- Rectangle 40
+				- popup_button_delete
+					- 삭제
+						• 삭제
+					- Rectangle 41
+		- Home_description
+			- Table 1
+				- Table
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• No.
+						- Cell
+							- Content
+								- Text
+									• Name
+						- Cell
+							- Content
+								- Text
+									• Desc
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• 1
+						- Cell
+							- Content
+								- Text
+									• Home_tab
+						- Cell
+							- Content
+								- Text
+									• 클릭 시, 홈으로 이동
+									• 홈인 상태에서 클릭 시, 반응 없음.
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• 2
+						- Cell
+							- Content
+								- Text
+									• Chat_tab
+						- Cell
+							- Content
+								- Text
+									• 클릭 시, 대화로 이동
+									• 대화 상태에서 클릭 시, 반응 없음.
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• 3
+						- Cell
+							- Content
+								- Text
+									• MyCharacter_tab
+						- Cell
+							- Content
+								- Text
+									• 클릭 시, 내 캐릭터로 이동
+									• 내 캐릭터에서 클릭 시, 반응 없음.
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• 4
+						- Cell
+							- Content
+								- Text
+									• LiveChat_tab
+						- Cell
+							- Content
+								- Text
+									• 클릭 시, 라이브 챗 으로 이동
+									• 라이브챗 에서 클릭 시, 반응 없음.
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• 5
+						- Cell
+							- Content
+								- Text
+									• My_tab
+						- Cell
+							- Content
+								- Text
+									• 클릭 시, My 로 이동
+									• My 에서 클릭 시, 반응 없음.
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• 6
+						- Cell
+							- Content
+								- Text
+									• AgeVerification_button
+						- Cell
+							- Content
+								- Text
+									• 클릭 시 On 상태로 변경되며 19세 이상 이용 가능 캐릭터 목록 출력.
+									• Off 시 목록 숨김. 로그인하지 않은 사용자는 버튼 클릭 불가.
+									• 19금 인증 완료 사용자만 이용 가능.
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• 7
+						- Cell
+							- Content
+								- Text
+									• notification_button
+						- Cell
+							- Content
+								- Text
+									• 클릭 시 notification 팝업창 출력.
+									• 읽지 않은 알림 존재 시 우측 상단에 레드닷 표시.
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• 8
+						- Cell
+							- Content
+								- Text
+									• shop_button
+						- Cell
+							- Content
+								- Text
+									• 클릭 시 Shop 탭으로 이동.
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• 9
+						- Cell
+							- Content
+								- Text
+									• setting_button
+						- Cell
+							- Content
+								- Text
+									• 클릭 시 setting 탭으로 이동.
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• 10
+						- Cell
+							- Content
+								- Text
+									• login_button
+						- Cell
+							- Content
+								- Text
+									• 클릭 시 login 팝업창 출력
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• 11
+						- Cell
+							- Content
+								- Text
+									• Search_bar
+						- Cell
+							- Content
+								- Text
+									• 클릭 시 입력 가능. 입력된 검색어로 캐릭터 이름 필터링. 엔터 키 입력 시 검색 실행.
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• 12
+						- Cell
+							- Content
+								- Text
+									• Search_button
+						- Cell
+							- Content
+								- Text
+									• 클릭 시 검색 실행.
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• 13
+						- Cell
+							- Content
+								- Text
+									• Filter
+						- Cell
+							- Content
+								- Text
+									• 클릭 시 해당 카테고리에 속한 캐릭터만 출력. 추천, 남성, 여성, 성별모름으로 구분. 클릭된 버튼은 색상 변경으로 표시되며, 최초 홈 진입 시 추천으로 설정.
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• 14
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+					- .Row
+						- Cell
+							- Content
+								- Text
+									• 15
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+					- .Row
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+					- .Row
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+					- .Row
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+					- .Row
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+					- .Row
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+					- .Row
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+					- .Row
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+					- .Row
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+						- Cell
+							- Content
+								- Text
+		- MyCharacter_home
+			- Mycharacter_home
+				- frame
+				- main
+					- card
+						- background
+						- card_image
+						- card_image
+							• 캐릭터 이미지
+						- card_commentcount
+							- 댓글 아이콘
+							- 댓글 개수
+								• 151
+						- card_title
+							• 캐릭터 이름
+						- card_hashtag
+							• #해시태그 #해시태그 #해시태그
+							• #해시태그
+						- card_info
+							• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+						- AgeVerification_mark
+							- 19
+								• 19
+							- Ellipse 1
+						- card_button_edit
+							- 수정
+								• 수정
+							- Rectangle 43
+						- card_button_delete
+							- 삭제
+								• 삭제
+							- Rectangle 43
+					- main_desc
+						• 내가 만든 캐릭터를 대화하고 싶은 캐릭터를 만들어 보세요!
+						• 확실한 보상! 채팅 수익은 현금으로 정산해 드립니다.
+					- main_notice
+						- Rectangle 16
+						- 내 캐릭터
+							• 내 캐릭터
+					- main_button_create_character
+						- 캐릭터 만들기
+							• 캐릭터 만들기
+						- Rectangle 43
+				- Header
+					- header
+					- Header_tab
+						- Home_tab
+							• 홈
+						- Chat_tab
+							• 대화
+						- MyCharacter_tab
+							• 내 캐릭터
+						- LiveChat_tab
+						- My_tab
+							• My
+					- Header_button
+						- AgeVerification_button
+							- 짜릿모드
+								• 짜릿모드
+							- 짜릿모드 On,Off버튼
+								- Rectangle 5
+								- Vector
+						- Line 1
+						- alarm_button
+						- shop_button
+							- Vector
+							- Vector
+							- Vector
+							- Vector
+							- Vector
+						- setting_button
+						- login_button
+					- Header_logo
+						• StoryNation
+		- MyCharacter_Create
+		
+![103:3686](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/6f850d26-e1ce-45a6-b9a2-cfceb080e276)
+Local file: docs/figma_img/103_3686.png
+			- Home_recommend
+				- frame
+				- main
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_logo
+							• StoryNation
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+					- name
+						- notice_name
+							- 이름
+								• 이름
+						- notice_name_count
+							• 0/25
+						- input_name_bar
+						- input_name_notice
+							• 캐릭터 이름을 입력해 주세요.
+					- bio
+						- notice_bio_count
+							• 0/80
+						- notice_bio
+							- 한줄 소개 내 캐릭터를 간단히 소개해 보세요!
+								• 한줄 소개
+								• 내 캐릭터를 간단히 소개해 보세요!
+							- Rectangle 43
+						- input_bio_bar
+						- input_bio_notice
+							• 예시)까칠한 뱀파이어
+					- first_message
+						- notice_first_message_count
+							• 0/80
+						- notice_first_message
+							• 첫 메세지
+							• 재미있는 선톡으로 유저의 답장을 이끌어내 보세요!
+						- input_first_message_bar
+						- input_first_message_notice
+							• 캐릭터가 보내는 첫 메세지를 입력하세요
+					- visibility
+						- notice_visibility_desc
+							- 게시 범위에 따라 무엇이 달라지나요?
+								• 게시 범위에 따라 무엇이 달라지나요?
+							- 공개 모든 유저가 캐릭터와 대화할 수 있어요. 생성한 공개 캐릭터는 비공개로 바꿀 수 없어요. 비공개 나만 캐릭터와 대화할 수 있어요. 캐릭터가 검색되지 않아요. 최대 3개만 보유할 수 있어요.
+								• 공개
+								• 모든 유저가 캐릭터와 대화할 수 있어요.
+								• 생성한 공개 캐릭터는 비공개로 바꿀 수 없어요.
+								• 비공개
+								• 나만 캐릭터와 대화할 수 있어요.
+								• 캐릭터가 검색되지 않아요.
+								• 최대 3개만 보유할 수 있어요.
+						- notice_Visibility
+							• 게시 범위 0 / 3
+							• 캐릭터의 게시범위를 정해요!
+						- button_public
+							- Rectangle 109
+							- Group 122
+								- 비공개
+									• 비공개
+								- Rectangle 43
+						- button_private
+							- Rectangle 109
+							- Group 122
+								- 공개
+									• 공개
+								- Rectangle 43
+					- gender
+						- notice_gender
+							- 성별
+								• 성별
+							- Rectangle 43
+						- button_gender_male
+							- Rectangle 109
+							- Group 122
+								- 남성
+									• 남성
+								- Rectangle 43
+						- button_gender_female
+							- Rectangle 109
+							- Group 122
+								- 여성
+									• 여성
+								- Rectangle 43
+						- button_gender_Unspecified
+							- Rectangle 109
+							- Group 122
+								- 알 수 없음
+									• 알 수 없음
+								- Rectangle 43
+					- section_line
+						- Line 5
+						- Line 4
+						- Line 6
+						- Line 7
+					- hash_tag
+						- notice_hash_tag
+							• 캐릭터 태그
+							• 내 캐릭터를 태그로 설명한다면? (최대7개)
+						- input_hash_tag_bar
+						- input_hash_tag_notice
+							• 캐릭터의 특징을 나타내는 태그를 선택하세요!
+						- button_hash_tag
+							- Group 1
+								- Rectangle 4
+								- #집착
+									• #집착
+							- Group 91
+								- Rectangle 4
+								- #집착
+									• #집착
+							- Group 40
+								- Rectangle 4
+								- #집착
+									• #집착
+							- Group 92
+								- Rectangle 4
+								- #집착
+									• #집착
+							- Group 57
+								- Rectangle 4
+								- #집착
+									• #집착
+							- Group 111
+								- Rectangle 4
+								- #집착
+									• #집착
+							- Group 93
+								- Rectangle 4
+								- #집착
+									• #집착
+							- Group 112
+								- Rectangle 4
+								- #집착
+									• #집착
+							- Group 74
+								- Rectangle 4
+								- #집착
+									• #집착
+							- Group 113
+								- Rectangle 4
+								- #집착
+									• #집착
+							- Group 94
+								- Rectangle 4
+								- #집착
+									• #집착
+							- Group 114
+								- Rectangle 4
+								- #집착
+									• #집착
+							- Group 2
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 95
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 103
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 41
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 96
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 104
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 58
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 115
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 97
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 116
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 105
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 117
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 75
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 118
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 98
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 119
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 106
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 120
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 3
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 99
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 107
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 54
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 100
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 108
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 71
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 121
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 101
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 122
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 109
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 123
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 88
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 124
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 102
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 125
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 110
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 126
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 4
+								- Rectangle 4
+								- #중세 판타지
+									• #중세 판타지
+							- Group 55
+								- Rectangle 4
+								- #중세 판타지
+									• #중세 판타지
+							- Group 72
+								- Rectangle 4
+								- #중세 판타지
+									• #중세 판타지
+							- Group 127
+								- Rectangle 4
+								- #중세 판타지
+									• #중세 판타지
+							- Group 89
+								- Rectangle 4
+								- #중세 판타지
+									• #중세 판타지
+							- Group 128
+								- Rectangle 4
+								- #중세 판타지
+									• #중세 판타지
+							- Group 5
+								- Rectangle 4
+								- #남매/형제/자매
+									• #남매/형제/자매
+							- Group 56
+								- Rectangle 4
+								- #남매/형제/자매
+									• #남매/형제/자매
+							- Group 73
+								- Rectangle 4
+								- #남매/형제/자매
+									• #남매/형제/자매
+							- Group 129
+								- Rectangle 4
+								- #남매/형제/자매
+									• #남매/형제/자매
+							- Group 90
+								- Rectangle 4
+								- #남매/형제/자매
+									• #남매/형제/자매
+							- Group 130
+								- Rectangle 4
+								- #남매/형제/자매
+									• #남매/형제/자매
+				- nav
+					- button_create_image
+						• 이미지
+					- button_create_basic
+						• 기본설정
+					- button_create_detail
+						• 상세설정
+					- button_next
+						• 다음
+					- frame
+		- MyCharacter_Create_Detail
+			- Home_recommend
+				- frame
+				- nav
+					- button_create_image
+						• 이미지
+					- button_create_basic
+						• 기본설정
+					- button_create_detail
+						• 상세설정
+					- button_next
+						• 다음
+					- frame
+				- main
+					- button_notice_chat_example
+						- frame
+						- notice_chat_example_add_count
+							• (51/1500)
+						- notice_chat_example_add
+							• 대화 예시 추가
+					- button_chat_example
+						- frame
+						- notice_button_chat_example
+							• 대화 예시 1
+						- button_chat_example_delete
+							• X
+						- button_chat_example_edit
+							- Vector
+							- Vector
+					- Line 6
+					- notice_chat_example
+						• 대화 예시(최대 3개)
+						• 캐릭터의 말투가 채팅에 반영될 거에요!
+					- bio_detail
+						- visibility
+							- button_public
+								- Rectangle 109
+								- Group 122
+									- 비공개
+										• 비공개
+									- Rectangle 43
+							- button_private
+								- Rectangle 109
+								- Group 122
+									- 공개
+										• 공개
+									- Rectangle 43
+						- name
+							- notice_bio_detail_count
+								• 0/3500
+							- input_bio_detail_bar
+							- input_bio_detail_notice
+								• 예시) 유키는 차가운 첫인상을 가진 고등학교 3학년으로 공부와 운동 모두 뛰어난 완벽주의자다. 겉으로는 “귀찮게 하지마 라며 주변을 밀어내지만 사실은 누구보다 친구들의 사소한 행동도 기억하며 배려하는 속 깊은 성격을 가졌다.
+						- notice_bio_detail
+							• 상세 설명
+							• 성격, 외모, 상황 등의 정보를 알려주세요!
+						- visibility
+							- button_public
+								- Rectangle 109
+								- Group 122
+									- 비공개
+										• 비공개
+									- Rectangle 43
+							- button_private
+								- Rectangle 109
+								- Group 122
+									- 공개
+										• 공개
+									- Rectangle 43
+				- Header
+					- header
+					- Header_tab
+						- Home_tab
+							• 홈
+						- Chat_tab
+							• 대화
+						- MyCharacter_tab
+							• 내 캐릭터
+						- LiveChat_tab
+						- My_tab
+							• My
+					- Header_logo
+						• StoryNation
+					- Header_button
+						- AgeVerification_button
+							- 짜릿모드
+								• 짜릿모드
+							- 짜릿모드 On,Off버튼
+								- Rectangle 5
+								- Vector
+						- Line 1
+						- alarm_button
+						- shop_button
+							- Vector
+							- Vector
+							- Vector
+							- Vector
+							- Vector
+						- setting_button
+						- login_button
+		- MyCharacter_Create_Image
+			- Home_recommend
+				- frame
+				- nav
+					- button_create_image
+						• 이미지
+					- button_create_basic
+						• 기본설정
+					- button_create_detail
+						• 상세설정
+					- button_next
+						• 완료
+					- frame
+				- Header
+					- header
+					- Header_tab
+						- Home_tab
+							• 홈
+						- Chat_tab
+							• 대화
+						- MyCharacter_tab
+							• 내 캐릭터
+						- LiveChat_tab
+						- My_tab
+							• My
+					- Header_logo
+						• StoryNation
+					- Header_button
+						- AgeVerification_button
+							- 짜릿모드
+								• 짜릿모드
+							- 짜릿모드 On,Off버튼
+								- Rectangle 5
+								- Vector
+						- Line 1
+						- alarm_button
+						- shop_button
+							- Vector
+							- Vector
+							- Vector
+							- Vector
+							- Vector
+						- setting_button
+						- login_button
+				- Group 142
+					- 성기 노출, 잔인한 장면, 그외 사회 통념상 허용할 수 없는 이미지는 통보 없이 삭제될 수 있습니다. 초상권, 저작권 침해 이미지는 통보 없이 삭제될 수 있습니다.
+						• 성기 노출, 잔인한 장면, 그외 사회  통념상 허용할 수 없는 이미지는 통보 없이 삭제될 수 있습니다.
+						• 초상권, 저작권 침해 이미지는 통보 없이 삭제될 수 있습니다.
+					- Group 18
+						- Rectangle 11
+						- 이미지 업로드
+							• 이미지 업로드
+					- Group 118
+						- Rectangle 11
+						- 이미지 업로드
+							• 이미지 업로드
+					- Group 117
+						- 이미지 등록
+							• 이미지 등록
+						- 1/30
+							• 1/30
+						- Rectangle 43
+					- Vector
+					- image 632
+					- X
+						• X
+					- Rectangle 107
+					- ㅇ
+						• ㅇ
+					- Vector
+					- Filter_male
+						- 버튼
+						- 성인
+							• 성인
+					- Filter_recommended
+						- 버튼
+						- 전체
+							• 전체
+					- Filter_Female
+						- 버튼
+						- 성인2
+							• 성인2
+				- main
+					- Line 4
+		- Home
+		
+![90:309](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/afbfe60a-65f1-4db8-95eb-8b57aa6bcdb7)
+Local file: docs/figma_img/90_309.png
+			- Home
+			
+![85:2](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/7a0d553b-4ac6-48ca-8759-6af7cbcc80bc)
+Local file: docs/figma_img/85_2.png
+				- Home
+				
+![85:696](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/5a9eef12-bdcc-48bc-951b-0d1ea9d5b592)
+Local file: docs/figma_img/85_696.png
+					- frame
+					- main
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- Category
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+					- nav
+						- input
+							- Search_bar
+							- Search_button
+								- Rectangle 3
+								- 검색
+									• 검색
+						- category_filter
+							- Filter_male
+								- 버튼
+								- 남성
+									• 남성
+							- Filter_recommended
+								- 버튼
+								- 추천
+									• 추천
+							- Filter_Female
+								- 버튼
+								- 여성
+									• 여성
+							- Filter_Unspecified
+								- 버튼
+								- 성별모름
+									• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- notification_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+						- Header_logo
+							• StoryNation
+				- Group 2049518613
+					- Group 714
+						- Rectangle 36
+						- 1
+							• 1
+					- Group 724
+						- Rectangle 36
+						- 11
+							• 11
+					- Group 725
+						- Rectangle 36
+						- 12
+							• 12
+					- Group 726
+						- Rectangle 36
+						- 13
+							• 13
+					- Group 727
+						- Rectangle 36
+						- 14
+							• 14
+					- Group 728
+						- Rectangle 36
+						- 15
+							• 15
+					- Group 715
+						- Rectangle 36
+						- 2
+							• 2
+					- Group 716
+						- Rectangle 36
+						- 3
+							• 3
+					- Group 717
+						- Rectangle 36
+						- 4
+							• 4
+					- Group 718
+						- Rectangle 36
+						- 5
+							• 5
+					- Group 719
+						- Rectangle 36
+						- 6
+							• 6
+					- Group 720
+						- Rectangle 36
+						- 7
+							• 7
+					- Group 721
+						- Rectangle 36
+						- 8
+							• 8
+					- Group 722
+						- Rectangle 36
+						- 9
+							• 9
+					- Group 723
+						- Rectangle 36
+						- 10
+							• 10
+		- Home_recommend
+			- Home_recommend
+				- Home
+				
+![90:1699](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/8b9b9249-bc54-4b08-993d-07976b9e6240)
+Local file: docs/figma_img/90_1699.png
+					- frame
+					- main
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- Category
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+						- Category
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+					- nav
+						- input
+							- Search_bar
+							- Search_button
+								- Rectangle 3
+								- 검색
+									• 검색
+						- category_filter
+							- Filter_male
+								- 버튼
+								- 남성
+									• 남성
+							- Filter_recommended
+								- 버튼
+								- 추천
+									• 추천
+							- Filter_Female
+								- 버튼
+								- 여성
+									• 여성
+							- Filter_Unspecified
+								- 버튼
+								- 성별모름
+									• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+						- Header_logo
+							• StoryNation
+		- Home_notification_notice
+			- Home_notification
+				- Home
+				
+![110:4914](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/53e659f4-c729-4658-b310-e85582723c42)
+Local file: docs/figma_img/110_4914.png
+					- frame
+					- main
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- Category
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+					- nav
+						- input
+							- Search_bar
+							- Search_button
+								- Rectangle 3
+								- 검색
+									• 검색
+						- category_filter
+							- Filter_male
+								- 버튼
+								- 남성
+									• 남성
+							- Filter_recommended
+								- 버튼
+								- 추천
+									• 추천
+							- Filter_Female
+								- 버튼
+								- 여성
+									• 여성
+							- Filter_Unspecified
+								- 버튼
+								- 성별모름
+									• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+						- Header_logo
+							• StoryNation
+				- backdrop
+				- popup_notification
+					- frame
+					- Header
+						- notice_notification
+							• 알림
+						- button_back
+							• <
+					- nav
+						- button_alert
+							• 알림
+						- button_notice
+							• 공지
+						- selection_indicator
+							- Line 10
+							- Line 11
+					- home
+						- frame
+						- card_notice_info
+					- scroll_bar
+						- Line 12
+						- Line 13
+		- Shop_recharge
+			- Shop_recharge
+				- Home
+				
+![116:5578](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/d3acccfe-d954-48a0-8ccf-747aebb07b93)
+Local file: docs/figma_img/116_5578.png
+					- frame
+					- main
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- Category
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+					- nav
+						- input
+							- Search_bar
+							- Search_button
+								- Rectangle 3
+								- 검색
+									• 검색
+						- category_filter
+							- Filter_male
+								- 버튼
+								- 남성
+									• 남성
+							- Filter_recommended
+								- 버튼
+								- 추천
+									• 추천
+							- Filter_Female
+								- 버튼
+								- 여성
+									• 여성
+							- Filter_Unspecified
+								- 버튼
+								- 성별모름
+									• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+						- Header_logo
+							• StoryNation
+				- backdrop
+				- popup_shop_recharge
+					- frame
+					- main
+						- frame
+						- card
+							- card
+								- frame
+								- card_total_earnings
+									• 120
+								- card_total_payment
+									• ₩ 1,600
+								- card_image
+								- card_image_notice
+									• 이미지
+							- card
+								- frame
+								- card_total_earnings
+									• 520
+								- card_total_payment
+									• ₩ 6,000
+								- card_image
+								- card_image_notice
+									• 이미지
+							- card
+								- frame
+								- card_total_earnings
+									• 1600
+								- card_total_payment
+									• ₩ 17,000
+								- card_image
+								- card_image_notice
+									• 이미지
+							- card
+								- frame
+								- card_total_earnings
+									• 250
+								- card_total_payment
+									• ₩ 3,200
+								- card_image
+								- card_image_notice
+									• 이미지
+							- card
+								- frame
+								- card_total_earnings
+									• 900
+								- card_total_payment
+									• ₩ 9,900
+								- card_image
+								- card_image_notice
+									• 이미지
+							- card
+								- frame
+								- card_total_earnings
+									• 2500
+								- card_total_payment
+									• ₩ 25,900
+								- card_image
+								- card_image_notice
+									• 이미지
+						- paid_currency
+							- Rectangle 346605333
+							- notice_paid_currency_count
+								• 600
+							- paid_currency_icon
+						- free_currency
+							- Rectangle 346605334
+							- free_currency_icon
+							- notice_free_currency_count
+								• 121
+					- nav
+						- button_history
+							• 펜 사용 내역
+						- button_recharge
+							• 펜 충전
+						- selection_indicator
+							- Line 10
+							- Line 11
+					- Header
+						- notice_notification
+							• 펜 충전
+						- button_back
+							• <
+		- Setting
+			- Shop_recharge
+				- frame
+				- Header
+					- header
+					- Header_tab
+						- Home_tab
+							• 홈
+						- Chat_tab
+							• 대화
+						- MyCharacter_tab
+							• 내 캐릭터
+						- LiveChat_tab
+						- My_tab
+							• My
+					- Header_button
+						- AgeVerification_button
+							- 짜릿모드
+								• 짜릿모드
+							- 짜릿모드 On,Off버튼
+								- Rectangle 5
+								- Vector
+						- Line 1
+						- alarm_button
+						- shop_button
+							- Vector
+							- Vector
+							- Vector
+							- Vector
+							- Vector
+						- setting_button
+						- login_button
+					- Header_logo
+						• StoryNation
+				- main
+					- Category_Name
+						• 기본 정보
+					- linked_platform
+						- Category_Linked_platform
+							• 연동 플랫폼
+						- Rectangle 346605338
+						- Category_Name
+							• Kakao
+					- nickname
+						- Category_Nickname
+							• 닉네임
+						- input_nickname
+						- notice_nickname
+							• pika1127
+					- Email
+						- Category_Email
+							• 이메일
+						- input_Email
+						- notice_Email
+							• pika1127@naver.com
+					- Bank_Account_form
+						- Category_Name
+							• 계좌 정보
+						- input_bank_account_number
+						- input_bank_account_holder
+						- button_select_bank
+						- notice_bank_account
+							• 은행 선택
+						- notice_bank_account_number
+							• 계좌번호
+						- notice_account_holder
+							• 예금주
+					- button_log_out
+						- Rectangle 346605350
+						- Category_Name
+							• 로그아웃
+					- button_kakaotalk_inquiry
+						- Rectangle 346605345
+						- Category_Name
+							• 카카오톡 1:1문의
+						- Category_Name
+							• >
+					- button_TOS
+						- Rectangle 346605346
+						- Category_Name
+							• 이용약관
+						- Category_Name
+							• >
+					- button_Privacy_policy
+						- Rectangle 346605347
+						- Category_Name
+							• 개인정보처리방침
+						- Category_Name
+							• >
+					- Button_paid_service_terms
+						- Rectangle 346605348
+						- Category_Name
+							• 유료 이용 약관
+						- Category_Name
+							• >
+					- Button_Operational_policy
+						- Rectangle 346605349
+						- Category_Name
+							• 운영정책
+						- Category_Name
+							• >
+					- language
+						- Category_language
+							• 언어/Language
+						- Rectangle 346605344
+						- button_select_language
+						- button_select_language
+						- notice_language_korean
+							• 한국어
+						- notice_language_english
+							• English
+						- notice_select_language
+				- nav
+					- notice_my_account_edit
+						• 내 계정
+					- button_back
+						• <
+					- button_save
+						- Category_Name
+							• 저장
+						- Rectangle 346605351
+		- Shop_history
+			- Shop_recharge
+				- Home
+				
+![123:700](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/cf432051-eb4e-405b-b3a7-ae231e1e03af)
+Local file: docs/figma_img/123_700.png
+					- frame
+					- main
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- Category
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+					- nav
+						- input
+							- Search_bar
+							- Search_button
+								- Rectangle 3
+								- 검색
+									• 검색
+						- category_filter
+							- Filter_male
+								- 버튼
+								- 남성
+									• 남성
+							- Filter_recommended
+								- 버튼
+								- 추천
+									• 추천
+							- Filter_Female
+								- 버튼
+								- 여성
+									• 여성
+							- Filter_Unspecified
+								- 버튼
+								- 성별모름
+									• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+						- Header_logo
+							• StoryNation
+				- backdrop
+				- popup_Shop_history
+					- frame
+					- nav
+						- button_history
+							• 펜 사용 내역
+						- button_recharge
+							• 펜 충전
+						- selection_indicator
+							- Line 10
+							- Line 11
+					- main
+						- card
+							- card
+								- card_notice_timestamp
+									- Rectangle 346605335
+									- card_notice_timestamp
+										• 25.03.05
+								- card_notice_usage_history
+									- Rectangle 346605337
+									- card_notice_usage_history
+										• 채팅
+								- card_notice_count_usage_history
+									- Rectangle 346605336
+									- card_notice_count_usage_history
+										• 7
+								- card_image
+							- card
+								- card_notice_timestamp
+									- Rectangle 346605335
+									- card_notice_timestamp
+										• 25.03.05
+								- card_notice_usage_history
+									- Rectangle 346605337
+									- card_notice_usage_history
+										• 채팅
+								- card_notice_count_usage_history
+									- Rectangle 346605336
+									- card_notice_count_usage_history
+										• 7
+								- card_image
+							- card
+								- card_notice_timestamp
+									- Rectangle 346605335
+									- card_notice_timestamp
+										• 25.03.05
+								- card_notice_usage_history
+									- Rectangle 346605337
+									- card_notice_usage_history
+										• 채팅
+								- card_notice_count_usage_history
+									- Rectangle 346605336
+									- card_notice_count_usage_history
+										• 7
+								- card_image
+							- card
+								- card_notice_timestamp
+									- Rectangle 346605335
+									- card_notice_timestamp
+										• 25.03.05
+								- card_notice_usage_history
+									- Rectangle 346605337
+									- card_notice_usage_history
+										• 채팅
+								- card_notice_count_usage_history
+									- Rectangle 346605336
+									- card_notice_count_usage_history
+										• 7
+								- card_image
+							- card
+								- card_notice_timestamp
+									- Rectangle 346605335
+									- card_notice_timestamp
+										• 25.03.05
+								- card_notice_usage_history
+									- Rectangle 346605337
+									- card_notice_usage_history
+										• 채팅
+								- card_notice_count_usage_history
+									- Rectangle 346605336
+									- card_notice_count_usage_history
+										• 7
+								- card_image
+					- Header
+						- notice_notification
+							• 펜 충전
+						- button_back
+							• <
+		- Home_notification_alert
+			- Home_notification
+				- Home
+				
+![116:5374](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/e057bb7b-ef43-4741-89b5-3cd158bcafbf)
+Local file: docs/figma_img/116_5374.png
+					- frame
+					- main
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- Category
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+					- nav
+						- input
+							- Search_bar
+							- Search_button
+								- Rectangle 3
+								- 검색
+									• 검색
+						- category_filter
+							- Filter_male
+								- 버튼
+								- 남성
+									• 남성
+							- Filter_recommended
+								- 버튼
+								- 추천
+									• 추천
+							- Filter_Female
+								- 버튼
+								- 여성
+									• 여성
+							- Filter_Unspecified
+								- 버튼
+								- 성별모름
+									• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+						- Header_logo
+							• StoryNation
+				- backdrop
+				- popup_notification
+					- frame
+					- Header
+						- notice_notification
+							• 알림
+						- button_back
+							• <
+					- nav
+						- button_alert
+							• 알림
+						- button_notice
+							• 공지
+						- selection_indicator
+							- Line 10
+							- Line 11
+					- home
+						- frame
+						- card_alert_info
+					- scroll_bar
+						- Line 12
+						- Line 13
+		- Chat_profile
+			- Chat_Profile
+				- Home
+				
+![90:2582](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/18a1162e-6b34-4967-bd03-d01febbc4743)
+Local file: docs/figma_img/90_2582.png
+					- frame
+					- main
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- Category
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+					- nav
+						- input
+							- Search_bar
+							- Search_button
+								- Rectangle 3
+								- 검색
+									• 검색
+						- category_filter
+							- Filter_male
+								- 버튼
+								- 남성
+									• 남성
+							- Filter_recommended
+								- 버튼
+								- 추천
+									• 추천
+							- Filter_Female
+								- 버튼
+								- 여성
+									• 여성
+							- Filter_Unspecified
+								- 버튼
+								- 성별모름
+									• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+						- Header_logo
+							• StoryNation
+				- popup_profile
+					- backdrop
+					- frame
+					- aside
+						- card_frame
+						- card_desc
+							- 캐릭터 간략 설명
+								• 캐릭터 간략 설명
+						- card_comment
+							- Vector
+							- 151
+								• 151
+						- card_like
+							- 151
+								• 151
+							- Vector
+						- AgeVerification_mark
+							- 19
+								• 19
+							- Ellipse 1
+						- card_hashtag
+							- Group 135
+								- Rectangle 4
+								- #집착
+									• #집착
+							- Group 2
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 3
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 4
+								- Rectangle 4
+								- #중세 판타지
+									• #중세 판타지
+						- card_image
+							- Rectangle 25
+							- 캐릭터 이미지
+								• 캐릭터 이미지
+					- main
+						- card
+							- card_frame
+							- card_title
+								• 세계관
+							- card_desc
+								• 세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정
+							- button_dropdown
+						- card
+							- card_frame
+							- card_title
+								• 캐릭터 소개
+							- card_desc
+								• 캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명
+							- button_dropdown
+						- card
+							- card_frame
+							- card_image
+								- Ellipse 2
+								- 캐릭터 이미지
+									• 캐릭터
+									• 이미지
+							- card_descframe
+							- card_desc
+								• 캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지
+							- button_startchat
+								- Rectangle 28
+								- 대화 시작
+									• 대화 시작
+					- Header
+						- notice_charactername
+							• 캐릭터 이름
+						- button_close
+							• X
+						- button_edit_character
+							- Vector
+							- Vector
+		- Create_character
+			- Chat_Profile
+				- Home
+				
+![103:1696](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/d8b8d7e7-3270-4d12-babf-483a14f28337)
+Local file: docs/figma_img/103_1696.png
+					- frame
+					- main
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- Category
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+					- nav
+						- input
+							- Search_bar
+							- Search_button
+								- Rectangle 3
+								- 검색
+									• 검색
+						- category_filter
+							- Filter_male
+								- 버튼
+								- 남성
+									• 남성
+							- Filter_recommended
+								- 버튼
+								- 추천
+									• 추천
+							- Filter_Female
+								- 버튼
+								- 여성
+									• 여성
+							- Filter_Unspecified
+								- 버튼
+								- 성별모름
+									• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+						- Header_logo
+							• StoryNation
+				- popup_profile
+					- backdrop
+					- frame
+					- aside
+						- card_frame
+						- card_desc
+							- 캐릭터 간략 설명
+								• 캐릭터 간략 설명
+						- card_comment
+							- Vector
+							- 151
+								• 151
+						- card_like
+							- 151
+								• 151
+							- Vector
+						- AgeVerification_mark
+							- 19
+								• 19
+							- Ellipse 1
+						- card_hashtag
+							- Group 135
+								- Rectangle 4
+								- #집착
+									• #집착
+							- Group 2
+								- Rectangle 4
+								- #BL
+									• #BL
+							- Group 3
+								- Rectangle 4
+								- #로맨스
+									• #로맨스
+							- Group 4
+								- Rectangle 4
+								- #중세 판타지
+									• #중세 판타지
+						- card_image
+							- Rectangle 25
+							- 캐릭터 이미지
+								• 캐릭터 이미지
+					- main
+						- card
+							- card_frame
+							- card_title
+								• 세계관
+							- card_desc
+								• 세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정  세계관 설정
+							- button_dropdown
+						- card
+							- card_frame
+							- card_title
+								• 캐릭터 소개
+							- card_desc
+								• 캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명  캐릭터 소개 설명
+							- button_dropdown
+						- card
+							- card_frame
+							- card_image
+								- Ellipse 2
+								- 캐릭터 이미지
+									• 캐릭터
+									• 이미지
+							- card_descframe
+							- card_desc
+								• 캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지  캐릭터 첫 메세지
+							- button_startchat
+								- Rectangle 28
+								- 대화 시작
+									• 대화 시작
+					- Header
+						- notice_charactername
+							• 캐릭터 이름
+						- button_close
+							• X
+		- Chat_main
+		
+![90:2768](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/97281d01-685c-42bd-85f5-bfa1826eb2df)
+Local file: docs/figma_img/90_2768.png
+			- Chat_main
+			
+![90:2769](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/f3294118-4d57-4bad-8068-c8311c042fd3)
+Local file: docs/figma_img/90_2769.png
+				- Home
+				
+![90:2770](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/adb7aadb-1f42-4080-8f2f-1a2b6c178073)
+Local file: docs/figma_img/90_2770.png
+					- frame
+					- main
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- Category
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+					- nav
+						- input
+							- Search_bar
+							- Search_button
+								- Rectangle 3
+								- 검색
+									• 검색
+						- category_filter
+							- Filter_male
+								- 버튼
+								- 남성
+									• 남성
+							- Filter_recommended
+								- 버튼
+								- 추천
+									• 추천
+							- Filter_Female
+								- 버튼
+								- 여성
+									• 여성
+							- Filter_Unspecified
+								- 버튼
+								- 성별모름
+									• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+						- Header_logo
+							• StoryNation
+				- popup_chat
+					- backdrop
+					- frame
+					- aside
+						- card_frame
+						- card_image
+							- Rectangle 25
+							- 캐릭터 이미지
+								• 캐릭터 이미지
+					- main
+						- frame
+						- main_chat
+							- main_chat_bar
+								- Rectangle 23
+								- 대사를 입력하세요. 예) 안녕! 뭐해?
+									• 대사를 입력하세요. 예) 안녕! 뭐해?
+							- main_chat_button_action
+								• *
+							- main_chat_message
+								• 첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지
+							- main_chat_button_send
+								- Rectangle 29
+								- Vector
+					- header
+						- header_profile
+							- profile_name
+								• 캐릭터 이름
+							- profile_hash_tag
+								• #태그 #태그
+								• #태그 #태그
+							- profile_button_detail
+								• >
+							- profile_button_back
+								• >
+							- profile_image
+								- Ellipse 2
+								- 캐릭터 이미지
+									• 캐릭터
+									• 이미지
+						- header_info
+							- header_info_paid_currency
+								- 600
+									• 600
+								- Group
+									- Vector
+									- Vector
+							- header_info_free_reward
+								- Vector
+								- 121
+									• 121
+							- header_info_button_mode
+								- 짜릿모드2
+									• 짜릿모드2
+								- Vector
+							- header_info_button_more
+		- Chat_main
+		
+![110:4023](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/e2f7b35a-a4fc-4bbe-9d63-7c6b8438a378)
+Local file: docs/figma_img/110_4023.png
+			- Chat_main
+			
+![110:4024](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/6c173917-81cc-4675-8de2-86f0642d3556)
+Local file: docs/figma_img/110_4024.png
+				- Home
+				
+![110:4025](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/7ede5853-d0f2-4f36-9d11-8382f73a1c64)
+Local file: docs/figma_img/110_4025.png
+					- frame
+					- main
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- Category
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+							- Category
+								- Category_Name
+									• 카테고리
+								- Category_Desc
+									• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+					- nav
+						- input
+							- Search_bar
+							- Search_button
+								- Rectangle 3
+								- 검색
+									• 검색
+						- category_filter
+							- Filter_male
+								- 버튼
+								- 남성
+									• 남성
+							- Filter_recommended
+								- 버튼
+								- 추천
+									• 추천
+							- Filter_Female
+								- 버튼
+								- 여성
+									• 여성
+							- Filter_Unspecified
+								- 버튼
+								- 성별모름
+									• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+						- Header_logo
+							• StoryNation
+				- popup_chat
+					- backdrop
+					- frame
+					- aside
+						- card_frame
+						- card_image
+							- Rectangle 25
+							- 캐릭터 이미지
+								• 캐릭터 이미지
+					- main
+						- frame
+						- main_chat
+							- main_chat_bar
+								- Rectangle 23
+								- 대사를 입력하세요. 예) 안녕! 뭐해?
+									• 대사를 입력하세요. 예) 안녕! 뭐해?
+							- main_chat_button_action
+								• *
+							- main_chat_message
+								• 첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지  첫 메세지
+							- main_chat_button_send
+								- Rectangle 29
+								- Vector
+					- header
+						- header_profile
+							- profile_name
+								• 캐릭터 이름
+							- profile_hash_tag
+								• #태그 #태그
+								• #태그 #태그
+							- profile_button_detail
+								• >
+							- profile_button_back
+								• >
+							- profile_image
+								- Ellipse 2
+								- 캐릭터 이미지
+									• 캐릭터
+									• 이미지
+						- header_info
+							- header_info_paid_currency
+								- 600
+									• 600
+								- Group
+									- Vector
+									- Vector
+							- header_info_free_reward
+								- Vector
+								- 121
+									• 121
+							- header_info_button_mode
+								- 짜릿모드2
+									• 짜릿모드2
+								- Vector
+							- header_info_button_more
+		- Chat_list
+		
+![103:32](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/4fda253d-6c8a-401e-89f8-f0235fe00097)
+Local file: docs/figma_img/103_32.png
+			- Chat_main
+			
+![103:33](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/839f1790-5436-4be0-8f46-3eb219b45a05)
+Local file: docs/figma_img/103_33.png
+				- frame
+				- Header
+					- header
+					- Header_tab
+						- Home_tab
+							• 홈
+						- Chat_tab
+							• 대화
+						- MyCharacter_tab
+							• 내 캐릭터
+						- LiveChat_tab
+						- My_tab
+							• My
+					- Header_button
+						- AgeVerification_button
+							- 짜릿모드
+								• 짜릿모드
+							- 짜릿모드 On,Off버튼
+								- Rectangle 5
+								- Vector
+						- Line 1
+						- alarm_button
+						- shop_button
+							- Vector
+							- Vector
+							- Vector
+							- Vector
+							- Vector
+						- setting_button
+						- login_button
+					- Header_logo
+						• StoryNation
+				- main
+					- card
+						- card_info_name
+							• 캐릭터 이름
+						- card_time_history
+							• 오전 11:56
+						- card_info_chat
+							• 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지
+						- card_image
+							- Ellipse 2
+							- 캐릭터 이미지
+								• 캐릭터
+								• 이미지
+						- frame
+					- card
+						- card_info_name
+							• 캐릭터 이름
+						- card_time_history
+							• 오전 11:56
+						- card_info_chat
+							• 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지
+						- card_image
+							- Ellipse 2
+							- 캐릭터 이미지
+								• 캐릭터
+								• 이미지
+						- frame
+					- card
+						- card_info_name
+							• 캐릭터 이름
+						- card_time_history
+							• 오전 11:56
+						- card_info_chat
+							• 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지
+						- card_image
+							- Ellipse 2
+							- 캐릭터 이미지
+								• 캐릭터
+								• 이미지
+						- frame
+					- card
+						- card_info_name
+							• 캐릭터 이름
+						- card_time_history
+							• 오전 11:56
+						- card_info_chat
+							• 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지 대화 메세지
+						- card_image
+							- Ellipse 2
+							- 캐릭터 이미지
+								• 캐릭터
+								• 이미지
+						- frame
+				- nav
+					- nav_notice_list
+						- Rectangle 16
+						- 대화
+							• 대화
+					- nav_button_all
+						- Rectangle 16
+						- 모든 대화
+							• 모든 대화
+					- nav_button_favorites
+						- Rectangle 16
+						- 즐겨찾기
+							• 즐겨찾기
+					- nav_button_sorting
+						- Rectangle 16
+						- 최근대화순
+							• 최근대화순
+					- nav_search_bar
+						- Rectangle 2
+						- 캐릭터 이름 으로 검색
+							• 캐릭터 이름 으로 검색
+					- nav_button_search
+						- Rectangle 125
+						- 검색
+							• 검색
+		- Home_filter
+			- home_filter
+				- Home
+				
+![90:1885](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/1b625200-faaa-4a24-8024-615cb1df2dfd)
+Local file: docs/figma_img/90_1885.png
+					- main
+						- frame
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- panel_hashtag
+							• 태그 선택
+						- buttons
+							- button_dropdown
+							- button_hashtag
+								- Group 1
+									- Rectangle 4
+									- #집착
+										• #집착
+								- Group 2
+									- Rectangle 4
+									- #BL
+										• #BL
+								- Group 6
+									- Rectangle 4
+									- #동거
+										• #동거
+								- Group 7
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 8
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 9
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 10
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 11
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 12
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 13
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 14
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 15
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 17
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 3
+									- Rectangle 4
+									- #로맨스
+										• #로맨스
+								- Group 4
+									- Rectangle 4
+									- #중세 판타지
+										• #중세 판타지
+								- Group 5
+									- Rectangle 4
+									- #남매/형제/자매
+										• #남매/형제/자매
+								- Group 16
+									- Rectangle 4
+									- #연인
+										• #연인
+							- button_refresh
+							- button_sorting
+								- Rectangle 4
+								- 인기순
+									• 인기순
+					- nav
+						- input
+							- Search_bar
+							- Search_button
+								- Rectangle 3
+								- 검색
+									• 검색
+						- category_filter
+							- Filter_male
+								- 버튼
+								- 남성
+									• 남성
+							- Filter_recommended
+								- 버튼
+								- 추천
+									• 추천
+							- Filter_Female
+								- 버튼
+								- 여성
+									• 여성
+							- Filter_Unspecified
+								- 버튼
+								- 성별모름
+									• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+						- Header_logo
+							• StoryNation
+		- Home_search_noresult
+			- Home_search_noresult
+				- Home
+				
+![90:2131](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/7013d7c5-30c9-435e-9ceb-5e464356f7cc)
+Local file: docs/figma_img/90_2131.png
+					- main
+						- frame
+						- panel_hashtag
+							• 태그 선택
+						- buttons
+							- button_dropdown
+							- button_hashtag
+								- Group 1
+									- Rectangle 4
+									- #집착
+										• #집착
+								- Group 2
+									- Rectangle 4
+									- #BL
+										• #BL
+								- Group 6
+									- Rectangle 4
+									- #동거
+										• #동거
+								- Group 7
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 8
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 9
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 10
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 11
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 12
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 13
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 14
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 15
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 17
+									- Rectangle 4
+									- #연인
+										• #연인
+								- Group 3
+									- Rectangle 4
+									- #로맨스
+										• #로맨스
+								- Group 4
+									- Rectangle 4
+									- #중세 판타지
+										• #중세 판타지
+								- Group 5
+									- Rectangle 4
+									- #남매/형제/자매
+										• #남매/형제/자매
+								- Group 16
+									- Rectangle 4
+									- #연인
+										• #연인
+							- button_refresh
+							- button_sorting
+								- Rectangle 4
+								- 인기순
+									• 인기순
+							- button_generatecharacter
+								- Rectangle 18
+								- 캐릭터 만들기
+									• 캐릭터 만들기
+						- notices
+							- notice_select_hash_tag
+								- #집착 #BL #로맨스 #중세 판타지
+									• #집착 #BL #로맨스 #중세 판타지
+							- notice_noresult
+								- 검색된 캐릭터가 없어요.
+									• 검색된 캐릭터가 없어요.
+								- 내가 원하는 캐릭터를 직접 만들어 보세요!
+									• 내가 원하는 캐릭터를 직접 만들어 보세요!
+					- nav
+						- input
+							- Search_bar
+							- Search_button
+								- Rectangle 3
+								- 검색
+									• 검색
+						- category_filter
+							- Filter_male
+								- 버튼
+								- 남성
+									• 남성
+							- Filter_recommended
+								- 버튼
+								- 추천
+									• 추천
+							- Filter_Female
+								- 버튼
+								- 여성
+									• 여성
+							- Filter_Unspecified
+								- 버튼
+								- 성별모름
+									• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+						- Header_logo
+							• StoryNation
+		- Home_Login_popup1
+			- Home_login_popup1
+				- Home
+				
+![90:124](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/983a10db-c689-4aa1-bbec-e7a5f54b7263)
+Local file: docs/figma_img/90_124.png
+					- Background
+					- Header_logo
+						• StoryNation
+					- Category
+						- Category
+							- Category_Name
+								• 카테고리
+							- Category_Desc
+								• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+						- Category
+							- Category_Name
+								• 카테고리
+							- Category_Desc
+								• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+					- input
+						- Search_bar
+						- Search_button
+							- Rectangle 3
+							- 검색
+								• 검색
+					- main
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+					- category_filter
+						- Filter_male
+							- 버튼
+							- 남성
+								• 남성
+						- Filter_recommended
+							- 버튼
+							- 추천
+								• 추천
+						- Filter_Female
+							- 버튼
+							- 여성
+								• 여성
+						- Filter_Unspecified
+							- 버튼
+							- 성별모름
+								• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+				- backdrop
+				- popup_login
+					- popup
+					- main
+						- buttons
+							- Button_Googlelogin
+								- Rectangle 112
+								- Google 계정으로 로그인
+									• Google 계정으로 로그인
+							- Button_Applelogin
+								- Rectangle 113
+								- Apple 계정으로 로그인
+									• Apple 계정으로 로그인
+							- Button_kakaologin
+								- Rectangle 114
+								- Kakao 계정으로 로그인
+									• Kakao 계정으로 로그인
+							- Button_naverlogin
+								- Rectangle 115
+								- Naver 계정으로 로그인
+									• Naver 계정으로 로그인
+					- Header
+						- button_close
+							• X
+		- Home_Login_popup2
+			- Home_login_popup2
+				- Home
+				
+![90:500](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/79f41e65-d45e-42aa-a95b-df7af16c9dde)
+Local file: docs/figma_img/90_500.png
+					- Background
+					- Header_logo
+						• StoryNation
+					- Category
+						- Category
+							- Category_Name
+								• 카테고리
+							- Category_Desc
+								• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+						- Category
+							- Category_Name
+								• 카테고리
+							- Category_Desc
+								• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+					- input
+						- Search_bar
+						- Search_button
+							- Rectangle 3
+							- 검색
+								• 검색
+					- main
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+					- category_filter
+						- Filter_male
+							- 버튼
+							- 남성
+								• 남성
+						- Filter_recommended
+							- 버튼
+							- 추천
+								• 추천
+						- Filter_Female
+							- 버튼
+							- 여성
+								• 여성
+						- Filter_Unspecified
+							- 버튼
+							- 성별모름
+								• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+				- backdrop
+				- popup_login
+					- Frame
+					- Header
+						- button_close
+							• X
+					- main
+						- buttons
+							- Button_Googlelogin
+								- Rectangle 112
+								- Google 계정으로 로그인
+									• Google 계정으로 로그인
+							- Button_Applelogin
+								- Rectangle 113
+								- Apple 계정으로 로그인
+									• Apple 계정으로 로그인
+							- Button_kakaologin
+								- Rectangle 114
+								- Kakao 계정으로 로그인
+									• Kakao 계정으로 로그인
+							- Button_naverlogin
+								- Rectangle 115
+								- Naver 계정으로 로그인
+									• Naver 계정으로 로그인
+						- category
+							- category_nickname
+								• 닉네임
+							- category_age
+								• 생년월일
+						- Inputs
+							- Input
+							- Input
+							- Input_Desc
+								• 닉네임을 입력하세요. (20자 이내)
+							- Input_Desc
+								• ex. 19970320 (숫자 8자리)
+							- Button_DuplicateCheck
+								- Rectangle 117
+								- 중복확인
+									• 중복확인
+						- CheckBoxes
+							- CheckBox
+								- Rectangle 119
+								- Rectangle 120
+								- Rectangle 121
+								- Rectangle 122
+								- Rectangle 123
+							- CheckBox_Desc
+								- 모두 동의
+									• 모두 동의
+								- 서비스 이용약관(필수)
+									• 서비스 이용약관(필수)
+								- 개인정보 수집 및 이용(필수)
+									• 개인정보 수집 및 이용(필수)
+								- 유료 이용약관(필수)
+									• 유료 이용약관(필수)
+								- 마케팅 정보 수신 동의(선택)
+									• 마케팅 정보 수신 동의(선택)
+							- Buttons_Viewterms
+								- 보기
+									• 보기
+								- 보기
+									• 보기
+								- 보기
+									• 보기
+						- Notice
+							• 스토리네이션은 만14세 이상 이용 가능합니다.
+					- footer
+						- Button_OK
+							- Rectangle 124
+							- 확인
+								• 확인
+		- Home_Login_popup3
+			- Home_login_popup3
+				- Home
+				
+![90:1450](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/58a184fa-18ae-4ff2-9196-ddd107cbc411)
+Local file: docs/figma_img/90_1450.png
+					- Background
+					- Header_logo
+						• StoryNation
+					- Category
+						- Category
+							- Category_Name
+								• 카테고리
+							- Category_Desc
+								• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+						- Category
+							- Category_Name
+								• 카테고리
+							- Category_Desc
+								• 카테고리 설명 카테고리 설명 카테고리 설명 카테고리 설명
+					- input
+						- Search_bar
+						- Search_button
+							- Rectangle 3
+							- 검색
+								• 검색
+					- main
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+						- card
+							- background
+							- card_image
+							- card_image
+								• 캐릭터 이미지
+							- card_commentcount
+								- 댓글 아이콘
+								- 댓글 개수
+									• 151
+							- card_title
+								• 캐릭터 이름
+							- card_hashtag
+								• #해시태그 #해시태그 #해시태그
+								• #해시태그
+							- card_info
+								• 캐릭터 설명캐릭터 설명캐릭터 설명캐릭터       설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명캐릭터 설명
+							- AgeVerification_mark
+								- 19
+									• 19
+								- Ellipse 1
+					- category_filter
+						- Filter_male
+							- 버튼
+							- 남성
+								• 남성
+						- Filter_recommended
+							- 버튼
+							- 추천
+								• 추천
+						- Filter_Female
+							- 버튼
+							- 여성
+								• 여성
+						- Filter_Unspecified
+							- 버튼
+							- 성별모름
+								• 성별모름
+					- Header
+						- header
+						- Header_tab
+							- Home_tab
+								• 홈
+							- Chat_tab
+								• 대화
+							- MyCharacter_tab
+								• 내 캐릭터
+							- LiveChat_tab
+							- My_tab
+								• My
+						- Header_button
+							- AgeVerification_button
+								- 짜릿모드
+									• 짜릿모드
+								- 짜릿모드 On,Off버튼
+									- Rectangle 5
+									- Vector
+							- Line 1
+							- alarm_button
+							- shop_button
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+								- Vector
+							- setting_button
+							- login_button
+				- backdrop
+				- popup_login
+					- popup_login
+						- popup
+						- button
+							- Button_Googlelogin
+								- Rectangle 112
+								- Google 계정으로 로그인
+									• Google 계정으로 로그인
+							- Button_Applelogin
+								- Rectangle 113
+								- Apple 계정으로 로그인
+									• Apple 계정으로 로그인
+							- Button_kakaologin
+								- Rectangle 114
+								- Kakao 계정으로 로그인
+									• Kakao 계정으로 로그인
+							- Button_naverlogin
+								- Rectangle 115
+								- Naver 계정으로 로그인
+									• Naver 계정으로 로그인
+							- button_close
+								• X
+					- category
+						- category_nickname
+							• 닉네임
+						- category_age
+							• 생년월일
+					- Inputs
+						- Input
+						- Input
+						- Input_Desc
+							• 닉네임을 입력하세요. (20자 이내)
+						- Input_Desc
+							• ex. 19970320 (숫자 8자리)
+						- Button_DuplicateCheck
+							- Rectangle 117
+							- 중복확인
+								• 중복확인
+					- CheckBoxes
+						- CheckBox
+							- Rectangle 119
+							- Rectangle 120
+							- Rectangle 121
+							- Rectangle 122
+							- Rectangle 123
+						- CheckBox_Desc
+							- 모두 동의
+								• 모두 동의
+							- 서비스 이용약관(필수)
+								• 서비스 이용약관(필수)
+							- 개인정보 수집 및 이용(필수)
+								• 개인정보 수집 및 이용(필수)
+							- 유료 이용약관(필수)
+								• 유료 이용약관(필수)
+							- 마케팅 정보 수신 동의(선택)
+								• 마케팅 정보 수신 동의(선택)
+						- Buttons_Viewterms
+							- 보기
+								• 보기
+							- 보기
+								• 보기
+							- 보기
+								• 보기
+					- Button_OK
+						- Rectangle 124
+						- 확인
+							• 확인
+					- Notice
+						• 스토리네이션은 만14세 이상 이용 가능합니다.
+				- backdrop
+				- popup_signupCompletion
+					- frame
+					- header
+						- Header_notice
+							• 가입 완료!
+							• 30펜을 지급해 드렸어요
+					- main
+						- main
+						- main_icon
+							• 지급 아이콘
+					- footer
+						- Button_OK
+							- Rectangle 124
+							- 확인
+								• 확인
+		- image 634
+		- image 633
+		- Frame 119
+			- image 616
+			- image 617
+			- image 618
+			- image 619
+			- image 620
+			- image 621
+			- image 622
+			- image 623
+			- image 624
+			- image 625
+			- image 626
+			- image 627
+			- image 628
+			- image 629
+			- image 630
+			- image 631
+		- 로판 AI
+			- image 587
+			- image 588
+			- image 589
+			- image 590
+			- image 591
+			- image 592
+			- image 593
+			- image 594
+			- image 595
+			- image 596
+			- image 597
+			- image 598
+			- image 599
+			- image 600
+			- image 601
+			- image 602
+			- image 603
+			- image 604
+			- image 605
+			- image 606
+			- image 607
+			- image 608
+			- image 609
+			- image 610
+			- image 611
+			- image 612
+			- image 613
+			- image 614
+			- image 615
+		- Rectangle 18
+		- 추가되면 좋을 것 같은 부분 (제안) 메인페이지 상단 배너추가 추가 개요 초반에 많은 캐릭터들이 나오는 것도 좋지만, 실제 페이지를 둘러보며 느낀 부분은 많은 카테고리가 있어 모든 카테고리를 보고 있으니 지루한 느낌이 추가되고 홈페이지 자체가 급하게 만들어진 느낌을 받았음 개선 요청사항 메인 페이지 들어갈 카테고리 중 대중적인 카테고리(유행하고 있는 신작, storynation 추천 캐릭터, 유행하는 장르) 내용을 포함 제안
+			• 추가되면 좋을 것 같은 부분 (제안)
+			• 메인페이지 상단 배너추가
+			• 추가 개요
+			• 초반에 많은 캐릭터들이 나오는 것도 좋지만, 실제 페이지를 둘러보며 느낀 부분은 많은 카테고리가 있어 모든 카테고리를 보고 있으니 지루한 느낌이 추가되고 홈페이지 자체가 급하게 만들어진 느낌을 받았음
+			• 개선 요청사항
+			• 메인 페이지 들어갈 카테고리 중 대중적인 카테고리(유행하고 있는 신작, storynation 추천 캐릭터, 유행하는 장르) 내용을 포함 제안
+		- image 637
+		- 스와이퍼 적용 시 딱 떨어지는 스크롤 보다 중간정도 걸쳐 있는 스크롤로 진행되었으면 좋겠음 이하 타 플랫폼 레퍼런스
+			• 스와이퍼 적용 시 딱 떨어지는 스크롤 보다 중간정도 걸쳐 있는 스크롤로 진행되었으면 좋겠음 이하 타 플랫폼 레퍼런스
+		- image 638
+		- Line 8
+		- Line 9
+		- project_guide
+			- Group 36
+				- ### 0.인덱스 https://zeta-ai.io/ko  ### 1.프로필 https://zeta-ai.io/ko/characters/2c01419d-27f2-4aa5-abc1-e83593e49216/profile -> profile 제거하면 2f5397ec-e089-4d06-aa36-d5ae253fe835에 해당하는 캐릭터 채팅으로 이동 아마도 고유 토큰 접근 시 채팅 뱉는듯? ### 2.내 채팅 리스트 https://zeta-ai.io/ko/rooms ### 2.캐릭터 채팅 https://zeta-ai.io/ko/rooms/732ac588-b960-497b-a263-b14aae6c7c31 ### 3. 인덱스 탭 https://zeta-ai.io/ko/?locale=ko&tab=ranking&type=REALTIME ### 4.회원가입 https://zeta-ai.io/ko/signup?token=토큰주소 ### 5.캐릭터 제작 https://zeta-ai.io/ko/characters/create ### 5.1 캐릭터 이미지 생성 https://zeta-ai.io/ko/characters/5ac146cd-6d46-4ca7-aef6-def69eb08a36/profile-image/generation ### 5.2 캐릭터 이미지 선택 https://zeta-ai.io/ko/characters/b871ad9f-91ca-4588-a51b-7f793e59397d/profile-image/review ### 5.3 캐릭터 이름 설정 https://zeta-ai.io/ko/characters/b871ad9f-91ca-4588-a51b-7f793e59397d/edit#tab=name ### 5.4 캐릭터 목소리 설정 https://zeta-ai.io/ko/characters/b871ad9f-91ca-4588-a51b-7f793e59397d/edit#tab=voice ### 5.1 캐릭터 이미지 생성 ### 5.1 캐릭터 이미지 생성 ### 6.마이페이지 https://zeta-ai.io/ko/my-page ### 7.더보기 https://zeta-ai.io/ko/more ### 8.검색 https://zeta-ai.io/ko/rooms?query=
+					• ### 0.인덱스
+					• https://zeta-ai.io/ko
+					• ### 1.프로필
+					• https://zeta-ai.io/ko/characters/2c01419d-27f2-4aa5-abc1-e83593e49216/profile
+					• -> profile 제거하면 2f5397ec-e089-4d06-aa36-d5ae253fe835에 해당하는 캐릭터 채팅으로 이동
+					• 아마도 고유 토큰 접근 시 채팅 뱉는듯?
+					• ### 2.내 채팅 리스트
+					• https://zeta-ai.io/ko/rooms
+					• ### 2.캐릭터 채팅
+					• https://zeta-ai.io/ko/rooms/732ac588-b960-497b-a263-b14aae6c7c31 ### 3. 인덱스 탭
+					• https://zeta-ai.io/ko/?locale=ko&tab=ranking&type=REALTIME
+					• ### 4.회원가입
+					• https://zeta-ai.io/ko/signup?token=토큰주소
+					• ### 5.캐릭터 제작
+					• https://zeta-ai.io/ko/characters/create ### 5.1 캐릭터 이미지 생성 https://zeta-ai.io/ko/characters/5ac146cd-6d46-4ca7-aef6-def69eb08a36/profile-image/generation
+					• ### 5.2 캐릭터 이미지 선택 https://zeta-ai.io/ko/characters/b871ad9f-91ca-4588-a51b-7f793e59397d/profile-image/review ### 5.3 캐릭터 이름 설정 https://zeta-ai.io/ko/characters/b871ad9f-91ca-4588-a51b-7f793e59397d/edit#tab=name ### 5.4 캐릭터 목소리 설정 https://zeta-ai.io/ko/characters/b871ad9f-91ca-4588-a51b-7f793e59397d/edit#tab=voice ### 5.1 캐릭터 이미지 생성 ### 5.1 캐릭터 이미지 생성 ### 6.마이페이지
+					• https://zeta-ai.io/ko/my-page
+					• ### 7.더보기
+					• https://zeta-ai.io/ko/more
+					• ### 8.검색
+					• https://zeta-ai.io/ko/rooms?query=
+				- zeta 페이지 접근 url 및 엔드포인트
+					• zeta 페이지 접근 url 및 엔드포인트
+			- 준비사항 덕 -페이지 컨테이너 뷰사이즈 1280px 작아지면 리스트들 좌우 스크롤 5 갭 20 카드 1280 이하로 작아지면 스크롤형태로 바뀐다. 로판 -페이지 컨테이너 뷰사이즈 1152px 애초에 스크롤뷰
+				• 준비사항
+				• 덕
+				• -페이지 컨테이너 뷰사이즈 1280px 작아지면 리스트들 좌우 스크롤 5 갭 20 카드 1280 이하로 작아지면 스크롤형태로 바뀐다.
+				• 로판
+				• -페이지 컨테이너 뷰사이즈 1152px 애초에 스크롤뷰
+			- 필요한 라이브러리
+				• 필요한 라이브러리
+			- 이거 pwa 추후에 이용해도 좋을듯. 카테고리 많아서 1.config 파일 2.스와이퍼 3.통신 데이터 pending 상태일 경우 스켈레톤 처리. 4.**Intersection Observer API** -스크립트 **Google Tag Manager** -**Next.js** -**Tailwind CSS** -react skeleton 사용하여 통신데이터 관리 -zustand -1~999k 처리 -0개 처리 -토스트 팝업 -카테고리 분류 -부드러운 애니메이션 처리 ( 라이브러리 아무거나) react-framer -스타일 라이브러리 - 통제 가능하면 -lodash.debounce 검색 api 및 debounce 기능 최적화 라이브러리 -캐싱 질문사항) -반응형 지원인지? - 제타처럼 아예 pc에서도 모바일 뷰로 보여줄 것인지? -url공유기능 필요 -소셜로그인 지원 플랫폼
+				• 이거 pwa 추후에 이용해도 좋을듯.
+				• 카테고리 많아서
+				• 1.config 파일
+				• 2.스와이퍼
+				• 3.통신 데이터 pending 상태일 경우 스켈레톤 처리.
+				• 4.**Intersection Observer API**
+				• -스크립트 **Google Tag Manager**
+				• -**Next.js**
+				• -**Tailwind CSS**
+				• -react skeleton 사용하여 통신데이터 관리
+				• -zustand
+				• -1~999k 처리
+				• -0개 처리
+				• -토스트 팝업
+				• -카테고리 분류
+				• -부드러운 애니메이션 처리 ( 라이브러리 아무거나) react-framer
+				• -스타일 라이브러리 - 통제 가능하면
+				• -lodash.debounce 검색 api 및 debounce 기능 최적화 라이브러리
+				• -캐싱
+				• 질문사항)
+				• -반응형 지원인지? - 제타처럼 아예 pc에서도 모바일 뷰로 보여줄 것인지?
+				• -url공유기능 필요
+				• -소셜로그인 지원 플랫폼
+			- "creator": { "id": "8f20beae-23ed-4ebe-a786-6174d4e7224d", "nickname": "CroakySled1251", "username": "CroakySled1251", "profileImageUrl": null, "isActive": true },
+				• "creator": {
+				• "id": "8f20beae-23ed-4ebe-a786-6174d4e7224d",
+				• "nickname": "CroakySled1251",
+				• "username": "CroakySled1251",
+				• "profileImageUrl": null,
+				• "isActive": true
+				• },
+	- 어드민
+		- Rectangle 1
+		- Rectangle 2
+		- Rectangle 6
+		- Rectangle 11
+		- Rectangle 3
+		- Rectangle 4
+		- Rectangle 13
+		- image 1
+		- 스토리 네이션
+			• 스토리 네이션
+		- 바른송골매
+			• 바른송골매
+		- 포인트 설정
+			• 포인트 설정
+		- 회원정보
+			• 회원정보
+		- 캐릭터 AI 관리
+			• 캐릭터 AI 관리
+		- 태그관리
+			• 태그관리
+		- 배너설정
+			• 배너설정
+		- 관리자
+			• 관리자
+		- 노출순서
+			• 노출순서
+		- 1
+			• 1
+		- 1
+			• 1
+		- 500
+			• 500
+		- 5,000
+			• 5,000
+		- 0%
+			• 0%
+		- No
+			• No
+		- 포인트
+			• 포인트
+		- 추가 포인트
+			• 추가 포인트
+		- 할인
+			• 할인
+		- 설정금액
+			• 설정금액
+		- 적용 포인트
+			• 적용 포인트
+		- 적용금액
+			• 적용금액
+		- 수정
+			• 수정
+		- 만들기
+			• 만들기
+		- Rectangle 5
+		- 수정
+			• 수정
+		- 2
+			• 2
+		- 2
+			• 2
+		- 1000
+			• 1000
+		- 10,000
+			• 10,000
+		- 0%
+			• 0%
+		- Rectangle 7
+		- 수정
+			• 수정
+		- 3
+			• 3
+		- 3
+			• 3
+		- 3000
+			• 3000
+		- 31,500
+			• 31,500
+		- 5%
+			• 5%
+		- Rectangle 8
+		- 수정
+			• 수정
+		- 4
+			• 4
+		- 4
+			• 4
+		- 5000
+			• 5000
+		- 55,000
+			• 55,000
+		- 10%
+			• 10%
+		- Rectangle 9
+		- 수정
+			• 수정
+		- 5
+			• 5
+		- 5
+			• 5
+		- 10,000
+			• 10,000
+		- 500
+			• 500
+		- 1000
+			• 1000
+		- 3150
+			• 3150
+		- 5500
+			• 5500
+		- 11500
+			• 11500
+		- 0
+			• 0
+		- 0
+			• 0
+		- 150
+			• 150
+		- 500
+			• 500
+		- 1500
+			• 1500
+		- 115,000
+			• 115,000
+		- 5,000
+			• 5,000
+		- 10,000
+			• 10,000
+		- 30,000
+			• 30,000
+		- 50,000
+			• 50,000
+		- 100,000
+			• 100,000
+		- 15%
+			• 15%
+		- Rectangle 10
+		- 수정
+			• 수정
+		- Rectangle 12
+		- 로그아웃
+			• 로그아웃
+	- Table Creator
+		- .Tooltip
+			- Artwork
+				- Union
+					- Rectangle 1
+					- Rectangle 2
+			- Only layer styles such as: background, color, border radius etc will be used to create tables. You don't have to create tables using the plugin. You can also create tables by creating an instance of this component and detaching them and their rows. If you change the styles used on the table or row components you can update existing tables by going to Plugins > Table Creator > Settings and select Refresh Tables
+				• This component is a template used by Table Creator to create tables from. You can customise the appearance of your tables by customising this template. It’s made up of the components below.
+		- .Tooltip
+			- Artwork
+				- Union
+					- Rectangle 1
+					- Rectangle 2
+			- Only layer styles such as: background, color, border radius etc will be used to create tables. You don't have to create tables using the plugin. You can also create tables by creating an instance of this component and detaching them and their rows. If you change the styles used on the table or row components you can update existing tables by going to Plugins > Table Creator > Settings and select Refresh Tables
+				• Customise rows by changing this component.
+		- .Tooltip
+			- Artwork
+				- Union
+					- Rectangle 1
+					- Rectangle 2
+			- Only layer styles such as: background, color, border radius etc will be used to create tables. You don't have to create tables using the plugin. You can also create tables by creating an instance of this component and detaching them and their rows. If you change the styles used on the table or row components you can update existing tables by going to Plugins > Table Creator > Settings and select Refresh Tables
+				• Customise cell borders by changing these components. Create variants for different types of cells, icons, dropdowns, ratings etc.
+		- Row
+			- Cell
+				- Content
+					- Text
+			- Cell
+				- Content
+					- Text
+		- Cell
+			- Type=Default
+				- Content
+					- Text
+			- Type=Header
+				- Content
+					- Text
+		- Table 1
+			- Table
+				- Row
+					- Cell
+						- Content
+							- Text
+					- Cell
+						- Content
+							- Text
+				- Row
+					- Cell
+						- Content
+							- Text
+					- Cell
+						- Content
+							- Text
+				- Row
+					- Cell
+						- Content
+							- Text
+					- Cell
+						- Content
+							- Text
