@@ -10,6 +10,7 @@ import { faPaperPlane, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import Image from 'next/image'
 import { useStoreData, Character } from '@/store/useStoreData'
 import Link from 'next/link'
+import Footer from '@/components/layout/footer'
 
 export default function ChatDetailPage() {
   const params = useParams()
@@ -89,7 +90,7 @@ export default function ChatDetailPage() {
   
   return (
     <PageTransition>
-      <main className="min-h-screen flex flex-col">
+      <div className="flex flex-col min-h-screen">
         <Header />
         
         {/* 채팅 헤더 */}
@@ -120,68 +121,72 @@ export default function ChatDetailPage() {
           </div>
         </div>
         
-        {/* 채팅 내용 */}
-        <div className="flex-1 bg-secondary-50 dark:bg-dark-background-DEFAULT overflow-y-auto p-4">
-          <div className="container mx-auto max-w-4xl space-y-4">
-            {chatHistory.map((chat) => (
-              <motion.div
-                key={chat.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className={`flex ${chat.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                {chat.sender === 'character' && (
-                  <div className="relative w-8 h-8 rounded-full overflow-hidden mr-2 flex-shrink-0">
-                    <Image
-                      src={character.imageUrl}
-                      alt={character.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                )}
-                
-                <div className={`max-w-[70%] rounded-lg p-3 ${
-                  chat.sender === 'user' 
-                    ? 'bg-primary-500 dark:bg-dark-primary-600 text-white' 
-                    : 'bg-white dark:bg-dark-background-light text-secondary-900 dark:text-dark-secondary-700'
-                }`}>
-                  <p className="text-sm">{chat.message}</p>
-                  <p className={`text-xs mt-1 ${
+        {/* 채팅 내용 - flex-grow를 사용하여 남은 공간을 모두 차지하도록 설정 */}
+        <div className="flex-grow flex flex-col">
+          <div className="flex-grow bg-secondary-50 dark:bg-dark-background-DEFAULT overflow-y-auto p-4">
+            <div className="container mx-auto max-w-4xl space-y-4">
+              {chatHistory.map((chat) => (
+                <motion.div
+                  key={chat.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={`flex ${chat.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  {chat.sender === 'character' && (
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden mr-2 flex-shrink-0">
+                      <Image
+                        src={character.imageUrl}
+                        alt={character.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  
+                  <div className={`max-w-[70%] rounded-lg p-3 ${
                     chat.sender === 'user' 
-                      ? 'text-primary-100 dark:text-dark-primary-300' 
-                      : 'text-secondary-500 dark:text-dark-secondary-500'
+                      ? 'bg-primary-500 dark:bg-dark-primary-600 text-white' 
+                      : 'bg-white dark:bg-dark-background-light text-secondary-900 dark:text-dark-secondary-700'
                   }`}>
-                    {formatTime(chat.timestamp)}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+                    <p className="text-sm">{chat.message}</p>
+                    <p className={`text-xs mt-1 ${
+                      chat.sender === 'user' 
+                        ? 'text-primary-100 dark:text-dark-primary-300' 
+                        : 'text-secondary-500 dark:text-dark-secondary-500'
+                    }`}>
+                      {formatTime(chat.timestamp)}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+          
+          {/* 메시지 입력 */}
+          <div className="bg-white dark:bg-dark-background-light shadow-t p-4">
+            <div className="container mx-auto max-w-4xl">
+              <form onSubmit={handleSendMessage} className="flex items-center">
+                <input
+                  type="text"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder={`${character.name}에게 메시지 보내기...`}
+                  className="flex-1 py-3 px-4 bg-secondary-50 dark:bg-dark-secondary-100/10 text-secondary-900 dark:text-dark-secondary-700 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500"
+                />
+                <button
+                  type="submit"
+                  className="py-3 px-4 bg-primary-500 hover:bg-primary-600 dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700 text-white rounded-r-lg transition-colors"
+                >
+                  <FontAwesomeIcon icon={faPaperPlane} />
+                </button>
+              </form>
+            </div>
           </div>
         </div>
         
-        {/* 메시지 입력 */}
-        <div className="bg-white dark:bg-dark-background-light shadow-t p-4">
-          <div className="container mx-auto max-w-4xl">
-            <form onSubmit={handleSendMessage} className="flex items-center">
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder={`${character.name}에게 메시지 보내기...`}
-                className="flex-1 py-3 px-4 bg-secondary-50 dark:bg-dark-secondary-100/10 text-secondary-900 dark:text-dark-secondary-700 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500"
-              />
-              <button
-                type="submit"
-                className="py-3 px-4 bg-primary-500 hover:bg-primary-600 dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700 text-white rounded-r-lg transition-colors"
-              >
-                <FontAwesomeIcon icon={faPaperPlane} />
-              </button>
-            </form>
-          </div>
-        </div>
-      </main>
+        <Footer />
+      </div>
     </PageTransition>
   )
 } 
