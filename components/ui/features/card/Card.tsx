@@ -26,11 +26,11 @@ export default function Card({ character, index = 0 }: CardProps) {
   return (
     <CardTransition index={index}>
       <div 
-        className="group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-dark-background-light dark:border dark:border-dark-secondary-200/10 cursor-pointer"
+        className="group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-dark-background-light dark: cursor-pointer"
         onClick={handleCardClick}
       >
         <div className="block">
-          <div className="relative aspect-[3/4] overflow-hidden rounded-t-xl">
+          <div className="relative aspect-[3/4] overflow-hidden rounded-xl">
             <Image
               src={imageUrl}
               alt={name}
@@ -59,7 +59,7 @@ export default function Card({ character, index = 0 }: CardProps) {
             )}
           </div>
           
-          <div className="p-4">
+          <div className="py-4">
             <h3 className="font-bold text-secondary-900 dark:text-dark-secondary-700 mb-1 truncate group-hover:text-primary-600 dark:group-hover:text-dark-primary-600 transition-colors">{name}</h3>
             
             <div className="mb-2 flex flex-wrap gap-1">
