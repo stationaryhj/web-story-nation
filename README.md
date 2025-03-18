@@ -1,94 +1,193 @@
-# StoryNation Frontend
+# StoryNation Front-End
 
+## 프로젝트 개요
 
-## eslint 규칙 및 설정
-1. 파일 이름은 대문자로 시작하지 않는다.
-2. 컴포넌트 파일은 대문자로 시작한다.
+**프로젝트 이름:** StoryNation  
+**버전:** 0.1.0  
+**개발 환경:**
 
-인터페이스 = 파스칼케이스
-메서드 = 카멜케이스,스네이크케이스,어퍼케이스
-펑션 = 카멜케이스, 파스칼케이스,
-이넘 = 카멜,파스칼,어퍼
-클레스 = 파스칼
-임포트 = 카멜,파스칼
+- Next.js 15.1.5
+- React 19.0.0
+- TypeScript 5.3.3
+- TailwindCSS 3.4.1
+- 기타 주요 라이브러리: Zustand, React Query, Axios, Framer Motion, Web3
 
+## 프로젝트 구조
 
+### 페이지 구조
 
-## 스켈레톤 UI 컴포넌트
+- **CSR**: 클라이언트 측에서 페이지가 렌더링됩니다.
+- **SSR**: 서버 측에서 페이지가 렌더링됩니다.
+- **SSG**: 정적 페이지로 미리 렌더링됩니다.
 
-이 프로젝트는 데이터 로딩 상태를 표시하기 위한 다양한 스켈레톤 UI 컴포넌트를 제공합니다.
+### 폴더 구조
 
-### 설치된 라이브러리
-
-- `react-loading-skeleton`: 스켈레톤 UI를 쉽게 구현할 수 있는 라이브러리
-
-### 사용 가능한 컴포넌트
-
-프로젝트에서는 다음과 같은 스켈레톤 컴포넌트를 제공합니다:
-
-1. **BaseSkeleton**: 기본 스켈레톤 컴포넌트
-2. **TextSkeleton**: 텍스트 로딩을 위한 스켈레톤
-3. **CardSkeleton**: 카드 UI를 위한 스켈레톤
-4. **ListItemSkeleton**: 리스트 아이템을 위한 스켈레톤
-5. **TableSkeleton**: 테이블을 위한 스켈레톤
-6. **ProfileSkeleton**: 프로필 UI를 위한 스켈레톤
-7. **GridSkeleton**: 그리드 레이아웃을 위한 스켈레톤
-
-### 사용 방법
-
-```tsx
-// 컴포넌트 가져오기
-import { 
-  TextSkeleton, 
-  CardSkeleton, 
-  ListItemSkeleton 
-} from '@/components/ui/skeleton';
-
-// 컴포넌트에서 사용하기
-function MyComponent() {
-  const { data, isLoading } = useQuery(...);
-
-  return (
-    <div>
-      {isLoading ? (
-        <CardSkeleton /> // 로딩 중일 때 스켈레톤 표시
-      ) : (
-        // 데이터가 로드된 후 실제 컨텐츠 표시
-        <div>
-          <h2>{data.title}</h2>
-          <p>{data.description}</p>
-        </div>
-      )}
-    </div>
-  );
-}
+```
+app/
+├── (routes)/
+│   ├── my-characters/
+│   │   ├── create/
+│   │   │   └── page.tsx
+│   │   ├── edit/[id]/
+│   │   │   └── page.tsx
+│   │   └── page.tsx
+│   ├── chat/
+│   │   ├── [id]/
+│   │   │   └── page.tsx
+│   │   └── page.tsx
+│   └── ...
+├── api/
+│   └── ...
+components/
+├── ui/
+│   ├── features/
+│   │   ├── card/
+│   │   │   └── Card.tsx
+│   │   └── ...
+│   └── motion/
+│       └── PageTransition.tsx
+├── modal/
+│   ├── Modal.tsx
+│   └── DeleteConfirmModal.tsx
+└── layout/
+    ├── header.tsx
+    └── ...
+store/
+├── useStoreData.ts
+├── useAuthStore.ts
+├── useStoreModal.ts
+└── ...
 ```
 
-### 테마 설정
+## ESLint 규칙 및 설정
 
-스켈레톤 UI의 테마를 전역적으로 설정하려면 `SkeletonThemeProvider`를 사용합니다:
+### 파일 이름 규칙
 
-```tsx
-import { SkeletonThemeProvider } from '@/components/ui/skeleton';
+1. **일반 파일**: 파일 이름은 **대문자로 시작하지 않는다**.
+   - 예시:
+     - `userProfile.tsx`
+     - `loginForm.tsx`
+     - `chatList.tsx`
+2. **컴포넌트 파일**: 컴포넌트 파일은 **대문자로 시작한다**.
+   - 예시:
+     - `UserProfile.tsx`
+     - `LoginForm.tsx`
+     - `ChatList.tsx`
 
-function App({ children }) {
-  return (
-    <SkeletonThemeProvider
-      baseColor="#E5E7EB"
-      highlightColor="#F3F4F6"
-      borderRadius="0.25rem"
-      duration={1.5}
-    >
-      {children}
-    </SkeletonThemeProvider>
-  );
+### 네이밍 규칙
+
+#### 1. **인터페이스 (Interface)**
+
+- **파스칼케이스 (PascalCase)** 사용
+- 예시:
+  - `UserProfile`
+  - `LoginFormProps`
+  - `ChatMessage`
+
+#### 2. **메서드 (Methods)**
+
+- **카멜케이스 (camelCase)** 또는 **스네이크케이스 (snake_case)** 또는 **어퍼케이스 (UPPERCASE)**를 사용
+- 예시:
+  - `handleClick()`
+  - `getUserData()`
+  - `update_profile()`
+  - `DELETE_USER_DATA`
+
+#### 3. **함수 (Function)**
+
+- **카멜케이스 (camelCase)** 또는 **파스칼케이스 (PascalCase)** 사용
+- 예시:
+  - `submitForm()`
+  - `toggleModal()`
+  - `MyComponent()`
+
+#### 4. **이넘 (Enum)**
+
+- **카멜케이스 (camelCase)**, **파스칼케이스 (PascalCase)**, 또는 **어퍼케이스 (UPPERCASE)** 사용
+- 예시:
+  - `UserRole`
+  - `OrderStatus`
+  - `STATUS_PENDING`
+
+#### 5. **클래스 (Class)**
+
+- **파스칼케이스 (PascalCase)** 사용
+- 예시:
+  - `UserProfile`
+  - `LoginModal`
+  - `ChatComponent`
+
+#### 6. **임포트 (Import)**
+
+- **카멜케이스 (camelCase)** 또는 **파스칼케이스 (PascalCase)** 사용
+- 예시:
+  - `import UserProfile from './UserProfile'`
+  - `import { useState } from 'react'`
+  - `import { getUserData } from './api/user'`
+
+### 컴포넌트 구조
+
+- **공통 컴포넌트**는 `components/ui/` 디렉토리에 보관됩니다.
+- **기능별 컴포넌트**는 `components/ui/features/` 아래에 구성됩니다.
+- **모달 컴포넌트**는 `components/modal/` 디렉토리에 구성됩니다.
+- **기능**은 콜백 함수로 받아서 처리하며, **스타일**은 props로 전달받은 타입에 맞춰 동적으로 변경됩니다.
+
+## Git 관리 및 브랜치 전략
+
+- **브랜치 전략**: `issue`, `branch` 방식으로 관리됩니다.
+
+## 타입스크립트 및 폴더 정리
+
+- **타입 분리**: 페이지별로 타입을 분리하여 관리합니다.
+  - 예: `types/main`, `types/chat`, `types/myCharacter` 등
+- **타입 및 인터페이스 분리**는 진행하지 않습니다.
+
+## 코드 스타일 가이드
+
+### ESLint & Prettier 적용
+
+프로젝트에 ESLint와 Prettier를 적용하여 코드 스타일을 통일합니다.
+
+- **ESLint**: 코드 품질 및 일관성을 유지하기 위해 사용됩니다.
+- **Prettier**: 코드 포맷팅을 자동으로 관리하여 개발자의 생산성을 높입니다.
+
+## 사용되는 도구 및 라이브러리
+
+### 주요 의존성 패키지
+
+```json
+{
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+    "@metamask/sdk": "^0.31.2",
+    "@tanstack/react-query": "^5.18.1",
+    "axios": "^1.6.7",
+    "bignumber.js": "^9.1.2",
+    "dotenv": "^16.4.7",
+    "framer-motion": "^12.5.0",
+    "i18next": "^24.2.1",
+    "idb": "^8.0.1",
+    "immer": "^10.1.1",
+    "next": "15.1.5",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-intersection-observer": "^9.15.0",
+    "react-loading-skeleton": "^3.5.0",
+    "web3": "^4.16.0",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.16",
+    "@types/react": "19.0.7",
+    "@types/react-dom": "19.0.3",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.33",
+    "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.5.11",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3"
+  }
 }
 ```
-
-### 예제 페이지
-
-스켈레톤 UI 컴포넌트의 사용 예제는 `/skeleton-example` 페이지에서 확인할 수 있습니다.
-
-## 기타 프로젝트 정보
-
-(기존 README 내용 유지) 
