@@ -149,10 +149,10 @@ export default tseslint.config(
         },
       ],
       '@typescript-eslint/no-empty-function': [ 'off' ],
-      '@typescript-eslint/no-unused-vars': [ 'error', { caughtErrors: 'none', ignoreRestSiblings: true } ],
+      '@typescript-eslint/no-unused-vars': [ 'warn', { caughtErrors: 'none', ignoreRestSiblings: true } ],
       '@typescript-eslint/no-use-before-define': 'off',
       '@typescript-eslint/no-useless-constructor': [ 'error' ],
-      '@typescript-eslint/no-explicit-any': [ 'error', { ignoreRestArgs: true } ],
+      '@typescript-eslint/no-explicit-any': [ 'warn', { ignoreRestArgs: true } ],
       '@typescript-eslint/no-unused-expressions': [ 'error', {
         allowShortCircuit: true,
         allowTernary: true,
@@ -175,7 +175,6 @@ export default tseslint.config(
         ignoreRefs: true,
         allowArrowFunctions: true,
         allowFunctions: true,
-        allowBind: false,
       } ],
       'react/jsx-curly-brace-presence': [ 'error', {
         props: 'never',
@@ -228,7 +227,6 @@ export default tseslint.config(
     rules: {
       ...nextJsPlugin.configs.recommended.rules,
       ...nextJsPlugin.configs['core-web-vitals'].rules,
-      '@next/next/no-img-element': 'warn',
     },
   },
 
@@ -349,7 +347,7 @@ export default tseslint.config(
         afterColon: true,
       } ],
       '@stylistic/keyword-spacing': 'error',
-      '@stylistic/linebreak-style': [ 'off', 'unix' ],
+      '@stylistic/linebreak-style': [ 'error', 'unix' ],
       '@stylistic/lines-around-comment': [ 'error', {
         beforeBlockComment: true,
         allowBlockStart: true,
@@ -403,8 +401,8 @@ export default tseslint.config(
       eqeqeq: [ 'error', 'allow-null' ],
       'id-match': [ 'error', '^[\\w$]+$' ],
       'max-len': [ 'warn', 160, 4 ],
-      'no-console': 'off',
-      'no-implicit-coercion': [ 'off', {
+      'no-console': 'warn',
+      'no-implicit-coercion': [ 'error', {
         number: true,
         'boolean': true,
         string: true,
