@@ -1,0 +1,154 @@
+# 이슈 기반 브랜치 자동 생성 워크플로우
+#
+# 이 워크플로우는 GitHub 이슈가 생성되거나 라벨이 추가될 때 자동으로 해당 이슈에 대한
+# 브랜치를 생성합니다. 특정 라벨(dev-required, bug, feature, enhancement)이 붙은
+# 이슈에 대해서만 브랜치가 생성됩니다.
+#
+# 라벨에 따라 브랜치 접두어가 다르게 적용됩니다:
+# - bug: fix-이슈번호-이슈제목
+# - feature: feat-이슈번호-이슈제목
+# - enhancement: enhance-이슈번호-이슈제목
+# - documentation: docs-이슈번호-이슈제목
+# - 기타: issue-이슈번호-이슈제목
+#
+# 작성자: GitHub Actions (자동 생성)
+# 최종 수정일: 2024-08-15
+
+name: Create Branch on Issue
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  create_branch:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: read
+      contents: write
+    # 이슈가 닫히지 않았을 때만 실행
+    if: github.event.issue.state != 'closed'
+    steps:
+      - name: Check if branch should be created
+        id: check_labels
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          script: |
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(label => label.name);
+
+            // 작업 요구 라벨 확인 (이 중 하나라도 있으면 브랜치 생성)
+            const workLabels = ['dev-required', 'bug', 'feature', 'enhancement'];
+            const shouldCreateBranch = labels.some(label => workLabels.includes(label));
+
+            // 작업 제외 라벨 확인 (이 중 하나라도 있으면 브랜치 생성 안함)
+            const excludeLabels = ['no-dev-required', 'question', 'duplicate'];
+            const hasExcludeLabel = labels.some(label => excludeLabels.includes(label));
+
+            if (!shouldCreateBranch || hasExcludeLabel) {
+              console.log('This issue does not require a branch');
+              return 'skip';
+            }
+            return 'create';
+
+      - name: Check if branch already exists
+        id: check_branch
+        if: steps.check_labels.outputs.result == 'create'
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          script: |
+            const issueNumber = context.issue.number;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber
+            });
+
+            // 이미 브랜치가 생성되었다는 코멘트가 있는지 확인
+            for (const comment of comments) {
+              if (comment.body.includes('브랜치') && comment.body.includes('생성되었습니다')) {
+                console.log('Branch already created for this issue');
+                return 'exists';
+              }
+            }
+            return 'not_exists';
+
+      # 브랜치를 생성해야 하고, 아직 생성되지 않았을 때만 실행
+      - name: Checkout repository
+        if: steps.check_labels.outputs.result == 'create' && steps.check_branch.outputs.result == 'not_exists'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create branch
+        if: steps.check_labels.outputs.result == 'create' && steps.check_branch.outputs.result == 'not_exists'
+        run: |
+          # 이슈 번호와 제목 가져오기
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
+          ISSUE_TITLE="${{ github.event.issue.title }}"
+
+          # 라벨에 따른 접두어 결정
+          PREFIX="issue"
+          LABELS="${{ toJSON(github.event.issue.labels) }}"
+
+          if echo "$LABELS" | grep -q '"name":"bug"'; then
+            PREFIX="fix"
+          elif echo "$LABELS" | grep -q '"name":"feature"'; then
+            PREFIX="feat"
+          elif echo "$LABELS" | grep -q '"name":"enhancement"'; then
+            PREFIX="enhance"
+          elif echo "$LABELS" | grep -q '"name":"documentation"'; then
+            PREFIX="docs"
+          fi
+
+          # 브랜치 이름 생성 (접두어-이슈 번호-이슈 제목)
+          # 제목에서 공백을 하이픈으로 변환하고 특수문자 제거
+          BRANCH_TITLE=$(echo "$ISSUE_TITLE" | tr ' ' '-' | tr -cd '[:alnum:]-' | tr '[:upper:]' '[:lower:]')
+          BRANCH_NAME="${PREFIX}-${ISSUE_NUMBER}-${BRANCH_TITLE}"
+
+          # 최대 길이 제한 (63자)
+          if [ ${#BRANCH_NAME} -gt 63 ]; then
+            BRANCH_NAME="${BRANCH_NAME:0:63}"
+          fi
+
+          # 로컬과 리모트에서 브랜치가 이미 존재하는지 확인
+          if git ls-remote --heads origin refs/heads/$BRANCH_NAME | grep -q refs/heads/$BRANCH_NAME; then
+            echo "Branch $BRANCH_NAME already exists on remote. Skipping branch creation."
+            exit 0
+          fi
+
+          # 새 브랜치 생성 및 푸시
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+
+          # main 브랜치에서 시작
+          git checkout main
+          git pull origin main
+
+          git checkout -b $BRANCH_NAME
+          git push -u origin $BRANCH_NAME
+
+          # 이슈에 코멘트 추가
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Comment on Issue
+        if: steps.check_labels.outputs.result == 'create' && steps.check_branch.outputs.result == 'not_exists' && env.BRANCH_NAME != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const branchName = process.env.BRANCH_NAME;
+            const issueNumber = context.issue.number;
+
+            if (!branchName) {
+              console.log('Branch name not set, skipping comment');
+              return;
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: `브랜치 \`${branchName}\`가 생성되었습니다. 이 브랜치를 사용하여 작업해주세요.\n\n> 이 브랜치를 로컬에 가져오려면:\n> \`\`\`bash\n> git fetch origin\n> git checkout ${branchName}\n> \`\`\``
+            });
