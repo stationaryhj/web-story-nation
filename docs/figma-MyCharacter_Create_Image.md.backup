@@ -1,20 +1,9 @@
 		- MyCharacter_Create_Image
 		
-![103:3461](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/d3401d8f-2ce8-472e-b18d-72e97d6b6cb9)
+![103:3461](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/628f24de-7b91-4abc-a973-19985221a864)
 Local file: docs/figma_img/103_3461.png
-			- MyCharacter_Create_Image
-			
-![103:3462](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/c0a0183d-84d3-4577-bb2e-8dbc4c60f843)
-Local file: docs/figma_img/103_3462.png
+			- Home_recommend
 				- frame
-				- button_adult_only
-					- 버튼
-					- 성인
-						• 성인
-				- Button_all_ages
-					- 버튼
-					- 전체
-						• 전체
 				- nav
 					- button_create_image
 						• 이미지
@@ -79,6 +68,20 @@ Local file: docs/figma_img/103_3462.png
 					- X
 						• X
 					- Rectangle 107
-					- 기본 이미지
-						• 기본 이미지
+					- ㅇ
+						• ㅇ
 					- Vector
+					- Filter_male
+						- 버튼
+						- 성인
+							• 성인
+					- Filter_recommended
+						- 버튼
+						- 전체
+							• 전체
+					- Filter_Female
+						- 버튼
+						- 성인2
+							• 성인2
+				- main
+					- Line 4

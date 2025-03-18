@@ -13,6 +13,8 @@ export default function CreateCharacterPage() {
 
   // 유효성 검사 상태
   const [isFormValid, setIsFormValid] = useState(false)
+  // 이미지 유효성 검사를 위한 별도 상태
+  const [isImageValid, setIsImageValid] = useState(false)
 
   // 폼 유효성 검사
   useEffect(() => {
@@ -22,13 +24,21 @@ export default function CreateCharacterPage() {
       } else if (activeTab === 'detail') {
         // 상세 설정에서의 유효성 검사 - 최소한 상세 설명이 있어야 함
         return formData.bioDetail.trim() !== ''
+      } else if (activeTab === 'image') {
+        // 이미지 탭에서는 별도의 상태로 관리
+        return isImageValid
       }
 
       return true
     }
 
     setIsFormValid(validateForm())
-  }, [activeTab, formData])
+  }, [activeTab, formData, isImageValid])
+
+  // 이미지 유효성 상태 업데이트 핸들러
+  const handleImageValidationChange = (isValid: boolean) => {
+    setIsImageValid(isValid)
+  }
 
   // 다음 버튼 클릭 핸들러
   const handleNext = () => {
@@ -105,7 +115,11 @@ export default function CreateCharacterPage() {
             {/* 폼 컨텐츠 */}
             <div className="p-6">
               <FadeIn>
-                <CharacterForm formType="create" mode={activeTab} />
+                <CharacterForm
+                  formType="create"
+                  mode={activeTab}
+                  onValidationChange={activeTab === 'image' ? handleImageValidationChange : undefined}
+                />
               </FadeIn>
             </div>
 

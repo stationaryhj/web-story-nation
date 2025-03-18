@@ -2,20 +2,13 @@
 
 import type { Character } from '@/store/useStoreData'
 import { useStoreData } from '@/store/useStoreData'
-import {
-  faPaperPlane,
-  faArrowLeft,
-  faHeart,
-  faShare,
-  faDownload,
-  faEllipsisVertical,
-} from '@fortawesome/free-solid-svg-icons'
+import { faPaperPlane, faArrowLeft, faGift, faCaretDown, faEllipsisH } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { FormEvent } from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 interface ChatDetailClientProps {
   characterId: string
@@ -33,6 +26,22 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
       timestamp: Date
     }>
   >([])
+  const [showModeDropdown, setShowModeDropdown] = useState(false)
+  const [currentMode, setCurrentMode] = useState('짜릿모드2')
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // 드롭다운 외부 클릭 감지
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowModeDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   // 캐릭터 정보 로드
   useEffect(() => {
@@ -114,6 +123,11 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
 
+  const handleModeSelect = (mode: string) => {
+    setCurrentMode(mode)
+    setShowModeDropdown(false)
+  }
+
   if (!character) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -123,85 +137,125 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
   }
 
   return (
-    <div className="flex-grow container mx-auto">
-      <div className="flex flex-col md:flex-row h-[calc(100vh-64px)]">
-        {/* 왼쪽 이미지 영역 (모바일에서는 상단에 표시) */}
-        <div className="md:w-4/10 relative h-[40vh] md:h-full order-1 md:order-1">
-          <div className="absolute inset-0">
+    <div className="flex flex-col h-screen">
+      {/* 상단 헤더 - Figma 디자인 기반으로 수정 */}
+      <div className="bg-white dark:bg-dark-background-light shadow-sm px-4 py-3 flex items-center border-b border-gray-200 dark:border-gray-700">
+        <Link href="/chat" className="text-gray-500">
+          <FontAwesomeIcon icon={faArrowLeft} />
+        </Link>
+
+        <div className="flex items-center mx-4">
+          <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 border border-gray-200">
             <Image
               src={character.imageUrl || '/images/character1.jpg'}
               alt={character.name}
               fill
-              className="object-cover object-center"
-              priority
+              className="object-cover"
             />
-
-            {/* 이미지 상단 네비게이션 */}
-            <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-10">
-              <Link href="/chat-list" className="text-white bg-black/30 p-2 rounded-full backdrop-blur-sm">
-                <FontAwesomeIcon icon={faArrowLeft} />
+          </div>
+          <div>
+            <div className="flex items-center">
+              <h2 className="font-medium text-black dark:text-white">{character.name}</h2>
+              <Link href={`/chat/character/${characterId}`} className="ml-2 text-primary-500">
+                <FontAwesomeIcon icon={faArrowLeft} className="transform rotate-180" />
               </Link>
-              <div className="text-white bg-black/30 p-2 rounded-full backdrop-blur-sm">
-                <FontAwesomeIcon icon={faEllipsisVertical} />
-              </div>
             </div>
+            <div className="flex gap-1">
+              {character.hashtags?.map((tag: string, index: number) => (
+                <span key={index} className="text-xs text-gray-500">
+                  #{tag}
+                </span>
+              )) || (
+                <>
+                  <span className="text-xs text-gray-500">#태그</span>
+                  <span className="text-xs text-gray-500">#태그</span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
 
-            {/* 이미지 하단 정보 */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 text-white">
-              <h2 className="text-xl font-bold">{character.name}</h2>
-              <p className="text-sm text-white/80">{character.isAdult ? '19+ 캐릭터' : '전체 이용가능'}</p>
+        {/* 헤더 우측 아이콘들 - Figma 디자인 기반으로 수정 */}
+        <div className="ml-auto flex items-center gap-4">
+          <div className="flex items-center">
+            <FontAwesomeIcon icon={faGift} className="text-gray-500" />
+            <span className="ml-1 text-sm font-semibold">121</span>
+          </div>
 
-              {/* 액션 버튼 */}
-              <div className="flex mt-3 space-x-4">
-                <button className="text-white/90 hover:text-white">
-                  <FontAwesomeIcon icon={faHeart} />
-                </button>
-                <button className="text-white/90 hover:text-white">
-                  <FontAwesomeIcon icon={faShare} />
-                </button>
-                <button className="text-white/90 hover:text-white">
-                  <FontAwesomeIcon icon={faDownload} />
-                </button>
+          <div className="relative" ref={dropdownRef}>
+            <button
+              className="flex items-center space-x-1 bg-violet-500 text-white px-3 py-1.5 rounded-3xl"
+              onClick={() => setShowModeDropdown(!showModeDropdown)}
+            >
+              <span className="text-sm">{currentMode}</span>
+              <FontAwesomeIcon icon={faCaretDown} className="text-xs" />
+            </button>
+
+            {showModeDropdown && (
+              <div className="absolute right-0 mt-1 w-36 bg-white rounded-lg shadow-lg z-50 border border-gray-200">
+                <ul>
+                  <li
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => handleModeSelect('일반모드')}
+                  >
+                    일반모드
+                  </li>
+                  <li
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => handleModeSelect('짜릿모드1')}
+                  >
+                    짜릿모드1
+                  </li>
+                  <li
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer bg-gray-100"
+                    onClick={() => handleModeSelect('짜릿모드2')}
+                  >
+                    짜릿모드2
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
+
+          <span className="font-semibold">600</span>
+
+          <button className="text-gray-500">
+            <FontAwesomeIcon icon={faEllipsisH} />
+          </button>
+        </div>
+      </div>
+
+      {/* 메인 채팅 영역 */}
+      <div className="flex flex-1 overflow-hidden bg-neutral-100">
+        {/* 왼쪽 이미지 영역 */}
+        <div className="hidden md:block w-1/2 relative">
+          <div className="absolute inset-0 flex flex-col justify-center items-center">
+            <div className="relative w-full h-full">
+              <Image
+                src={character.imageUrl || '/images/character1.jpg'}
+                alt={character.name}
+                fill
+                className="object-cover object-center"
+                priority
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <h1 className="text-4xl font-bold text-white text-shadow-lg">{character.name}</h1>
               </div>
             </div>
           </div>
         </div>
 
-        {/* 오른쪽 채팅 영역 (모바일에서는 하단에 표시) */}
-        <div className="md:w-6/10 flex flex-col bg-white dark:bg-dark-background-DEFAULT order-2 md:order-2 h-full">
-          {/* 채팅 헤더 */}
-          <div className="bg-white dark:bg-dark-background-light shadow-sm p-3 flex items-center">
-            <div className="md:hidden mr-4 text-secondary-500 dark:text-dark-secondary-500">
-              <FontAwesomeIcon icon={faArrowLeft} />
-            </div>
-
-            <div className="flex items-center">
-              <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3">
-                <Image
-                  src={character.imageUrl || '/images/character1.jpg'}
-                  alt={character.name}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div>
-                <h2 className="font-bold text-secondary-900 dark:text-dark-secondary-700">{character.name}</h2>
-                <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-                  {character.isAdult ? '19+ 캐릭터' : '전체 이용가능'}
-                </p>
-              </div>
-            </div>
-          </div>
-
+        {/* 오른쪽 채팅 영역 - Figma 디자인 기반으로 수정 */}
+        <div className="w-full md:w-1/2 flex flex-col bg-white">
           {/* 채팅 내용 */}
-          <div className="flex-grow overflow-y-auto p-4 bg-secondary-50 dark:bg-dark-background-light">
+          <div className="flex-1 overflow-y-auto p-4 bg-neutral-100">
             <div className="space-y-4">
               {chatHistory.map(chat => (
                 <motion.div
                   key={chat.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
+                  transition={{ duration: 0.2 }}
                   className={`flex ${chat.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   {chat.sender === 'character' && (
@@ -216,18 +270,16 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
                   )}
 
                   <div
-                    className={`max-w-[70%] rounded-lg p-3 ${
+                    className={`max-w-[75%] rounded-lg px-3 py-2 ${
                       chat.sender === 'user'
-                        ? 'bg-primary-500 dark:bg-dark-primary-600 text-white'
-                        : 'bg-white dark:bg-dark-background-light text-secondary-900 dark:text-dark-secondary-700'
+                        ? 'bg-violet-500 text-white'
+                        : 'bg-white text-gray-800 border border-gray-200'
                     }`}
                   >
-                    <p className="text-sm">{chat.message}</p>
+                    <p className="text-sm whitespace-pre-wrap">{chat.message}</p>
                     <p
-                      className={`text-xs mt-1 ${
-                        chat.sender === 'user'
-                          ? 'text-primary-100 dark:text-dark-primary-300'
-                          : 'text-secondary-500 dark:text-dark-secondary-500'
+                      className={`text-xs mt-1 text-right ${
+                        chat.sender === 'user' ? 'text-violet-200' : 'text-gray-500'
                       }`}
                     >
                       {formatTime(chat.timestamp)}
@@ -239,18 +291,19 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
           </div>
 
           {/* 메시지 입력 */}
-          <div className="bg-white dark:bg-dark-background-light p-4 border-t border-secondary-100 dark:border-dark-secondary-200">
+          <div className="bg-white p-3 border-t border-gray-200">
             <form onSubmit={handleSendMessage} className="flex items-center">
               <input
                 type="text"
                 value={message}
                 onChange={e => setMessage(e.target.value)}
-                placeholder={`${character.name}에게 메시지 보내기...`}
-                className="flex-1 py-3 px-4 bg-secondary-50 dark:bg-dark-secondary-100/10 text-secondary-900 dark:text-dark-secondary-700 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500"
+                placeholder="대화를 입력하세요. (예) 안녕! 뭐해?"
+                className="flex-1 py-2 px-3 bg-neutral-100 text-gray-800 rounded-l-lg border-0 focus:outline-none"
               />
               <button
                 type="submit"
-                className="py-3 px-4 bg-primary-500 hover:bg-primary-600 dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700 text-white rounded-r-lg transition-colors"
+                className="py-2 px-3 bg-white text-violet-500 rounded-r-lg transition-colors hover:text-violet-600"
+                disabled={!message.trim()}
               >
                 <FontAwesomeIcon icon={faPaperPlane} />
               </button>
