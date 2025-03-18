@@ -1,5 +1,9 @@
-'use client';
+import ImageCharacterPage from '@/views/myCharacters/image'
 
-export default function ImageCharacterPage() {
-  return <div>{ /* 이 페이지는 직접 접근하지 않고, 탭 UI를 통해 관리됩니다. */ }</div>;
+export default function page() {
+  return (
+    <>
+      <ImageCharacterPage />
+    </>
+  )
 }
