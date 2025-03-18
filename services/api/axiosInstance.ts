@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const HEADER_NAME_AUTH_TOKEN = "ca" as const;
+const HEADER_NAME_AUTH_TOKEN = 'ca' as const;
 
 // 공통 axios 인스턴스
 const api = axios.create({
@@ -9,7 +9,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true
+  withCredentials: true,
 });
 
 // Request 인터셉터
@@ -28,7 +28,7 @@ api.interceptors.request.use(
   // 에러 처리
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // 응답 인터셉터 설정
@@ -52,9 +52,9 @@ api.interceptors.response.use(
       console.error('Request Error:', error.message);
       return Promise.reject({ message: '요청 중 오류가 발생했습니다.' });
     }
-  }
+  },
 );
 
 //토큰 만료시
 
-export { api, HEADER_NAME_AUTH_TOKEN }; 
+export { api, HEADER_NAME_AUTH_TOKEN };

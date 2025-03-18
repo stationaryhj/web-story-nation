@@ -1,77 +1,77 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import Header from '@/components/layout/header'
-import CardGrid from '@/components/ui/features/card/CardGrid'
-import Footer from '@/components/layout/footer'
-import Navigation from '@/components/ui/features/navigation/Navigation'
-import { useStoreData } from '@/store/useStoreData'
-import PageTransition, { SectionTransition } from '@/components/ui/motion/PageTransition'
+import Footer from '@/components/layout/footer';
+import Header from '@/components/layout/header';
+import CardGrid from '@/components/ui/features/card/CardGrid';
+import Navigation from '@/components/ui/features/navigation/Navigation';
+import PageTransition, { SectionTransition } from '@/components/ui/motion/PageTransition';
+import { useStoreData } from '@/store/useStoreData';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
-  const [activeCategory, setActiveCategory] = useState('recommended')
-  const [searchQuery, setSearchQuery] = useState('')
-  const { fetchCharacters } = useStoreData()
+  const [ activeCategory, setActiveCategory ] = useState('recommended');
+  const [ searchQuery, setSearchQuery ] = useState('');
+  const { fetchCharacters } = useStoreData();
 
   useEffect(() => {
     // 페이지 로드 시 모든 캐릭터 데이터 미리 로드
-    fetchCharacters()
-  }, [fetchCharacters])
+    fetchCharacters();
+  }, [ fetchCharacters ]);
 
   const handleCategoryChange = (categoryId: string) => {
-    setActiveCategory(categoryId)
-  }
+    setActiveCategory(categoryId);
+  };
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query)
+    setSearchQuery(query);
     // 여기서 검색 로직 구현
-    console.log('검색어:', query)
-  }
+    console.log('검색어:', query);
+  };
 
   // 검색 중일 때는 검색 결과만 표시
   if (searchQuery) {
     return (
       <PageTransition>
         <main className="min-h-screen pb-20">
-          <Header />
-          <Navigation onCategoryChange={handleCategoryChange} onSearch={handleSearch} />
+          <Header/>
+          <Navigation onCategoryChange={ handleCategoryChange } onSearch={ handleSearch }/>
           <SectionTransition className="py-10 bg-gradient-to-b from-white via-background-light to-white dark:from-dark-background-light dark:via-dark-background-DEFAULT dark:to-dark-background-light">
-            <CardGrid title={`'${searchQuery}' 검색 결과`} categoryId={activeCategory} />
+            <CardGrid title={ `'${ searchQuery }' 검색 결과` } categoryId={ activeCategory }/>
           </SectionTransition>
-          <Footer />
+          <Footer/>
         </main>
       </PageTransition>
-    )
+    );
   }
 
   return (
     <PageTransition>
       <main className="min-h-screen pb-20">
-        <Header />
-        <Navigation onCategoryChange={handleCategoryChange} onSearch={handleSearch} />
+        <Header/>
+        <Navigation onCategoryChange={ handleCategoryChange } onSearch={ handleSearch }/>
 
-        {/* 추천 캐릭터 섹션 */}
-        <SectionTransition className="py-12 bg-white dark:bg-dark-background-light" delay={0.1}>
-          <CardGrid title="추천 캐릭터" categoryId="recommended" />
+        { /* 추천 캐릭터 섹션 */ }
+        <SectionTransition className="py-12 bg-white dark:bg-dark-background-light" delay={ 0.1 }>
+          <CardGrid title="추천 캐릭터" categoryId="recommended"/>
         </SectionTransition>
 
-        {/* 남성 캐릭터 섹션 */}
-        <SectionTransition className="py-12 bg-white dark:bg-dark-background-light" delay={0.2}>
-          <CardGrid title="남성 캐릭터" categoryId="male" />
+        { /* 남성 캐릭터 섹션 */ }
+        <SectionTransition className="py-12 bg-white dark:bg-dark-background-light" delay={ 0.2 }>
+          <CardGrid title="남성 캐릭터" categoryId="male"/>
         </SectionTransition>
 
-        {/* 여성 캐릭터 섹션 */}
-        <SectionTransition className="py-12 bg-white dark:bg-dark-background-light" delay={0.3}>
-          <CardGrid title="여성 캐릭터" categoryId="female" />
+        { /* 여성 캐릭터 섹션 */ }
+        <SectionTransition className="py-12 bg-white dark:bg-dark-background-light" delay={ 0.3 }>
+          <CardGrid title="여성 캐릭터" categoryId="female"/>
         </SectionTransition>
 
-        {/* 성별 미지정 캐릭터 섹션 */}
-        <SectionTransition className="py-12 bg-white dark:bg-dark-background-light" delay={0.4}>
-          <CardGrid title="성별 미지정 캐릭터" categoryId="unspecified" />
+        { /* 성별 미지정 캐릭터 섹션 */ }
+        <SectionTransition className="py-12 bg-white dark:bg-dark-background-light" delay={ 0.4 }>
+          <CardGrid title="성별 미지정 캐릭터" categoryId="unspecified"/>
         </SectionTransition>
 
-        <Footer />
+        <Footer/>
       </main>
     </PageTransition>
-  )
+  );
 }

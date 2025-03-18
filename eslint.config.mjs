@@ -152,7 +152,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-vars': [ 'error', { caughtErrors: 'none', ignoreRestSiblings: true } ],
       '@typescript-eslint/no-use-before-define': 'off',
       '@typescript-eslint/no-useless-constructor': [ 'error' ],
-      '@typescript-eslint/no-explicit-any': [ 'error', { ignoreRestArgs: true } ],
+      '@typescript-eslint/no-explicit-any': [ 'off', { ignoreRestArgs: true } ],
       '@typescript-eslint/no-unused-expressions': [ 'error', {
         allowShortCircuit: true,
         allowTernary: true,
@@ -402,7 +402,7 @@ export default tseslint.config(
       // rules customizations
       eqeqeq: [ 'error', 'allow-null' ],
       'id-match': [ 'error', '^[\\w$]+$' ],
-      'max-len': [ 'warn', 160, 4 ],
+      'max-len': [ 'off', 160, 4 ],
       'no-console': 'off',
       'no-implicit-coercion': [ 'off', {
         number: true,

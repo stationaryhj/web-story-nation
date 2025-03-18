@@ -11,5 +11,5 @@ export const useTooltipStore = create<TooltipState>((set) => ({
   showInfo: false,
   position: 'top',
   setShowInfo: (show) => set({ showInfo: show }),
-  setPosition: (position) => set({ position })
-})); 
+  setPosition: (position) => set({ position }),
+}));

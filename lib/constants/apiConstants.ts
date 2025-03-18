@@ -3,7 +3,7 @@ export const API_ENDPOINTS = {
   USER: '/api/users',
   AUTH: '/api/auth',
   CHAT: '/api/chats',
-} as const
+} as const;
 
 export const API_METHODS = {
   GET: 'GET',
@@ -11,4 +11,4 @@ export const API_METHODS = {
   PUT: 'PUT',
   DELETE: 'DELETE',
   PATCH: 'PATCH',
-} as const 
+} as const;

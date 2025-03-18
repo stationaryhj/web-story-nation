@@ -1,21 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false)
+  const [ matches, setMatches ] = useState(false);
 
   useEffect(() => {
-    const media = window.matchMedia(query)
-    
+    const media = window.matchMedia(query);
+
     // 초기값 설정
-    setMatches(media.matches)
+    setMatches(media.matches);
 
     // 리스너 설정
-    const listener = (e: MediaQueryListEvent) => setMatches(e.matches)
-    media.addEventListener('change', listener)
+    const listener = (e: MediaQueryListEvent) => setMatches(e.matches);
+    media.addEventListener('change', listener);
 
     // 클린업
-    return () => media.removeEventListener('change', listener)
-  }, [query])
+    return () => media.removeEventListener('change', listener);
+  }, [ query ]);
 
-  return matches
-} 
+  return matches;
+}

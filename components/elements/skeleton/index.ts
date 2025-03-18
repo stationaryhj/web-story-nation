@@ -6,9 +6,9 @@ import Skeleton, {
   TableSkeleton,
   ProfileSkeleton,
   GridSkeleton,
-  SkeletonProvider
-} from './Skeleton'
-import SkeletonThemeProvider from './SkeletonTheme'
+  SkeletonProvider,
+} from './Skeleton';
+import SkeletonThemeProvider from './SkeletonTheme';
 
 export {
   BaseSkeleton,
@@ -19,7 +19,7 @@ export {
   ProfileSkeleton,
   GridSkeleton,
   SkeletonProvider,
-  SkeletonThemeProvider
-}
+  SkeletonThemeProvider,
+};
 
-export default Skeleton 
+export default Skeleton;

@@ -1,48 +1,48 @@
 // store/useStoreData.ts
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 // 캐릭터 타입 정의
 export interface Character {
-  id: string
-  name: string
-  description: string
-  imageUrl: string
-  commentCount: number
-  hashtags: string[]
-  isAdult: boolean
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  commentCount: number;
+  hashtags: Array<string>;
+  isAdult: boolean;
   creator: {
-    id: string
-    nickname: string
-    username: string
-    profileImageUrl: string | null
-    isActive: boolean
-  }
-  category: 'male' | 'female' | 'unspecified' // 카테고리 추가
+    id: string;
+    nickname: string;
+    username: string;
+    profileImageUrl: string | null;
+    isActive: boolean;
+  };
+  category: 'male' | 'female' | 'unspecified'; // 카테고리 추가
 }
 
 // 스토어 타입 정의
 interface DataStore {
-  characters: Character[]
-  maleCharacters: Character[]
-  femaleCharacters: Character[]
-  unspecifiedCharacters: Character[]
-  recommendedCharacters: Character[]
-  isLoading: boolean
-  error: string | null
-  fetchCharacters: () => Promise<void>
-  fetchCategoryCharacters: (category: string) => Promise<Character[]>
+  characters: Array<Character>;
+  maleCharacters: Array<Character>;
+  femaleCharacters: Array<Character>;
+  unspecifiedCharacters: Array<Character>;
+  recommendedCharacters: Array<Character>;
+  isLoading: boolean;
+  error: string | null;
+  fetchCharacters: () => Promise<void>;
+  fetchCategoryCharacters: (category: string) => Promise<Array<Character>>;
 }
 
 // 임시 데이터
-const dummyCharacters: Character[] = [
+const dummyCharacters: Array<Character> = [
   {
     id: '1',
     name: '에단 카터',
     description: '미식축구도, 사랑도 전력 질주가 원칙. 목표는 단 하나, 내 심장을 터치다운하는 것.',
     imageUrl: '/images/character1.jpg',
     commentCount: 151,
-    hashtags: ['#스포츠', '#로맨스', '#미식축구'],
+    hashtags: [ '#스포츠', '#로맨스', '#미식축구' ],
     isAdult: false,
     creator: {
       id: '8f20beae-23ed-4ebe-a786-6174d4e7224d',
@@ -51,7 +51,7 @@ const dummyCharacters: Character[] = [
       profileImageUrl: null,
       isActive: true,
     },
-    category: 'male'
+    category: 'male',
   },
   {
     id: '2',
@@ -59,7 +59,7 @@ const dummyCharacters: Character[] = [
     description: '한국계 미국인 천재 해커. 낮에는 평범한 대학생, 밤에는 사이버 세계의 정의를 실현하는 비밀 요원.',
     imageUrl: '/images/character1.jpg',
     commentCount: 89,
-    hashtags: ['#액션', '#스릴러', '#해커'],
+    hashtags: [ '#액션', '#스릴러', '#해커' ],
     isAdult: false,
     creator: {
       id: '7a30beae-45ed-4ebe-a786-6174d4e7224d',
@@ -68,7 +68,7 @@ const dummyCharacters: Character[] = [
       profileImageUrl: null,
       isActive: true,
     },
-    category: 'female'
+    category: 'female',
   },
   {
     id: '3',
@@ -76,7 +76,7 @@ const dummyCharacters: Character[] = [
     description: '이탈리아 출신의 미스터리한 셰프. 그의 요리에는 사람의 마음을 사로잡는 마법 같은 비밀이 있다.',
     imageUrl: '/images/character1.jpg',
     commentCount: 210,
-    hashtags: ['#요리', '#로맨스', '#판타지'],
+    hashtags: [ '#요리', '#로맨스', '#판타지' ],
     isAdult: false,
     creator: {
       id: '5f20beae-23ed-4ebe-a786-6174d4e7224d',
@@ -85,7 +85,7 @@ const dummyCharacters: Character[] = [
       profileImageUrl: null,
       isActive: true,
     },
-    category: 'male'
+    category: 'male',
   },
   {
     id: '4',
@@ -93,7 +93,7 @@ const dummyCharacters: Character[] = [
     description: '도쿄의 밤을 지배하는 언더그라운드 DJ. 음악으로 사람들의 영혼을 움직이는 능력을 가졌다.',
     imageUrl: '/images/character1.jpg',
     commentCount: 175,
-    hashtags: ['#음악', '#드라마', '#도쿄'],
+    hashtags: [ '#음악', '#드라마', '#도쿄' ],
     isAdult: false,
     creator: {
       id: '9f20beae-23ed-4ebe-a786-6174d4e7224d',
@@ -102,7 +102,7 @@ const dummyCharacters: Character[] = [
       profileImageUrl: null,
       isActive: true,
     },
-    category: 'female'
+    category: 'female',
   },
   {
     id: '5',
@@ -110,7 +110,7 @@ const dummyCharacters: Character[] = [
     description: '전직 러시아 특수부대 요원. 과거의 그림자에서 벗어나 평범한 삶을 꿈꾸지만, 과거는 그를 쉽게 놓아주지 않는다.',
     imageUrl: '/images/character1.jpg',
     commentCount: 132,
-    hashtags: ['#액션', '#스릴러', '#첩보'],
+    hashtags: [ '#액션', '#스릴러', '#첩보' ],
     isAdult: true,
     creator: {
       id: '3f20beae-23ed-4ebe-a786-6174d4e7224d',
@@ -119,7 +119,7 @@ const dummyCharacters: Character[] = [
       profileImageUrl: null,
       isActive: true,
     },
-    category: 'male'
+    category: 'male',
   },
   {
     id: '6',
@@ -127,7 +127,7 @@ const dummyCharacters: Character[] = [
     description: '뉴욕의 야심 찬 패션 디자이너. 화려한 패션계의 이면에 숨겨진 어두운 비밀을 파헤친다.',
     imageUrl: '/images/character1.jpg',
     commentCount: 98,
-    hashtags: ['#패션', '#미스터리', '#뉴욕'],
+    hashtags: [ '#패션', '#미스터리', '#뉴욕' ],
     isAdult: false,
     creator: {
       id: '2f20beae-23ed-4ebe-a786-6174d4e7224d',
@@ -136,7 +136,7 @@ const dummyCharacters: Character[] = [
       profileImageUrl: null,
       isActive: true,
     },
-    category: 'female'
+    category: 'female',
   },
   {
     id: '7',
@@ -144,7 +144,7 @@ const dummyCharacters: Character[] = [
     description: '정체를 알 수 없는 미스터리한 인물. 과거도, 성별도 알려진 바 없지만 놀라운 능력을 가지고 있다.',
     imageUrl: '/images/character1.jpg',
     commentCount: 245,
-    hashtags: ['#미스터리', '#판타지', '#초능력'],
+    hashtags: [ '#미스터리', '#판타지', '#초능력' ],
     isAdult: false,
     creator: {
       id: '1f20beae-23ed-4ebe-a786-6174d4e7224d',
@@ -153,7 +153,7 @@ const dummyCharacters: Character[] = [
       profileImageUrl: null,
       isActive: true,
     },
-    category: 'unspecified'
+    category: 'unspecified',
   },
   {
     id: '8',
@@ -161,7 +161,7 @@ const dummyCharacters: Character[] = [
     description: '성별에 구애받지 않는 자유로운 영혼. 예술과 음악을 통해 자신의 정체성을 표현한다.',
     imageUrl: '/images/character1.jpg',
     commentCount: 178,
-    hashtags: ['#예술', '#음악', '#자유'],
+    hashtags: [ '#예술', '#음악', '#자유' ],
     isAdult: false,
     creator: {
       id: '4f20beae-23ed-4ebe-a786-6174d4e7224d',
@@ -170,12 +170,12 @@ const dummyCharacters: Character[] = [
       profileImageUrl: null,
       isActive: true,
     },
-    category: 'unspecified'
-  }
+    category: 'unspecified',
+  },
 ];
 
 // 추천 캐릭터 ID 목록 (실제로는 알고리즘에 의해 결정될 수 있음)
-const recommendedIds = ['1', '4', '5', '7'];
+const recommendedIds = [ '1', '4', '5', '7' ];
 
 // Zustand 스토어 생성
 export const useStoreData = create<DataStore>((set, get) => ({
@@ -186,38 +186,38 @@ export const useStoreData = create<DataStore>((set, get) => ({
   recommendedCharacters: [],
   isLoading: false,
   error: null,
-  
-  fetchCharacters: async () => {
+
+  fetchCharacters: async() => {
     set({ isLoading: true, error: null });
-    
+
     try {
-      // 실제 API 호출 대신 임시 데이터 사용 
+      // 실제 API 호출 대신 임시 데이터 사용
       // 실제 구현에서는 axios 등을 사용하여 API 호출
       await new Promise(resolve => setTimeout(resolve, 1000)); // 로딩 시뮬레이션
-      
+
       // 카테고리별로 캐릭터 분류
       const maleChars = dummyCharacters.filter(char => char.category === 'male');
       const femaleChars = dummyCharacters.filter(char => char.category === 'female');
       const unspecifiedChars = dummyCharacters.filter(char => char.category === 'unspecified');
       const recommendedChars = dummyCharacters.filter(char => recommendedIds.includes(char.id));
-      
-      set({ 
-        characters: dummyCharacters, 
+
+      set({
+        characters: dummyCharacters,
         maleCharacters: maleChars,
         femaleCharacters: femaleChars,
         unspecifiedCharacters: unspecifiedChars,
         recommendedCharacters: recommendedChars,
-        isLoading: false 
+        isLoading: false,
       });
     } catch (error) {
       set({ error: '캐릭터 데이터를 불러오는데 실패했습니다.', isLoading: false });
     }
   },
-  
-  fetchCategoryCharacters: async (category: string) => {
+
+  fetchCategoryCharacters: async(category: string) => {
     // 이미 데이터가 있으면 바로 반환
     if (get().characters.length > 0) {
-      switch(category) {
+      switch (category) {
         case 'male':
           return get().maleCharacters;
         case 'female':
@@ -230,12 +230,12 @@ export const useStoreData = create<DataStore>((set, get) => ({
           return get().characters;
       }
     }
-    
+
     // 데이터가 없으면 먼저 불러오기
     await get().fetchCharacters();
-    
+
     // 불러온 후 카테고리에 맞는 데이터 반환
-    switch(category) {
+    switch (category) {
       case 'male':
         return get().maleCharacters;
       case 'female':
@@ -247,7 +247,7 @@ export const useStoreData = create<DataStore>((set, get) => ({
       default:
         return get().characters;
     }
-  }
+  },
 }));
 
 // 다크모드 스토어 타입 정의
@@ -289,6 +289,6 @@ export const useThemeStore = create<ThemeStore>()(
       name: 'theme-storage', // 로컬 스토리지 키 이름
       storage: createJSONStorage(() => safeStorage),
       skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
-    }
-  )
+    },
+  ),
 );
