@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ReactNode } from 'react'
+import { ReactNode, useState, useEffect } from 'react'
 
 interface PageTransitionProps {
   children: ReactNode
@@ -11,15 +11,10 @@ interface PageTransitionProps {
 export default function PageTransition({ children, className = '' }: PageTransitionProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{
-        type: 'spring',
-        stiffness: 260,
-        damping: 20,
-        duration: 0.3
-      }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
       className={className}
     >
       {children}
@@ -58,18 +53,10 @@ export function CardTransition({
 }: PageTransitionProps & { index?: number }) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{
-        type: 'spring',
-        stiffness: 260,
-        damping: 20,
-        delay: index * 0.05 // 카드마다 약간의 딜레이를 줘서 순차적으로 나타나게 함
-      }}
-      whileHover={{ 
-        y: -8,
-        transition: { duration: 0.2 }
-      }}
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 50 }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
       className={className}
     >
       {children}
@@ -87,6 +74,16 @@ export function FadeIn({
   delay?: number,
   direction?: 'up' | 'down' | 'left' | 'right' | 'none'
 }) {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  
+  if (!mounted) {
+    return <div className="opacity-0">{children}</div>
+  }
+
   const directionVariants = {
     up: { y: 20 },
     down: { y: -20 },
@@ -107,7 +104,7 @@ export function FadeIn({
         y: 0
       }}
       transition={{
-        duration: 0.5,
+        duration: 0.3,
         delay: delay
       }}
       className={className}

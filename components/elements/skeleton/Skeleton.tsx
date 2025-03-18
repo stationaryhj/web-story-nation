@@ -48,9 +48,9 @@ export const CardSkeleton = ({ imageHeight = 200, ...rest }: {
   [key: string]: any
 }) => {
   return (
-    <div className="rounded-lg overflow-hidden shadow-sm border border-gray-200">
+    <div className="rounded-lg overflow-hidden shadow-sm ">
       <BaseSkeleton height={imageHeight} {...rest} />
-      <div className="p-4 space-y-3">
+      <div className="py-4 space-y-3">
         <BaseSkeleton height={24} width="70%" {...rest} />
         <BaseSkeleton count={2} height={16} {...rest} />
         <div className="flex justify-between pt-2">

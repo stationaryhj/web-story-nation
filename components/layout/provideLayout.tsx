@@ -14,8 +14,6 @@ interface ProvideLayoutProps {
 }
 
 export default function ProvideLayout({ children }: ProvideLayoutProps) {
-  const [selectedNetwork, setSelectedNetwork] = useState('ethereum')
-  const [walletConnected, setWalletConnected] = useState(false)
   const pathname = usePathname()
   const systemInfo = useQuery({
     queryKey: ['systemInfo'],

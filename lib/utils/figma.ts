@@ -57,6 +57,8 @@ const CAPTURE_CONFIG: CaptureConfigs = {
   Chat_main: { scale: 1, format: 'png' },
   MyCharacter_Create: { scale: 1, format: 'png' },
   Chat_list: { scale: 1, format: 'png' },
+  Home_Login_popup1: { scale: 1, format: 'png' },
+  Setting: { scale: 1, format: 'png' },
   MyCharacter_home: { scale: 1, format: 'png' },
   MyCharacter_Create_Detail: { scale: 1, format: 'png' },
   MyCharacter_Create_Image: { scale: 1, format: 'png' },

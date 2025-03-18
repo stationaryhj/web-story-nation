@@ -62,7 +62,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="font-sans bg-background dark:bg-gradient-dark transition-colors duration-300">
+      <body className="font-sans bg-background dark:bg-gradient-dark transition-colors duration-300" suppressHydrationWarning>
         <Providers>{children}</Providers>
       </body>
     </html>

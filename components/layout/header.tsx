@@ -3,19 +3,27 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faShoppingBag, faCog, faMoon, faSun, faBars, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { useThemeStore } from '@/store/useStoreData'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FadeIn } from '@/components/ui/motion/PageTransition'
+import { useModalStore } from '@/store/useStoreModal'
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const { isDarkMode, toggleDarkMode } = useThemeStore()
   const [mounted, setMounted] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const pathname = usePathname()
   const [activeLink, setActiveLink] = useState('/')
+<<<<<<< HEAD
 
+=======
+  const { openModal } = useModalStore()
+  
+>>>>>>> 24c00138d96f0184be09f46f55ccb384b06cf61e
   // 네비게이션 링크
   const navLinks = [
     { href: '/', label: '홈' },
@@ -27,6 +35,7 @@ export default function Header() {
   // 컴포넌트가 마운트되었는지 확인
   useEffect(() => {
     setMounted(true)
+<<<<<<< HEAD
 
     // 현재 경로 확인
     if (typeof window !== 'undefined') {
@@ -40,6 +49,20 @@ export default function Header() {
     // 클라이언트 사이드에서만 실행
     if (typeof window === 'undefined' || !mounted) return
 
+=======
+    
+    // 현재 경로 확인 - usePathname 훅 사용으로 대체
+    if (pathname) {
+      setActiveLink(pathname)
+    }
+  }, [pathname])
+  
+  // 다크모드 변경 시 HTML에 클래스 추가/제거
+  useEffect(() => {
+    // 클라이언트 사이드에서만 실행
+    if (!mounted) return;
+    
+>>>>>>> 24c00138d96f0184be09f46f55ccb384b06cf61e
     if (isDarkMode) {
       document.documentElement.classList.add('dark')
     } else {
@@ -49,6 +72,8 @@ export default function Header() {
 
   // 사이드바가 열렸을 때 스크롤 방지
   useEffect(() => {
+    if (!mounted) return;
+    
     if (isSidebarOpen) {
       document.body.style.overflow = 'hidden'
     } else {
@@ -58,8 +83,13 @@ export default function Header() {
     return () => {
       document.body.style.overflow = 'auto'
     }
+<<<<<<< HEAD
   }, [isSidebarOpen])
 
+=======
+  }, [isSidebarOpen, mounted])
+  
+>>>>>>> 24c00138d96f0184be09f46f55ccb384b06cf61e
   // 클라이언트 사이드 렌더링 전에는 아이콘 표시하지 않음
   const themeIcon = mounted ? (isDarkMode ? faSun : faMoon) : null
   const themeText = mounted ? (isDarkMode ? '라이트 모드' : '다크 모드') : '테마 모드'
@@ -67,7 +97,7 @@ export default function Header() {
   return (
     <motion.header
       className="sticky top-0 z-50 bg-white dark:bg-dark-background-light shadow-sm dark:shadow-dark-primary-300/20"
-      initial={{ y: -100 }}
+      initial={{ y:0 }}
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
@@ -109,6 +139,7 @@ export default function Header() {
           >
             <FontAwesomeIcon icon={faBars} className="text-2xl" />
           </motion.button>
+<<<<<<< HEAD
 
           <motion.button
             onClick={toggleDarkMode}
@@ -121,6 +152,27 @@ export default function Header() {
             <span className="ml-2 text-sm hidden md:inline">{themeText}</span>
           </motion.button>
 
+=======
+          
+          {mounted && (
+            <motion.button 
+              onClick={toggleDarkMode}
+              className="p-2 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
+              aria-label={isDarkMode ? '라이트 모드로 전환' : '다크 모드로 전환'}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <FontAwesomeIcon 
+                icon={themeIcon || faMoon} 
+                className="text-lg" 
+              />
+              <span className="ml-2 text-sm hidden md:inline">
+                {themeText}
+              </span>
+            </motion.button>
+          )}
+          
+>>>>>>> 24c00138d96f0184be09f46f55ccb384b06cf61e
           <div className="h-5 w-px bg-secondary-200 dark:bg-dark-secondary-300 hidden md:block"></div>
 
           <motion.button
@@ -138,7 +190,21 @@ export default function Header() {
           >
             <FontAwesomeIcon icon={faShoppingBag} className="text-lg" />
           </motion.button>
+<<<<<<< HEAD
 
+=======
+          
+          <Link href="/settings">
+            <motion.button 
+              className="p-2 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <FontAwesomeIcon icon={faCog} className="text-lg" />
+            </motion.button>
+          </Link>
+          
+>>>>>>> 24c00138d96f0184be09f46f55ccb384b06cf61e
           {isLoggedIn ? (
             <motion.button
               className="p-2 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
@@ -149,12 +215,23 @@ export default function Header() {
             </motion.button>
           ) : (
             <FadeIn>
+<<<<<<< HEAD
               <Link
                 href="/login"
                 className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
               >
                 로그인
               </Link>
+=======
+              {mounted && (
+                <button 
+                  onClick={() => openModal('login')}
+                  className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
+                >
+                  로그인
+                </button>
+              )}
+>>>>>>> 24c00138d96f0184be09f46f55ccb384b06cf61e
             </FadeIn>
           )}
         </div>
@@ -162,7 +239,7 @@ export default function Header() {
 
       {/* 모바일 사이드바 */}
       <AnimatePresence>
-        {isSidebarOpen && (
+        {isSidebarOpen && mounted && (
           <>
             {/* 배경 오버레이 */}
             <motion.div
