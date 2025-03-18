@@ -1,6 +1,7 @@
 import Header from '@/components/layout/header'
 import PageTransition from '@/components/motion/PageTransition'
 import { Suspense, use } from 'react'
+
 import ChatDetailClient from '@/views/chat/detail'
 
 export default function ChatDetailPage({ params }: { params: Promise<{ id: string }> }) {

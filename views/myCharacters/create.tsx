@@ -125,7 +125,7 @@ export default function CreateCharacterPage() {
                 className={`px-6 py-3 rounded-lg transition-colors ${
                   isFormValid
                     ? 'bg-primary-500 hover:bg-primary-600 text-white dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600'
-                    : 'bg-primary-300 text-white cursor-not-allowed dark:bg-dark-primary-800 dark:text-dark-secondary-300'
+                    : 'bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-400'
                 }`}
               >
                 {activeTab === 'image' ? '완료' : '다음'}
