@@ -144,20 +144,22 @@ store/
 
 이슈가 생성되면 자동으로 해당 이슈에 대한 브랜치가 생성됩니다.
 
-- **작동 방식**:
+- **지원하는 라벨과 브랜치 접두어**:
 
-  - 특정 라벨(`dev-required`, `bug`, `feature`, `enhancement`)이 있는 이슈에 대해서만 브랜치가 생성됩니다.
-  - 이슈 라벨에 따라 브랜치 접두어가 다르게 적용됩니다 (예: `fix-`, `feat-`, `enhance-`).
-  - 이슈가 닫히면 브랜치가 생성되지 않습니다.
-  - 브랜치 이름은 `[접두어]-[이슈번호]-[이슈제목]` 형식으로 생성됩니다.
-
-- **예시**:
-
-  - 이슈: "로그인 버튼 디자인 개선" (이슈 번호 #42, 라벨: `enhancement`)
-  - 생성되는 브랜치: `enhance-42-로그인-버튼-디자인-개선`
+  - `build`: `build-이슈번호-이슈제목`
+  - `documentation`: `docs-이슈번호-이슈제목`
+  - `enhancement`: `enhance-이슈번호-이슈제목`
+  - `feature`: `feat-이슈번호-이슈제목`
+  - `fix`: `fix-이슈번호-이슈제목`
+  - `perf`: `perf-이슈번호-이슈제목`
+  - `refactor`: `refactor-이슈번호-이슈제목`
+  - `revert`: `revert-이슈번호-이슈제목`
+  - `style`: `style-이슈번호-이슈제목`
+  - `test`: `test-이슈번호-이슈제목`
+  - `기타`: `issue-이슈번호-이슈제목`
 
 - **제외 대상**:
-  - `no-dev-required`, `question`, `duplicate` 라벨이 있는 이슈는 브랜치가 생성되지 않습니다.
+  - `wontfix`, `invalid`, `duplicate`, `question` 라벨이 있는 이슈는 브랜치가 생성되지 않습니다.
 
 ## 타입스크립트 및 폴더 정리
 
