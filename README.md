@@ -156,7 +156,7 @@ store/
   - `revert`: `revert-이슈번호-이슈제목`
   - `style`: `style-이슈번호-이슈제목`
   - `test`: `test-이슈번호-이슈제목`
-  - `기타`: `issue-이슈번호-이슈제목`
+  - `other`: `issue-이슈번호-이슈제목`
 
 - **제외 대상**:
   - `wontfix`, `invalid`, `duplicate`, `question` 라벨이 있는 이슈는 브랜치가 생성되지 않습니다.

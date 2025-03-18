@@ -14,7 +14,7 @@
 # - revert: revert-이슈번호-이슈제목
 # - style: style-이슈번호-이슈제목
 # - test: test-이슈번호-이슈제목
-# - 기타: issue-이슈번호-이슈제목
+# - other: issue-이슈번호-이슈제목
 #
 # 작성자: GitHub Actions (자동 생성)
 # 최종 수정일: 2024-08-15
@@ -46,7 +46,7 @@ jobs:
             // 작업 요구 라벨 확인 (이 중 하나라도 있으면 브랜치 생성)
             const workLabels = [
               'build', 'documentation', 'enhancement', 'feature', 
-              'fix', 'perf', 'refactor', 'revert', 'style', 'test', '기타'
+              'fix', 'perf', 'refactor', 'revert', 'style', 'test', 'other'
             ];
             const shouldCreateBranch = labels.some(label => workLabels.includes(label));
 
@@ -95,7 +95,6 @@ jobs:
         id: issue_details
         uses: actions/github-script@v7
         with:
-          result-encoding: string
           script: |
             const issue = context.payload.issue;
             const issueNumber = issue.number;
@@ -124,7 +123,7 @@ jobs:
               prefix = "style";
             } else if (labels.includes('test')) {
               prefix = "test";
-            } else if (labels.includes('기타')) {
+            } else if (labels.includes('other')) {
               prefix = "issue";
             }
 
@@ -142,19 +141,16 @@ jobs:
               branchName = branchName.substring(0, 63);
             }
 
-            return {
-              issueNumber: issueNumber,
-              branchName: branchName
-            };
+            core.setOutput('issue_number', issueNumber);
+            core.setOutput('branch_name', branchName);
 
       - name: Create branch
         if: steps.check_labels.outputs.result == 'create' && steps.check_branch.outputs.result == 'not_exists'
         run: |
-          # JSON 파싱을 통해 변수 설정
-          ISSUE_DETAILS='${{ steps.issue_details.outputs.result }}'
-          BRANCH_NAME=$(echo $ISSUE_DETAILS | jq -r '.branchName')
+          # 환경 변수 설정
+          BRANCH_NAME="${{ steps.issue_details.outputs.branch_name }}"
 
-          echo "브랜치 이름: $BRANCH_NAME"
+          echo "Branch name: $BRANCH_NAME"
 
           # 로컬과 리모트에서 브랜치가 이미 존재하는지 확인
           if git ls-remote --heads origin refs/heads/"$BRANCH_NAME" | grep -q refs/heads/"$BRANCH_NAME"; then
@@ -182,8 +178,7 @@ jobs:
         with:
           script: |
             const branchName = process.env.BRANCH_NAME;
-            const issueDetails = JSON.parse('${{ steps.issue_details.outputs.result }}');
-            const issueNumber = issueDetails.issueNumber;
+            const issueNumber = ${{ steps.issue_details.outputs.issue_number }};
 
             if (!branchName) {
               console.log('Branch name not set, skipping comment');
@@ -194,5 +189,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issueNumber,
-              body: `브랜치 \`${branchName}\`가 생성되었습니다. 이 브랜치를 사용하여 작업해주세요.\n\n> 이 브랜치를 로컬에 가져오려면:\n> \`\`\`bash\n> git fetch origin\n> git checkout ${branchName}\n> \`\`\``
+              body: `Branch \`${branchName}\` has been created. Please use this branch for your work.\n\n> To get this branch locally:\n> \`\`\`bash\n> git fetch origin\n> git checkout ${branchName}\n> \`\`\``
             });
