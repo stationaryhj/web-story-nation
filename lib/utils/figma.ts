@@ -59,6 +59,7 @@ const CAPTURE_CONFIG: CaptureConfigs = {
   Chat_list: { scale: 1, format: 'png' },
   MyCharacter_home: { scale: 1, format: 'png' },
   MyCharacter_Create_Detail: { scale: 1, format: 'png' },
+  MyCharacter_Create_Image: { scale: 1, format: 'png' },
 }
 
 // 환경 변수 검증 함수
