@@ -90,53 +90,74 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set issue details
+        if: steps.check_labels.outputs.result == 'create' && steps.check_branch.outputs.result == 'not_exists'
+        id: issue_details
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          script: |
+            const issue = context.payload.issue;
+            const issueNumber = issue.number;
+            const issueTitle = issue.title;
+            const labels = issue.labels.map(label => label.name);
+
+            // 라벨에 따른 접두어 결정
+            let prefix = "issue";
+            if (labels.includes('build')) {
+              prefix = "build";
+            } else if (labels.includes('documentation')) {
+              prefix = "docs";
+            } else if (labels.includes('enhancement')) {
+              prefix = "enhance";
+            } else if (labels.includes('feature')) {
+              prefix = "feat";
+            } else if (labels.includes('fix')) {
+              prefix = "fix";
+            } else if (labels.includes('perf')) {
+              prefix = "perf";
+            } else if (labels.includes('refactor')) {
+              prefix = "refactor";
+            } else if (labels.includes('revert')) {
+              prefix = "revert";
+            } else if (labels.includes('style')) {
+              prefix = "style";
+            } else if (labels.includes('test')) {
+              prefix = "test";
+            } else if (labels.includes('기타')) {
+              prefix = "issue";
+            }
+
+            // 브랜치 이름 생성 (접두어-이슈 번호-이슈 제목)
+            // 제목에서 공백을 하이픈으로 변환하고 특수문자 제거
+            const branchTitle = issueTitle
+              .replace(/ /g, '-')
+              .replace(/[^\w\-]/g, '')
+              .toLowerCase();
+
+            let branchName = `${prefix}-${issueNumber}-${branchTitle}`;
+
+            // 최대 길이 제한 (63자)
+            if (branchName.length > 63) {
+              branchName = branchName.substring(0, 63);
+            }
+
+            return {
+              issueNumber: issueNumber,
+              branchName: branchName
+            };
+
       - name: Create branch
         if: steps.check_labels.outputs.result == 'create' && steps.check_branch.outputs.result == 'not_exists'
         run: |
-          # 이슈 번호와 제목 가져오기
-          ISSUE_NUMBER="${{ github.event.issue.number }}"
-          ISSUE_TITLE="${{ github.event.issue.title }}"
+          # JSON 파싱을 통해 변수 설정
+          ISSUE_DETAILS='${{ steps.issue_details.outputs.result }}'
+          BRANCH_NAME=$(echo $ISSUE_DETAILS | jq -r '.branchName')
 
-          # 라벨에 따른 접두어 결정
-          PREFIX="issue"
-          LABELS="${{ toJSON(github.event.issue.labels) }}"
-
-          if echo "$LABELS" | grep -q '"name":"build"'; then
-            PREFIX="build"
-          elif echo "$LABELS" | grep -q '"name":"documentation"'; then
-            PREFIX="docs"
-          elif echo "$LABELS" | grep -q '"name":"enhancement"'; then
-            PREFIX="enhance"
-          elif echo "$LABELS" | grep -q '"name":"feature"'; then
-            PREFIX="feat"
-          elif echo "$LABELS" | grep -q '"name":"fix"'; then
-            PREFIX="fix"
-          elif echo "$LABELS" | grep -q '"name":"perf"'; then
-            PREFIX="perf"
-          elif echo "$LABELS" | grep -q '"name":"refactor"'; then
-            PREFIX="refactor"
-          elif echo "$LABELS" | grep -q '"name":"revert"'; then
-            PREFIX="revert"
-          elif echo "$LABELS" | grep -q '"name":"style"'; then
-            PREFIX="style"
-          elif echo "$LABELS" | grep -q '"name":"test"'; then
-            PREFIX="test"
-          elif echo "$LABELS" | grep -q '"name":"기타"'; then
-            PREFIX="issue"
-          fi
-
-          # 브랜치 이름 생성 (접두어-이슈 번호-이슈 제목)
-          # 제목에서 공백을 하이픈으로 변환하고 특수문자 제거
-          BRANCH_TITLE=$(echo "$ISSUE_TITLE" | tr ' ' '-' | tr -cd '[:alnum:]-' | tr '[:upper:]' '[:lower:]')
-          BRANCH_NAME="${PREFIX}-${ISSUE_NUMBER}-${BRANCH_TITLE}"
-
-          # 최대 길이 제한 (63자)
-          if [ ${#BRANCH_NAME} -gt 63 ]; then
-            BRANCH_NAME="${BRANCH_NAME:0:63}"
-          fi
+          echo "브랜치 이름: $BRANCH_NAME"
 
           # 로컬과 리모트에서 브랜치가 이미 존재하는지 확인
-          if git ls-remote --heads origin refs/heads/$BRANCH_NAME | grep -q refs/heads/$BRANCH_NAME; then
+          if git ls-remote --heads origin refs/heads/"$BRANCH_NAME" | grep -q refs/heads/"$BRANCH_NAME"; then
             echo "Branch $BRANCH_NAME already exists on remote. Skipping branch creation."
             exit 0
           fi
@@ -149,8 +170,8 @@ jobs:
           git checkout main
           git pull origin main
 
-          git checkout -b $BRANCH_NAME
-          git push -u origin $BRANCH_NAME
+          git checkout -b "$BRANCH_NAME"
+          git push -u origin "$BRANCH_NAME"
 
           # 이슈에 코멘트 추가
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
@@ -161,7 +182,8 @@ jobs:
         with:
           script: |
             const branchName = process.env.BRANCH_NAME;
-            const issueNumber = context.issue.number;
+            const issueDetails = JSON.parse('${{ steps.issue_details.outputs.result }}');
+            const issueNumber = issueDetails.issueNumber;
 
             if (!branchName) {
               console.log('Branch name not set, skipping comment');
