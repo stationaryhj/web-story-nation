@@ -7,6 +7,7 @@ import { SectionTransition, FadeIn } from '@/components/ui/motion/PageTransition
 import { Character } from '@/store/useStoreData'
 import { useCharacterFormStore, ConversationExample } from '../../../../../store/useCharacterFormStore'
 import CharacterForm from '../../components/CharacterForm'
+import Card from '@/components/ui/features/card/Card'
 
 // 임시 데이터 (실제로는 API에서 가져옴)
 const MOCK_CHARACTER = {
@@ -115,7 +116,7 @@ export default function EditCharacterPage() {
     try {
       // 실제 API 호출로 대체될 부분
       alert('캐릭터가 성공적으로 수정되었습니다!')
-      router.push('/MyCharacter')
+      router.push('/my-characters')
     } catch (error) {
       console.error('캐릭터 수정 실패:', error)
       alert('캐릭터 수정에 실패했습니다. 다시 시도해주세요.')

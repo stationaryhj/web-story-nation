@@ -5,7 +5,7 @@ import ChatDetailClient from './chat-detail-client'
 
 export default function ChatDetailPage({ params }: { params: Promise<{ id: string }> }) {
   // params를 use() 함수로 unwrap하여 사용
-  const unwrappedParams = use(params)
+  const unwrappedParams = use(params);
 
   return (
     <PageTransition>
