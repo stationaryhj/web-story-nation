@@ -3,6 +3,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
   faBell, 
@@ -23,6 +24,7 @@ export default function Header() {
   const { isDarkMode, toggleDarkMode } = useThemeStore()
   const [mounted, setMounted] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const pathname = usePathname()
   const [activeLink, setActiveLink] = useState('/')
   const { openModal } = useModalStore()
   
@@ -38,17 +40,16 @@ export default function Header() {
   useEffect(() => {
     setMounted(true)
     
-    // 현재 경로 확인
-    if (typeof window !== 'undefined') {
-      const path = window.location.pathname
-      setActiveLink(path)
+    // 현재 경로 확인 - usePathname 훅 사용으로 대체
+    if (pathname) {
+      setActiveLink(pathname)
     }
-  }, [])
+  }, [pathname])
   
   // 다크모드 변경 시 HTML에 클래스 추가/제거
   useEffect(() => {
     // 클라이언트 사이드에서만 실행
-    if (typeof window === 'undefined' || !mounted) return;
+    if (!mounted) return;
     
     if (isDarkMode) {
       document.documentElement.classList.add('dark')
@@ -59,6 +60,8 @@ export default function Header() {
   
   // 사이드바가 열렸을 때 스크롤 방지
   useEffect(() => {
+    if (!mounted) return;
+    
     if (isSidebarOpen) {
       document.body.style.overflow = 'hidden'
     } else {
@@ -68,7 +71,7 @@ export default function Header() {
     return () => {
       document.body.style.overflow = 'auto'
     }
-  }, [isSidebarOpen])
+  }, [isSidebarOpen, mounted])
   
   // 클라이언트 사이드 렌더링 전에는 아이콘 표시하지 않음
   const themeIcon = mounted ? (isDarkMode ? faSun : faMoon) : null
@@ -77,7 +80,7 @@ export default function Header() {
   return (
     <motion.header 
       className="sticky top-0 z-50 bg-white dark:bg-dark-background-light shadow-sm dark:shadow-dark-primary-300/20"
-      initial={{ y: -100 }}
+      initial={{ y:0 }}
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
     >
@@ -120,23 +123,23 @@ export default function Header() {
             <FontAwesomeIcon icon={faBars} className="text-2xl" />
           </motion.button>
           
-          <motion.button 
-            onClick={toggleDarkMode}
-            className="p-2 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
-            aria-label={mounted ? (isDarkMode ? '라이트 모드로 전환' : '다크 모드로 전환') : '테마 모드 전환'}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {mounted && (
+          {mounted && (
+            <motion.button 
+              onClick={toggleDarkMode}
+              className="p-2 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
+              aria-label={isDarkMode ? '라이트 모드로 전환' : '다크 모드로 전환'}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <FontAwesomeIcon 
                 icon={themeIcon || faMoon} 
                 className="text-lg" 
               />
-            )}
-            <span className="ml-2 text-sm hidden md:inline">
-              {themeText}
-            </span>
-          </motion.button>
+              <span className="ml-2 text-sm hidden md:inline">
+                {themeText}
+              </span>
+            </motion.button>
+          )}
           
           <div className="h-5 w-px bg-secondary-200 dark:bg-dark-secondary-300 hidden md:block"></div>
           
@@ -156,6 +159,16 @@ export default function Header() {
             <FontAwesomeIcon icon={faShoppingBag} className="text-lg" />
           </motion.button>
           
+          <Link href="/settings">
+            <motion.button 
+              className="p-2 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <FontAwesomeIcon icon={faCog} className="text-lg" />
+            </motion.button>
+          </Link>
+          
           {isLoggedIn ? (
             <motion.button 
               className="p-2 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
@@ -166,12 +179,14 @@ export default function Header() {
             </motion.button>
           ) : (
             <FadeIn>
-              <button 
-                onClick={() => openModal('login')}
-                className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
-              >
-                로그인
-              </button>
+              {mounted && (
+                <button 
+                  onClick={() => openModal('login')}
+                  className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
+                >
+                  로그인
+                </button>
+              )}
             </FadeIn>
           )}
         </div>
@@ -179,7 +194,7 @@ export default function Header() {
       
       {/* 모바일 사이드바 */}
       <AnimatePresence>
-        {isSidebarOpen && (
+        {isSidebarOpen && mounted && (
           <>
             {/* 배경 오버레이 */}
             <motion.div 
