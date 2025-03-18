@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { useCharacterFormStore, ConversationExample } from '../store'
+import { useCharacterFormStore, ConversationExample } from '../../../../../store/useCharacterFormStore'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faPencilAlt, faTrash, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons'
 

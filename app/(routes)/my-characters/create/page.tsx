@@ -3,86 +3,15 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { SectionTransition, FadeIn } from '@/components/ui/motion/PageTransition'
-import { Character } from '@/store/useStoreData'
-import { useCharacterFormStore, ConversationExample } from '../../create/store'
-import CharacterForm from '../../components/CharacterForm'
+import { useCharacterFormStore } from '../../../../store/useCharacterFormStore'
+import CharacterForm from '../components/CharacterForm'
 
-interface EditCharacterPageProps {
-  params: {
-    id: string
-  }
-}
-
-// 임시 데이터 (실제로는 API에서 가져옴)
-const MOCK_CHARACTER = {
-  id: '1',
-  name: '고양이 앤지',
-  gender: 'female',
-  visibility: 'private',
-  bio: '뾰로롱~ 고양이 앤지에요! 집사님과 놀아요~',
-  firstMessage: '안녕하세요 집사님~! 오늘은 저를 얼마나 예뻐해 주실 건가요?',
-  hashtags: ['#로맨스', '#판타지', '#성장'],
-  bioDetail:
-    '한국의 서울에 사는 4살 고양이입니다. 츤데레 성격이지만 마음은 따뜻해요. 집사를 좋아하고 츄르를 좋아해요. 가끔 새침하게 굴지만 관심을 많이 받고 싶어하는 귀여운 성격이에요.',
-  detailVisibility: 'private',
-  conversationExamples: [
-    {
-      id: '1',
-      text: '집사: 앤지야 오늘 뭐하고 놀까?\n앤지: 츄르주면 같이 놀아줄게냥. 아, 딱히 놀고싶어서가 아니라 심심해서 그런거야!',
-      isEditing: false,
-      visibility: 'private',
-    },
-    {
-      id: '2',
-      text: '집사: 앤지 오늘 너무 귀엽다~\n앤지: 흥! 당연하지! 난 매일 귀여운걸! ...근데 오늘은 특별히 더 귀엽다고...?',
-      isEditing: false,
-      visibility: 'private',
-    },
-  ],
-  imageUrl: '/images/character-1.jpg',
-}
-
-export default function EditCharacterPage({ params }: EditCharacterPageProps) {
+export default function CreateCharacterPage() {
   const router = useRouter()
-  const { activeTab, setActiveTab, formData, setFormField, resetForm } = useCharacterFormStore()
+  const { activeTab, setActiveTab, formData } = useCharacterFormStore()
 
   // 유효성 검사 상태
   const [isFormValid, setIsFormValid] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  // 캐릭터 데이터 로드 (실제로는 API에서 가져옴)
-  useEffect(() => {
-    // API 호출 대신 임시 데이터 사용
-    const loadCharacter = async () => {
-      try {
-        setIsLoading(true)
-        // 실제 API 호출로 대체될 부분 - 지금은 mock 데이터 사용
-
-        resetForm() // 이전 데이터 초기화
-
-        // 캐릭터 데이터를 스토어에 설정
-        Object.entries(MOCK_CHARACTER).forEach(([key, value]) => {
-          if (key !== 'id') {
-            setFormField(key as any, value)
-          }
-        })
-
-        setIsLoading(false)
-      } catch (error) {
-        console.error('캐릭터 로딩 실패:', error)
-        setError('캐릭터를 불러오는 중 오류가 발생했습니다.')
-        setIsLoading(false)
-      }
-    }
-
-    loadCharacter()
-
-    // 컴포넌트 언마운트 시 폼 초기화
-    return () => {
-      resetForm()
-    }
-  }, [params.id, resetForm, setFormField])
 
   // 폼 유효성 검사
   useEffect(() => {
@@ -115,31 +44,22 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
   // 폼 제출 핸들러
   const handleSubmit = async () => {
     try {
-      // 실제 API 호출로 대체될 부분
-      alert('캐릭터가 성공적으로 수정되었습니다!')
+      // API 호출 (실제 구현 시 추가)
+      // const response = await fetch('/api/characters', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify(formData),
+      // })
+
+      // 임시 처리 (성공으로 가정)
+      alert('캐릭터가 성공적으로 생성되었습니다!')
       router.push('/MyCharacter')
     } catch (error) {
-      console.error('캐릭터 수정 실패:', error)
-      alert('캐릭터 수정에 실패했습니다. 다시 시도해주세요.')
+      console.error('캐릭터 생성 실패:', error)
+      alert('캐릭터 생성에 실패했습니다. 다시 시도해주세요.')
     }
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-secondary-50 dark:bg-dark-background flex items-center justify-center">
-        <div className="animate-pulse text-secondary-500 dark:text-dark-secondary-500">
-          캐릭터 정보를 불러오는 중...
-        </div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-secondary-50 dark:bg-dark-background flex items-center justify-center">
-        <div className="text-red-500 dark:text-red-400">{error}</div>
-      </div>
-    )
   }
 
   return (
@@ -184,7 +104,7 @@ export default function EditCharacterPage({ params }: EditCharacterPageProps) {
             {/* 폼 컨텐츠 */}
             <div className="p-6">
               <FadeIn>
-                <CharacterForm formType="edit" mode={activeTab} />
+                <CharacterForm formType="create" mode={activeTab} />
               </FadeIn>
             </div>
 

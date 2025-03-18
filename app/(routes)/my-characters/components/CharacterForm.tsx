@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faUpload, faTimes } from '@fortawesome/free-solid-svg-icons'
-import { useCharacterFormStore, useImageStore } from '../create/store'
+import { useCharacterFormStore, useImageStore } from '../../../../store/useCharacterFormStore'
 import DetailCharacterPage from '../create/detail/page'
 
 // 해시태그 데이터

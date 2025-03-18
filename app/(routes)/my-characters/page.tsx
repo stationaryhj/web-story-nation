@@ -49,12 +49,12 @@ export default function MyCharacterPage() {
 
   // 캐릭터 생성 페이지로 이동
   const handleCreateCharacter = () => {
-    router.push('/MyCharacter/create')
+    router.push('/my-characters/create')
   }
 
   // 캐릭터 수정 처리
   const handleEditCharacter = (characterId: string) => {
-    router.push(`/MyCharacter/edit/${characterId}`)
+    router.push(`/my-characters/edit/${characterId}`)
   }
 
   // 캐릭터 삭제 처리
@@ -79,7 +79,8 @@ export default function MyCharacterPage() {
 
   // 캐릭터 클릭 시 대화방으로 이동
   const handleCardClick = (characterId: string) => {
-    router.push(`/chat/${characterId}`)
+    const parsedId = Number(characterId)
+    router.push(`/chat/?characterId=${parsedId}`)
   }
 
   // 모든 페이지의 캐릭터 데이터를 하나의 배열로 변환
@@ -120,15 +121,15 @@ export default function MyCharacterPage() {
                 .fill(0)
                 .map((_, index) => <CardSkeleton key={index} />)
             ) : allCharacters.length > 0 ? (
-              // 캐릭터 카드 표시
               allCharacters.map((character, index) => (
                 <MyCharacterCard
                   key={character.id}
                   character={character}
                   index={index}
-                  onCardClick={() => handleCardClick(character.id)}
-                  onEdit={() => handleEditCharacter(character.id)}
-                  onDelete={() => handleDeleteCharacter(character.id)}
+                  // 이 부분은 수정 시 꼭 id값 확인해야됨, 임시 데이터로 넣어둠
+                  onCardClick={() => handleCardClick(character.id + 1)}
+                  onEdit={() => handleEditCharacter(character.id + 1)}
+                  onDelete={() => handleDeleteCharacter(character.id + 1)}
                 />
               ))
             ) : (
@@ -167,7 +168,7 @@ function getMockCharacters(page: number) {
   const characters: Character[] = Array(ITEMS_PER_PAGE)
     .fill(0)
     .map((_, idx) => ({
-      id: `my-char-${startIdx + idx}`,
+      id: `${startIdx + idx}`,
       name: `내 캐릭터 ${startIdx + idx + 1}`,
       description: `이것은 내가 만든 ${startIdx + idx + 1}번째 캐릭터입니다. 다양한 대화를 나눠보세요.`,
       imageUrl: '/images/character1.jpg',
