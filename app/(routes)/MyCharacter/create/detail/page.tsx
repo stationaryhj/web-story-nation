@@ -38,7 +38,7 @@ export default function DetailCharacterPage() {
 
   // 공개/비공개 변경 핸들러
   const handleVisibilitySelect = (visibility: 'public' | 'private') => {
-    setFormField('detailVisibility', visibility)
+    setFormField('visibility', visibility)
   }
 
   // 대화 예시 추가 버튼 핸들러
@@ -147,7 +147,7 @@ export default function DetailCharacterPage() {
             type="button"
             onClick={() => handleVisibilitySelect('private')}
             className={`w-full px-4 py-3 rounded-lg text-center transition-colors ${
-              formData.detailVisibility === 'private'
+              formData.visibility === 'private'
                 ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                 : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
             }`}
@@ -158,7 +158,7 @@ export default function DetailCharacterPage() {
             type="button"
             onClick={() => handleVisibilitySelect('public')}
             className={`w-full px-4 py-3 rounded-lg text-center transition-colors ${
-              formData.detailVisibility === 'public'
+              formData.visibility === 'public'
                 ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                 : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
             }`}
