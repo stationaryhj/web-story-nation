@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import type { CharbotTop10Response, ModuleCharacter } from '@/types/api';
+import type { CharbotTop10Response, LoginResponse, ModuleCharacter } from '@/types/api';
 
 import { contentApi } from '../api/storyNationApi';
 
@@ -64,3 +64,16 @@ export const ReqGetCharacterList = (
 
   return { data, isLoading, error, refetch };
 };
+
+
+// export const ReqLogin = () => {
+//   const { data, isLoading, error, refetch } = useQuery<LoginResponse>({
+//     queryKey: [ 'login' ],
+//     queryFn: async() => {
+//       const response = await contentApi.Login();
+//       return response as LoginResponse;
+//     }
+//   });
+
+//   return { data, isLoading, error, refetch };
+// };

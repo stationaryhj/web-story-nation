@@ -9,7 +9,6 @@ import { ReqTop10Characters } from '@/services/hooks/DataListManager';
 import { useStoreData } from '@/store/useStoreData';
 import { useState, useEffect } from 'react';
 
-// 탑10 캐릭터 데이터 요청
 
 export default function Home() {
   const [ activeCategory, setActiveCategory ] = useState('recommended');
@@ -29,7 +28,6 @@ export default function Home() {
   }, [ fetchCharacters ]);
 
   const handleCategoryChange = (categoryId: string) => {
-    console.log('@@@@categoryId : ', categoryId);
     setActiveCategory(categoryId);
 
     if(categoryId === 'all') {
