@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import type { ApiResponse, LoginResponse, ModuleCharacter, CharbotTop10Response, TagRankingListResponse } from '../../types/api';
+import type { ApiResponse, LoginResponse, ModuleCharacter, CharbotTop10Response, CharbotListResponse, TagRankingListResponse } from '../../types/api';
 
 // API 기본 설정
 const createApiInstance = (baseURL: string) => {
@@ -16,7 +16,7 @@ const createApiInstance = (baseURL: string) => {
   // 응답 인터셉터 설정
   instance.interceptors.response.use(
     (response) => {
-      return response.data;
+      return response;
     },
     (error) => {
       if (error.response) {
@@ -39,6 +39,8 @@ const createApiInstance = (baseURL: string) => {
 const API_URL = process.env.NODE_ENV === 'production' ?
   process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL :
   process.env.NEXT_PUBLIC_STORYNATION_API_URL;
+
+// const API_URL = process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL;
 
 const CHAT_URL = process.env.NODE_ENV === 'production' ?
   process.env.NEXT_PUBLIC_STORYNATION_PROD_CHAT_URL :
@@ -128,14 +130,14 @@ export const contentApi = {
     });
   },
 
-  Login: async(nick_nm: string): Promise<ApiResponse<LoginResponse>> => {
+  LoginGuest: async(nick_nm: string): Promise<ApiResponse<LoginResponse>> => {
     return api.post('/api/guestlogin', {
       nick_nm,
     });
   },
 
   // Top10
-  GetTop10: async(): Promise<CharbotTop10Response> => {
+  GetTop10: async(): Promise<ApiResponse<CharbotTop10Response>> => {
     return api.post('/api/charbot/rcmnd/top10');
   },
 
@@ -155,7 +157,7 @@ export const contentApi = {
     order: string,
     page: number,
     paginate: number,
-  ): Promise<ApiResponse<Array<ModuleCharacter>>> => {
+  ): Promise<ApiResponse<CharbotListResponse>> => {
     return api.post('/api/charbot/getlist', {
       type,
       chrbot_tag_keys,
@@ -457,4 +459,4 @@ export const createApi = {
   },
 };
 
-export { setAuthToken };
+export { setAuthToken, API_URL, CHAT_URL };

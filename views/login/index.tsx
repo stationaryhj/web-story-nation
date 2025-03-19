@@ -7,6 +7,9 @@ import SocialLoginButton from '@/components/form/SocialLoginButton'
 import GuestLoginForm from '@/components/form/GuestLoginForm'
 import PageTransition from '@/components/motion/PageTransition'
 
+import { contentApi } from '@/services/api'
+import { useAccountStore } from '@/store/useStoreData';
+
 type SocialType = 'google' | 'naver' | 'kakao' | 'apple'
 
 export default function LoginPage() {
@@ -27,15 +30,31 @@ export default function LoginPage() {
   }
 
   // 게스트 로그인 핸들러
-  const handleGuestLogin = (nickname: string) => {
+  const handleGuestLogin = async (nickname: string) => {
     setLoading(true)
     setError(null)
     
-    // 실제 구현 시 게스트 로그인 API 호출
-    console.log(`게스트 로그인 시도: ${nickname}`)
-
-    // 임시: 목록 페이지로 리다이렉트
-    router.push('/')
+    try {
+      // 실제 구현 시 게스트 로그인 API 호출
+      console.log(`게스트 로그인 시도: ${nickname}`)
+      
+      // 직접 API 호출하고 상태 업데이트
+      const response = await contentApi.LoginGuest(nickname);
+      console.log('login response', response);
+      
+      // 계정 정보 상태 업데이트 - AccountStore 타입에 맞게 수정
+      useAccountStore.setState({
+        isLogin: true,
+        data: response.data,
+      });
+      
+      router.push('/')
+    } catch (err) {
+      console.error('로그인 오류:', err);
+      setError('로그인 처리 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   // 회원가입 페이지 이동

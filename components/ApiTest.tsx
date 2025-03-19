@@ -4,16 +4,15 @@ import { ReqTop10Characters } from '@/services/hooks/DataListManager';
 import type { Character } from '@/store/useStoreData';
 import { useState } from 'react';
 
-import type { ModuleCharacter } from '../types/api';
-
 import { contentApi, chatApi } from '../services/api';
 import Card from './elements/card/Card';
+
+import { ModuleCharacter, CharbotTop10Response } from '@/types/api';
 
 export default function ApiTest() {
   const [ loading, setLoading ] = useState(false);
   const [ error, setError ] = useState<string | null>(null);
   const [ data, setData ] = useState<Array<ModuleCharacter> | null>(null);
-  // const [ characters, setCharacters ] = useState<Array<Character> | null>(null);
 
   const {
     data: top10Data,

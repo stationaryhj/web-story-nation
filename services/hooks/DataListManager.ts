@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 
-import type { CharbotTop10Response, LoginResponse, ModuleCharacter } from '@/types/api';
+import type { CharbotTop10Response, LoginResponse, ModuleCharacter, CharbotListResponse } from '@/types/api';
 
 import { contentApi } from '../api/storyNationApi';
+import { useAccountStore } from '@/store/useStoreData';
 
 export type CategoryId = 'all' | 'male' | 'female' | 'unknown';
 type Category = {
@@ -23,7 +24,8 @@ export const ReqTop10Characters = () => {
     queryKey: [ 'RequestTop10' ],
     queryFn: async() => {
       const response = await contentApi.GetTop10();
-      return response as CharbotTop10Response;
+      
+      return response?.data as CharbotTop10Response;
     },
   });
 
@@ -37,11 +39,29 @@ export const ReqGetCharacterList = (
   paginate: number | 10,
   order: string | 'latest',
 ) => {
-  const { data, isLoading, error, refetch } = useQuery<Array<ModuleCharacter>>({
+  const { data, isLoading, error, refetch } = useQuery<CharbotListResponse>({
     queryKey: [ 'characters', activeCategory ],
     queryFn: async() => {
       const category = CATEGORIES.find(cat => cat.id === activeCategory);
-      if (!category || category.id === 'all') return [];
+      if (!category || category.id === 'all') {
+        // 빈 CharbotListResponse 반환
+        return {
+          current_page: 1,
+          data: [],
+          first_page_url: '',
+          from: 0,
+          last_page: 1,
+          last_page_url: '',
+          links: [],
+          next_page_url: null,
+          path: '',
+          per_page: 10,
+          prev_page_url: null,
+          to: 0,
+          total: 0,
+          result: { err: 0, msg: '' }
+        };
+      }
 
       const response = await contentApi.GetList(
         category.type, // type (1: 남자, 2: 여자, 3: 모름)
@@ -55,10 +75,25 @@ export const ReqGetCharacterList = (
       // 응답 데이터 유효성 검사
       if (!response || !response.data) {
         console.error('Invalid response data:', response);
-        return [];
+        return {
+          current_page: 1,
+          data: [],
+          first_page_url: '',
+          from: 0,
+          last_page: 1,
+          last_page_url: '',
+          links: [],
+          next_page_url: null,
+          path: '',
+          per_page: 10,
+          prev_page_url: null,
+          to: 0,
+          total: 0,
+          result: { err: 0, msg: '' }
+        };
       }
 
-      return response.data;
+      return response.data as CharbotListResponse;
     },
   });
 
@@ -66,14 +101,14 @@ export const ReqGetCharacterList = (
 };
 
 
-// export const ReqLogin = () => {
-//   const { data, isLoading, error, refetch } = useQuery<LoginResponse>({
-//     queryKey: [ 'login' ],
-//     queryFn: async() => {
-//       const response = await contentApi.Login();
-//       return response as LoginResponse;
-//     }
-//   });
+export const ReqLogin = (nick_nm: string) => {
+  const { data, isLoading, error, refetch } = useQuery<LoginResponse>({
+    queryKey: [ 'loginGuest' ],
+    queryFn: async() => {
+      const response = await contentApi.LoginGuest(nick_nm);
+      return response.data as LoginResponse;
+    }
+  });
 
-//   return { data, isLoading, error, refetch };
-// };
+  return { data, isLoading, error, refetch };
+};

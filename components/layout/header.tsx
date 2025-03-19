@@ -2,7 +2,7 @@
 'use client'
 
 import { FadeIn } from '@/components/motion/PageTransition'
-import { useThemeStore } from '@/store/useStoreData'
+import { useThemeStore, useAccountStore } from '@/store/useStoreData'
 import { useModalStore } from '@/store/useStoreModal'
 import { faBell, faShoppingBag, faCog, faMoon, faSun, faBars, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -19,6 +19,8 @@ export default function Header() {
   const pathname = usePathname()
   const [activeLink, setActiveLink] = useState('/')
   const { openModal } = useModalStore()
+
+  const { isLogin, removeAccountInfo } = useAccountStore();
 
   // 네비게이션 링크
   const navLinks = [
@@ -167,11 +169,19 @@ export default function Header() {
           ) : (
             <FadeIn>
               {mounted && (
+                !isLogin ?
                 <button
                   onClick={() => openModal('login')}
                   className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
                 >
                   로그인
+                </button>
+                :
+                <button
+                  onClick={() => removeAccountInfo()}
+                  className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
+                >
+                  로그아웃
                 </button>
               )}
             </FadeIn>
