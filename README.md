@@ -146,17 +146,17 @@ store/
 
 - **지원하는 라벨과 브랜치 접두어**:
 
-  - `build`: `build-이슈번호-이슈제목`
-  - `documentation`: `docs-이슈번호-이슈제목`
-  - `enhancement`: `enhance-이슈번호-이슈제목`
-  - `feature`: `feat-이슈번호-이슈제목`
-  - `fix`: `fix-이슈번호-이슈제목`
-  - `perf`: `perf-이슈번호-이슈제목`
-  - `refactor`: `refactor-이슈번호-이슈제목`
-  - `revert`: `revert-이슈번호-이슈제목`
-  - `style`: `style-이슈번호-이슈제목`
-  - `test`: `test-이슈번호-이슈제목`
-  - `other`: `issue-이슈번호-이슈제목`
+  - `build`: `build/issue-이슈번호`
+  - `documentation`: `docs/issue-이슈번호`
+  - `enhancement`: `enhance/issue-이슈번호`
+  - `feature`: `feat/issue-이슈번호`
+  - `fix`: `fix/issue-이슈번호`
+  - `perf`: `perf/issue-이슈번호`
+  - `refactor`: `refactor/issue-이슈번호`
+  - `revert`: `revert/issue-이슈번호`
+  - `style`: `style/issue-이슈번호`
+  - `test`: `test/issue-이슈번호`
+  - `other`: `issue/issue-이슈번호`
 
 - **제외 대상**:
   - `wontfix`, `invalid`, `duplicate`, `question` 라벨이 있는 이슈는 브랜치가 생성되지 않습니다.

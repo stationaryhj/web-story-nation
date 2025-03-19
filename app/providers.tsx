@@ -9,6 +9,8 @@ import { AnimatePresence } from 'framer-motion';
 import type { ReactNode } from 'react';
 import { useState, useEffect } from 'react';
 
+import { API_URL, CHAT_URL } from '@/services/api/storyNationApi';
+
 export default function Providers({ children }: { children: ReactNode }) {
   const [ queryClient ] = useState(() => new QueryClient());
   const { isDarkMode } = useThemeStore();
@@ -63,6 +65,24 @@ export default function Providers({ children }: { children: ReactNode }) {
   const skeletonBaseColor = mounted && isDarkMode ? '#1E293B' : '#E5E7EB';
   const skeletonHighlightColor = mounted && isDarkMode ? '#334155' : '#F3F4F6';
 
+
+  const DevNote = () => {
+    return(
+      <div className="fixed top-0 left-0 bg-black/40 text-white text-bold p-4 shadow-lg z-50 rounded text-xs pointer-events-none">
+        <b>CURRENT</b>
+        <p>API_URL: { API_URL }</p>
+        <p>CHAT_URL: { CHAT_URL }</p>
+
+        <br />
+        <pre>
+          GUEST LOGIN<br />
+          release : bslive1, bslive2, bslive1<br />
+          dev :     BS1, BS2, BS3
+        </pre>
+      </div>
+    )
+  }
+
   return (
     <QueryClientProvider client={ queryClient }>
       <ReactQueryDevtools initialIsOpen={ false }/>
@@ -75,6 +95,8 @@ export default function Providers({ children }: { children: ReactNode }) {
         <AnimatePresence mode="wait">{ children }</AnimatePresence>
         <BaseModal/>
       </SkeletonThemeProvider>
+
+      <DevNote/>
     </QueryClientProvider>
   );
 }

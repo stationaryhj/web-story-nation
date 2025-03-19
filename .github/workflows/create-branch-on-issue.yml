@@ -4,17 +4,17 @@
 # 브랜치를 생성합니다.
 #
 # 라벨에 따라 브랜치 접두어가 다르게 적용됩니다:
-# - build: build-이슈번호-이슈제목
-# - documentation: docs-이슈번호-이슈제목
-# - enhancement: enhance-이슈번호-이슈제목
-# - feature: feat-이슈번호-이슈제목
-# - fix: fix-이슈번호-이슈제목
-# - perf: perf-이슈번호-이슈제목
-# - refactor: refactor-이슈번호-이슈제목
-# - revert: revert-이슈번호-이슈제목
-# - style: style-이슈번호-이슈제목
-# - test: test-이슈번호-이슈제목
-# - other: issue-이슈번호-이슈제목
+# - build: build/issue-이슈번호
+# - documentation: docs/issue-이슈번호
+# - enhancement: enhance/issue-이슈번호
+# - feature: feat/issue-이슈번호
+# - fix: fix/issue-이슈번호
+# - perf: perf/issue-이슈번호
+# - refactor: refactor/issue-이슈번호
+# - revert: revert/issue-이슈번호
+# - style: style/issue-이슈번호
+# - test: test/issue-이슈번호
+# - other: issue/issue-이슈번호
 #
 # 작성자: GitHub Actions (자동 생성)
 # 최종 수정일: 2024-08-15
@@ -98,7 +98,6 @@ jobs:
           script: |
             const issue = context.payload.issue;
             const issueNumber = issue.number;
-            const issueTitle = issue.title;
             const labels = issue.labels.map(label => label.name);
 
             // 라벨에 따른 접두어 결정
@@ -127,19 +126,8 @@ jobs:
               prefix = "issue";
             }
 
-            // 브랜치 이름 생성 (접두어-이슈 번호-이슈 제목)
-            // 제목에서 공백을 하이픈으로 변환하고 특수문자 제거
-            const branchTitle = issueTitle
-              .replace(/ /g, '-')
-              .replace(/[^\w\-]/g, '')
-              .toLowerCase();
-
-            let branchName = `${prefix}-${issueNumber}-${branchTitle}`;
-
-            // 최대 길이 제한 (63자)
-            if (branchName.length > 63) {
-              branchName = branchName.substring(0, 63);
-            }
+            // 새로운 브랜치 이름 형식: [접두어]/issue-[이슈번호]
+            let branchName = `${prefix}/issue-${issueNumber}`;
 
             core.setOutput('issue_number', issueNumber);
             core.setOutput('branch_name', branchName);

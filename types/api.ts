@@ -1,0 +1,379 @@
+// API 응답 기본 타입
+export interface ApiResponse<T = any> {
+  success: boolean;
+  data: T;
+  code?: string;
+}
+
+// Response Data
+// Login
+export interface LoginResponse {
+  access_token: string;
+  cm_user: string;
+  coin_free: number;
+  coin_free_dt: string;
+  coin_register: number;
+  coin_user: number;
+  di: string;
+  energy_user: number;
+  exp: number;
+  image_url: string;
+  ink_user: number;
+  lv: number;
+  minor: number;
+  nick_nm: string;
+  parental_chk: number;
+  persona: string;
+  persona_gender: number;
+  profile_url: string;
+  sns_type: number;
+  token_type: string;
+  user_block_type: number;
+  user_key: number;
+  user_property: string;
+  writerchk: number;
+  result: ApiResult;
+}
+
+// Charbot Top 10 List
+export type CharbotTop10Response = {
+  module_1: Array<ModuleCharacter>;
+  module_2: Array<ModuleCharacter>;
+  module_3: Array<ModuleCharacter>;
+  module_4: Array<ModuleCharacter>;
+  module_5: Array<ModuleCharacter>;
+  module_6: Array<ModuleCharacter>;
+  module_7: Array<ModuleCharacter>;
+  result: ApiResult;
+};
+
+export interface ModuleCharacter {
+  world_list_detail_chrbot_key: number;
+  title: string;
+  intro: string;
+  img_url: string;
+  lv: number;
+  tags: string;
+  chat_cnt: number;
+  msg_cnt: number;
+  like_cnt: number;
+  create_dt: string;
+  nick_nm: string;
+  nsfw: number;
+  module_id: number;
+  sort: number;
+}
+
+// Tag Top Ranking List
+export interface TagRankingListResponse {
+  result: ApiResult;
+  charbot_tag: Array<TagRanking>;
+}
+
+export interface TagRanking {
+  c_chrbot_tag_key: number;
+  group: number;
+  sort: number;
+  tag: string;
+}
+
+// Charbot List
+export interface CharbotListResponse {
+  current_page: number;
+  data: Array<CharbotData>;
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: Array<PaginationLink>;
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number | null;
+  total: number;
+  result: ApiResult;
+}
+
+export interface PaginationLink {
+  url: string | null;
+  label: string;
+  active: boolean;
+}
+
+export interface CharbotData {
+  chat_cnt: number;
+  create_dt: string;
+  img_url: string;
+  intro: string;
+  like_cnt: number;
+  lv: number;
+  msg_cnt: number;
+  nick_nm: string;
+  nsfw: number;
+  tags: string;
+  title: string;
+  world_list_detail_chrbot_key: number;
+}
+
+// Charbot Response
+export interface CharbotResponse {
+  chrbot: ChrbotData;
+  result: ApiResult;
+}
+
+export interface ChrbotData {
+  block_type: number;
+  chat_cnt: number;
+  comment_cnt: number;
+  content: string;
+  content_show_yn: number;
+  countryCode: string;
+  create_dt: string;
+  delete_yn: number;
+  example: string;
+  example_show_yn: number;
+  finish_yn: number;
+  first_talk: string;
+  gender: string;
+  img_url: string;
+  img_url_nsfw: string;
+  intro: string;
+  like_cnt: number;
+  lv: number;
+  msg_cnt: number;
+  nick_nm: string;
+  nsfw: number;
+  show_yn: number;
+  sort: number;
+  tags: string;
+  title: string;
+  update_dt: string;
+  user_key: number;
+  world_key: number;
+  world_list_detail_chrbot_key: number;
+  world_list_detail_key: number;
+}
+
+export interface CharbotChatListResponse {
+  current_page: number;
+  data: Array<CharbotChatData>;
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: Array<PaginationLink>;
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number | null;
+  total: number;
+}
+
+export interface CharbotChatData {
+  block_type: number;
+  chrbot_chat_key: number;
+  fixed: number;
+  img_url: string;
+  last_msg: string;
+  nsfw: number;
+  title: string;
+  world_list_detail_chrbot_key: number;
+}
+
+// Charbot Chat Mode Response
+export interface CharbotChatModeResponse {
+  chat_mode: Array<ChatModeData>;
+  result: ApiResult;
+}
+
+export interface ChatModeData {
+  chat_mode: number;
+  coin: number;
+  discount: number;
+  original_coin: number;
+}
+
+// CharbotGetList Response
+export interface CharbotGetListResponse {
+  current_page: number;
+  data: Array<CharbotData>;
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: Array<PaginationLink>;
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number | null;
+  total: number;
+  result: ApiResult;
+}
+
+// CharbotGetListMine Response
+export interface CharbotGetListMineResponse {
+  current_page: number;
+  data: Array<CharbotMineData>;
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: Array<PaginationLink>;
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number | null;
+  total: number;
+  result: ApiResult;
+}
+
+export interface CharbotMineData {
+  block_type: number;
+  chat_cnt: number;
+  create_dt: string;
+  finish_yn: number;
+  img_url: string;
+  intro: string;
+  like_cnt: number;
+  msg_cnt: number;
+  nsfw: number;
+  show_yn: number;
+  tags: string;
+  title: string;
+  world_list_detail_chrbot_key: number;
+}
+
+// Charbot Inprogress Response
+export interface CharbotInprogressResponse {
+  chrbot: CharbotInprogressData;
+  charbot_tag: Array<CharbotTagData>;
+  result: ApiResult;
+}
+
+export interface CharbotInprogressData {
+  block_type: number;
+  chat_cnt: number;
+  comment_cnt: number;
+  content: string;
+  content_show_yn: number;
+  countryCode: string;
+  create_dt: string;
+  delete_yn: number;
+  example: string;
+  example_show_yn: number;
+  finish_yn: number;
+  first_talk: string;
+  gender: string;
+  img_url: string;
+  img_url_nsfw: string;
+  intro: string;
+  like_cnt: number;
+  msg_cnt: number;
+  nsfw: number;
+  show_yn: number;
+  sort: number;
+  tags: string;
+  title: string;
+  update_dt: string;
+  user_key: number;
+  world_key: number;
+  world_list_detail_chrbot_key: number;
+  world_list_detail_key: number;
+}
+
+export interface CharbotTagData {
+  c_chrbot_tag_key: number;
+  chrbot_tag_key: number;
+  create_dt: string;
+  tag: string;
+  world_list_detail_chrbot_key: number;
+}
+
+// SaleMonthlyIncomeList Response
+export interface SaleMonthlyIncomeListResponse {
+  IncomeList: Array<IncomeList>;
+  result: ApiResult;
+}
+
+export interface IncomeList {
+  current_page: number;
+  data: any;
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: Array<PaginationLink>;
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number | null;
+  total: number;
+}
+
+// CharbotLike Response
+export interface CharbotLikeResponse {
+  like_cnt: number;
+  result: ApiResult;
+  status: number;
+}
+
+// ReportAdd Response
+export interface ReportAddResponse {
+  report_exist: number;
+  result: ApiResult;
+}
+
+// CharbotSearch Response
+export interface CharbotSearchResponse {
+  chrbotList: CharbotSearchData;
+  result: ApiResult;
+}
+
+export interface CharbotSearchData {
+  current_page: number;
+  data: Array<CharbotData>;
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: Array<PaginationLink>;
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number | null;
+  total: number;
+}
+
+// API Result
+export type ApiResult = {
+  err: number;
+  msg: string;
+};
+
+// 소셜 로그인 관련 상수
+export const SocialLoginTypes = {
+  KAKAO: {
+    id: 1,
+    name: 'kakao',
+  },
+  NAVER: {
+    id: 2,
+    name: 'naver',
+  },
+  GOOGLE: {
+    id: 3,
+    name: 'google',
+  },
+  APPLE: {
+    id: 4,
+    name: 'apple',
+  },
+} as const;
+
+export type SocialLoginType = typeof SocialLoginTypes[keyof typeof SocialLoginTypes];

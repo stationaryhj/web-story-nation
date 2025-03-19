@@ -1,7 +1,8 @@
 // components/ui/navigation/Navigation.tsx
 'use client';
 
-import { FadeIn } from '@/components/ui/motion/PageTransition';
+import { FadeIn } from '@/components/motion/PageTransition';
+import { CATEGORIES } from '@/services/hooks/DataListManager';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion } from 'framer-motion';
@@ -21,7 +22,7 @@ interface NavigationProps {
 }
 
 export default function Navigation({ onCategoryChange, onSearch }: NavigationProps) {
-  const [ activeCategory, setActiveCategory ] = useState('recommended');
+  const [ activeCategory, setActiveCategory ] = useState('all');
   const [ searchQuery, setSearchQuery ] = useState('');
   const [ isSearchOpen, setIsSearchOpen ] = useState(false);
 
@@ -54,7 +55,7 @@ export default function Navigation({ onCategoryChange, onSearch }: NavigationPro
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, delay: 0.2 }}
             >
-              { categories.map((category) => (
+              { CATEGORIES.map(category => (
                 <motion.button
                   key={ category.id }
                   className={ `py-2 px-1 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
@@ -82,7 +83,7 @@ export default function Navigation({ onCategoryChange, onSearch }: NavigationPro
                   <motion.input
                     type="text"
                     value={ searchQuery }
-                    onChange={ (e) => setSearchQuery(e.target.value) }
+                    onChange={ e => setSearchQuery(e.target.value) }
                     placeholder="캐릭터 검색..."
                     className="py-1 px-3 pr-8 text-sm border border-secondary-200 dark:border-dark-secondary-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:bg-dark-background-DEFAULT dark:text-dark-secondary-700"
                     autoFocus

@@ -1,12 +1,14 @@
 // components/ui/card/Card.tsx
 'use client';
 
-import { CardTransition } from '@/components/ui/motion/PageTransition';
+import { CardTransition } from '@/components/motion/PageTransition';
+import { getImageUri } from '@/lib/utils/storyNationUtil';
 import type { Character } from '@/store/useStoreData';
 import { useModalStore } from '@/store/useStoreModal';
 import { faComment, faFire, faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Image from 'next/image';
+import React from 'react';
 
 interface CardProps {
   character: Character;
@@ -37,13 +39,13 @@ export default function Card({ character, index = 0, variant = 'default', onEdit
   };
 
   // 수정 버튼 클릭 처리
-  const handleEditClick = (e: MouseEvent) => {
+  const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation(); // 카드 클릭 이벤트 전파 방지
     if (onEdit) onEdit();
   };
 
   // 삭제 버튼 클릭 처리
-  const handleDeleteClick = (e: MouseEvent) => {
+  const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation(); // 카드 클릭 이벤트 전파 방지
     if (onDelete) onDelete();
   };
@@ -57,7 +59,7 @@ export default function Card({ character, index = 0, variant = 'default', onEdit
         <div className="block">
           <div className="relative aspect-[3/4] overflow-hidden rounded-t-xl">
             <Image
-              src={ imageUrl }
+              src={ getImageUri(imageUrl) }
               alt={ name }
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
