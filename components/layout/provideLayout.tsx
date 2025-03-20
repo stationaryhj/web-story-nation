@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { ReactNode } from 'react'
 
-import Footer from './footer'
-import Header from './header'
+import Footer from '../common/footer'
+import Header from '../common/header'
 
 interface ProvideLayoutProps {
   children: ReactNode
