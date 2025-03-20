@@ -7,13 +7,16 @@ import { useModalStore } from '@/store/useStoreModal'
 import { faBell, faShoppingBag, faCog, faMoon, faSun, faBars, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion, AnimatePresence } from 'framer-motion'
+import NotificationButton from '@/components/elements/sidebar/NotificationButton'
+import CreditButton from '@/components/elements/sidebar/CreditButton'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { useSettingsStore } from '../../store/useStoreSettings'
+import ToggleSwitch from '../form/ToggleSwitch'
 
-// 토글 스위치 컴포넌트 추가
-const ToggleSwitch = ({ isOn, onToggle }: { isOn: boolean; onToggle: () => void }) => {
+// 토글 스위치 컴포넌트 추가 (이름 변경)
+const SimpleToggle = ({ isOn, onToggle }: { isOn: boolean; onToggle: () => void }) => {
   return (
     <div className="flex items-center">
       <span className="mr-2 text-sm text-secondary-600 dark:text-dark-secondary-400">짜릿모드</span>
@@ -43,14 +46,26 @@ export default function Header() {
   const { openModal } = useModalStore()
   const { isAdultModeEnabled, toggleAdultMode } = useSettingsStore()
 
-  const { isLogin, removeAccountInfo } = useAccountStore();
+  const { isLogin, removeAccountInfo } = useAccountStore()
+
+  // 짜릿모드 토글 핸들러
+  const handleAdultModeToggle = () => {
+    if (!isAdultModeEnabled) {
+      // 성인 모드가 꺼져 있을 때는 먼저 성인 인증 모달 표시
+      openModal('adultVerification')
+    } else {
+      // 성인 모드가 켜져 있을 때는 바로 토글
+      toggleAdultMode()
+    }
+  }
 
   // 네비게이션 링크
   const navLinks = [
     { href: '/', label: '홈' },
     { href: '/chat-list', label: '대화' },
-    { href: '/my-characters', label: '내 캐릭터' },
-    { href: '/MyCharacter', label: 'my' },
+    { href: '/live', label: 'Live' },
+    { href: '/my-characters', label: '나의 캐릭터' },
+    { href: '/my-page', label: '마이페이지' },
   ]
 
   // 컴포넌트가 마운트되었는지 확인
@@ -108,28 +123,31 @@ export default function Header() {
           </Link>
 
           {/* 데스크탑 네비게이션 - 태블릿 이상에서는 숨김 */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center gap-8">
             {navLinks.map(link => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-base font-medium transition-colors relative ${
+                className={`text-sm font-medium transition-colors hover:text-primary-500 dark:hover:text-dark-primary-500 ${
                   activeLink === link.href
-                    ? 'text-primary-600 dark:text-dark-primary-600'
-                    : 'text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600'
+                    ? 'text-primary-500 dark:text-dark-primary-500'
+                    : 'text-secondary-700 dark:text-dark-secondary-400'
                 }`}
-                onClick={() => setActiveLink(link.href)}
               >
                 {link.label}
-                {activeLink === link.href && (
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-primary-500 dark:bg-dark-primary-500 rounded-full"></span>
-                )}
               </Link>
             ))}
           </nav>
         </div>
 
         <div className="flex items-center space-x-4">
+          {/* 짜릿모드 토글 */}
+          {mounted && (
+            <div className="hidden md:block">
+              <SimpleToggle isOn={isAdultModeEnabled} onToggle={handleAdultModeToggle} />
+            </div>
+          )}
+
           {/* 햄버거 메뉴 버튼 - 태블릿 이하에서만 표시 */}
           <motion.button
             onClick={() => setIsSidebarOpen(true)}
@@ -155,21 +173,22 @@ export default function Header() {
 
           <div className="h-5 w-px bg-secondary-200 dark:bg-dark-secondary-300 hidden md:block"></div>
 
-          <motion.button
+          <motion.div
             className="p-2 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
           >
-            <FontAwesomeIcon icon={faBell} className="text-lg" />
-          </motion.button>
+            <NotificationButton count={3} />
+          </motion.div>
 
-          <motion.button
-            className="p-2 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
+          <motion.div
+            className="ml-1 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <FontAwesomeIcon icon={faShoppingBag} className="text-lg" />
-          </motion.button>
+            <CreditButton credits={1000} />
+            {/* <FontAwesomeIcon icon={faShoppingBag} className="text-lg" /> */}
+          </motion.div>
 
           <Link href="/settings">
             <motion.button
@@ -191,27 +210,24 @@ export default function Header() {
             </motion.button>
           ) : (
             <FadeIn>
-              {mounted && (
-                !isLogin ?
-                <button
-                  onClick={() => openModal('login')}
-                  className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
-                >
-                  로그인
-                </button>
-                :
-                <button
-                  onClick={() => removeAccountInfo()}
-                  className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
-                >
-                  로그아웃
-                </button>
-              )}
+              {mounted &&
+                (!isLogin ? (
+                  <button
+                    onClick={() => openModal('login')}
+                    className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
+                  >
+                    로그인
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => removeAccountInfo()}
+                    className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
+                  >
+                    로그아웃
+                  </button>
+                ))}
             </FadeIn>
           )}
-
-          {/* 짜릿모드 토글 수정 */}
-          <ToggleSwitch isOn={isAdultModeEnabled} onToggle={toggleAdultMode} />
         </div>
       </div>
 
@@ -279,6 +295,11 @@ export default function Header() {
                         <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} className="text-lg mr-3" />
                         {isDarkMode ? '라이트 모드' : '다크 모드'}
                       </button>
+                    </li>
+                    <li>
+                      <div className="flex items-center py-2">
+                        <SimpleToggle isOn={isAdultModeEnabled} onToggle={handleAdultModeToggle} />
+                      </div>
                     </li>
                     <li>
                       <Link

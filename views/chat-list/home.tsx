@@ -1,7 +1,7 @@
 'use client'
 
-import Footer from '@/components/layout/footer'
-import Header from '@/components/layout/header'
+import Footer from '@/components/common/footer'
+import Header from '@/components/common/header'
 import PageTransition from '@/components/motion/PageTransition'
 import ChatList from '@/components/chat/ChatList'
 import { useRouter } from 'next/navigation'

@@ -4,11 +4,13 @@ import { faCheck, faUpload, faTimes, faPlus } from '@fortawesome/free-solid-svg-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import type { ChangeEvent, MouseEvent } from 'react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 import { useCharacterFormStore, useImageStore } from '../../store/useCharacterFormStore'
 import DetailCharacterPage from '../../app/(routes)/my-characters/create/detail/page'
 import { useSettingsStore } from '../../store/useStoreSettings'
+import { useModalStore } from '@/store/useStoreModal'
+import ToggleSwitch from './ToggleSwitch'
 
 // 해시태그 데이터
 const AVAILABLE_HASHTAGS = [
@@ -51,7 +53,8 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
-  const { isAdultModeEnabled } = useSettingsStore()
+  const { isAdultModeEnabled, toggleAdultMode } = useSettingsStore()
+  const { openModal } = useModalStore()
 
   // 이미지 배열이 없는 경우를 대비한 안전 조치
   useEffect(() => {
@@ -214,6 +217,17 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
       setSelectedImage(null)
     }
   }
+
+  // 이미지 필터 기능 예시 (성인 이미지 필터링)
+  const filteredImages = useMemo(() => {
+    if (isAdultModeEnabled) {
+      // 성인 모드가 활성화되면 모든 이미지 표시
+      return images || []
+    } else {
+      // 성인 모드가 비활성화되면 성인 이미지 필터링
+      return (images || []).filter(img => img.type !== 'adult')
+    }
+  }, [images, isAdultModeEnabled])
 
   // 상세 설정 탭을 렌더링합니다
   if (mode === 'detail') {
@@ -455,6 +469,9 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
             ))}
           </div>
         </div>
+
+        {/* 성인 모드 토글 스위치 */}
+        <ToggleSwitch className="mt-4" />
       </div>
     )
   }
@@ -467,7 +484,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
     // 성인 탭 클릭 핸들러 - 짜릿모드 체크
     const handleAdultTabClick = () => {
       if (!isAdultModeEnabled) {
-        alert('성인 이미지를 보려면 짜릿모드를 활성화해주세요!')
+        alert('짜릿모드 이미지를 보려면 짜릿모드를 활성화해주세요!')
       } else {
         setActiveImageTab('adult')
       }
@@ -508,7 +525,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
                     : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
               }`}
             >
-              성인
+              짜릿모드
             </button>
           </div>
           <button
@@ -815,6 +832,9 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
           ))}
         </div>
       </div>
+
+      {/* 성인 모드 토글 스위치 */}
+      <ToggleSwitch className="mt-4" />
     </div>
   )
 }
