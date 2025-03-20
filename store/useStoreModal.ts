@@ -15,6 +15,7 @@ type ModalType =
   | 'notification'
   | 'credit'
   | 'adultVerification'
+  | 'chatMode'
 
 interface ModalState {
   isOpen: boolean

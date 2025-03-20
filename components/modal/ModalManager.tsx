@@ -7,6 +7,7 @@ import ConfirmActionModal from './ConfirmActionModal'
 import NotificationSidebar from './NotificationSidebar'
 import CreditSidebar from './CreditSidebar'
 import AdultVerificationModal from './AdultVerificationModal'
+import ChatModeModal from './ChatModeModal'
 
 export default function ModalManager() {
   const { isOpen, modalType, closeModal, modalProps } = useModalStore()
@@ -46,6 +47,17 @@ export default function ModalManager() {
 
   if (modalType === 'adultVerification') {
     return <AdultVerificationModal isOpen={isOpen} onClose={closeModal} />
+  }
+
+  if (modalType === 'chatMode') {
+    return (
+      <ChatModeModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        currentMode={modalProps?.currentMode || 'economic'}
+        onSelectMode={modalProps?.onSelectMode || (() => {})}
+      />
+    )
   }
 
   return null
