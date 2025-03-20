@@ -8,6 +8,7 @@ import { contentApi, chatApi } from '../services/api';
 import Card from './elements/card/Card';
 
 import { ModuleCharacter, CharbotTop10Response } from '@/types/api';
+import { bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil';
 
 export default function ApiTest() {
   const [ loading, setLoading ] = useState(false);
@@ -48,7 +49,7 @@ export default function ApiTest() {
   }
 
 
-  const characters = bridgeTop10Data(top10Data);
+  const characters = bridgeTop10DataToModuleCharacter(top10Data.module_1);
   // if(top10Data) {
   //   bridgeTop10Data(top10Data);
   // }

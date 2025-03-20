@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import type { CharbotTop10Response, LoginResponse, ModuleCharacter, CharbotListResponse } from '@/types/api';
+import type { CharbotTop10Response, LoginResponse, CharbotSearchResponse, TagRankingListResponse, ApiResponse } from '@/types/api';
 
 import { contentApi } from '../api/storyNationApi';
 import { useAccountStore } from '@/store/useStoreData';
@@ -37,37 +37,40 @@ export const ReqGetCharacterList = (
   nsfw: number | 0,
   page: number | 1,
   paginate: number | 10,
-  order: string | 'latest',
+  order: number | 0,
+  tag: string = ''
 ) => {
-  const { data, isLoading, error, refetch } = useQuery<CharbotListResponse>({
-    queryKey: [ 'characters', activeCategory ],
+  const { data, isLoading, error, refetch } = useQuery<CharbotSearchResponse>({
+    queryKey: [ 'characters', activeCategory, nsfw, order, tag ],
     queryFn: async() => {
       const category = CATEGORIES.find(cat => cat.id === activeCategory);
       if (!category || category.id === 'all') {
-        // 빈 CharbotListResponse 반환
+        // CharbotSearchResponse 형식에 맞게 빈 객체 반환
         return {
-          current_page: 1,
-          data: [],
-          first_page_url: '',
-          from: 0,
-          last_page: 1,
-          last_page_url: '',
-          links: [],
-          next_page_url: null,
-          path: '',
-          per_page: 10,
-          prev_page_url: null,
-          to: 0,
-          total: 0,
-          result: { err: 0, msg: '' }
+          result: { err: 0, msg: '' },
+          chrbotList: {
+            current_page: 1,
+            data: [],
+            first_page_url: '',
+            from: 0,
+            last_page: 1,
+            last_page_url: '',
+            links: [],
+            next_page_url: null,
+            path: '',
+            per_page: 10,
+            prev_page_url: null,
+            to: 0,
+            total: 0
+          }
         };
       }
 
       const response = await contentApi.GetList(
         category.type, // type (1: 남자, 2: 여자, 3: 모름)
-        '', // chrbot_tag_keys
+        tag, // chrbot_tag_keys
         nsfw, // nsfw
-        order, // order
+        order, // order - 이미 number 타입
         page, // page
         paginate, // paginate
       );
@@ -75,31 +78,45 @@ export const ReqGetCharacterList = (
       // 응답 데이터 유효성 검사
       if (!response || !response.data) {
         console.error('Invalid response data:', response);
+        // CharbotSearchResponse 형식에 맞게 빈 객체 반환
         return {
-          current_page: 1,
-          data: [],
-          first_page_url: '',
-          from: 0,
-          last_page: 1,
-          last_page_url: '',
-          links: [],
-          next_page_url: null,
-          path: '',
-          per_page: 10,
-          prev_page_url: null,
-          to: 0,
-          total: 0,
-          result: { err: 0, msg: '' }
+          result: { err: 0, msg: '' },
+          chrbotList: {
+            current_page: 1,
+            data: [],
+            first_page_url: '',
+            from: 0,
+            last_page: 1,
+            last_page_url: '',
+            links: [],
+            next_page_url: null,
+            path: '',
+            per_page: 10,
+            prev_page_url: null,
+            to: 0,
+            total: 0
+          }
         };
       }
 
-      return response.data as CharbotListResponse;
+      return response.data as CharbotSearchResponse;
     },
   });
 
   return { data, isLoading, error, refetch };
 };
 
+export const ReqGetTags = (categoryType: number) => {
+  const { data, isLoading, error } = useQuery<TagRankingListResponse>({
+    queryKey: ['tagRanking', categoryType],
+    queryFn: async () => {
+        const response = await contentApi.GetTagRankingList(categoryType);
+        return response.data as TagRankingListResponse;
+    }
+  });
+
+  return { data, isLoading, error };
+};
 
 export const ReqLogin = (nick_nm: string) => {
   const { data, isLoading, error, refetch } = useQuery<LoginResponse>({

@@ -1,3 +1,5 @@
+import { ModuleCharacter } from '@/types/api';
+
 /**
   get image Uri
  */
@@ -39,3 +41,56 @@ export function getSnsTypeNumber(provider: string): number {
       return 0;
   }
 };
+
+/**
+ * 탑 10 데이터 브릿지
+ * @param dataList - 탑 10 데이터 리스트
+ * @returns 탑 10 데이터 리스트
+ */
+export function bridgeTop10DataToModuleCharacter(dataList: Array<ModuleCharacter>) {
+  const characters = dataList?.map((item) => ({
+    id: item.world_list_detail_chrbot_key.toString(),
+    name: item.title,
+    description: item.intro,
+    imageUrl: item.img_url,
+    commentCount: item.msg_cnt,
+    hashtags: item.tags.split(','),
+    isAdult: item.nsfw === 1,
+    creator: {
+      id: item.world_list_detail_chrbot_key.toString(),
+    }
+  }));
+
+  return characters;
+}
+
+/**
+ * 일반 캐릭터 데이터를 Character 타입으로 변환하는 함수
+ * @param dataList - ModuleCharacter 데이터 리스트
+ * @returns Character 타입으로 변환된 데이터 리스트
+ */
+export function bridgeCharacterDataToCharacter(dataList: Array<ModuleCharacter>) {
+  const characters = dataList?.map((item) => ({
+    id: item.world_list_detail_chrbot_key.toString(),
+    name: item.title,
+    description: item.intro,
+    imageUrl: item.img_url,
+    commentCount: item.msg_cnt,
+    likeCount: item.like_cnt,
+    chatCount: item.chat_cnt,
+    level: item.lv,
+    createDate: item.create_dt,
+    hashtags: item.tags ? item.tags.split(',') : [],
+    isAdult: item.nsfw === 1,
+    creator: {
+      id: item.world_list_detail_chrbot_key.toString(),
+      nickname: item.nick_nm || '',
+      username: '',
+      profileImageUrl: null,
+      isActive: true,
+    },
+    category: 'unspecified'
+  }));
+
+  return characters;
+}

@@ -1,6 +1,14 @@
 import axios from 'axios';
 
-import type { ApiResponse, LoginResponse, ModuleCharacter, CharbotTop10Response, CharbotListResponse, TagRankingListResponse } from '../../types/api';
+import type {
+    ApiResponse,
+    LoginResponse,
+    ModuleCharacter,
+    CharbotTop10Response,
+    CharbotListResponse,
+    TagRankingListResponse,
+    CharbotSearchResponse
+} from '../../types/api';
 
 // API 기본 설정
 const createApiInstance = (baseURL: string) => {
@@ -36,11 +44,11 @@ const createApiInstance = (baseURL: string) => {
 };
 
 // 환경에 따른 API URL 설정
-const API_URL = process.env.NODE_ENV === 'production' ?
-  process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL :
-  process.env.NEXT_PUBLIC_STORYNATION_API_URL;
+// const API_URL = process.env.NODE_ENV === 'production' ?
+//   process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL :
+//   process.env.NEXT_PUBLIC_STORYNATION_API_URL;
 
-// const API_URL = process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL;
 
 const CHAT_URL = process.env.NODE_ENV === 'production' ?
   process.env.NEXT_PUBLIC_STORYNATION_PROD_CHAT_URL :
@@ -154,10 +162,10 @@ export const contentApi = {
     type: string,
     chrbot_tag_keys: string,
     nsfw: number,
-    order: string,
+    order: number,
     page: number,
     paginate: number,
-  ): Promise<ApiResponse<CharbotListResponse>> => {
+  ): Promise<ApiResponse<CharbotSearchResponse>> => {
     return api.post('/api/charbot/getlist', {
       type,
       chrbot_tag_keys,
@@ -168,7 +176,7 @@ export const contentApi = {
     });
   },
 
-  GetTagRankingList: async(type: string): Promise<ApiResponse<TagRankingListResponse>> => {
+  GetTagRankingList: async(type: number): Promise<ApiResponse<TagRankingListResponse>> => {
     return api.post('/api/charbot/tagranking/get', {
       type,
     });

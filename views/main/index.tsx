@@ -1,26 +1,20 @@
 'use client';
 
-import CardGrid from '@/components/elements/card/CardGrid';
 import Navigation from '@/components/elements/navigation/Navigation';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
 import PageTransition, { SectionTransition } from '@/components/motion/PageTransition';
-import { ReqTop10Characters } from '@/services/hooks/DataListManager';
+import { CATEGORIES } from '@/services/hooks/DataListManager';
 import { useStoreData } from '@/store/useStoreData';
 import { useState, useEffect } from 'react';
-
+import RecommendSection from '@/components/main/RecommendSection';
+import CharacterGridSection from '@/components/main/CharacterGridSection';
+import CardGrid from '@/components/elements/card/CardGrid';
 
 export default function Home() {
-  const [ activeCategory, setActiveCategory ] = useState('recommended');
+  const [ activeCategory, setActiveCategory ] = useState('all');
   const [ searchQuery, setSearchQuery ] = useState('');
   const { fetchCharacters } = useStoreData();
-
-  const {
-    data: top10Data,
-    isLoading: top10Loading,
-    error: top10Error,
-    refetch: top10Refetch,
-  } = ReqTop10Characters();
 
   useEffect(() => {
     // 페이지 로드 시 모든 캐릭터 데이터 미리 로드
@@ -29,14 +23,9 @@ export default function Home() {
 
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId);
-
-    if(categoryId === 'all') {
-      top10Refetch();
-    }
   };
 
   const handleSearch = (query: string) => {
-    console.log('@@@@query : ', query);
     setSearchQuery(query);
     // 여기서 검색 로직 구현
     console.log('검색어:', query);
@@ -64,25 +53,17 @@ export default function Home() {
         <Header/>
         <Navigation onCategoryChange={ handleCategoryChange } onSearch={ handleSearch }/>
 
-        { /* 추천 캐릭터 섹션 */ }
-        <SectionTransition className="py-12 bg-white dark:bg-dark-background-light" delay={ 0.1 }>
-          <CardGrid title="추천 캐릭터" categoryId="recommended"/>
-        </SectionTransition>
-
-        { /* 남성 캐릭터 섹션 */ }
-        <SectionTransition className="py-12 bg-white dark:bg-dark-background-light" delay={ 0.2 }>
-          <CardGrid title="남성 캐릭터" categoryId="male"/>
-        </SectionTransition>
-
-        { /* 여성 캐릭터 섹션 */ }
-        <SectionTransition className="py-12 bg-white dark:bg-dark-background-light" delay={ 0.3 }>
-          <CardGrid title="여성 캐릭터" categoryId="female"/>
-        </SectionTransition>
-
-        { /* 성별 미지정 캐릭터 섹션 */ }
-        <SectionTransition className="py-12 bg-white dark:bg-dark-background-light" delay={ 0.4 }>
-          <CardGrid title="성별 미지정 캐릭터" categoryId="unspecified"/>
-        </SectionTransition>
+        {/* 활성 카테고리에 따라 적절한 섹션 표시 */}
+        {activeCategory === 'all' ? (
+          // 추천 섹션 (자체적으로 데이터 관리)
+          <RecommendSection onSearchTrigger={handleSearch} />
+        ) : (
+          // 카테고리 섹션 (자체적으로 데이터 관리)
+          <CharacterGridSection 
+            categoryId={activeCategory as any} 
+            onSearchTrigger={handleSearch} 
+          />
+        )}
 
         <Footer/>
       </main>
