@@ -1,6 +1,6 @@
 'use client';
 
-import Header from '@/components/layout/header';
+import Header from '@/components/common/header';
 import Footer from '@/components/common/footer';
 import PageTransition from '@/components/motion/PageTransition';
 import { useSearchParams, useRouter } from 'next/navigation';
