@@ -1,6 +1,14 @@
 import axios from 'axios';
 
-import type { ApiResponse, LoginResponse, ModuleCharacter, CharbotTop10Response, CharbotListResponse, TagRankingListResponse } from '../../types/api';
+import type {
+    ApiResponse,
+    LoginResponse,
+    ModuleCharacter,
+    CharbotTop10Response,
+    CharbotListResponse,
+    TagRankingListResponse,
+    CharbotSearchResponse
+} from '../../types/api';
 
 // API 기본 설정
 const createApiInstance = (baseURL: string) => {
@@ -154,10 +162,10 @@ export const contentApi = {
     type: string,
     chrbot_tag_keys: string,
     nsfw: number,
-    order: string,
+    order: number,
     page: number,
     paginate: number,
-  ): Promise<ApiResponse<CharbotListResponse>> => {
+  ): Promise<ApiResponse<CharbotSearchResponse>> => {
     return api.post('/api/charbot/getlist', {
       type,
       chrbot_tag_keys,
@@ -168,7 +176,7 @@ export const contentApi = {
     });
   },
 
-  GetTagRankingList: async(type: string): Promise<ApiResponse<TagRankingListResponse>> => {
+  GetTagRankingList: async(type: number): Promise<ApiResponse<TagRankingListResponse>> => {
     return api.post('/api/charbot/tagranking/get', {
       type,
     });

@@ -9,13 +9,13 @@ import CardSkeleton from '../skeleton/CardSkeleton';
 import Card from './Card';
 
 interface CardGridProps {
-  title?: string;
-  subtitle?: string;
+  title?: string | null;
+  subtitle?: string | null;
   categoryId?: string;
   customData?: Array<Character>;
 }
 
-export default function CardGrid({ title = '인기 캐릭터', subtitle = '', categoryId = 'recommended', customData }: CardGridProps) {
+export default function CardGrid({ title = null, subtitle = null, categoryId = 'all', customData }: CardGridProps) {
   const { isLoading, error, fetchCategoryCharacters } = useStoreData();
   const [ characters, setCharacters ] = useState<Array<Character>>([]);
   const [ localLoading, setLocalLoading ] = useState(true);
@@ -48,6 +48,7 @@ export default function CardGrid({ title = '인기 캐릭터', subtitle = '', ca
 
   return (
     <div className="container mx-auto px-4">
+      {title && subtitle &&
       <FadeIn direction="up" delay={ 0.1 }>
         <h2 className="text-2xl font-bold mb-6 text-secondary-900 dark:text-dark-secondary-700 relative inline-block">
           { title }
@@ -55,6 +56,7 @@ export default function CardGrid({ title = '인기 캐릭터', subtitle = '', ca
           { subtitle && <span className="text-sm text-gray-500 dark:text-dark-gray-500">{ subtitle }</span> }
         </h2>
       </FadeIn>
+      }
 
       { error && (
         <FadeIn direction="up" delay={ 0.2 }>
