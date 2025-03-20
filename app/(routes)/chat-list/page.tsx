@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 'use client';
 
 import { useEffect } from 'react';
@@ -20,6 +21,9 @@ export default function Page() {
   if (!isLogin) {
     return null;
   }
+=======
+import ChatListPage from '@/views/chat-list/home'
+>>>>>>> d52f283b589cf3627df43245f82c281c5d3b5553
 
   return (
     <>
