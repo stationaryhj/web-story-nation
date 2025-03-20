@@ -3,7 +3,7 @@
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { ReactNode } from 'react';
+import type { ReactNode, MouseEvent as ReactMouseEvent } from 'react';
 import { useEffect } from 'react';
 
 interface ModalProps {
@@ -45,7 +45,7 @@ export default function Modal({
   };
 
   // 모달 컨텐츠 클릭 시 이벤트 전파 중지
-  const handleModalClick = (e: MouseEvent) => {
+  const handleModalClick = (e: ReactMouseEvent) => {
     e.stopPropagation();
   };
 

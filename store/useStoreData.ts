@@ -305,7 +305,7 @@ interface AccountStore {
 
 export const useAccountStore = create<AccountStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       isLogin: false,
       data: null,
       setAccountInfo: (accountInfo: AccountStore) => set(accountInfo),

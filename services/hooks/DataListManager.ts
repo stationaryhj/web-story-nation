@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import type { CharbotTop10Response, LoginResponse, CharbotSearchResponse, TagRankingListResponse, ApiResponse } from '@/types/api';
+import type { CharbotTop10Response, LoginResponse, CharbotSearchResponse, TagRankingListResponse, ApiResponse, CharbotChatListResponse } from '@/types/api';
 
 import { contentApi } from '../api/storyNationApi';
 import { useAccountStore } from '@/store/useStoreData';
@@ -116,6 +116,18 @@ export const ReqGetTags = (categoryType: number) => {
   });
 
   return { data, isLoading, error };
+};
+
+export const ReqGetChatList = (paginate: number, page: number) => {
+  const { data, isLoading, error, refetch } = useQuery<CharbotChatListResponse>({
+    queryKey: ['chatList', paginate, page],
+    queryFn: async () => {
+      const response = await contentApi.GetChatList(paginate, page);
+      return response.data as CharbotChatListResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
 };
 
 export const ReqLogin = (nick_nm: string) => {
