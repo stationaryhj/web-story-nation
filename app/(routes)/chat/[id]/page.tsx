@@ -1,6 +1,5 @@
 import { Suspense, use } from 'react'
 import ChatDetailClient from '@/views/chat/detail'
-import Header from '@/components/common/header'
 
 export default function ChatDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params)
