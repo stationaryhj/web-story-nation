@@ -1,24 +1,10 @@
 'use client'
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { motion, AnimatePresence } from 'framer-motion';
-import type { ReactNode, MouseEvent as ReactMouseEvent } from 'react';
-import { useEffect } from 'react';
-=======
-=======
->>>>>>> d52f283b589cf3627df43245f82c281c5d3b5553
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { ReactNode, MouseEvent as ReactMouseEvent } from 'react'
 import { useEffect } from 'react'
-<<<<<<< HEAD
->>>>>>> d52f283b589cf3627df43245f82c281c5d3b5553
-=======
->>>>>>> d52f283b589cf3627df43245f82c281c5d3b5553
 
 interface ModalProps {
   isOpen: boolean
@@ -60,18 +46,8 @@ export default function Modal({
 
   // 모달 컨텐츠 클릭 시 이벤트 전파 중지
   const handleModalClick = (e: ReactMouseEvent) => {
-<<<<<<< HEAD
-<<<<<<< HEAD
-    e.stopPropagation();
-  };
-=======
     e.stopPropagation()
   }
->>>>>>> d52f283b589cf3627df43245f82c281c5d3b5553
-=======
-    e.stopPropagation()
-  }
->>>>>>> d52f283b589cf3627df43245f82c281c5d3b5553
 
   return (
     <AnimatePresence>

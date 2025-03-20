@@ -1,8 +1,8 @@
 'use client';
 
 import PageTransition from '@/components/motion/PageTransition';
-import Header from '@/components/layout/header';
-import Footer from '@/components/layout/footer';
+import Header from '@/components/common/header';
+import Footer from '@/components/common/footer';
 import { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 

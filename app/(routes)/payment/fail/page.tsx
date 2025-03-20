@@ -1,7 +1,7 @@
 'use client';
 
-import Header from '@/components/layout/header';
-import Footer from '@/components/layout/footer';
+import Header from '@/components/common/header';
+import Footer from '@/components/common/footer';
 import PageTransition from '@/components/motion/PageTransition';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';

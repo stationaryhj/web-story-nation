@@ -3,18 +3,6 @@
 import Footer from '@/components/common/footer'
 import Header from '@/components/common/header'
 import PageTransition from '@/components/motion/PageTransition'
-<<<<<<< HEAD
-import ChatList from '@/components/chat/ChatList'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-import { ReqGetChatList } from '@/services/hooks/DataListManager'
-export default function ChatListPage() {
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState('')
-
-  
-
-=======
 import { faSearch, faSort } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion } from 'framer-motion'
@@ -28,7 +16,6 @@ export default function ChatListPage() {
   const [activeTab, setActiveTab] = useState('all') // 'all', 'favorites'
   const [searchQuery, setSearchQuery] = useState('')
 
->>>>>>> d52f283b589cf3627df43245f82c281c5d3b5553
   // 더미 채팅 데이터
   const chatList = [
     {
@@ -57,22 +44,10 @@ export default function ChatListPage() {
     },
   ]
 
-<<<<<<< HEAD
-
-  const { data, isLoading, error, refetch } = ReqGetChatList(10, 1);
-  console.log('ReqGetChatList :: ', data);
-
-  // 검색 핸들러 - 실제로는 API 호출 등으로 구현
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    console.log('검색어:', query);
-    // 추후 서버 API 연동 처리
-=======
   const handleSearch = (e: FormEvent) => {
     e.preventDefault()
     // 검색 로직 구현
     console.log('검색어:', searchQuery)
->>>>>>> d52f283b589cf3627df43245f82c281c5d3b5553
   }
 
   return (
@@ -83,12 +58,6 @@ export default function ChatListPage() {
         <main className="flex-grow">
           <div className="container mx-auto px-4 py-6">
             <div className="flex flex-col">
-<<<<<<< HEAD
-              <ChatList 
-                chats={chatList} 
-                onSearch={handleSearch} 
-              />
-=======
               <motion.div
                 className="bg-white dark:bg-dark-background-light rounded-xl shadow-sm p-4 w-full mx-auto"
                 initial={{ opacity: 0, y: 20 }}
@@ -178,7 +147,6 @@ export default function ChatListPage() {
                   </div>
                 )}
               </motion.div>
->>>>>>> d52f283b589cf3627df43245f82c281c5d3b5553
             </div>
           </div>
         </main>
