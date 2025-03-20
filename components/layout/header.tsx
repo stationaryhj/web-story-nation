@@ -10,6 +10,28 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import { useSettingsStore } from '../../store/useStoreSettings'
+
+// 토글 스위치 컴포넌트 추가
+const ToggleSwitch = ({ isOn, onToggle }: { isOn: boolean; onToggle: () => void }) => {
+  return (
+    <div className="flex items-center">
+      <span className="mr-2 text-sm text-secondary-600 dark:text-dark-secondary-400">짜릿모드</span>
+      <button
+        onClick={onToggle}
+        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+          isOn ? 'bg-primary-500 dark:bg-dark-primary-500' : 'bg-secondary-200 dark:bg-dark-secondary-700'
+        }`}
+      >
+        <span
+          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+            isOn ? 'translate-x-6' : 'translate-x-1'
+          }`}
+        />
+      </button>
+    </div>
+  )
+}
 
 export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -19,6 +41,7 @@ export default function Header() {
   const pathname = usePathname()
   const [activeLink, setActiveLink] = useState('/')
   const { openModal } = useModalStore()
+  const { isAdultModeEnabled, toggleAdultMode } = useSettingsStore()
 
   const { isLogin, removeAccountInfo } = useAccountStore();
 
@@ -186,6 +209,9 @@ export default function Header() {
               )}
             </FadeIn>
           )}
+
+          {/* 짜릿모드 토글 수정 */}
+          <ToggleSwitch isOn={isAdultModeEnabled} onToggle={toggleAdultMode} />
         </div>
       </div>
 
