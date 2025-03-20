@@ -1,4 +1,4 @@
-import ImageCharacterPage from '@/views/myCharacters/image'
+import ImageCharacterPage from '@/views/my-characters/image'
 
 export default function page() {
   return (
