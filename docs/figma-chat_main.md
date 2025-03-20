@@ -1,7 +1,7 @@
 			- Chat_main
 			
-![103:536](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/ecfff6c4-0338-4264-8ef7-098cf1995abb)
-Local file: docs/figma_img/103_536.png
+![258:3406](https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/1de86b22-c3a2-4875-a4d6-b89d23fdb771)
+Local file: docs/figma_img/258_3406.png
 				- frame
 				- Header
 					- header
@@ -113,7 +113,7 @@ Local file: docs/figma_img/103_536.png
 						- 검색
 							• 검색
 				- Rectangle 48
-				- popup
+				- popup_confirm_chat_delete
 					- frame
 					- popup_notice
 						- 삭제된 채팅 내용은 복구할 수 없습니다. 그래도 삭제하시겠습니까?
