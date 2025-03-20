@@ -1,4 +1,4 @@
-import ChatListPage from '@/views/chatList'
+import ChatListPage from '@/views/chat-list/home'
 
 export default function page() {
   return (
