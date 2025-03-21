@@ -282,11 +282,6 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
     }
   }
 
-  // 성인 모드 토글
-  const toggleAdultMode = () => {
-    setIsAdultMode(!isAdultMode)
-  }
-
   // 채팅 삭제 핸들러
   const handleDeleteChat = () => {
     // 삭제 로직 구현
@@ -360,7 +355,7 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
       {/* 상단 헤더 */}
       <header className="bg-white shadow-sm px-5 py-3 flex items-center justify-between border-b border-gray-200 z-10">
         {/* 왼쪽 그룹: 뒤로가기 + 캐릭터 프로필 */}
-        <div className="flex items-center">
+        <div className="flex items-center min-w-0">
           {/* 1: 뒤로가기 버튼 */}
           <Link href="/chat" className="mr-3">
             <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center transition-colors hover:bg-gray-200">
@@ -369,7 +364,7 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
           </Link>
 
           {/* 캐릭터 프로필 */}
-          <div className="flex items-center">
+          <div className="flex items-center min-w-0 overflow-hidden">
             {/* 캐릭터 프로필 이미지 */}
             <Link href={`/chat/character/${characterId}`}>
               <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 border border-gray-200 flex-shrink-0 hover:opacity-90 transition-opacity shadow-sm">
@@ -382,20 +377,23 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
               </div>
             </Link>
 
-            <div>
+            <div className="min-w-0 overflow-hidden">
               <div className="flex items-center">
                 {/* 캐릭터 이름 */}
-                <h2 className="font-medium text-gray-800">{character.name}</h2>
+                <h2 className="font-medium text-gray-800 truncate">{character.name}</h2>
                 {/* 프로필 상세 버튼 */}
-                <Link href={`/chat/character/${characterId}`} className="ml-2 text-violet-500 hover:text-violet-600">
+                <Link
+                  href={`/chat/character/${characterId}`}
+                  className="ml-2 text-violet-500 hover:text-violet-600 flex-shrink-0"
+                >
                   <FontAwesomeIcon icon={faInfoCircle} size="sm" />
                 </Link>
               </div>
 
               {/* 해시태그 */}
-              <div className="flex flex-wrap gap-1 mt-0.5">
-                {character.hashtags?.map((tag: string, index: number) => (
-                  <span key={index} className="text-xs text-gray-500">
+              <div className="flex flex-wrap gap-1 mt-0.5 overflow-hidden">
+                {character.hashtags?.slice(0, 2).map((tag: string, index: number) => (
+                  <span key={index} className="text-xs text-gray-500 truncate">
                     #{tag}
                   </span>
                 )) || (
@@ -404,6 +402,9 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
                     <span className="text-xs text-gray-500">#태그</span>
                   </>
                 )}
+                {character.hashtags && character.hashtags.length > 2 && (
+                  <span className="text-xs text-gray-500">+{character.hashtags.length - 2}</span>
+                )}
               </div>
             </div>
           </div>
@@ -411,14 +412,6 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
 
         {/* 헤더 우측 아이콘들 */}
         <div className="flex items-center space-x-4">
-          {/* 무료 재화 (펜) - 클릭 시 사이드바 */}
-          <div className="flex items-center cursor-pointer" onClick={() => openModal('credit')}>
-            <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-              <FontAwesomeIcon icon={faGift} />
-            </div>
-            <span className="ml-1.5 text-sm font-semibold text-gray-700">121</span>
-          </div>
-
           {/* 짜릿모드 버튼 - 클릭 시 모달 */}
           <BaseButton
             color="gradient"
@@ -436,12 +429,20 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
             className="flex items-center"
           >
             <FontAwesomeIcon icon={getModeIcon(currentModeId)} className="mr-1.5" />
-            <span className="text-sm font-medium">{currentMode}</span>
+            <span className="text-sm font-medium md:inline hidden">{currentMode}</span>
             <FontAwesomeIcon icon={faCaretDown} className="text-xs ml-1.5" />
           </BaseButton>
 
-          {/* 유료 재화 (펜) - 클릭 시 사이드바 */}
+          {/* 무료 재화 (펜) - 클릭 시 사이드바 */}
           <div className="flex items-center cursor-pointer" onClick={() => openModal('credit')}>
+            <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+              <FontAwesomeIcon icon={faGift} />
+            </div>
+            <span className="ml-1.5 text-sm font-semibold text-gray-700">121</span>
+          </div>
+
+          {/* 유료 재화 (펜) - 클릭 시 사이드바 */}
+          <div className="hidden md:flex items-center cursor-pointer" onClick={() => openModal('credit')}>
             <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
               <FontAwesomeIcon icon={faCoins} className="h-4 w-4" />
             </div>
@@ -513,7 +514,7 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
         <div className="flex-1 flex flex-col bg-gradient-to-b from-gray-50 to-white">
           {/* 채팅 내용 */}
           <div className="flex-1 overflow-y-auto p-4 md:p-6">
-            <div className="space-y-8 max-w-3xl mx-auto">
+            <div className="flex flex-col space-y-12 max-w-3xl mx-auto">
               {chatHistory.map(chat => (
                 <motion.div
                   key={chat.id}
@@ -536,7 +537,7 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
                   <motion.div
                     initial={{ scale: 0.95 }}
                     animate={{ scale: 1 }}
-                    className={`max-w-[85%] rounded-2xl px-5 py-4 shadow-sm ${
+                    className={`max-w-[85%] md:max-w-[75%] rounded-2xl px-5 py-4 shadow-sm ${
                       chat.sender === 'user'
                         ? 'bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white rounded-tr-none'
                         : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none'
