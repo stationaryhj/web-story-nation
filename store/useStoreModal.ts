@@ -11,6 +11,7 @@ type ModalType =
   | 'liquidity'
   | 'character'
   | 'login'
+  | 'signup'
   | 'confirmAction'
   | 'notification'
   | 'credit'

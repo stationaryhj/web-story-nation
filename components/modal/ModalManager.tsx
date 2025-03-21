@@ -3,6 +3,7 @@
 import { useModalStore } from '@/store/useStoreModal'
 import CharactorModal from './CharactorModal'
 import LoginModal from './LoginModal'
+import SignupModal from './SignupModal'
 import ConfirmActionModal from './ConfirmActionModal'
 import NotificationSidebar from './NotificationSidebar'
 import CreditSidebar from './CreditSidebar'
@@ -22,6 +23,10 @@ export default function ModalManager() {
 
   if (modalType === 'login') {
     return <LoginModal isOpen={isOpen} onClose={closeModal} {...modalProps} />
+  }
+
+  if (modalType === 'signup') {
+    return <SignupModal isOpen={isOpen} onClose={closeModal} {...modalProps} />
   }
 
   if (modalType === 'confirmAction') {
