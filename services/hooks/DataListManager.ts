@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 
-import type { CharbotTop10Response, LoginResponse, CharbotSearchResponse, TagRankingListResponse, ApiResponse, CharbotChatListResponse, OrderIdResponse, CoinListResponse, CharbotChatModeResponse } from '@/types/api';
+import type { CharbotTop10Response, LoginResponse, CharbotSearchResponse, TagRankingListResponse, ApiResponse, CharbotChatListResponse, OrderIdResponse, CoinListResponse, CharbotChatModeResponse, CharbotResponse } from '@/types/api';
 
-import { contentApi, settlementApi } from '../api/storyNationApi';
+import { contentApi, settlementApi, createApi } from '../api/storyNationApi';
 import { useAccountStore } from '@/store/useStoreData';
 
 export type CategoryId = 'all' | 'male' | 'female' | 'unknown';
@@ -181,3 +181,19 @@ export const ReqGetChatMode = () => {
 
   return { data, isLoading, error, refetch };
 };
+
+
+
+export const ReqGetChatBot = (world_list_detail_chrbot_key: number) => {
+  const { data, isLoading, error, refetch } = useQuery<CharbotResponse>({
+    queryKey: [ 'createChatBot', world_list_detail_chrbot_key ],
+    queryFn: async() => {
+      const response = await createApi.GetChatBot(world_list_detail_chrbot_key);
+      return response.data as CharbotResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
+
