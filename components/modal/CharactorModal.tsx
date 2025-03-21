@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import BaseModal from './BaseModal'
+import { getImageUri } from '@/lib/utils/storyNationUtil'
 
 interface CharactorModalProps {
   isOpen: boolean
@@ -29,9 +30,15 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
 
   // 대화 시작 버튼 클릭 시 채팅 페이지로 이동
   const handleStartChat = () => {
-    if (selectedCharacter) {
+    if (selectedCharacter && selectedCharacter.id) {
       handleClose()
-      router.push(`/chat/${selectedCharacter.id}`)
+      // 유효한 문자열인지 확인
+      const chatId = String(selectedCharacter.id).trim()
+      if (chatId) {
+        router.push(`/chat/${chatId}`)
+      } else {
+        console.error('Invalid character ID')
+      }
     }
   }
 
@@ -68,7 +75,12 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
       {/* 캐릭터 이미지 */}
       <div className="relative h-64 w-full bg-gradient-to-b from-primary-100 to-primary-50 dark:from-dark-primary-900 dark:to-dark-primary-800">
         {selectedCharacter.imageUrl && (
-          <Image src={selectedCharacter.imageUrl} alt={selectedCharacter.name} fill className="object-contain" />
+          <Image
+            src={getImageUri(selectedCharacter.imageUrl)}
+            alt={selectedCharacter.name || '캐릭터'}
+            fill
+            className="object-contain"
+          />
         )}
       </div>
 
@@ -76,7 +88,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
       <div className="bg-white p-6 dark:bg-dark-background-light">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-secondary-900 dark:text-dark-secondary-100">
-            {selectedCharacter.name}
+            {selectedCharacter.name || '이름 없음'}
           </h2>
           <div className="flex items-center space-x-2">
             <button className="flex items-center rounded-full bg-red-50 p-2 text-red-500 transition-colors hover:bg-red-100 dark:bg-dark-red-900 dark:text-dark-red-300 dark:hover:bg-dark-red-800">
@@ -92,7 +104,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
           <div className="flex flex-wrap gap-2">
             {selectedCharacter.hashtags?.map((tag: string, index: number) => (
               <span
-                key={index}
+                key={`tag-${index}`}
                 className="rounded-full bg-primary-50 px-3 py-1 text-sm text-primary-700 dark:bg-dark-primary-900 dark:text-dark-primary-300"
               >
                 {tag}

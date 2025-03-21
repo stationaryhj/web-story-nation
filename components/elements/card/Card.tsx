@@ -9,6 +9,7 @@ import { faComment, faFire, faPencilAlt, faTrash } from '@fortawesome/free-solid
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import React from 'react'
+import { useRouter } from 'next/navigation'
 
 interface CardProps {
   character: Character
@@ -23,11 +24,12 @@ export default function Card({ character, index = 0, variant = 'default', onEdit
   const { name, description, imageUrl, commentCount, hashtags, isAdult, creator } = character
   const { openModal, setSelectedCharacter } = useModalStore()
   const [imageError, setImageError] = React.useState(false)
-
+  const router = useRouter()
   // 카드 클릭 기본 핸들러 - 캐릭터 모달 열기
   const defaultCardClick = () => {
     setSelectedCharacter(character)
-    openModal('character')
+    // openModal('character')
+    router.push(`/chat/${1}`)
   }
 
   // 실제 카드 클릭 핸들러

@@ -13,6 +13,8 @@ import SearchBar from '@/components/elements/search/SearchBar'
 import NavigationTabs from '@/components/elements/navigation/NavigationTabs'
 import TagList from '@/components/elements/tags/TagList'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useModalStore } from '@/store/useStoreModal'
+import ModalManager from '@/components/modal/ModalManager'
 
 export default function Home() {
   const router = useRouter()
@@ -135,6 +137,7 @@ export default function Home() {
             />
           </SectionTransition>
           <Footer />
+          <ModalManager />
         </main>
       </PageTransition>
     )
@@ -177,6 +180,7 @@ export default function Home() {
         )}
 
         <Footer />
+        <ModalManager />
       </main>
     </PageTransition>
   )
