@@ -1,4 +1,4 @@
-import ChatClientPage from '@/views/chat/index'
+import ChatClientPage from '@/views/chat/home'
 
 export default function page() {
   return (

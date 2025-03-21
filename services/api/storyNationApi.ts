@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAccountStore } from '@/store/useStoreData';
 
 import type {
     ApiResponse,
@@ -7,7 +8,11 @@ import type {
     CharbotTop10Response,
     CharbotListResponse,
     TagRankingListResponse,
-    CharbotSearchResponse
+    CharbotSearchResponse,
+    CharbotChatListResponse,
+    CoinListResponse,
+    OrderIdResponse,
+    CharbotChatModeResponse
 } from '../../types/api';
 
 // API 기본 설정
@@ -192,7 +197,10 @@ export const contentApi = {
     });
   },
 
-  GetChatList: async(paginate: string, page: number): Promise<ApiResponse> => {
+  GetChatList: async(paginate: number, page: number): Promise<ApiResponse<CharbotChatListResponse>> => {
+    // 토큰 직접 구성
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
+    api.defaults.headers.common['Authorization'] = account_token;
     return api.post('/api/charbot/chat/list', {
       paginate,
       page,
@@ -248,7 +256,7 @@ export const contentApi = {
   },
 
   // 캐봇 챗 모드 가져오기
-  GetChatMode: async(): Promise<ApiResponse> => {
+  GetChatMode: async(): Promise<ApiResponse<CharbotChatModeResponse>> => {
     return api.post('/api/charbot/chatmode');
   },
 };
@@ -367,6 +375,14 @@ export const settlementApi = {
       page,
       paginate,
     });
+  },
+
+  GetOrderId: async(): Promise<ApiResponse<OrderIdResponse>> => {
+    return api.post('/api/getorderid');
+  },
+
+  GetCoinList: async(): Promise<ApiResponse<CoinListResponse>> => {
+    return api.post('/api/coinlist');
   },
 };
 

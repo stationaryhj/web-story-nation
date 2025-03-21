@@ -1,10 +1,11 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import PageTransition from '@/components/motion/PageTransition'
 
-export default function CallbackPage() {
+// 실제 콜백 로직을 처리하는 컴포넌트
+function CallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(true)
@@ -56,32 +57,48 @@ export default function CallbackPage() {
 
   if (error) {
     return (
-      <PageTransition>
-        <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gray-50">
-          <div className="w-full max-w-md text-center space-y-6">
-            <div className="text-red-500 text-lg font-medium">{error}</div>
-            <button
-              onClick={() => router.push('/login')}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              로그인 페이지로 돌아가기
-            </button>
-          </div>
+      <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gray-50">
+        <div className="w-full max-w-md text-center space-y-6">
+          <div className="text-red-500 text-lg font-medium">{error}</div>
+          <button
+            onClick={() => router.push('/login')}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            로그인 페이지로 돌아가기
+          </button>
         </div>
-      </PageTransition>
+      </div>
     )
   }
 
   return (
-    <PageTransition>
-      <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gray-50">
-        <div className="w-full max-w-md text-center space-y-6">
-          <div className="text-xl font-medium">로그인 처리 중...</div>
-          <div className="relative w-20 h-20 mx-auto">
-            <div className="w-full h-full rounded-full border-4 border-blue-100 border-t-blue-500 animate-spin"></div>
-          </div>
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gray-50">
+      <div className="w-full max-w-md text-center space-y-6">
+        <div className="text-xl font-medium">로그인 처리 중...</div>
+        <div className="relative w-20 h-20 mx-auto">
+          <div className="w-full h-full rounded-full border-4 border-blue-100 border-t-blue-500 animate-spin"></div>
         </div>
       </div>
+    </div>
+  )
+}
+
+// 메인 컴포넌트
+export default function CallbackPage() {
+  return (
+    <PageTransition>
+      <Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gray-50">
+          <div className="w-full max-w-md text-center space-y-6">
+            <div className="text-xl font-medium">로딩 중...</div>
+            <div className="relative w-20 h-20 mx-auto">
+              <div className="w-full h-full rounded-full border-4 border-blue-100 border-t-blue-500 animate-spin"></div>
+            </div>
+          </div>
+        </div>
+      }>
+        <CallbackContent />
+      </Suspense>
     </PageTransition>
   )
 } 

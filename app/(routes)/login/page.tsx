@@ -1,4 +1,4 @@
-import LoginPage from '@/views/login'
+import LoginPage from '@/views/login/home'
 
 export default function Page() {
   return (
@@ -6,4 +6,4 @@ export default function Page() {
       <LoginPage />
     </>
   )
-} 
+}
