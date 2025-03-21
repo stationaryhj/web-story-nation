@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import BaseModal from './BaseModal'
+import { getImageUri } from '@/lib/utils/storyNationUtil'
 
 interface CharactorModalProps {
   isOpen: boolean
@@ -68,7 +69,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
       {/* 캐릭터 이미지 */}
       <div className="relative h-64 w-full bg-gradient-to-b from-primary-100 to-primary-50 dark:from-dark-primary-900 dark:to-dark-primary-800">
         {selectedCharacter.imageUrl && (
-          <Image src={selectedCharacter.imageUrl} alt={selectedCharacter.name} fill className="object-contain" />
+          <Image src={getImageUri(selectedCharacter.imageUrl)} alt={selectedCharacter.name} fill className="object-contain" />
         )}
       </div>
 

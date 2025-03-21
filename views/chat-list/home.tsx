@@ -3,6 +3,7 @@
 import Footer from '@/components/common/footer'
 import Header from '@/components/common/header'
 import PageTransition from '@/components/motion/PageTransition'
+import { ReqGetChatList } from '@/services/hooks/DataListManager'
 import { faSearch, faSort } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion } from 'framer-motion'
@@ -15,6 +16,8 @@ export default function ChatListPage() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('all') // 'all', 'favorites'
   const [searchQuery, setSearchQuery] = useState('')
+
+  const { data: chatDataList, isLoading, error, refetch } = ReqGetChatList(10, 1);
 
   // 더미 채팅 데이터
   const chatList = [

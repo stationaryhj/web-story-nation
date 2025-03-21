@@ -16,7 +16,7 @@ interface CardProps {
   variant?: 'default' | 'my-character'
   onEdit?: () => void
   onDelete?: () => void
-  onCardClick?: () => void
+  onCardClick?: (data: Character) => void
 }
 
 export default function Card({ character, index = 0, variant = 'default', onEdit, onDelete, onCardClick }: CardProps) {
@@ -32,7 +32,7 @@ export default function Card({ character, index = 0, variant = 'default', onEdit
   // 실제 카드 클릭 핸들러
   const handleCardClick = () => {
     if (onCardClick) {
-      onCardClick()
+      onCardClick(character)
     } else {
       defaultCardClick()
     }

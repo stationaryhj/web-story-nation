@@ -3,7 +3,7 @@
 import Header from '@/components/common/header';
 import Footer from '@/components/common/footer';
 import PageTransition from '@/components/motion/PageTransition';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -11,7 +11,6 @@ import Link from 'next/link';
 
 // 실제 콘텐츠를 처리하는 컴포넌트
 function PaymentSuccessContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   const [paymentData, setPaymentData] = useState<any>(null);

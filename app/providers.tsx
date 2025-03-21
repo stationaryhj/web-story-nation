@@ -8,11 +8,19 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AnimatePresence } from 'framer-motion'
 import type { ReactNode } from 'react'
 import { useState, useEffect } from 'react'
+import { InitDataLoader } from '@/app/providers/InitDataLoader'
 
 import { API_URL, CHAT_URL } from '@/services/api/storyNationApi'
 
 export default function Providers({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient())
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+        retry: 1,
+      },
+    },
+  }))
   const { isDarkMode } = useThemeStore()
   const [mounted, setMounted] = useState(false)
 
@@ -22,8 +30,9 @@ export default function Providers({ children }: { children: ReactNode }) {
 
     // Zustand 스토어 하이드레이션 수동 처리
     const hydrateStore = async () => {
-      const { useThemeStore } = await import('@/store/useStoreData')
+      const { useThemeStore, useCoinStore } = await import('@/store/useStoreData')
       useThemeStore.persist.rehydrate()
+      useCoinStore.persist.rehydrate()
     }
 
     hydrateStore()
@@ -93,8 +102,10 @@ export default function Providers({ children }: { children: ReactNode }) {
         borderRadius="0.25rem"
         duration={1.5}
       >
-        <AnimatePresence mode="wait">{children}</AnimatePresence>
-        <ModalManager />
+        <InitDataLoader>
+          <AnimatePresence mode="wait">{children}</AnimatePresence>
+          <ModalManager />
+        </InitDataLoader>
       </SkeletonThemeProvider>
 
       <DevNote />

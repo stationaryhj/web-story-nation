@@ -71,7 +71,7 @@ export default function CardGrid({ title = null, subtitle = null, categoryId = '
           Array(5)
             .fill(0)
             .map((_, index) => <CardSkeleton key={ index }/>) :
-          characters.map((character, index) => <Card key={ character.id } character={ character } index={ index }/>) }
+          characters.map((character, index) => <Card key={ character.id } character={ character } index={ index } />) }
       </div>
     </div>
   );
