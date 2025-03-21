@@ -1,6 +1,7 @@
 'use client'
 
 import { faPen } from '@fortawesome/free-solid-svg-icons'
+import { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useModalStore } from '@/store/useStoreModal'
 
@@ -10,6 +11,7 @@ interface CreditButtonProps {
 }
 
 export default function CreditButton({ credits = 0, className = '' }: CreditButtonProps) {
+  const [isHovered, setIsHovered] = useState(false)
   const { openModal } = useModalStore()
 
   const handleClick = () => {
@@ -18,14 +20,13 @@ export default function CreditButton({ credits = 0, className = '' }: CreditButt
 
   return (
     <button
-      className={`flex items-center rounded-full bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100 dark:bg-dark-primary-900 dark:text-dark-primary-300 dark:hover:bg-dark-primary-800 ${className}`}
+      className={`relative rounded-full p-2 text-secondary-500 transition-colors hover:bg-secondary-100 hover:text-secondary-700 dark:text-dark-secondary-400 dark:hover:bg-dark-secondary-800 dark:hover:text-dark-secondary-300 ${className}`}
       onClick={handleClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       aria-label="펜 충전"
     >
-      <FontAwesomeIcon icon={faPen} className="mr-1.5 h-3.5 w-3.5" />
-      <span>{credits.toLocaleString()}</span>
-      <span className="ml-1 text-xs text-primary-500 dark:text-dark-primary-400">펜</span>
-      <span className="ml-2 text-xs text-primary-600 dark:text-dark-primary-400">+</span>
+      <FontAwesomeIcon icon={faPen} className={`h-5 w-5 ${isHovered ? 'animate-wiggle' : ''}`} />
     </button>
   )
 }
