@@ -1,4 +1,4 @@
-import CreateDetailCharacterPage from '@/views/myCharacters/createDetail'
+import CreateDetailCharacterPage from '@/views/my-characters/createDetail'
 
 export default function page() {
   return (

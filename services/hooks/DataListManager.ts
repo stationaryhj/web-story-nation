@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 
-import type { CharbotTop10Response, LoginResponse, CharbotSearchResponse, TagRankingListResponse, ApiResponse } from '@/types/api';
+import type { CharbotTop10Response, LoginResponse, CharbotSearchResponse, TagRankingListResponse, ApiResponse, CharbotChatListResponse, OrderIdResponse, CoinListResponse, CharbotChatModeResponse } from '@/types/api';
 
-import { contentApi } from '../api/storyNationApi';
+import { contentApi, settlementApi } from '../api/storyNationApi';
 import { useAccountStore } from '@/store/useStoreData';
 
 export type CategoryId = 'all' | 'male' | 'female' | 'unknown';
@@ -118,12 +118,64 @@ export const ReqGetTags = (categoryType: number) => {
   return { data, isLoading, error };
 };
 
+export const ReqGetChatList = (paginate: number, page: number) => {
+  const { data, isLoading, error, refetch } = useQuery<CharbotChatListResponse>({
+    queryKey: ['chatList', paginate, page],
+    queryFn: async () => {
+      const response = await contentApi.GetChatList(paginate, page);
+      return response.data as CharbotChatListResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
 export const ReqLogin = (nick_nm: string) => {
   const { data, isLoading, error, refetch } = useQuery<LoginResponse>({
     queryKey: [ 'loginGuest' ],
     queryFn: async() => {
       const response = await contentApi.LoginGuest(nick_nm);
       return response.data as LoginResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
+// 이녀석은 차후 신성도 유지해야함.
+export const ReqGetOrderId = () => {
+  const { data, isLoading, error, refetch } = useQuery<OrderIdResponse>({
+    queryKey: [ 'orderId' ],
+    queryFn: async() => {
+      const response = await settlementApi.GetOrderId();
+      return response.data as OrderIdResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
+
+// 이녀석은 차후 신성도 유지해야함.
+export const ReqGetCoinList = () => {
+  const { data, isLoading, error, refetch } = useQuery<CoinListResponse>({
+    queryKey: [ 'coinList' ],
+    queryFn: async() => {
+      const response = await settlementApi.GetCoinList();
+      return response.data as CoinListResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
+
+export const ReqGetChatMode = () => {
+  const { data, isLoading, error, refetch } = useQuery<CharbotChatModeResponse>({
+    queryKey: [ 'chatMode' ],
+    queryFn: async() => {
+      const response = await contentApi.GetChatMode();
+      return response.data as CharbotChatModeResponse;
     }
   });
 

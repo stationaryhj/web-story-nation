@@ -1,8 +1,8 @@
 // 서버 컴포넌트로 변경
-import Header from '@/components/layout/header'
+import Header from '@/components/common/header'
 import PageTransition from '@/components/motion/PageTransition'
 
-import SettingsForm from '../../../views/settings'
+import SettingsForm from '../../../views/settings/home'
 
 export default function SettingsPage() {
   return (

@@ -1,19 +1,20 @@
-'use client';
+'use client'
 
-import { bridgeCharacterDataToCharacter } from '@/lib/utils/storyNationUtil';
-import { ReqGetCharacterList, CATEGORIES } from '@/services/hooks/DataListManager';
-import { SectionTransition } from '@/components/motion/PageTransition';
-import CardGrid from '@/components/elements/card/CardGrid';
-import FilterControls from '@/components/elements/filters/FilterControls';
-import Tags from '@/components/elements/tags';
-import { CategoryId } from '@/services/hooks/DataListManager';
-import { Character } from '@/store/useStoreData';
-import { CharbotData, ModuleCharacter } from '@/types/api';
-import { useState, useEffect } from 'react';
+import { bridgeCharacterDataToCharacter } from '@/lib/utils/storyNationUtil'
+import { ReqGetCharacterList, CATEGORIES } from '@/services/hooks/DataListManager'
+import { SectionTransition } from '@/components/motion/PageTransition'
+import CardGrid from '@/components/elements/card/CardGrid'
+import FilterControls from '@/components/elements/filters/FilterControls'
+import Tags from '@/components/elements/tags'
+import { CategoryId } from '@/services/hooks/DataListManager'
+import { Character } from '@/store/useStoreData'
+import { CharbotData, ModuleCharacter } from '@/types/api'
+import { useState, useEffect } from 'react'
+import { useSettingsStore } from '@/store/useStoreSettings'
 
 interface CharacterGridSectionProps {
-  categoryId: CategoryId;
-  onSearchTrigger?: (query: string) => void;
+  categoryId: CategoryId
+  onSearchTrigger?: (query: string) => void
 }
 
 // CharbotData를 ModuleCharacter 형식으로 변환하는 함수
@@ -32,30 +33,30 @@ const mapToModuleCharacter = (data: CharbotData[]): ModuleCharacter[] => {
     nick_nm: item.nick_nm,
     nsfw: item.nsfw,
     module_id: 0, // 기본값 설정
-    sort: 0 // 기본값 설정
-  }));
-};
+    sort: 0, // 기본값 설정
+  }))
+}
 
-export default function CharacterGridSection({ 
-  categoryId,
-  onSearchTrigger 
-}: CharacterGridSectionProps) {
+export default function CharacterGridSection({ categoryId, onSearchTrigger }: CharacterGridSectionProps) {
+  // 짜릿모드 상태 가져오기
+  const { isAdultModeEnabled } = useSettingsStore()
+
   // 필터링 상태 관리
-  const [order, setOrder] = useState<number>(1); // 1: 인기순(기본값), 2: 최신순
-  const [nsfw, setNsfw] = useState<number>(2); // 2: 전체 이용가(기본값), 1: 짜릿모드 가능, 3: 이용등급 전체
-  const [selectedTag, setSelectedTag] = useState<string>('');
+  const [order, setOrder] = useState<number>(1) // 1: 인기순(기본값), 2: 최신순
+  const [nsfw, setNsfw] = useState<number>(2) // 2: 전체 이용가(기본값), 1: 짜릿모드 가능, 3: 이용등급 전체
+  const [selectedTag, setSelectedTag] = useState<string>('')
 
   // 카테고리 정보 가져오기
-  const categoryInfo = CATEGORIES.find(cat => cat.id === categoryId);
-  const categoryName = categoryInfo?.name || '캐릭터';
-  const categoryType = categoryInfo?.type || '';
+  const categoryInfo = CATEGORIES.find(cat => cat.id === categoryId)
+  const categoryName = categoryInfo?.name || '캐릭터'
+  const categoryType = categoryInfo?.type || ''
 
   // 컴포넌트 내부에서 직접 데이터 로드
   const {
     data: categoryData,
     isLoading,
     error,
-    refetch
+    refetch,
   } = ReqGetCharacterList(
     categoryId,
     nsfw, // nsfw
@@ -63,15 +64,15 @@ export default function CharacterGridSection({
     10, // paginate
     order, // order
     selectedTag // tag 검색어
-  );
+  )
 
   // 필터 값이 변경될 때 데이터 다시 로드
   useEffect(() => {
-    refetch();
-  }, [order, nsfw, selectedTag, refetch]);
+    refetch()
+  }, [order, nsfw, selectedTag, refetch])
 
   if (categoryId === 'all') {
-    return null; // all 카테고리는 RecommendSection에서 처리
+    return null // all 카테고리는 RecommendSection에서 처리
   }
 
   if (isLoading) {
@@ -81,7 +82,7 @@ export default function CharacterGridSection({
           <h2 className="text-2xl font-bold mb-6">Loading {categoryName} data...</h2>
         </div>
       </SectionTransition>
-    );
+    )
   }
 
   if (error) {
@@ -92,11 +93,16 @@ export default function CharacterGridSection({
           <p>{error.message}</p>
         </div>
       </SectionTransition>
-    );
+    )
   }
 
   // categoryData가 없는 경우
-  if (!categoryData || !categoryData.chrbotList || !categoryData.chrbotList.data || categoryData.chrbotList.data.length === 0) {
+  if (
+    !categoryData ||
+    !categoryData.chrbotList ||
+    !categoryData.chrbotList.data ||
+    categoryData.chrbotList.data.length === 0
+  ) {
     return (
       <SectionTransition className="py-12 bg-white dark:bg-dark-background-light">
         <div className="container mx-auto px-4">
@@ -104,39 +110,32 @@ export default function CharacterGridSection({
           <p>데이터가 없습니다.</p>
         </div>
       </SectionTransition>
-    );
+    )
   }
 
   // 데이터 변환 과정 간소화
   // 1. CharbotData를 ModuleCharacter로 변환
-  const moduleData = mapToModuleCharacter(categoryData.chrbotList.data);
-  
+  const moduleData = mapToModuleCharacter(categoryData.chrbotList.data)
+
   // 2. 새로 추가한 브릿지 함수로 ModuleCharacter를 Character로 바로 변환
-  const characterData = bridgeCharacterDataToCharacter(moduleData);
+  const characterData = bridgeCharacterDataToCharacter(moduleData)
+
+  // 3. 짜릿모드가 아닌 경우 isAdult가 true인 카드는 필터링
+  const filteredCharacterData = isAdultModeEnabled
+    ? characterData
+    : characterData.filter(character => !character.isAdult)
 
   return (
     <SectionTransition className="py-12 bg-white dark:bg-dark-background-light">
       <div className="container mx-auto px-4">
         {/* 태그 필터 */}
-        <Tags 
-          categoryType={categoryType} 
-          selectedTag={selectedTag} 
-          setSelectedTag={setSelectedTag} 
-        />
+        <Tags categoryType={categoryType} selectedTag={selectedTag} setSelectedTag={setSelectedTag} />
 
         {/* 공통 필터 컴포넌트 적용 */}
-        <FilterControls
-          order={order}
-          setOrder={setOrder}
-          nsfw={nsfw}
-          setNsfw={setNsfw}
-        />
-        
-        <CardGrid 
-          categoryId={categoryId}
-          customData={characterData as Character[]}
-        />
+        <FilterControls order={order} setOrder={setOrder} nsfw={nsfw} setNsfw={setNsfw} />
+
+        <CardGrid categoryId={categoryId} customData={filteredCharacterData as Character[]} />
       </div>
     </SectionTransition>
-  );
+  )
 }

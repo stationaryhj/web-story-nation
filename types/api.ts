@@ -350,6 +350,29 @@ export interface CharbotSearchData {
   total: number;
 }
 
+// GetOrderId Response
+export interface OrderIdResponse {
+  orderId: string;
+  result: ApiResult;
+}
+
+// CoinData Response
+export interface CoinListResponse {
+  coinList: Array<CoinData>;
+  result: ApiResult;
+}
+
+export interface CoinData {
+  coin_key: number;
+  coin_type: number;
+  coin_nm: string;
+  img_url: string;
+  content: string;
+  cnt: number;
+  price: number;
+  sort: number;
+}
+
 // API Result
 export type ApiResult = {
   err: number;
