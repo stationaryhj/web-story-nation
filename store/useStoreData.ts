@@ -1,5 +1,5 @@
 // store/useStoreData.ts
-import { LoginResponse } from '@/types/api';
+import { ChatModeData, CoinData, LoginResponse } from '@/types/api';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
@@ -323,3 +323,46 @@ export const useAccountStore = create<AccountStore>()(
 );
 
 
+interface CoinStore {
+  coinList: Array<CoinData>;
+  orderId: string;
+  setCoinList: (coinList: Array<CoinData>) => void;
+  setOrderId: (orderId: string) => void;
+}
+
+export const useCoinStore = create<CoinStore>()(
+  persist(
+    (set) => ({
+      coinList: [],
+      orderId: '',
+      setCoinList: (coinList: Array<CoinData>) => set({ coinList }),
+      setOrderId: (orderId: string) => set({ orderId }),
+    }),
+    {
+      name: 'coin-storage',
+      storage: createJSONStorage(() => safeStorage),
+      skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
+    },
+  ),
+);
+
+
+interface ChatModeStore {
+  chatMode: Array<ChatModeData>;
+  setChatMode: (chatMode: Array<ChatModeData>) => void;
+}
+
+
+export const useChatModeStore = create<ChatModeStore>()(
+  persist(
+    (set) => ({
+      chatMode: [],
+      setChatMode: (chatMode: Array<ChatModeData>) => set({ chatMode }),
+    }),
+    {
+      name: 'chatMode-storage',
+      storage: createJSONStorage(() => safeStorage),
+      skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
+    },
+  ),
+);
