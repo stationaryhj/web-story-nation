@@ -1,4 +1,4 @@
-import { ModuleCharacter } from '@/types/api';
+import { CharbotChatData, CharbotChatListData, ChrbotData, ModuleCharacter } from '@/types/api';
 
 /**
   get image Uri
@@ -94,3 +94,47 @@ export function bridgeCharacterDataToCharacter(dataList: Array<ModuleCharacter>)
 
   return characters;
 }
+
+
+export function bridgeCharbotDataToCharacter(data: ChrbotData) {
+  return {
+    id: data.world_list_detail_chrbot_key.toString(),
+    name: data.title,
+    description: data.intro,
+    imageUrl: getImageUri(data.img_url),
+    commentCount: data.msg_cnt,
+    hashtags: data.tags ? data.tags.split(',') : [],
+    isAdult: data.nsfw === 1,
+    creator: {
+      id: data.world_list_detail_chrbot_key.toString(),
+      nickname: data.nick_nm || '',
+      username: '',
+      profileImageUrl: null,
+      isActive: true,
+    },
+    category: getCategory(Number(data.gender))
+  };
+}
+
+
+export function bridgeCharbotChatDataToChatList(data: Array<CharbotChatData>) {
+  return data.map((item) => ({
+    id: item.chrbot_chat_key.toString(),
+    characterId: item.world_list_detail_chrbot_key.toString(),
+    name: item.title,
+    lastMessage: item.last_msg,
+    time: '',
+    imageUrl: getImageUri(item.img_url),
+  }));
+}
+
+function getCategory(gender: number) {
+  if (gender === 1) {
+    return 'male';
+  } else if (gender === 2) {
+    return 'female';
+  } else {
+    return 'unspecified';
+  }
+}
+

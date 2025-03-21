@@ -12,7 +12,8 @@ import type {
     CharbotChatListResponse,
     CoinListResponse,
     OrderIdResponse,
-    CharbotChatModeResponse
+    CharbotChatModeResponse,
+    CharbotResponse
 } from '../../types/api';
 
 // API 기본 설정
@@ -49,11 +50,11 @@ const createApiInstance = (baseURL: string) => {
 };
 
 // 환경에 따른 API URL 설정
-// const API_URL = process.env.NODE_ENV === 'production' ?
-//   process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL :
-//   process.env.NEXT_PUBLIC_STORYNATION_API_URL;
+const API_URL = process.env.NODE_ENV === 'production' ?
+  process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL :
+  process.env.NEXT_PUBLIC_STORYNATION_API_URL;
 
-const API_URL = process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL;
+// const API_URL = process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL;
 
 const CHAT_URL = process.env.NODE_ENV === 'production' ?
   process.env.NEXT_PUBLIC_STORYNATION_PROD_CHAT_URL :
@@ -264,6 +265,8 @@ export const contentApi = {
 // 채팅 API
 export const chatApi = {
   OpenChat: async(chrbot_chat_key: number, chat_mode: number, nsfw: number): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
+    chatApiInstance.defaults.headers.common['Authorization'] = account_token;
     return chatApiInstance.post('/api/charbot/chat/open', {
       chrbot_chat_key,
       chat_mode,
@@ -472,13 +475,13 @@ export const createApi = {
     });
   },
 
-  GetCreateChatBot: async(world_list_detail_chrbot_key: number): Promise<ApiResponse> => {
+  GetChatBot: async(world_list_detail_chrbot_key: number): Promise<ApiResponse<CharbotResponse>> => {
     return api.post('/api/charbot/get', {
       world_list_detail_chrbot_key,
     });
   },
 
-  GetCreateChatBotAuth: async(): Promise<ApiResponse> => {
+  GetChatBotAuth: async(): Promise<ApiResponse> => {
     return api.post('/api/charbot/get/auth');
   },
 };

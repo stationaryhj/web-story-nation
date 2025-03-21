@@ -1,7 +1,7 @@
 'use client'
 
 import type { Character } from '@/store/useStoreData'
-import { useStoreData } from '@/store/useStoreData'
+import { useAccountStore, useStoreData } from '@/store/useStoreData'
 import {
   faPaperPlane,
   faArrowLeft,
@@ -31,15 +31,46 @@ import { useEffect, useState, useRef } from 'react'
 import { useModalStore } from '@/store/useStoreModal'
 import type { ChatMode } from '@/components/modal/ChatModeModal'
 import { BaseButton } from '@/components/elements/button/BaseButton'
+import type { ChrbotData } from '@/types/api'
+import { bridgeCharbotDataToCharacter } from '@/lib/utils/storyNationUtil'
+import { useNakama } from '@/app/providers/NakamaProviders'
+
 
 interface ChatDetailClientProps {
-  characterId: string
+  characterId: string,
+  charbotData: ChrbotData | null
 }
 
-export default function ChatDetailClient({ characterId }: ChatDetailClientProps) {
+export default function ChatDetailClient({ characterId, charbotData }: ChatDetailClientProps) {
+  const { isLogin, data: accountData } = useAccountStore(state => ({ 
+    isLogin: state.isLogin, 
+    data: state.data 
+  }));
+  
+  const {
+    client,
+    session,
+    isConnected,
+    isConnecting,
+    setSession,
+    chatRoomInit,
+    connectSocket,
+    disconnectSocket,
+    joinChat,
+    leaveChat,
+    sendMessage,
+    addChannelMessageListener,
+    removeChannelMessageListener,
+    addConnectionListener,
+    removeConnectionListener,
+    addDisconnectionListener,
+    removeDisconnectionListener
+  } = useNakama();
+  
   const { characters } = useStoreData()
-  const [character, setCharacter] = useState<Character | null>(null)
   const [message, setMessage] = useState('')
+  const isFirstRender = useRef(true);
+  const hasInitialized = useRef(false);
   const [chatHistory, setChatHistory] = useState<
     Array<{
       id: string
@@ -53,8 +84,36 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [isAdultMode, setIsAdultMode] = useState(false)
   const [currentModeId, setCurrentModeId] = useState('')
+  const [isInitRoom, setIsInitRoom] = useState(false);
 
   const { openModal, closeModal } = useModalStore()
+
+  const character = bridgeCharbotDataToCharacter(charbotData as ChrbotData);
+
+  useEffect(() => {
+    if (hasInitialized.current || !character?.id) {
+      return;
+    }
+
+    const createChat = async () => {
+      try {
+        hasInitialized.current = true;
+        console.log('@@@ Initializing chat room...');
+        await chatRoomInit(accountData?.user_key, characterId, 2);
+      } catch (error) {
+        console.error('채팅방 초기화 실패:', error);
+        hasInitialized.current = false;
+      }
+    };
+
+    createChat();
+  }, [character?.id, characterId, chatRoomInit]);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+    }
+  }, [character, isConnected]);
 
   // 드롭다운 외부 클릭 감지
   useEffect(() => {
@@ -65,6 +124,8 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => {
+      disconnectSocket();
+      leaveChat();
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
@@ -92,7 +153,7 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
         category: 'unspecified',
       }
 
-      setCharacter(defaultCharacter)
+      // setCharacter(defaultCharacter)
       setCurrentModeId('exciting2')
       setCurrentMode('짜릿모드 2.0')
 
@@ -111,7 +172,7 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
     // 캐릭터 정보 찾기
     const foundCharacter = characters.find(char => char.id === characterId)
     if (foundCharacter) {
-      setCharacter(foundCharacter)
+      // setCharacter(foundCharacter)
       setCurrentModeId('exciting2')
       setCurrentMode('짜릿모드 2.0')
 
@@ -152,8 +213,52 @@ export default function ChatDetailClient({ characterId }: ChatDetailClientProps)
     }
   }, [characterId, characters])
 
+  const connectChatRoom = async () => {
+    if(!client) {
+      console.log('@@@ client is not connected');
+      return;
+    }
+    // accountData?.user_key, characterId, 2
+
+    const user_key = accountData?.user_key;
+    const _chatBotId = characterId;
+    const _chat_mode = 2;
+    const roomName = 'chat_' + user_key + '_' + _chatBotId;
+    const persistence = true;
+    const hidden = false;
+
+    let deviceId = 'chatbot_jackpot_' + user_key;
+    console.log('>> deviceId :: ', deviceId);
+
+    // session 생성
+    const newSession = await client.authenticateDevice(deviceId, false, user_key?.toString());
+    const isSuccess = await connectSocket(newSession);
+    if(!isSuccess) {
+      console.log('@@@ connectSocket failed');
+      return;
+    }
+
+    const channel = await joinChat(roomName, persistence, hidden);
+    if(!channel) {
+      console.log('@@@ joinChat failed');
+      return;
+    }
+
+    let _chrbot_chat_key = 0;
+
+    let split = channel['room_name'].split('|');
+
+    console.log('split :: ', split);
+    if(split.length >= 2) {
+      _chrbot_chat_key = parseInt(split[1]);
+    }
+
+    console.log('@@@@ End ChatRoomInit @@@@ :: ', _chrbot_chat_key);
+  }
+
+
   // 메시지 전송 처리
-  const handleSendMessage = (e: FormEvent) => {
+  const handleSendMessage = async (e: FormEvent) => {
     e.preventDefault()
 
     if (!message.trim() || !character) return

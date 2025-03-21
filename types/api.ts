@@ -155,7 +155,13 @@ export interface ChrbotData {
   world_list_detail_key: number;
 }
 
+
 export interface CharbotChatListResponse {
+  chrbot_chat: CharbotChatListData,
+  result: ApiResult;
+}
+
+export interface CharbotChatListData {
   current_page: number;
   data: Array<CharbotChatData>;
   first_page_url: string;

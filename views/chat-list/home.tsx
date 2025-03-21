@@ -3,6 +3,7 @@
 import Footer from '@/components/common/footer'
 import Header from '@/components/common/header'
 import PageTransition from '@/components/motion/PageTransition'
+import { bridgeCharbotChatDataToChatList } from '@/lib/utils/storyNationUtil'
 import { ReqGetChatList } from '@/services/hooks/DataListManager'
 import { faSearch, faSort } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -19,33 +20,8 @@ export default function ChatListPage() {
 
   const { data: chatDataList, isLoading, error, refetch } = ReqGetChatList(10, 1);
 
-  // 더미 채팅 데이터
-  const chatList = [
-    {
-      id: '1',
-      characterId: '1',
-      name: '에단 카터',
-      lastMessage: '안녕하세요! 오늘 경기 준비는 잘 되고 있나요?',
-      time: '오전 11:56',
-      imageUrl: '/images/character1.jpg',
-    },
-    {
-      id: '2',
-      characterId: '2',
-      name: '리아 김',
-      lastMessage: '새로운 보안 취약점을 발견했어요. 확인해보세요.',
-      time: '어제',
-      imageUrl: '/images/character1.jpg',
-    },
-    {
-      id: '3',
-      characterId: '3',
-      name: '마르코 발렌티',
-      lastMessage: '오늘의 특별 요리는 트러플 리조또입니다.',
-      time: '2일 전',
-      imageUrl: '/images/character1.jpg',
-    },
-  ]
+  const chatList = bridgeCharbotChatDataToChatList(chatDataList?.chrbot_chat?.data || []);
+
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault()
@@ -122,7 +98,7 @@ export default function ChatListPage() {
                       key={chat.id}
                       className="flex items-center p-3 rounded-lg hover:bg-secondary-50 dark:hover:bg-dark-secondary-100/10 cursor-pointer"
                       whileHover={{ scale: 1.02 }}
-                      onClick={() => router.push(`/chat/${chat.id}`)}
+                      onClick={() => router.push(`/chat/${chat.characterId}`)}
                     >
                       <div className="relative w-12 h-12 rounded-full overflow-hidden mr-3">
                         <Image src={chat.imageUrl} alt={chat.name} fill className="object-cover" />
