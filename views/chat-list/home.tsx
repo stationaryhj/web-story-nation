@@ -4,8 +4,9 @@ import Footer from '@/components/common/footer'
 import Header from '@/components/common/header'
 import PageTransition from '@/components/motion/PageTransition'
 import { bridgeCharbotChatDataToChatList } from '@/lib/utils/storyNationUtil'
+import { contentApi, chatApi } from '@/services/api/storyNationApi'
 import { ReqGetChatList } from '@/services/hooks/DataListManager'
-import { faSearch, faSort } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faSort, faThumbtack, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
@@ -17,17 +18,39 @@ export default function ChatListPage() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('all') // 'all', 'favorites'
   const [searchQuery, setSearchQuery] = useState('')
+  
 
   const { data: chatDataList, isLoading, error, refetch } = ReqGetChatList(10, 1);
-
   const chatList = bridgeCharbotChatDataToChatList(chatDataList?.chrbot_chat?.data || []);
-
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault()
     // 검색 로직 구현
     console.log('검색어:', searchQuery)
   }
+
+  const handleDeleteChat = async (e: React.MouseEvent, bot_key: number) => {
+    e.stopPropagation();  // 버블링 방지
+    try {
+      await chatApi.CloseChat(bot_key);
+      // API 호출이 성공하면 목록 다시 불러오기
+      await refetch();
+    } catch (error) {
+      console.error('Failed to update chat fixed status:', error);
+    }
+  };
+
+  const handleTogglePin = async (e: React.MouseEvent, bot_key: number, _fixed: number) => {
+    e.stopPropagation();  // 버블링 방지
+
+    try {
+      await contentApi.GetChatTopFixed(bot_key, _fixed > 0 ? 0 : 1);
+      // API 호출이 성공하면 목록 다시 불러오기
+      await refetch();
+    } catch (error) {
+      console.error('Failed to update chat fixed status:', error);
+    }
+  };
 
   return (
     <PageTransition>
@@ -96,7 +119,7 @@ export default function ChatListPage() {
                   {chatList.map(chat => (
                     <motion.div
                       key={chat.id}
-                      className="flex items-center p-3 rounded-lg hover:bg-secondary-50 dark:hover:bg-dark-secondary-100/10 cursor-pointer"
+                      className="flex items-center p-3 rounded-lg hover:bg-secondary-50 dark:hover:bg-dark-secondary-100/10 cursor-pointer group"
                       whileHover={{ scale: 1.02 }}
                       onClick={() => router.push(`/chat/${chat.characterId}`)}
                     >
@@ -115,6 +138,22 @@ export default function ChatListPage() {
                         <p className="text-sm text-secondary-600 dark:text-dark-secondary-500 truncate">
                           {chat.lastMessage}
                         </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 ml-3 transition-opacity">
+                        <button
+                          onClick={(e) => handleTogglePin(e, Number(chat.id), Number(chat.fixed))}
+                          className={`p-2 rounded-full hover:bg-secondary-100 dark:hover:bg-dark-secondary-200/10 transition-colors ${
+                            Number(chat.fixed) === 1 ? 'text-yellow-500 dark:text-yellow-400' : 'text-secondary-400 dark:text-dark-secondary-400'
+                          }`}
+                        >
+                          <FontAwesomeIcon icon={faThumbtack} className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => handleDeleteChat(e, Number(chat.id))}
+                          className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/10 text-red-400 dark:text-red-400 hover:text-red-500 dark:hover:text-red-500 transition-colors"
+                        >
+                          <FontAwesomeIcon icon={faTrash} className="w-4 h-4" />
+                        </button>
                       </div>
                     </motion.div>
                   ))}

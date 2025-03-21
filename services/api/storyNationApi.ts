@@ -275,6 +275,8 @@ export const chatApi = {
   },
 
   CloseChat: async(chrbot_chat_key: number): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
+    chatApiInstance.defaults.headers.common['Authorization'] = account_token;
     return chatApiInstance.post('/api/charbot/chat/close', {
       chrbot_chat_key,
     });

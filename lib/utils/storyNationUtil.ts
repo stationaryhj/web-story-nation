@@ -125,6 +125,7 @@ export function bridgeCharbotChatDataToChatList(data: Array<CharbotChatData>) {
     lastMessage: item.last_msg,
     time: '',
     imageUrl: getImageUri(item.img_url),
+    fixed: item.fixed,
   }));
 }
 
