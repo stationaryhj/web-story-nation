@@ -3,7 +3,7 @@
 import { faPen } from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useModalStore } from '@/store/useStoreModal'
+import { useRouter } from 'next/navigation'
 
 interface CreditButtonProps {
   credits?: number
@@ -12,10 +12,10 @@ interface CreditButtonProps {
 
 export default function CreditButton({ credits = 0, className = '' }: CreditButtonProps) {
   const [isHovered, setIsHovered] = useState(false)
-  const { openModal } = useModalStore()
+  const router = useRouter()
 
   const handleClick = () => {
-    openModal('credit')
+    router.push('/shop-recharge')
   }
 
   return (
