@@ -1,11 +1,15 @@
+'use client'
+
 import { Suspense, use } from 'react'
 import ChatDetailClient from '@/views/chat/detail'
+import { NakamaProvider, useNakama } from './NakamaContext';
 
 export default function ChatDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { isAuthenticated, session, logout, closeChat, exitChat, sendMessage, messagesList } = useNakama();
   const unwrappedParams = use(params)
 
   return (
-    <>
+    <NakamaProvider chatId={unwrappedParams.id as string} chat_mode={2}>
       <div className="flex flex-col justify-center items-center h-screen w-100vw bg-neutral-100 dark:bg-dark-background-DEFAULT">
         <div className="flex flex-col justify-center items-center h-screen max-w-[1280px] w-full bg-neutral-100 dark:bg-dark-background-DEFAULT">
           <Suspense
@@ -19,6 +23,6 @@ export default function ChatDetailPage({ params }: { params: Promise<{ id: strin
           </Suspense>
         </div>
       </div>
-    </>
+    </NakamaProvider>
   )
 }
