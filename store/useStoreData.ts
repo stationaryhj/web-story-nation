@@ -317,7 +317,7 @@ export const useAccountStore = create<AccountStore>()(
     {
       name: 'account-storage',
       storage: createJSONStorage(() => safeStorage),
-      skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
+      // skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
     },  
   ),
 );
@@ -341,7 +341,7 @@ export const useCoinStore = create<CoinStore>()(
     {
       name: 'coin-storage',
       storage: createJSONStorage(() => safeStorage),
-      skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
+      // skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
     },
   ),
 );
@@ -362,7 +362,7 @@ export const useChatModeStore = create<ChatModeStore>()(
     {
       name: 'chatMode-storage',
       storage: createJSONStorage(() => safeStorage),
-      skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
+      // skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
     },
   ),
 );

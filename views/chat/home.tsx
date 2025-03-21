@@ -3,13 +3,18 @@
 import Footer from '@/components/common/footer'
 import Header from '@/components/common/header'
 import PageTransition from '@/components/motion/PageTransition'
-import { faSearch, faSort, faStar, faEllipsisV } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faSort, faStar, faEllipsisV, faThumbtack, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { FormEvent } from 'react'
 import { useState, useEffect } from 'react'
+import { bridgeCharbotChatDataToChatList } from '@/lib/utils/storyNationUtil'
+import { ReqGetChatList } from '@/services/hooks/DataListManager'
+import { chatApi, contentApi } from '@/services/api/storyNationApi'
+
+
 
 export default function ChatPage() {
   const router = useRouter()
@@ -18,33 +23,8 @@ export default function ChatPage() {
   const [activeTab, setActiveTab] = useState('all') // 'all', 'favorites'
   const [searchQuery, setSearchQuery] = useState('')
 
-  // 더미 채팅 데이터
-  const chatList = [
-    {
-      id: '1',
-      characterId: '1',
-      name: '에단 카터',
-      lastMessage: '안녕하세요! 오늘 경기 준비는 잘 되고 있나요?',
-      time: '오전 11:56',
-      imageUrl: '/images/character1.jpg',
-    },
-    {
-      id: '2',
-      characterId: '2',
-      name: '리아 김',
-      lastMessage: '새로운 보안 취약점을 발견했어요. 확인해보세요.',
-      time: '어제',
-      imageUrl: '/images/character1.jpg',
-    },
-    {
-      id: '3',
-      characterId: '3',
-      name: '마르코 발렌티',
-      lastMessage: '오늘의 특별 요리는 트러플 리조또입니다.',
-      time: '2일 전',
-      imageUrl: '/images/character1.jpg',
-    },
-  ]
+  const { data: chatDataList, isLoading, error, refetch } = ReqGetChatList(10, 1);
+  const chatList = bridgeCharbotChatDataToChatList(chatDataList?.chrbot_chat?.data || []);
 
   // 캐릭터 ID로 채팅방 찾기
   useEffect(() => {
@@ -59,6 +39,29 @@ export default function ChatPage() {
     // 검색 로직 구현
     console.log('검색어:', searchQuery)
   }
+
+  const handleDeleteChat = async (e: React.MouseEvent, bot_key: number) => {
+    e.stopPropagation();  // 버블링 방지
+    try {
+      await chatApi.CloseChat(bot_key);
+      // API 호출이 성공하면 목록 다시 불러오기
+      await refetch();
+    } catch (error) {
+      console.error('Failed to update chat fixed status:', error);
+    }
+  };
+
+  const handleTogglePin = async (e: React.MouseEvent, bot_key: number, _fixed: number) => {
+    e.stopPropagation();  // 버블링 방지
+
+    try {
+      await contentApi.GetChatTopFixed(bot_key, _fixed > 0 ? 0 : 1);
+      // API 호출이 성공하면 목록 다시 불러오기
+      await refetch();
+    } catch (error) {
+      console.error('Failed to update chat fixed status:', error);
+    }
+  };
 
   return (
     <PageTransition>
@@ -150,6 +153,22 @@ export default function ChatPage() {
                         <p className="text-sm text-secondary-600 dark:text-dark-secondary-500 truncate">
                           {chat.lastMessage}
                         </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 ml-3 transition-opacity">
+                        <button
+                          onClick={(e) => handleTogglePin(e, Number(chat.id), Number(chat.fixed))}
+                          className={`p-2 rounded-full hover:bg-secondary-100 dark:hover:bg-dark-secondary-200/10 transition-colors ${
+                            Number(chat.fixed) === 1 ? 'text-yellow-500 dark:text-yellow-400' : 'text-secondary-400 dark:text-dark-secondary-400'
+                          }`}
+                        >
+                          <FontAwesomeIcon icon={faThumbtack} className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => handleDeleteChat(e, Number(chat.id))}
+                          className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/10 text-red-400 dark:text-red-400 hover:text-red-500 dark:hover:text-red-500 transition-colors"
+                        >
+                          <FontAwesomeIcon icon={faTrash} className="w-4 h-4" />
+                        </button>
                       </div>
                     </motion.div>
                   ))}
