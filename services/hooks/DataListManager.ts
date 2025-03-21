@@ -1,36 +1,43 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query'
 
-import type { CharbotTop10Response, LoginResponse, CharbotSearchResponse, TagRankingListResponse, ApiResponse, CharbotChatListResponse } from '@/types/api';
+import type {
+  CharbotTop10Response,
+  LoginResponse,
+  CharbotSearchResponse,
+  TagRankingListResponse,
+  ApiResponse,
+  CharbotChatListResponse,
+} from '@/types/api'
 
-import { contentApi } from '../api/storyNationApi';
-import { useAccountStore } from '@/store/useStoreData';
+import { contentApi } from '../api/storyNationApi'
+import { useAccountStore } from '@/store/useStoreData'
 
-export type CategoryId = 'all' | 'male' | 'female' | 'unknown';
+export type CategoryId = 'all' | 'male' | 'female' | 'unknown'
 type Category = {
-  id: CategoryId;
-  name: string;
-  type: string;
-};
+  id: CategoryId
+  name: string
+  type: string
+}
 
 export const CATEGORIES: Array<Category> = [
   { id: 'all', name: '추천', type: 'recommend' },
   { id: 'male', name: '남성', type: '1' },
   { id: 'female', name: '여성', type: '2' },
   { id: 'unknown', name: '성별모름', type: '3' },
-];
+]
 
 export const ReqTop10Characters = () => {
   const { data, isLoading, error, refetch } = useQuery<CharbotTop10Response>({
-    queryKey: [ 'RequestTop10' ],
-    queryFn: async() => {
-      const response = await contentApi.GetTop10();
-      
-      return response?.data as CharbotTop10Response;
-    },
-  });
+    queryKey: ['RequestTop10'],
+    queryFn: async () => {
+      const response = await contentApi.GetTop10()
 
-  return { data, isLoading, error, refetch };
-};
+      return response?.data as CharbotTop10Response
+    },
+  })
+
+  return { data, isLoading, error, refetch }
+}
 
 export const ReqGetCharacterList = (
   activeCategory: string,
@@ -41,9 +48,9 @@ export const ReqGetCharacterList = (
   tag: string = ''
 ) => {
   const { data, isLoading, error, refetch } = useQuery<CharbotSearchResponse>({
-    queryKey: [ 'characters', activeCategory, nsfw, order, tag ],
-    queryFn: async() => {
-      const category = CATEGORIES.find(cat => cat.id === activeCategory);
+    queryKey: ['characters', activeCategory, nsfw, order, tag],
+    queryFn: async () => {
+      const category = CATEGORIES.find(cat => cat.id === activeCategory)
       if (!category || category.id === 'all') {
         // CharbotSearchResponse 형식에 맞게 빈 객체 반환
         return {
@@ -61,23 +68,26 @@ export const ReqGetCharacterList = (
             per_page: 10,
             prev_page_url: null,
             to: 0,
-            total: 0
-          }
-        };
+            total: 0,
+          },
+        }
       }
 
+      // tag 값이 쉼표로 구분된 값이면 합집합으로 처리하기 위해 그대로 전달
+      // 백엔드에서 합집합으로 처리 (여러 태그 중 하나라도 포함하면 결과에 포함)
+      // 특별한 변환 없이 그대로 전달
       const response = await contentApi.GetList(
         category.type, // type (1: 남자, 2: 여자, 3: 모름)
-        tag, // chrbot_tag_keys
+        tag, // chrbot_tag_keys - 쉼표로 구분된 태그 ID (합집합)
         nsfw, // nsfw
         order, // order - 이미 number 타입
         page, // page
-        paginate, // paginate
-      );
+        paginate // paginate
+      )
 
       // 응답 데이터 유효성 검사
       if (!response || !response.data) {
-        console.error('Invalid response data:', response);
+        console.error('Invalid response data:', response)
         // CharbotSearchResponse 형식에 맞게 빈 객체 반환
         return {
           result: { err: 0, msg: '' },
@@ -94,50 +104,50 @@ export const ReqGetCharacterList = (
             per_page: 10,
             prev_page_url: null,
             to: 0,
-            total: 0
-          }
-        };
+            total: 0,
+          },
+        }
       }
 
-      return response.data as CharbotSearchResponse;
+      return response.data as CharbotSearchResponse
     },
-  });
+  })
 
-  return { data, isLoading, error, refetch };
-};
+  return { data, isLoading, error, refetch }
+}
 
 export const ReqGetTags = (categoryType: number) => {
   const { data, isLoading, error } = useQuery<TagRankingListResponse>({
     queryKey: ['tagRanking', categoryType],
     queryFn: async () => {
-        const response = await contentApi.GetTagRankingList(categoryType);
-        return response.data as TagRankingListResponse;
-    }
-  });
+      const response = await contentApi.GetTagRankingList(categoryType)
+      return response.data as TagRankingListResponse
+    },
+  })
 
-  return { data, isLoading, error };
-};
+  return { data, isLoading, error }
+}
 
 export const ReqGetChatList = (paginate: number, page: number) => {
   const { data, isLoading, error, refetch } = useQuery<CharbotChatListResponse>({
     queryKey: ['chatList', paginate, page],
     queryFn: async () => {
-      const response = await contentApi.GetChatList(paginate, page);
-      return response.data as CharbotChatListResponse;
-    }
-  });
+      const response = await contentApi.GetChatList(paginate, page)
+      return response.data as CharbotChatListResponse
+    },
+  })
 
-  return { data, isLoading, error, refetch };
-};
+  return { data, isLoading, error, refetch }
+}
 
 export const ReqLogin = (nick_nm: string) => {
   const { data, isLoading, error, refetch } = useQuery<LoginResponse>({
-    queryKey: [ 'loginGuest' ],
-    queryFn: async() => {
-      const response = await contentApi.LoginGuest(nick_nm);
-      return response.data as LoginResponse;
-    }
-  });
+    queryKey: ['loginGuest'],
+    queryFn: async () => {
+      const response = await contentApi.LoginGuest(nick_nm)
+      return response.data as LoginResponse
+    },
+  })
 
-  return { data, isLoading, error, refetch };
-};
+  return { data, isLoading, error, refetch }
+}

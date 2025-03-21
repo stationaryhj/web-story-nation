@@ -22,6 +22,7 @@ interface CardProps {
 export default function Card({ character, index = 0, variant = 'default', onEdit, onDelete, onCardClick }: CardProps) {
   const { name, description, imageUrl, commentCount, hashtags, isAdult, creator } = character
   const { openModal, setSelectedCharacter } = useModalStore()
+  const [imageError, setImageError] = React.useState(false)
 
   // 카드 클릭 기본 핸들러 - 캐릭터 모달 열기
   const defaultCardClick = () => {
@@ -36,6 +37,11 @@ export default function Card({ character, index = 0, variant = 'default', onEdit
     } else {
       defaultCardClick()
     }
+  }
+
+  // 이미지 로드 에러 핸들러
+  const handleImageError = () => {
+    setImageError(true)
   }
 
   // 수정 버튼 클릭 처리
@@ -64,6 +70,7 @@ export default function Card({ character, index = 0, variant = 'default', onEdit
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
               className="object-cover transition-transform duration-500 group-hover:scale-110"
+              onError={handleImageError}
             />
 
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -103,7 +110,7 @@ export default function Card({ character, index = 0, variant = 'default', onEdit
             <div className="mb-2 flex flex-wrap gap-1">
               {hashtags.slice(0, 3).map((tag, index) => (
                 <span
-                  key={index}
+                  key={`${character.id}-tag-${tag}-${index}`}
                   className="text-xs text-primary-500 dark:text-dark-primary-600 bg-primary-50 dark:bg-dark-primary-100/10 px-2 py-0.5 rounded-full"
                 >
                   {tag}

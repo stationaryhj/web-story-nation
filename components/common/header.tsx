@@ -63,8 +63,9 @@ export default function Header() {
   const navLinks = [
     { href: '/', label: '홈' },
     { href: '/chat-list', label: '대화' },
-    { href: '/live', label: 'Live' },
     { href: '/my-characters', label: '나의 캐릭터' },
+    { href: '/live', label: 'Live' },
+    { href: '/income-dashboard', label: '수익 관리' },
     { href: '/my-page', label: '마이페이지' },
   ]
 
