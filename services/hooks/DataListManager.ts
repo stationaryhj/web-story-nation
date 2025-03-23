@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 
-import type { CharbotTop10Response, LoginResponse, CharbotSearchResponse, TagRankingListResponse, ApiResponse, CharbotChatListResponse, OrderIdResponse, CoinListResponse, CharbotChatModeResponse, CharbotResponse } from '@/types/api';
+import type { CharbotTop10Response, LoginResponse, CharbotSearchResponse, TagRankingListResponse, ApiResponse, CharbotChatListResponse, OrderIdResponse, CoinListResponse, CharbotChatModeResponse, CharbotResponse, CharbotInprogressResponse, CharbotGetListMineResponse, CoinChargeUseHistoryResponse, SaleMonthlyIncomeListResponse, ChatUseResponse } from '@/types/api';
 
-import { contentApi, settlementApi, createApi } from '../api/storyNationApi';
+import { contentApi, settlementApi, createApi, chatApi } from '../api/storyNationApi';
 import { useAccountStore } from '@/store/useStoreData';
 
 export type CategoryId = 'all' | 'male' | 'female' | 'unknown';
@@ -196,4 +196,55 @@ export const ReqGetChatBot = (world_list_detail_chrbot_key: number) => {
   return { data, isLoading, error, refetch };
 };
 
+
+
+export const GetCreateChatBotListMine = (target_nick_nm: string, page: number, paginate: number) => {
+  const { data, isLoading, error, refetch } = useQuery<CharbotGetListMineResponse>({
+    queryKey: [ 'createChatBotListMine', target_nick_nm, page, paginate ],
+    queryFn: async() => {
+      const response = await createApi.GetCreateChatBotListMine(target_nick_nm, page, paginate);
+      return response.data as CharbotGetListMineResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
+
+export const ReqGetCoinChargeUseHistory = (charge_type: number, page: number, paginate: number) => {
+  const { data, isLoading, error, refetch } = useQuery<CoinChargeUseHistoryResponse>({
+    queryKey: [ 'coinChargeUseHistory', charge_type, page, paginate ],
+    queryFn: async() => {
+      const response = await settlementApi.GetCoinChargeUseHistory(charge_type, page, paginate);
+      return response.data as CoinChargeUseHistoryResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
+
+export const GetSettlementList = (type: number, page: number, paginate: number) => {
+  const { data, isLoading, error, refetch } = useQuery<SaleMonthlyIncomeListResponse>({
+    queryKey: [ 'settlementList', type, page, paginate ],
+    queryFn: async() => {
+      const response = await settlementApi.GetSettlementList(type, page, paginate);
+      return response.data as SaleMonthlyIncomeListResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
+export const UseChat = (chrbot_chat_key: number, chat_mode: number) => {
+  const { data, isLoading, error, refetch } = useQuery<ChatUseResponse>({
+    queryKey: [ 'useChat', chrbot_chat_key, chat_mode ],
+    queryFn: async() => {
+      const response = await chatApi.UseChat(chrbot_chat_key, chat_mode);
+      return response.data as ChatUseResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
 

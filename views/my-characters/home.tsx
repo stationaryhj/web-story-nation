@@ -4,18 +4,27 @@ import DeleteConfirmModal from '@/components/modal/DeleteConfirmModal'
 import Card from '@/components/elements/card/Card'
 import { SectionTransition } from '@/components/motion/PageTransition'
 import type { Character } from '@/store/useStoreData'
-import { useStoreData } from '@/store/useStoreData'
+import { useAccountStore } from '@/store/useStoreData'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { createApi } from '@/services/api/storyNationApi'
+import { CharbotInprogressResponse } from '@/types/api'
+import { GetCreateChatBotListMine } from '@/services/hooks/DataListManager'
+import { bridgeCharbotGetListMineDataToCharacter } from '@/lib/utils/storyNationUtil'
 
 export default function MyCharacterPage() {
   const router = useRouter()
-  const { characters } = useStoreData()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [characterToDelete, setCharacterToDelete] = useState<Character | null>(null)
+
+  const myNickName = useAccountStore.getState().data?.nick_nm;
+  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 10);
+  console.log(inProgressData);
+
+  const myCharacters = bridgeCharbotGetListMineDataToCharacter(inProgressData?.chrbotList.data || []);
+
 
   // 캐릭터 카드 클릭 처리
   const handleCardClick = (character: Character) => {
@@ -44,37 +53,46 @@ export default function MyCharacterPage() {
     }
   }
 
+  const handleCreateCharacter = async () => {
+    const response = await createApi.GetCreateChatBotInProgress(null);
+    const data = response.data as CharbotInprogressResponse;
+
+    if (data?.chrbot && data?.result.err === 0) {
+      router.push(`/my-characters/create/${data.chrbot.world_list_detail_chrbot_key}`);
+    }
+  }
+
   return (
     <SectionTransition>
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-secondary-900 dark:text-dark-secondary-700">내 캐릭터</h1>
-          <Link
-            href="/my-characters/create"
+          <button
+            onClick={handleCreateCharacter}
             className="flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
           >
             <FontAwesomeIcon icon={faPlus} />
             <span>캐릭터 생성</span>
-          </Link>
+          </button>
         </div>
 
-        {characters.length === 0 ? (
+        {myCharacters.length === 0 ? (
           <div className="bg-white dark:bg-dark-background-light rounded-xl p-8 text-center">
             <p className="text-secondary-500 dark:text-dark-secondary-500 mb-4">아직 생성한 캐릭터가 없습니다.</p>
-            <Link
-              href="/my-characters/create"
+            <button
+              onClick={handleCreateCharacter}
               className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
             >
               <FontAwesomeIcon icon={faPlus} />
               <span>첫 캐릭터 만들기</span>
-            </Link>
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {characters.map((character, index) => (
+            {myCharacters.map((character, index) => (
               <Card
                 key={character.id}
-                character={character}
+                character={character as Character}
                 index={index}
                 variant="my-character"
                 onCardClick={() => handleCardClick(character)}

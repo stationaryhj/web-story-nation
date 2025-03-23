@@ -9,8 +9,10 @@ import PageTransition from '@/components/motion/PageTransition'
 
 import { contentApi } from '@/services/api'
 import { useAccountStore } from '@/store/useStoreData';
+import { OAUTH_PROVIDERS } from '@/types/login'
+import { OAuthState, OAuthProvider } from '@/types/login'
 
-type SocialType = 'google' | 'naver' | 'kakao' | 'apple'
+const REDIRECT_URI = 'http://npt.iptime.org:3100/callback'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -18,7 +20,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
 
   // 소셜 로그인 핸들러
-  const handleSocialLogin = (type: SocialType) => {
+  const handleSocialLogin = (type: OAuthProvider) => {
     setLoading(true)
     setError(null)
     
@@ -26,7 +28,8 @@ export default function LoginPage() {
     console.log(`${type} 로그인 시도`)
 
     // 임시: 콜백 페이지로 리다이렉트
-    router.push(`/login/callback?type=${type}`)
+    // router.push(`/login/callback?type=${type}`)
+    MoveOAuthUri(type);
   }
 
   // 게스트 로그인 핸들러
@@ -62,6 +65,46 @@ export default function LoginPage() {
     router.push('/login/signup')
   }
 
+  const MoveOAuthUri = async (provider: OAuthProvider) => {
+    const providerConfig = OAUTH_PROVIDERS[provider.toUpperCase() as OAuthProvider];
+    if (!providerConfig) {
+      throw new Error('지원하지 않는 로그인 방식입니다.');
+    }
+
+    const response = await contentApi.getUuid(providerConfig.id);
+    const { clientId, snsauth } = response.data;
+
+    // state 파라미터 생성
+    const state: OAuthState = {
+      provider: providerConfig.name as OAuthProvider,
+      snsauth,
+      clientId,
+      snstype: providerConfig.id
+    };
+
+    console.log('state ::: ', state);0
+
+    // URL 파라미터 생성
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: REDIRECT_URI,
+      response_type: 'code',
+      state: JSON.stringify(state)
+    });
+
+    // Apple 로그인의 경우 추가 파라미터
+    if (provider === 'APPLE') {
+      params.append('response_mode', 'form_post');
+    }
+
+    // OAuth URL 생성
+    const authUrl = `${providerConfig.endpoints.OAUTH_URL}?${params.toString()}`;
+
+    console.log('authUrl ::: ', authUrl);
+    window.location.href = authUrl;
+  };
+  
+
   return (
     <PageTransition>
       <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gray-50">
@@ -82,22 +125,22 @@ export default function LoginPage() {
           <div className="mt-8 space-y-6">
             <div className="space-y-3">
               <SocialLoginButton 
-                type="kakao" 
+                type="KAKAO"
                 onClick={handleSocialLogin} 
                 disabled={loading} 
               />
               <SocialLoginButton 
-                type="naver" 
+                type="NAVER" 
                 onClick={handleSocialLogin} 
                 disabled={loading} 
               />
               <SocialLoginButton 
-                type="google" 
+                type="GOOGLE" 
                 onClick={handleSocialLogin} 
                 disabled={loading} 
               />
               <SocialLoginButton 
-                type="apple" 
+                type="APPLE" 
                 onClick={handleSocialLogin} 
                 disabled={loading} 
               />

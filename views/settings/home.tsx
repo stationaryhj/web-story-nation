@@ -1,6 +1,7 @@
 'use client'
 
 import { useSettingsStore, BANK_LIST } from '@/store/useStoreSettings'
+import { useAccountStore } from '@/store/useStoreData'
 import { faChevronRight, faChevronLeft, faCamera } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
@@ -12,6 +13,7 @@ import { useState, useRef } from 'react'
 export default function SettingsForm() {
   const router = useRouter()
   const { settings, updateProfile, updateBankAccount, setLanguage, uploadProfileImage } = useSettingsStore()
+  const { data: userInfo } = useAccountStore()
 
   // 입력 폼 상태
   const [nickname, setNickname] = useState(settings.profile.nickname)
@@ -19,6 +21,8 @@ export default function SettingsForm() {
   const [bank, setBank] = useState(settings.bankAccount.bank)
   const [accountNumber, setAccountNumber] = useState(settings.bankAccount.accountNumber)
   const [accountHolder, setAccountHolder] = useState(settings.bankAccount.accountHolder)
+
+  console.log('@@ userInfo :: ', userInfo);
 
   // 언어 선택 상태
   const [language, setLanguageState] = useState<'ko' | 'en'>(settings.language)
