@@ -1,62 +1,40 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-
 import SocialLoginButton from '@/components/form/SocialLoginButton'
 import GuestLoginForm from '@/components/form/GuestLoginForm'
 import PageTransition from '@/components/motion/PageTransition'
-
-import { contentApi } from '@/services/api'
-import { useAccountStore } from '@/store/useStoreData';
-import { OAUTH_PROVIDERS } from '@/types/login'
-import { OAuthState, OAuthProvider } from '@/types/login'
-
-const REDIRECT_URI = 'http://npt.iptime.org:3100/callback'
+import { useAccountStore } from '@/store/useAccountStore'
+import { OAuthProvider } from '@/types/login'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { 
+    loading, 
+    error, 
+    guestLogin, 
+    socialLogin, 
+    setError 
+  } = useAccountStore()
 
   // 소셜 로그인 핸들러
-  const handleSocialLogin = (type: OAuthProvider) => {
-    setLoading(true)
-    setError(null)
-    
-    // 실제 구현 시 각 소셜 로그인 API 호출
-    console.log(`${type} 로그인 시도`)
-
-    // 임시: 콜백 페이지로 리다이렉트
-    // router.push(`/login/callback?type=${type}`)
-    MoveOAuthUri(type);
+  const handleSocialLogin = async (type: OAuthProvider) => {
+    try {
+      await socialLogin(type)
+    } catch (err) {
+      console.error('소셜 로그인 오류:', err)
+    }
   }
 
   // 게스트 로그인 핸들러
   const handleGuestLogin = async (nickname: string) => {
-    setLoading(true)
-    setError(null)
-    
     try {
-      // 실제 구현 시 게스트 로그인 API 호출
-      console.log(`게스트 로그인 시도: ${nickname}`)
-      
-      // 직접 API 호출하고 상태 업데이트
-      const response = await contentApi.LoginGuest(nickname);
-      console.log('login response', response);
-      
-      // 계정 정보 상태 업데이트 - AccountStore 타입에 맞게 수정
-      useAccountStore.setState({
-        isLogin: true,
-        data: response.data,
-      });
-      
-      router.back();
+      let isSuccess = await guestLogin(nickname)
+      if(isSuccess) {
+        router.push('/')
+      }
     } catch (err) {
-      console.error('로그인 오류:', err);
-      setError('로그인 처리 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
+      console.error('게스트 로그인 오류:', err)
     }
   }
 
@@ -64,46 +42,6 @@ export default function LoginPage() {
   const handleSignupClick = () => {
     router.push('/login/signup')
   }
-
-  const MoveOAuthUri = async (provider: OAuthProvider) => {
-    const providerConfig = OAUTH_PROVIDERS[provider.toUpperCase() as OAuthProvider];
-    if (!providerConfig) {
-      throw new Error('지원하지 않는 로그인 방식입니다.');
-    }
-
-    const response = await contentApi.getUuid(providerConfig.id);
-    const { clientId, snsauth } = response.data;
-
-    // state 파라미터 생성
-    const state: OAuthState = {
-      provider: providerConfig.name as OAuthProvider,
-      snsauth,
-      clientId,
-      snstype: providerConfig.id
-    };
-
-    console.log('state ::: ', state);0
-
-    // URL 파라미터 생성
-    const params = new URLSearchParams({
-      client_id: clientId,
-      redirect_uri: REDIRECT_URI,
-      response_type: 'code',
-      state: JSON.stringify(state)
-    });
-
-    // Apple 로그인의 경우 추가 파라미터
-    if (provider === 'APPLE') {
-      params.append('response_mode', 'form_post');
-    }
-
-    // OAuth URL 생성
-    const authUrl = `${providerConfig.endpoints.OAUTH_URL}?${params.toString()}`;
-
-    console.log('authUrl ::: ', authUrl);
-    window.location.href = authUrl;
-  };
-  
 
   return (
     <PageTransition>

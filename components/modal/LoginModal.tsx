@@ -1,6 +1,8 @@
 'use client'
 
 import BaseModal from './BaseModal'
+import { useAccountStore } from '@/store/useAccountStore'
+import { OAuthProvider } from '@/types/login'
 
 interface LoginModalProps {
   isOpen: boolean
@@ -8,6 +10,17 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+  const { socialLogin, loading } = useAccountStore()
+
+  const handleSocialLogin = async (provider: OAuthProvider) => {
+    try {
+      await socialLogin(provider)
+    } catch (error) {
+      console.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', error)
+      // toast.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+    }
+  }
+
   return (
     <BaseModal
       isOpen={isOpen}
@@ -19,17 +32,33 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     >
       <div className="flex flex-col space-y-6 py-4">
         <div className="space-y-4">
-          <button className="flex w-full items-center justify-center rounded-full bg-yellow-400 py-3 px-4 font-medium text-yellow-900 shadow transition-colors hover:bg-yellow-500">
-            카카오로 로그인
+          <button 
+            onClick={() => handleSocialLogin('KAKAO')}
+            disabled={loading}
+            className="flex w-full items-center justify-center rounded-full bg-yellow-400 py-3 px-4 font-medium text-yellow-900 shadow transition-colors hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? '로그인 중...' : '카카오로 로그인'}
           </button>
-          <button className="flex w-full items-center justify-center rounded-full bg-green-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-green-600">
-            네이버로 로그인
+          <button 
+            onClick={() => handleSocialLogin('NAVER')}
+            disabled={loading}
+            className="flex w-full items-center justify-center rounded-full bg-green-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? '로그인 중...' : '네이버로 로그인'}
           </button>
-          <button className="flex w-full items-center justify-center rounded-full bg-black py-3 px-4 font-medium text-white shadow transition-colors hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100">
-            애플로 로그인
+          <button 
+            onClick={() => handleSocialLogin('APPLE')}
+            disabled={loading}
+            className="flex w-full items-center justify-center rounded-full bg-black py-3 px-4 font-medium text-white shadow transition-colors hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? '로그인 중...' : '애플로 로그인'}
           </button>
-          <button className="flex w-full items-center justify-center rounded-full bg-blue-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-blue-600">
-            구글로 로그인
+          <button 
+            onClick={() => handleSocialLogin('GOOGLE')}
+            disabled={loading}
+            className="flex w-full items-center justify-center rounded-full bg-blue-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? '로그인 중...' : '구글로 로그인'}
           </button>
         </div>
 

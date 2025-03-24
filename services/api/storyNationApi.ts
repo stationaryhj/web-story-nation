@@ -17,7 +17,8 @@ import type {
     CharbotInprogressResponse,
     CharbotGetListMineResponse,
     ChatUseResponse,
-    CoinChargeUseHistoryResponse
+    CoinChargeUseHistoryResponse,
+    ConfirmTossPaymentResponse
 } from '../../types/api';
 
 // API 기본 설정
@@ -54,11 +55,12 @@ const createApiInstance = (baseURL: string) => {
 };
 
 // 환경에 따른 API URL 설정
-const API_URL = process.env.NODE_ENV === 'production' ?
-  process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL :
-  process.env.NEXT_PUBLIC_STORYNATION_API_URL;
+// const API_URL = process.env.NODE_ENV === 'production' ?
+//   process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL :
+//   process.env.NEXT_PUBLIC_STORYNATION_API_URL;
 
 // const API_URL = process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_STORYNATION_API_URL;
 
 const CHAT_URL = process.env.NODE_ENV === 'production' ?
   process.env.NEXT_PUBLIC_STORYNATION_PROD_CHAT_URL :
@@ -406,6 +408,14 @@ export const settlementApi = {
       page,
       paginate,
       charge_type,
+    });
+  },
+
+  ConfirmTossPayment: async(paymentKey: string, orderId: string, amount: number): Promise<ApiResponse<ConfirmTossPaymentResponse>> => {
+    return api.post('/api/web/toss/confirm', {
+      paymentKey,
+      orderId,
+      amount,
     });
   },
 };

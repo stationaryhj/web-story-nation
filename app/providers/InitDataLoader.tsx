@@ -5,6 +5,7 @@ import { useCoinStore, useChatModeStore } from '@/store/useStoreData';
 import { useQuery } from '@tanstack/react-query';
 import { CoinListResponse, CharbotChatModeResponse } from '@/types/api';
 import { settlementApi, contentApi } from '@/services/api/storyNationApi';
+import { ReqGetOrderId } from '@/services/hooks/DataListManager';
 
 interface InitDataLoaderProps {
   children: React.ReactNode;
@@ -21,8 +22,11 @@ export function InitDataLoader({ children }: InitDataLoaderProps) {
     chatMode: state.chatMode,
     setChatMode: state.setChatMode
   }));
+  
+  const { data: orderIdData, isLoading: orderIdLoading } = ReqGetOrderId();
 
   const version = 1.0;
+  console.log('@@ orderIdData :: ', orderIdData);
   
   // 데이터가 비어있는지 확인
   const shouldFetchCoinList = !coinList || coinList.length === 0;

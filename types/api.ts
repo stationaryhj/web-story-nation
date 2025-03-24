@@ -423,6 +423,14 @@ export interface ChatUseResponse {
   result: ApiResult;
 }
 
+// ConfirmTossPayment Response
+export interface ConfirmTossPaymentResponse {
+  coin_user: number;
+  coin_free: number;
+  coin_register: number;
+  result: ApiResult;
+}
+
 
 // API Result
 export type ApiResult = {

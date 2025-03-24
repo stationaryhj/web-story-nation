@@ -23,7 +23,17 @@ export default function MyCharacterPage() {
   const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 10);
   console.log(inProgressData);
 
-  const myCharacters = bridgeCharbotGetListMineDataToCharacter(inProgressData?.chrbotList.data || []);
+  const myCharacters = bridgeCharbotGetListMineDataToCharacter(inProgressData?.chrbotList.data || []).map(char => ({
+    ...char,
+    creator: {
+      id: char.creator.id,
+      nickname: '',
+      username: '',
+      profileImageUrl: null,
+      isActive: true
+    },
+    category: (char.category || 'unspecified') as 'unspecified' | 'male' | 'female'
+  }));
 
 
   // 캐릭터 카드 클릭 처리
