@@ -63,8 +63,9 @@ export default function Header() {
   const navLinks = [
     { href: '/', label: '홈' },
     { href: '/chat-list', label: '대화' },
-    { href: '/live', label: 'Live' },
     { href: '/my-characters', label: '나의 캐릭터' },
+    { href: '/live', label: 'Live' },
+    { href: '/shop-recharge', label: '수익 관리' },
     { href: '/my-page', label: '마이페이지' },
   ]
 
@@ -111,7 +112,7 @@ export default function Header() {
 
   return (
     <motion.header
-      className="sticky top-0 z-50 bg-white dark:bg-dark-background-light shadow-sm dark:shadow-dark-primary-300/20"
+      className="sticky top-0 z-[50] bg-white dark:bg-dark-background-light shadow-sm dark:shadow-dark-primary-300/20"
       initial={{ y: 0 }}
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}

@@ -55,6 +55,26 @@ export default function BaseModal({
   onBackdropClick,
   onAnimationComplete,
 }: BaseModalProps) {
+  // 모달이 열릴 때 배경 스크롤 방지
+  useEffect(() => {
+    const originalStyle = window.getComputedStyle(document.body).overflow
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+
+    if (isOpen) {
+      // 스크롤바 너비만큼 패딩을 추가하여 레이아웃 이동 방지
+      document.body.style.overflow = 'hidden'
+      document.body.style.paddingRight = `${scrollbarWidth}px`
+    }
+
+    return () => {
+      // 컴포넌트 언마운트 또는 isOpen 상태 변경 시 원래 스타일로 복원
+      if (isOpen) {
+        document.body.style.overflow = originalStyle
+        document.body.style.paddingRight = '0px'
+      }
+    }
+  }, [isOpen])
+
   // ESC 키로 모달 닫기
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {

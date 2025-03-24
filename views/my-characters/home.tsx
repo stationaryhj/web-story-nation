@@ -1,7 +1,7 @@
 'use client'
 
 import DeleteConfirmModal from '@/components/modal/DeleteConfirmModal'
-import Card from '@/components/elements/card/Card'
+import CardGrid from '@/components/elements/card/CardGrid'
 import { SectionTransition } from '@/components/motion/PageTransition'
 import type { Character } from '@/store/useStoreData'
 import { useAccountStore } from '@/store/useStoreData'
@@ -18,6 +18,7 @@ export default function MyCharacterPage() {
   const router = useRouter()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [characterToDelete, setCharacterToDelete] = useState<Character | null>(null)
+
 
   const myNickName = useAccountStore.getState().data?.nick_nm;
   const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 10);
@@ -98,19 +99,14 @@ export default function MyCharacterPage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {myCharacters.map((character, index) => (
-              <Card
-                key={character.id}
-                character={character as Character}
-                index={index}
-                variant="my-character"
-                onCardClick={() => handleCardClick(character)}
-                onEdit={() => handleEditClick(character)}
-                onDelete={() => handleDeleteClick(character)}
-              />
-            ))}
-          </div>
+
+          <CardGrid
+            customData={characters}
+            variant="my-character"
+            onEdit={handleEditClick}
+            onDelete={handleDeleteClick}
+          />
+
         )}
 
         <DeleteConfirmModal
