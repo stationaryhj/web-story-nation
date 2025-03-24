@@ -1,16 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 
-import type {
-  CharbotTop10Response,
-  LoginResponse,
-  CharbotSearchResponse,
-  TagRankingListResponse,
-  ApiResponse,
-  CharbotChatListResponse,
-} from '@/types/api'
 
-import { contentApi } from '../api/storyNationApi'
 import { useAccountStore } from '@/store/useStoreData'
+import type { CharbotTop10Response, LoginResponse, CharbotSearchResponse, TagRankingListResponse, ApiResponse, CharbotChatListResponse, OrderIdResponse, CoinListResponse, CharbotChatModeResponse, CharbotResponse, CharbotInprogressResponse, CharbotGetListMineResponse, CoinChargeUseHistoryResponse, SaleMonthlyIncomeListResponse, ChatUseResponse } from '@/types/api';
+import { contentApi, settlementApi, createApi, chatApi } from '../api/storyNationApi';
+import { useAccountStore } from '@/store/useStoreData';
+
 
 export type CategoryId = 'all' | 'male' | 'female' | 'unknown'
 type Category = {
@@ -142,12 +137,120 @@ export const ReqGetChatList = (paginate: number, page: number) => {
 
 export const ReqLogin = (nick_nm: string) => {
   const { data, isLoading, error, refetch } = useQuery<LoginResponse>({
-    queryKey: ['loginGuest'],
-    queryFn: async () => {
-      const response = await contentApi.LoginGuest(nick_nm)
-      return response.data as LoginResponse
-    },
-  })
 
-  return { data, isLoading, error, refetch }
-}
+    queryKey: [ 'loginGuest' ],
+    queryFn: async() => {
+      const response = await contentApi.LoginGuest(nick_nm);
+      return response.data as LoginResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
+// 이녀석은 차후 신성도 유지해야함.
+export const ReqGetOrderId = () => {
+  const { data, isLoading, error, refetch } = useQuery<OrderIdResponse>({
+    queryKey: [ 'orderId' ],
+    queryFn: async() => {
+      const response = await settlementApi.GetOrderId();
+      return response.data as OrderIdResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
+
+// 이녀석은 차후 신성도 유지해야함.
+export const ReqGetCoinList = () => {
+  const { data, isLoading, error, refetch } = useQuery<CoinListResponse>({
+    queryKey: [ 'coinList' ],
+    queryFn: async() => {
+      const response = await settlementApi.GetCoinList();
+      return response.data as CoinListResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
+
+export const ReqGetChatMode = () => {
+  const { data, isLoading, error, refetch } = useQuery<CharbotChatModeResponse>({
+    queryKey: [ 'chatMode' ],
+    queryFn: async() => {
+      const response = await contentApi.GetChatMode();
+      return response.data as CharbotChatModeResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
+
+
+export const ReqGetChatBot = (world_list_detail_chrbot_key: number) => {
+  const { data, isLoading, error, refetch } = useQuery<CharbotResponse>({
+    queryKey: [ 'createChatBot', world_list_detail_chrbot_key ],
+    queryFn: async() => {
+      const response = await createApi.GetChatBot(world_list_detail_chrbot_key);
+      return response.data as CharbotResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
+
+
+export const GetCreateChatBotListMine = (target_nick_nm: string, page: number, paginate: number) => {
+  const { data, isLoading, error, refetch } = useQuery<CharbotGetListMineResponse>({
+    queryKey: [ 'createChatBotListMine', target_nick_nm, page, paginate ],
+    queryFn: async() => {
+      const response = await createApi.GetCreateChatBotListMine(target_nick_nm, page, paginate);
+      return response.data as CharbotGetListMineResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
+
+export const ReqGetCoinChargeUseHistory = (charge_type: number, page: number, paginate: number) => {
+  const { data, isLoading, error, refetch } = useQuery<CoinChargeUseHistoryResponse>({
+    queryKey: [ 'coinChargeUseHistory', charge_type, page, paginate ],
+    queryFn: async() => {
+      const response = await settlementApi.GetCoinChargeUseHistory(charge_type, page, paginate);
+      return response.data as CoinChargeUseHistoryResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
+
+export const GetSettlementList = (type: number, page: number, paginate: number) => {
+  const { data, isLoading, error, refetch } = useQuery<SaleMonthlyIncomeListResponse>({
+    queryKey: [ 'settlementList', type, page, paginate ],
+    queryFn: async() => {
+      const response = await settlementApi.GetSettlementList(type, page, paginate);
+      return response.data as SaleMonthlyIncomeListResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+
+export const UseChat = (chrbot_chat_key: number, chat_mode: number) => {
+  const { data, isLoading, error, refetch } = useQuery<ChatUseResponse>({
+    queryKey: [ 'useChat', chrbot_chat_key, chat_mode ],
+    queryFn: async() => {
+      const response = await chatApi.UseChat(chrbot_chat_key, chat_mode);
+      return response.data as ChatUseResponse;
+    }
+  });
+
+  return { data, isLoading, error, refetch };
+};
+

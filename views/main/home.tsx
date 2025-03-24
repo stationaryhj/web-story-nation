@@ -3,7 +3,6 @@
 import Footer from '@/components/common/footer'
 import Header from '@/components/common/header'
 import PageTransition, { SectionTransition } from '@/components/motion/PageTransition'
-import { CATEGORIES } from '@/services/hooks/DataListManager'
 import { useStoreData } from '@/store/useStoreData'
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'

@@ -20,6 +20,7 @@ interface CardProps {
   onCardClick?: () => void
   rank?: number
   hasRank?: boolean
+
 }
 
 export default function Card({
@@ -45,7 +46,7 @@ export default function Card({
   // 실제 카드 클릭 핸들러
   const handleCardClick = () => {
     if (onCardClick) {
-      onCardClick()
+      onCardClick(character)
     } else {
       defaultCardClick()
     }

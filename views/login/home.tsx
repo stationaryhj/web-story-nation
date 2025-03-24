@@ -1,59 +1,40 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
-
 import SocialLoginButton from '@/components/form/SocialLoginButton'
 import GuestLoginForm from '@/components/form/GuestLoginForm'
 import PageTransition from '@/components/motion/PageTransition'
-
-import { contentApi } from '@/services/api'
-import { useAccountStore } from '@/store/useStoreData';
-
-type SocialType = 'google' | 'naver' | 'kakao' | 'apple'
+import { useAccountStore } from '@/store/useAccountStore'
+import { OAuthProvider } from '@/types/login'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { 
+    loading, 
+    error, 
+    guestLogin, 
+    socialLogin, 
+    setError 
+  } = useAccountStore()
 
   // 소셜 로그인 핸들러
-  const handleSocialLogin = (type: SocialType) => {
-    setLoading(true)
-    setError(null)
-    
-    // 실제 구현 시 각 소셜 로그인 API 호출
-    console.log(`${type} 로그인 시도`)
-
-    // 임시: 콜백 페이지로 리다이렉트
-    router.push(`/login/callback?type=${type}`)
+  const handleSocialLogin = async (type: OAuthProvider) => {
+    try {
+      await socialLogin(type)
+    } catch (err) {
+      console.error('소셜 로그인 오류:', err)
+    }
   }
 
   // 게스트 로그인 핸들러
   const handleGuestLogin = async (nickname: string) => {
-    setLoading(true)
-    setError(null)
-    
     try {
-      // 실제 구현 시 게스트 로그인 API 호출
-      console.log(`게스트 로그인 시도: ${nickname}`)
-      
-      // 직접 API 호출하고 상태 업데이트
-      const response = await contentApi.LoginGuest(nickname);
-      console.log('login response', response);
-      
-      // 계정 정보 상태 업데이트 - AccountStore 타입에 맞게 수정
-      useAccountStore.setState({
-        isLogin: true,
-        data: response.data,
-      });
-      
-      router.push('/')
+      let isSuccess = await guestLogin(nickname)
+      if(isSuccess) {
+        router.push('/')
+      }
     } catch (err) {
-      console.error('로그인 오류:', err);
-      setError('로그인 처리 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
+      console.error('게스트 로그인 오류:', err)
     }
   }
 
@@ -82,22 +63,22 @@ export default function LoginPage() {
           <div className="mt-8 space-y-6">
             <div className="space-y-3">
               <SocialLoginButton 
-                type="kakao" 
+                type="KAKAO"
                 onClick={handleSocialLogin} 
                 disabled={loading} 
               />
               <SocialLoginButton 
-                type="naver" 
+                type="NAVER" 
                 onClick={handleSocialLogin} 
                 disabled={loading} 
               />
               <SocialLoginButton 
-                type="google" 
+                type="GOOGLE" 
                 onClick={handleSocialLogin} 
                 disabled={loading} 
               />
               <SocialLoginButton 
-                type="apple" 
+                type="APPLE" 
                 onClick={handleSocialLogin} 
                 disabled={loading} 
               />

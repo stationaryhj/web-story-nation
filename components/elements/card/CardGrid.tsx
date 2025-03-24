@@ -163,6 +163,7 @@ export default function CardGrid({
                 rank={hasRanking ? index + 1 : undefined}
               />
             ))}
+
       </div>
     </div>
   )

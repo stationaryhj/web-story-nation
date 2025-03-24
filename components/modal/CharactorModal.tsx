@@ -35,6 +35,7 @@ const mockConversationExamples = [
   },
 ]
 
+
 interface CharactorModalProps {
   isOpen: boolean
   onClose: () => void
@@ -125,6 +126,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   }
 
   return (
+
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -137,6 +139,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
             variants={overlayVariants}
             onClick={handleClose}
           />
+
 
           {/* 모달 */}
           <motion.div

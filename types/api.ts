@@ -155,7 +155,13 @@ export interface ChrbotData {
   world_list_detail_key: number;
 }
 
+
 export interface CharbotChatListResponse {
+  chrbot_chat: CharbotChatListData,
+  result: ApiResult;
+}
+
+export interface CharbotChatListData {
   current_page: number;
   data: Array<CharbotChatData>;
   first_page_url: string;
@@ -213,8 +219,15 @@ export interface CharbotGetListResponse {
   result: ApiResult;
 }
 
+
 // CharbotGetListMine Response
 export interface CharbotGetListMineResponse {
+  chrbotList: CharbotGetListMineData;
+  result: ApiResult;
+}
+
+
+export interface CharbotGetListMineData {
   current_page: number;
   data: Array<CharbotMineData>;
   first_page_url: string;
@@ -349,6 +362,75 @@ export interface CharbotSearchData {
   to: number | null;
   total: number;
 }
+
+// GetOrderId Response
+export interface OrderIdResponse {
+  orderId: string;
+  result: ApiResult;
+}
+
+// CoinData Response
+export interface CoinListResponse {
+  coinList: Array<CoinData>;
+  result: ApiResult;
+}
+
+export interface CoinData {
+  coin_key: number;
+  coin_type: number;
+  coin_nm: string;
+  img_url: string;
+  content: string;
+  cnt: number;
+  price: number;
+  sort: number;
+}
+
+
+// CoinChargeUseHistory Response
+export interface CoinChargeUseHistoryResponse {
+  historyList: Array<CoinChargeUseHistoryData>;
+  result: ApiResult;
+}
+
+export interface CoinChargeUseHistoryData {
+  current_page: number;
+  data: Array<UseHistoryData>;
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: Array<PaginationLink>;
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number | null;
+  total: number;
+}
+
+export interface UseHistoryData {
+  // charge_type: number;
+  // charge_dt: string;
+  // charge_amount: number;
+  // charge_status: number;
+}
+
+// Use Coin Response
+export interface ChatUseResponse {
+  coin: number;
+  charge_use_key: number;
+  result: ApiResult;
+}
+
+// ConfirmTossPayment Response
+export interface ConfirmTossPaymentResponse {
+  coin_user: number;
+  coin_free: number;
+  coin_register: number;
+  result: ApiResult;
+}
+
 
 // API Result
 export type ApiResult = {

@@ -5,15 +5,27 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes, faPen, faGift, faHistory, faCoins } from '@fortawesome/free-solid-svg-icons'
 import { useEffect, useState } from 'react'
 import { useModalStore } from '@/store/useStoreModal'
+import { useCoinStore, useAccountStore } from '@/store/useStoreData'
 import List, { ListItem } from '@/components/elements/list/List'
+import { CoinData } from '@/types/api'
+import PaymentModal from '@/components/modal/PaymentModal';
 
 interface CreditSidebarProps {}
 
 export default function CreditSidebar({}: CreditSidebarProps) {
   const { isOpen, modalType, closeModal } = useModalStore()
+  const { coinList } = useCoinStore(state => ({ coinList: state.coinList }))
+  const accountData = useAccountStore(state => state.data)
   const [activeTab, setActiveTab] = useState<'charge' | 'history'>('charge')
-  const [freePenCount, setFreePenCount] = useState(121)
-  const [paidPenCount, setPaidPenCount] = useState(600)
+
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
+  const [paymentAmount, setPaymentAmount] = useState(0)
+  const [paymentOrderId, setPaymentOrderId] = useState(0)
+  const clientKey = 'test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm';
+  
+  // 계정 데이터에서 펜 정보 가져오기
+  const freePenCount = accountData?.coin_free ?? 0
+  const paidPenCount = accountData?.coin_register ?? 0
 
   if (!isOpen || modalType !== 'credit') {
     return null
@@ -77,6 +89,25 @@ export default function CreditSidebar({}: CreditSidebarProps) {
       trailing: <span className="text-sm font-medium text-green-600 dark:text-green-400">+200 펜</span>,
     },
   ]
+
+  const handlePackageClick = (coinData: CoinData) => {
+    console.log('@@ coinKey :: ', coinData)
+
+    const amount = coinData.price
+    const orderId = coinData.coin_key
+
+    setPaymentAmount(amount)
+    setPaymentOrderId(orderId)
+    setIsPaymentModalOpen(true)
+  }
+
+  const handlePaymentSuccess = (result: any) => {
+    console.log('@@ result :: ', result)
+  }
+
+  const handlePaymentFail = (error: any) => {
+    console.log('@@ error :: ', error)
+  }
 
   return (
     <>
@@ -173,37 +204,45 @@ export default function CreditSidebar({}: CreditSidebarProps) {
             <div>
               <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-200 mb-4">패키지</h3>
               <div className="space-y-3">
-                <div className="border border-secondary-200 dark:border-dark-secondary-700 rounded-lg p-4 hover:border-primary-300 dark:hover:border-dark-primary-600 transition-colors cursor-pointer">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-medium text-secondary-900 dark:text-dark-secondary-200">기본 패키지</span>
-                    <span className="bg-primary-100 dark:bg-dark-primary-900/60 text-primary-700 dark:text-dark-primary-400 text-xs font-medium px-2 py-1 rounded-full">
-                      10% 할인
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center">
-                      <FontAwesomeIcon icon={faPen} className="text-primary-600 dark:text-dark-primary-400 mr-1.5" />
-                      <span className="text-secondary-800 dark:text-dark-secondary-300">100 펜</span>
+                {/* coinList 데이터를 사용하여 패키지 렌더링 */}
+                {coinList && coinList.length > 0 ? (
+                  coinList.map((coin) => (
+                    <div 
+                      key={coin.coin_key}
+                      className="border border-secondary-200 dark:border-dark-secondary-700 rounded-lg p-4 hover:border-primary-300 dark:hover:border-dark-primary-600 transition-colors cursor-pointer"
+                      onClick={() => handlePackageClick(coin)}
+                    >
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-medium text-secondary-900 dark:text-dark-secondary-200">
+                          {coin.coin_nm}
+                        </span>
+                        {coin.sort > 0 && (
+                          <span className="bg-primary-100 dark:bg-dark-primary-900/60 text-primary-700 dark:text-dark-primary-400 text-xs font-medium px-2 py-1 rounded-full">
+                            인기
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                          <FontAwesomeIcon icon={faPen} className="text-primary-600 dark:text-dark-primary-400 mr-1.5" />
+                          <span className="text-secondary-800 dark:text-dark-secondary-300">{coin.cnt} 펜</span>
+                        </div>
+                        <span className="text-secondary-900 dark:text-dark-secondary-200 font-bold">
+                          ₩{coin.price.toLocaleString()}
+                        </span>
+                      </div>
+                      {coin.content && (
+                        <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mt-2">
+                          {coin.content}
+                        </p>
+                      )}
                     </div>
-                    <span className="text-secondary-900 dark:text-dark-secondary-200 font-bold">₩5,400</span>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-secondary-500 dark:text-dark-secondary-400">
+                    패키지 정보를 불러오는 중입니다...
                   </div>
-                </div>
-
-                <div className="border border-secondary-200 dark:border-dark-secondary-700 rounded-lg p-4 hover:border-primary-300 dark:hover:border-dark-primary-600 transition-colors cursor-pointer">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-medium text-secondary-900 dark:text-dark-secondary-200">인기 패키지</span>
-                    <span className="bg-primary-100 dark:bg-dark-primary-900/60 text-primary-700 dark:text-dark-primary-400 text-xs font-medium px-2 py-1 rounded-full">
-                      20% 할인
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center">
-                      <FontAwesomeIcon icon={faPen} className="text-primary-600 dark:text-dark-primary-400 mr-1.5" />
-                      <span className="text-secondary-800 dark:text-dark-secondary-300">500 펜</span>
-                    </div>
-                    <span className="text-secondary-900 dark:text-dark-secondary-200 font-bold">₩24,000</span>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -219,6 +258,18 @@ export default function CreditSidebar({}: CreditSidebarProps) {
           </div>
         )}
       </motion.div>
+
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        amount={paymentAmount}
+        clientKey={clientKey}
+        orderId={paymentOrderId}
+        orderName="펜 충전"
+        customerName={accountData?.nick_nm}
+        onSuccess={handlePaymentSuccess}
+        onFail={handlePaymentFail}
+      />
     </>
   )
 }
