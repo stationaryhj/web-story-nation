@@ -19,10 +19,9 @@ export default function MyCharacterPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [characterToDelete, setCharacterToDelete] = useState<Character | null>(null)
 
-
-  const myNickName = useAccountStore.getState().data?.nick_nm;
-  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 10);
-  console.log(inProgressData);
+  const myNickName = useAccountStore.getState().data?.nick_nm
+  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 10)
+  console.log(inProgressData)
 
   const myCharacters = bridgeCharbotGetListMineDataToCharacter(inProgressData?.chrbotList.data || []).map(char => ({
     ...char,
@@ -31,11 +30,10 @@ export default function MyCharacterPage() {
       nickname: '',
       username: '',
       profileImageUrl: null,
-      isActive: true
+      isActive: true,
     },
-    category: (char.category || 'unspecified') as 'unspecified' | 'male' | 'female'
-  }));
-
+    category: (char.category || 'unspecified') as 'unspecified' | 'male' | 'female',
+  }))
 
   // 캐릭터 카드 클릭 처리
   const handleCardClick = (character: Character) => {
@@ -65,11 +63,11 @@ export default function MyCharacterPage() {
   }
 
   const handleCreateCharacter = async () => {
-    const response = await createApi.GetCreateChatBotInProgress(null);
-    const data = response.data as CharbotInprogressResponse;
+    const response = await createApi.GetCreateChatBotInProgress(null)
+    const data = response.data as CharbotInprogressResponse
 
     if (data?.chrbot && data?.result.err === 0) {
-      router.push(`/my-characters/create/${data.chrbot.world_list_detail_chrbot_key}`);
+      router.push(`/my-characters/create/${data.chrbot.world_list_detail_chrbot_key}`)
     }
   }
 
@@ -99,14 +97,12 @@ export default function MyCharacterPage() {
             </button>
           </div>
         ) : (
-
           <CardGrid
-            customData={characters}
+            customData={myCharacters}
             variant="my-character"
             onEdit={handleEditClick}
             onDelete={handleDeleteClick}
           />
-
         )}
 
         <DeleteConfirmModal

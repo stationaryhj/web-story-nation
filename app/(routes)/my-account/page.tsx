@@ -1,12 +1,12 @@
 // 'use client'
 
 import Header from '@/components/common/header'
-import MyPageView from '@/views/my-page/home'
+import MyAccountView from '@/views/my-account/home'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAccountStore } from '@/store/useStoreData'
 
-export default function MyPage() {
+export default function MyAccount() {
   // const router = useRouter()
   // const isLogin = useAccountStore(state => state.isLogin)
 
@@ -25,7 +25,7 @@ export default function MyPage() {
   return (
     <>
       <Header />
-      <MyPageView />
+      <MyAccountView />
     </>
   )
 }

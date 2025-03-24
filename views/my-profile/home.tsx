@@ -21,7 +21,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 
-export default function MyPageView() {
+export default function MyAccountView() {
   const router = useRouter()
   const [isEdited, setIsEdited] = useState(false)
   const [isNicknameVerified, setIsNicknameVerified] = useState(true) // 초기값은 true로 설정 (기존 닉네임은 검증됨)
@@ -44,7 +44,7 @@ export default function MyPageView() {
   // 페르소나 설정
   const [persona, setPersona] = useState({
     name: '',
-    gender: '남성' as '남성' | '여성',
+    gender: '남성' as '남성' | '여성' | '알 수 없음',
   })
 
   // 이미지 업로드를 위한 참조
@@ -142,7 +142,7 @@ export default function MyPageView() {
   }
 
   // 성별 변경 핸들러
-  const handleGenderChange = (gender: '남성' | '여성') => {
+  const handleGenderChange = (gender: '남성' | '여성' | '알 수 없음') => {
     setPersona(prev => ({ ...prev, gender }))
     setIsEdited(true)
   }
@@ -183,10 +183,10 @@ export default function MyPageView() {
     if (isEdited) {
       const confirm = window.confirm('변경 사항이 저장되지 않았습니다. 그래도 나가시겠습니까?')
       if (confirm) {
-        router.push('/home')
+        router.push('/')
       }
     } else {
-      router.push('/home')
+      router.push('/')
     }
   }
 
@@ -449,6 +449,13 @@ export default function MyPageView() {
                   className={persona.gender === '여성' ? '!bg-violet-600 !text-white !border-violet-600' : ''}
                 >
                   여성
+                </BaseButton>
+                <BaseButton
+                  onClick={() => handleGenderChange('알 수 없음')}
+                  color="primary"
+                  className={persona.gender === '알 수 없음' ? '!bg-violet-600 !text-white !border-violet-600' : ''}
+                >
+                  알 수 없음
                 </BaseButton>
               </div>
             </div>

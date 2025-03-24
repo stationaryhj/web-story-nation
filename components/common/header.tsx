@@ -65,8 +65,8 @@ export default function Header() {
     { href: '/chat-list', label: '대화' },
     { href: '/my-characters', label: '나의 캐릭터' },
     { href: '/live', label: 'Live' },
-    { href: '/shop-recharge', label: '수익 관리' },
-    { href: '/my-page', label: '마이페이지' },
+    { href: '/my-account', label: '수익 관리' },
+    { href: '/my-profile', label: '마이페이지' },
   ]
 
   // 컴포넌트가 마운트되었는지 확인
