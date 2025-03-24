@@ -1,7 +1,6 @@
-import { ChatModeData, CoinData, LoginResponse } from '@/types/api';
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-
+import { ChatModeData, CoinData, LoginResponse } from '@/types/api'
+import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 // 캐릭터 타입 정의
 export interface Character {
@@ -332,7 +331,7 @@ interface AccountStore {
 
 export const useAccountStore = create<AccountStore>()(
   persist(
-    (set) => ({
+    set => ({
       isLogin: false,
       data: null,
       setAccountInfo: (accountInfo: AccountStore) => set(accountInfo),
@@ -351,22 +350,16 @@ export const useAccountStore = create<AccountStore>()(
   )
 )
 
-      // skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
-    },  
-  ),
-);
-
-
 interface CoinStore {
-  coinList: Array<CoinData>;
-  orderId: string;
-  setCoinList: (coinList: Array<CoinData>) => void;
-  setOrderId: (orderId: string) => void;
+  coinList: Array<CoinData>
+  orderId: string
+  setCoinList: (coinList: Array<CoinData>) => void
+  setOrderId: (orderId: string) => void
 }
 
 export const useCoinStore = create<CoinStore>()(
   persist(
-    (set) => ({
+    set => ({
       coinList: [],
       orderId: '',
       setCoinList: (coinList: Array<CoinData>) => set({ coinList }),
@@ -376,20 +369,18 @@ export const useCoinStore = create<CoinStore>()(
       name: 'coin-storage',
       storage: createJSONStorage(() => safeStorage),
       // skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
-    },
-  ),
-);
-
+    }
+  )
+)
 
 interface ChatModeStore {
-  chatMode: Array<ChatModeData>;
-  setChatMode: (chatMode: Array<ChatModeData>) => void;
+  chatMode: Array<ChatModeData>
+  setChatMode: (chatMode: Array<ChatModeData>) => void
 }
-
 
 export const useChatModeStore = create<ChatModeStore>()(
   persist(
-    (set) => ({
+    set => ({
       chatMode: [],
       setChatMode: (chatMode: Array<ChatModeData>) => set({ chatMode }),
     }),
@@ -397,6 +388,6 @@ export const useChatModeStore = create<ChatModeStore>()(
       name: 'chatMode-storage',
       storage: createJSONStorage(() => safeStorage),
       // skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
-    },
-  ),
-);
+    }
+  )
+)

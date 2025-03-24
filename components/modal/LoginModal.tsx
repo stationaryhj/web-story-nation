@@ -12,6 +12,15 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+  const [showSignup, setShowSignup] = useState(false)
+
+  const handleSignupClick = () => {
+    setShowSignup(true)
+  }
+
+  const handleSignupClose = () => {
+    setShowSignup(false)
+  }
 
   const { socialLogin, loading } = useAccountStore()
 
@@ -25,45 +34,46 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   }
 
   return (
-    <BaseModal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="로그인"
-      size="md"
-      animation="fade"
-      backdropColor="bg-black/70 backdrop-blur-sm"
-    >
-      <div className="flex flex-col space-y-6 py-4">
-        <div className="space-y-4">
-          <button 
-            onClick={() => handleSocialLogin('KAKAO')}
-            disabled={loading}
-            className="flex w-full items-center justify-center rounded-full bg-yellow-400 py-3 px-4 font-medium text-yellow-900 shadow transition-colors hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? '로그인 중...' : '카카오로 로그인'}
-          </button>
-          <button 
-            onClick={() => handleSocialLogin('NAVER')}
-            disabled={loading}
-            className="flex w-full items-center justify-center rounded-full bg-green-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? '로그인 중...' : '네이버로 로그인'}
-          </button>
-          <button 
-            onClick={() => handleSocialLogin('APPLE')}
-            disabled={loading}
-            className="flex w-full items-center justify-center rounded-full bg-black py-3 px-4 font-medium text-white shadow transition-colors hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? '로그인 중...' : '애플로 로그인'}
-          </button>
-          <button 
-            onClick={() => handleSocialLogin('GOOGLE')}
-            disabled={loading}
-            className="flex w-full items-center justify-center rounded-full bg-blue-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? '로그인 중...' : '구글로 로그인'}
-          </button>
-        </div>
+    <>
+      <BaseModal
+        isOpen={isOpen && !showSignup}
+        onClose={onClose}
+        title="로그인"
+        size="md"
+        animation="fade"
+        backdropColor="bg-black/70 backdrop-blur-sm"
+      >
+        <div className="flex flex-col space-y-6 py-4">
+          <div className="space-y-4">
+            <button
+              onClick={() => handleSocialLogin('KAKAO')}
+              disabled={loading}
+              className="flex w-full items-center justify-center rounded-full bg-yellow-400 py-3 px-4 font-medium text-yellow-900 shadow transition-colors hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? '로그인 중...' : '카카오로 로그인'}
+            </button>
+            <button
+              onClick={() => handleSocialLogin('NAVER')}
+              disabled={loading}
+              className="flex w-full items-center justify-center rounded-full bg-green-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? '로그인 중...' : '네이버로 로그인'}
+            </button>
+            <button
+              onClick={() => handleSocialLogin('APPLE')}
+              disabled={loading}
+              className="flex w-full items-center justify-center rounded-full bg-black py-3 px-4 font-medium text-white shadow transition-colors hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? '로그인 중...' : '애플로 로그인'}
+            </button>
+            <button
+              onClick={() => handleSocialLogin('GOOGLE')}
+              disabled={loading}
+              className="flex w-full items-center justify-center rounded-full bg-blue-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? '로그인 중...' : '구글로 로그인'}
+            </button>
+          </div>
 
           <div className="text-center text-sm text-gray-500 dark:text-gray-400">
             <p>또는</p>

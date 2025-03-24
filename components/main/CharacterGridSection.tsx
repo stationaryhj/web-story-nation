@@ -89,7 +89,13 @@ export default function CharacterGridSection({
         ? newCharacters
         : newCharacters.filter(character => !character.isAdult)
 
-      setCharacters(filteredCharacters as Character[])
+      // category 속성 추가
+      const charactersWithCategory = filteredCharacters.map(character => ({
+        ...character,
+        category: 'unspecified' as 'male' | 'female' | 'unspecified',
+      }))
+
+      setCharacters(charactersWithCategory as Character[])
     }
   }, [categoryData, isLoading, isAdultModeEnabled])
 

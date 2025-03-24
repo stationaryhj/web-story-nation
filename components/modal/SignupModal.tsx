@@ -7,6 +7,7 @@ import BaseModal from './BaseModal'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faCheckSquare, faSquare } from '@fortawesome/free-solid-svg-icons'
+import SignupCompleteModal from './SignupCompleteModal'
 
 interface SignupModalProps {
   isOpen: boolean
@@ -18,6 +19,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   const [birthdate, setBirthdate] = useState('')
   const [isNicknameValid, setIsNicknameValid] = useState(false)
   const [isNicknameChecked, setIsNicknameChecked] = useState(false)
+  const [showCompleteModal, setShowCompleteModal] = useState(false)
 
   // 약관 동의 상태
   const [allAgreed, setAllAgreed] = useState(false)
@@ -91,6 +93,21 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
     }
   }, [serviceAgreed, privacyAgreed, paidServiceAgreed, marketingAgreed])
 
+  // 회원가입 모달 닫기 처리
+  const handleCloseSignupModal = () => {
+    if (showCompleteModal) {
+      // 가입 완료 모달이 표시 중이면 두 모달 모두 닫기
+      setShowCompleteModal(false)
+    }
+    onClose()
+  }
+
+  // 가입 완료 모달 닫기 처리
+  const handleCloseCompleteModal = () => {
+    setShowCompleteModal(false)
+    onClose()
+  }
+
   // 회원가입 제출
   const handleSubmit = () => {
     // 닉네임 유효성 검사
@@ -124,21 +141,18 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
     // 회원가입 처리 로직 구현
     toast.success('회원가입이 완료되었습니다!', {
       onClose: () => {
-        // 토스트 메시지가 닫힌 후에 모달을 닫음
-        onClose()
+        // 토스트 메시지가 닫힌 후 가입 완료 모달 표시
+        setShowCompleteModal(true)
       },
-      autoClose: 1000, // 2초 후 자동으로 닫힘
+      autoClose: 1000, // 1초 후 자동으로 닫힘
     })
-
-    // 토스트 메시지가 보이도록 모달 닫기를 지연시킴
-    // onClose() // 즉시 닫지 않음
   }
 
   return (
     <>
       <BaseModal
-        isOpen={isOpen}
-        onClose={onClose}
+        isOpen={isOpen && !showCompleteModal}
+        onClose={handleCloseSignupModal}
         title="회원가입"
         size="md"
         animation="fade"
@@ -307,6 +321,10 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
           </div>
         </div>
       </BaseModal>
+
+      {/* 가입 완료 모달 */}
+      <SignupCompleteModal isOpen={showCompleteModal} onClose={handleCloseCompleteModal} />
+
       <ToastContainer position="bottom-center" autoClose={3000} />
     </>
   )
