@@ -49,7 +49,7 @@ const CharacterRankingSection = memo(() => {
   }
 
   return (
-    <section className="py-8">
+    <section className="pt-10 pb-20">
       <div className="container mx-auto px-4">
         {/* 캐릭터 랭킹 탭 */}
         <div className="mb-6">

@@ -182,7 +182,7 @@ export default function Home() {
         </div>
 
         {/* 네비게이션 탭 */}
-        <div className="container mx-auto px-4 mt-6 mb-8">
+        <div className="container px-4 mt-8 flex justify-center">
           <ButtonTabs tabs={navigationTabs} defaultTabId={tabParam} onTabChange={handleCategoryChange} />
         </div>
 

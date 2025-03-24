@@ -67,6 +67,60 @@ const mockAuthors = [
     characterCount: 5,
     isVerified: false,
   },
+  {
+    id: '5',
+    name: 'SF작가',
+    nickname: 'SF작가',
+    description: '미래 세계와 과학적 상상력을 기반으로 한 캐릭터를 만듭니다.',
+    profileImageUrl: '/images/profile/author5.jpg',
+    characterCount: 7,
+    isVerified: true,
+  },
+  {
+    id: '6',
+    name: '역사전문가',
+    nickname: '역사전문가',
+    description: '역사적 배경을 가진 캐릭터와 스토리를 만듭니다.',
+    profileImageUrl: '/images/profile/author6.jpg',
+    characterCount: 9,
+    isVerified: true,
+  },
+  {
+    id: '7',
+    name: '호러작가',
+    nickname: '호러작가',
+    description: '공포와 스릴을 주는 캐릭터 전문 작가입니다.',
+    profileImageUrl: null,
+    characterCount: 4,
+    isVerified: false,
+  },
+  {
+    id: '8',
+    name: '판타지히어로',
+    nickname: '판타지히어로',
+    description: '영웅적 요소를 가진 캐릭터를 전문적으로 만듭니다.',
+    profileImageUrl: '/images/profile/author8.jpg',
+    characterCount: 11,
+    isVerified: true,
+  },
+  {
+    id: '9',
+    name: '일상작가',
+    nickname: '일상작가',
+    description: '일상의 소소한 이야기를 가진 캐릭터를 만듭니다.',
+    profileImageUrl: '/images/profile/author9.jpg',
+    characterCount: 6,
+    isVerified: false,
+  },
+  {
+    id: '10',
+    name: '판타지메이커',
+    nickname: '판타지메이커',
+    description: '독특한 판타지 세계관의 캐릭터를 창작합니다.',
+    profileImageUrl: '/images/profile/author10.jpg',
+    characterCount: 14,
+    isVerified: true,
+  },
 ]
 
 // 작가 랭킹 섹션 컴포넌트
@@ -90,7 +144,7 @@ const AuthorRankingSection = memo(() => {
   }
 
   return (
-    <section className="py-8 bg-secondary-50 dark:bg-dark-secondary-900/30">
+    <section className="py-10 bg-secondary-50 dark:bg-dark-secondary-900/30">
       <div className="container mx-auto px-4">
         {/* 작가 랭킹 탭 */}
         <div className="mb-6">
@@ -114,16 +168,24 @@ const AuthorRankingSection = memo(() => {
 
         {/* 작가 랭킹 그리드 */}
         <SectionTransition>
-          <AuthorGrid
-            customData={getAuthorRankingData()}
-            cardsPerRow={4}
-            hasRanking={true}
-            onAuthorClick={handleAuthorClick}
-          />
+          <div className="overflow-x-auto">
+            <div className="min-w-full pb-4">
+              <AuthorGrid
+                customData={getAuthorRankingData()}
+                cardsPerRow={10}
+                hasRanking={true}
+                onAuthorClick={handleAuthorClick}
+              />
+            </div>
+          </div>
         </SectionTransition>
       </div>
 
-      <AuthorRankingSidebar isOpen={isAuthorRankingSidebarOpen} onClose={() => setIsAuthorRankingSidebarOpen(false)} />
+      <AuthorRankingSidebar
+        isOpen={isAuthorRankingSidebarOpen}
+        onClose={() => setIsAuthorRankingSidebarOpen(false)}
+        isSidebar={true}
+      />
     </section>
   )
 })

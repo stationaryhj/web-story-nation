@@ -108,7 +108,7 @@ export default function CardGrid({
   }
 
   return (
-    <div className="container mx-auto px-4">
+    <div>
       {title && (
         <FadeIn direction="up" delay={0.1}>
           <div className="flex justify-between items-center mb-4">

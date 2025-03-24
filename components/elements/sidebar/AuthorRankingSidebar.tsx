@@ -30,9 +30,10 @@ const generateMockAuthors = (count: number) => {
 interface AuthorRankingSidebarProps {
   isOpen: boolean
   onClose: () => void
+  isSidebar?: boolean
 }
 
-export default function AuthorRankingSidebar({ isOpen, onClose }: AuthorRankingSidebarProps) {
+export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = false }: AuthorRankingSidebarProps) {
   const [activeTab, setActiveTab] = useState('weekly')
   const [rankingData, setRankingData] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -65,6 +66,7 @@ export default function AuthorRankingSidebar({ isOpen, onClose }: AuthorRankingS
           }
 
           setRankingData(sortedAuthors)
+          console.log('sortedAuthors', sortedAuthors)
           setIsLoading(false)
         }, 500)
       } catch (error) {
@@ -141,7 +143,7 @@ export default function AuthorRankingSidebar({ isOpen, onClose }: AuthorRankingS
             onClick={e => e.stopPropagation()}
           >
             {/* 헤더 */}
-            <div className="sticky top-0 bg-white dark:bg-dark-background-DEFAULT z-10 px-6 py-4 border-b dark:border-dark-secondary-200/10 flex justify-between items-center">
+            <div className="sticky top-0 bg-white dark:bg-dark-background-DEFAULT z-20 px-6 py-4 border-b dark:border-dark-secondary-200/10 flex justify-between items-center">
               <h2 className="text-xl font-bold text-secondary-900 dark:text-dark-secondary-200">작가 랭킹</h2>
               <button
                 onClick={onClose}
@@ -163,11 +165,12 @@ export default function AuthorRankingSidebar({ isOpen, onClose }: AuthorRankingS
             <div className="px-4 py-6">
               <AuthorGrid
                 customData={rankingData}
-                cardsPerRow={2}
+                cardsPerRow={1}
                 hasRanking={true}
                 isLoading={isLoading}
                 subtitle={`${rankingTabs.find(tab => tab.id === activeTab)?.label || ''} 작가 랭킹`}
                 onAuthorClick={handleAuthorClick}
+                isSidebar={isSidebar}
               />
             </div>
           </motion.div>

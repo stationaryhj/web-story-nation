@@ -157,9 +157,9 @@ export default function ButtonTabs({
   const showHashTags = activeHashTags.length > 0
 
   return (
-    <div className={cn('w-full', className)}>
+    <div className={cn('', className)}>
       {/* 탭 네비게이션 */}
-      <div className="relative mb-4 flex overflow-x-auto hide-scrollbar">
+      <div className="relative flex overflow-x-auto hide-scrollbar">
         <div className="flex space-x-8">
           {tabs.map((tab, index) => (
             <button

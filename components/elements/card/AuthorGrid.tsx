@@ -28,6 +28,7 @@ interface AuthorGridProps {
   lastUpdateTime?: string
   isLoading?: boolean
   error?: string | null
+  isSidebar?: boolean
   onAuthorClick?: (author: Author) => void
 }
 
@@ -42,6 +43,7 @@ export default function AuthorGrid({
   lastUpdateTime,
   isLoading = false,
   error = null,
+  isSidebar = false,
   onAuthorClick,
 }: AuthorGridProps) {
   const [authors, setAuthors] = useState<Array<Author>>(customData)
@@ -72,13 +74,15 @@ export default function AuthorGrid({
         return 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'
       case 6:
         return 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+      case 10:
+        return 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-10'
       default:
         return 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4' // 기본값 4
     }
   }
 
   return (
-    <div className="container mx-auto px-4">
+    <div>
       {title && (
         <FadeIn direction="up" delay={0.1}>
           <div className="flex justify-between items-center mb-4">
@@ -115,7 +119,7 @@ export default function AuthorGrid({
         </FadeIn>
       )}
 
-      <div className={`grid ${getGridColumns()} gap-4 md:gap-6`}>
+      <div className={`grid ${getGridColumns()} ${isSidebar ? 'gap-5' : 'gap-2'}`}>
         {localLoading
           ? Array(cardsPerRow)
               .fill(0)
@@ -133,6 +137,7 @@ export default function AuthorGrid({
                 hasRank={hasRanking}
                 rank={hasRanking ? index + 1 : undefined}
                 onClick={() => handleAuthorClick(author)}
+                isSidebar={isSidebar}
               />
             ))}
       </div>

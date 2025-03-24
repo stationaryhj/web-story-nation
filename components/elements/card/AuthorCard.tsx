@@ -15,6 +15,7 @@ interface Author {
   profileImageUrl?: string | null
   characterCount: number // 생성한 캐릭터 수
   isVerified?: boolean // 인증된 작가 여부
+  isSidebar?: boolean
 }
 
 interface AuthorCardProps {
@@ -23,9 +24,17 @@ interface AuthorCardProps {
   hasRank?: boolean
   rank?: number
   onClick?: () => void
+  isSidebar?: boolean
 }
 
-export default function AuthorCard({ author, index = 0, hasRank = false, rank, onClick }: AuthorCardProps) {
+export default function AuthorCard({
+  author,
+  index = 0,
+  hasRank = false,
+  rank,
+  onClick,
+  isSidebar = false,
+}: AuthorCardProps) {
   const { name, nickname, description, profileImageUrl, characterCount, isVerified } = author
   const [imageError, setImageError] = React.useState(false)
 
@@ -45,30 +54,31 @@ export default function AuthorCard({ author, index = 0, hasRank = false, rank, o
   return (
     <CardTransition index={index}>
       <div
-        className="flex flex-col relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-dark-background-light dark:border dark:border-dark-secondary-200/10 cursor-pointer"
+        className="flex flex-col relative rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-dark-background-light dark:border dark:border-dark-secondary-200/10 cursor-pointer"
         onClick={onClick}
       >
-        <div className="block p-4">
+        <div className={`${isSidebar ? 'flex gap-4 p-2' : 'p-4'}`}>
           {/* 상단 이미지와 랭킹 */}
           <div className="relative mb-3">
             {/* 랭킹 표시 */}
             {hasRank && rank !== undefined && (
               <div
-                className={`absolute top-0 left-0 z-10 w-6 h-6 ${getRankBgColor(index)} text-white flex items-center justify-center font-bold shadow-md rounded-full`}
+                className={`absolute top-[-10px] left-[-10px] z-10 w-6 h-6 ${getRankBgColor(index + 1)} text-white flex items-center justify-center font-bold shadow-md rounded-full`}
               >
                 {rank}
               </div>
             )}
 
-            <div className="flex items-center">
+            <div
+              className={`flex items-center justify-center ${isSidebar ? '' : 'border-b border-secondary-200 dark:border-dark-secondary-200 mb-3'}`}
+            >
               {/* 프로필 이미지 */}
-              <div className="relative w-12 h-12 rounded-full overflow-hidden bg-secondary-100 dark:bg-dark-secondary-800 mr-3 flex-shrink-0">
+              <div className="relative w-12 h-12 rounded-full overflow-hidden bg-secondary-100 dark:bg-dark-secondary-800 mr-3 flex-shrink-0 mb-3">
                 {profileImageUrl ? (
                   <Image
-                    src={getImageUri(profileImageUrl)}
+                    src="/images/placeholders/author_default_img.jpg"
                     alt={nickname || name}
-                    width={48}
-                    height={48}
+                    fill
                     className="object-cover"
                     onError={handleImageError}
                   />
@@ -78,44 +88,30 @@ export default function AuthorCard({ author, index = 0, hasRank = false, rank, o
                   </div>
                 )}
               </div>
-
+            </div>
+          </div>
+          <div
+            className={`${isSidebar ? 'flex flex-col justify-start w-full' : 'flex flex-col justify-center items-center text-center w-full'}`}
+          >
+            <div>
               {/* 작가 정보 */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center">
-                  <h3 className="font-bold text-secondary-900 dark:text-dark-secondary-200 truncate group-hover:text-primary-600 dark:group-hover:text-dark-primary-400 transition-colors mr-1">
+                <div className={`flex items-center w-full mb-2 ${isSidebar ? '' : 'justify-center'}`}>
+                  <div className="font-bold text-[12px] text-secondary-900 dark:text-dark-secondary-200 truncate group-hover:text-primary-600 dark:group-hover:text-dark-primary-400 transition-colors">
                     {nickname || name}
-                  </h3>
-                  {isVerified && (
-                    <span className="inline-flex items-center justify-center w-4 h-4 bg-primary-500 text-white rounded-full">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="w-3 h-3"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center text-xs text-secondary-500 dark:text-dark-secondary-400 mt-0.5">
-                  <FontAwesomeIcon icon={faPen} className="mr-1" />
-                  <span>{characterCount}개의 캐릭터</span>
+                  </div>
                 </div>
               </div>
             </div>
+            <div className={`flex items-center w-full ${isSidebar ? '' : 'justify-center'}`}>
+              {/* 작가 소개 */}
+              {description && (
+                <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 group-hover:text-secondary-800 dark:group-hover:text-dark-secondary-400 transition-colors">
+                  {description}
+                </p>
+              )}
+            </div>
           </div>
-
-          {/* 작가 소개 */}
-          {description && (
-            <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 group-hover:text-secondary-800 dark:group-hover:text-dark-secondary-400 transition-colors">
-              {description}
-            </p>
-          )}
         </div>
       </div>
     </CardTransition>

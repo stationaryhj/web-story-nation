@@ -8,7 +8,7 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 // 캐릭터 생성 유도 섹션 컴포넌트
 const CreateCharacterSection = memo(() => {
   return (
-    <section className="py-12 bg-primary-50 dark:bg-dark-primary-900/30">
+    <section className="py-20 bg-primary-50 dark:bg-dark-primary-900/30 mb-20">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl font-bold text-secondary-900 dark:text-dark-secondary-200 mb-4">
           내가 원하는 캐릭터를 만들어 보세요!
