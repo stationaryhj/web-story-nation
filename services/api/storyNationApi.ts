@@ -392,8 +392,12 @@ export const settlementApi = {
     });
   },
 
-  GetOrderId: async(): Promise<ApiResponse<OrderIdResponse>> => {
-    return api.post('/api/getorderid');
+  GetOrderId: async(coin_key: number): Promise<ApiResponse<OrderIdResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
+    api.defaults.headers.common['Authorization'] = account_token;
+    return api.post('/api/getorderid', {
+      coin_key,
+    });
   },
 
   GetCoinList: async(): Promise<ApiResponse<CoinListResponse>> => {
