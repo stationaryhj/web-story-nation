@@ -10,12 +10,60 @@ import Image from 'next/image'
 
 // 더미 상품 데이터
 const penPackages = [
-  { id: 1, pen: 120, price: '1,600', image: '/images/pen1.png' },
-  { id: 2, pen: 250, price: '3,200', image: '/images/pen2.png' },
-  { id: 3, pen: 520, price: '6,000', image: '/images/pen3.png' },
-  { id: 4, pen: 900, price: '9,900', image: '/images/pen4.png' },
-  { id: 5, pen: 1600, price: '17,000', image: '/images/pen5.png' },
-  { id: 6, pen: 2500, price: '25,900', image: '/images/pen6.png' },
+  {
+    id: 1,
+    pen: 100,
+    bonusPen: 20,
+    discountRate: 20,
+    originalPrice: '2,000',
+    price: '1,600',
+    image: '/images/pen1.png',
+  },
+  {
+    id: 2,
+    pen: 200,
+    bonusPen: 50,
+    discountRate: 20,
+    originalPrice: '4,000',
+    price: '3,200',
+    image: '/images/pen2.png',
+  },
+  {
+    id: 3,
+    pen: 420,
+    bonusPen: 100,
+    discountRate: 20,
+    originalPrice: '7,500',
+    price: '6,000',
+    image: '/images/pen3.png',
+  },
+  {
+    id: 4,
+    pen: 750,
+    bonusPen: 150,
+    discountRate: 25,
+    originalPrice: '13,200',
+    price: '9,900',
+    image: '/images/pen4.png',
+  },
+  {
+    id: 5,
+    pen: 1350,
+    bonusPen: 250,
+    discountRate: 25,
+    originalPrice: '22,700',
+    price: '17,000',
+    image: '/images/pen5.png',
+  },
+  {
+    id: 6,
+    pen: 2100,
+    bonusPen: 400,
+    discountRate: 30,
+    originalPrice: '37,000',
+    price: '25,900',
+    image: '/images/pen6.png',
+  },
 ]
 
 // 더미 거래 내역 데이터
@@ -128,18 +176,47 @@ export default function ShopRecharge() {
                     className="bg-white dark:bg-dark-background-light rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden cursor-pointer"
                   >
                     <div className="p-4">
+                      {/* 헤더 영역 - 할인률 표시 */}
                       <div className="flex items-center justify-between mb-3">
                         <div className="bg-primary-100 dark:bg-dark-primary-900/30 px-3 py-1 rounded-full">
                           <span className="text-sm font-medium text-primary-600 dark:text-primary-400">
-                            {pkg.pen} 펜
+                            {pkg.discountRate}% 할인
                           </span>
                         </div>
-                        <span className="text-lg font-bold text-gray-900 dark:text-white">₩ {pkg.price}</span>
                       </div>
-                      <div className="aspect-square relative bg-gray-100 dark:bg-dark-background-accent rounded-lg flex items-center justify-center">
-                        <div className="text-center text-gray-500 dark:text-gray-400 text-sm">
-                          <FontAwesomeIcon icon={faPen} className="h-10 w-10 mb-2" />
-                          <p>이미지</p>
+
+                      {/* 정보 영역 */}
+                      <div className="flex items-center space-x-3 mb-3">
+                        {/* 이미지 (크기 축소) */}
+                        <div className="w-16 h-16 bg-gray-100 dark:bg-dark-background-accent rounded-lg flex items-center justify-center flex-shrink-0">
+                          <FontAwesomeIcon icon={faPen} className="h-8 w-8 text-primary-500 dark:text-primary-400" />
+                        </div>
+
+                        {/* 획득 정보 */}
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="flex items-center space-x-1">
+                                <span className="text-lg font-bold text-gray-900 dark:text-white">
+                                  {pkg.pen + pkg.bonusPen}
+                                </span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400">펜</span>
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                기본 {pkg.pen} + 보너스 {pkg.bonusPen}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 가격 정보 */}
+                      <div className="border-t border-gray-100 dark:border-gray-700 pt-3">
+                        <div className="flex items-center justify-between">
+                          <div className="text-xs line-through text-gray-400 dark:text-gray-500">
+                            ₩ {pkg.originalPrice}
+                          </div>
+                          <div className="text-lg font-bold text-gray-900 dark:text-white">₩ {pkg.price}</div>
                         </div>
                       </div>
                     </div>
