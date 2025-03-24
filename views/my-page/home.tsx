@@ -1,360 +1,558 @@
 'use client'
 
 import {
-  faChartSimple,
+  faArrowLeft,
+  faCheck,
+  faChevronDown,
   faChevronRight,
-  faCoins,
-  faDownload,
-  faMoneyBillWave,
-  faPen,
-  faWallet,
+  faCircleUser,
+  faCopy,
+  faImage,
+  faTrash,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter } from 'next/navigation'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useAccountStore } from '@/store/useStoreData'
 import { bridgeLoginDataToUserInfo } from '@/lib/utils/storyNationUtil'
-import { ReqGetCoinChargeUseHistory, GetSettlementList } from '@/services/hooks/DataListManager'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import { BaseButton } from '@/components/elements/button/BaseButton'
 
 export default function MyPageView() {
-  const [activeTab, setActiveTab] = useState<'income' | 'withdrawal'>('income')
+  const router = useRouter()
+  const [isEdited, setIsEdited] = useState(false)
+  const [isNicknameVerified, setIsNicknameVerified] = useState(true) // 초기값은 true로 설정 (기존 닉네임은 검증됨)
+  const [isNicknameChanged, setIsNicknameChanged] = useState(false) // 닉네임이 변경되었는지 추적
+  const [originalNickname, setOriginalNickname] = useState('닉네임') // 초기 닉네임 저장
+  const [activeTab, setActiveTab] = useState<'support' | 'terms' | 'privacy' | 'paid' | 'policy'>('support')
 
-  const userInfo = bridgeLoginDataToUserInfo(useAccountStore.getState().data || null)
+  // 사용자 정보 상태
+  const [profile, setProfile] = useState({
+    nickname: '닉네임',
+    email: 'user@example.com',
+    platform: 'Google',
+    bank: '',
+    accountNumber: '',
+    accountHolder: '',
+    language: 'ko', // 'ko' 또는 'en'
+    profileImage: null as string | null,
+  })
 
-  if(userInfo === null) {
-    return <div>로그인 후 이용해주세요.</div>
+  // 페르소나 설정
+  const [persona, setPersona] = useState({
+    name: '',
+    gender: '남성' as '남성' | '여성',
+  })
+
+  // 이미지 업로드를 위한 참조
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // 은행 목록
+  const [showBankList, setShowBankList] = useState(false)
+  const bankList = [
+    '국민은행',
+    '신한은행',
+    '우리은행',
+    '하나은행',
+    '농협은행',
+    '기업은행',
+    '새마을금고',
+    '카카오뱅크',
+    '토스뱅크',
+  ]
+
+  // 닉네임 중복 체크 핸들러
+  const handleDuplicateCheck = () => {
+    // 여기에 실제 API 호출 로직이 들어갈 수 있음
+    const isAvailable = Math.random() > 0.3 // 임시로 랜덤하게 결과 생성
+
+    if (isAvailable) {
+      toast.success('사용 가능한 닉네임입니다.')
+      setIsNicknameVerified(true)
+      setIsNicknameChanged(false) // 중복 체크 통과 후 상태 초기화
+    } else {
+      toast.error('사용할 수 없는 닉네임입니다.')
+      setIsNicknameVerified(false)
+    }
   }
 
+  // 닉네임이 원래 닉네임과 같은지 확인
+  useEffect(() => {
+    if (profile.nickname === originalNickname) {
+      setIsNicknameVerified(true)
+      setIsNicknameChanged(false)
+    } else {
+      setIsNicknameChanged(true)
+    }
+  }, [profile.nickname, originalNickname])
 
-  const {
-    data: coinChargeUseHistoryData,
-    isLoading: coinChargeUseHistoryLoading,
-    error: coinChargeUseHistoryError,
-    refetch: coinChargeUseHistoryRefetch } = ReqGetCoinChargeUseHistory(121, 1, 10);
+  // 저장 핸들러
+  const handleSave = () => {
+    // 닉네임이 변경되었고 중복 확인을 하지 않은 경우
+    if (isNicknameChanged && !isNicknameVerified) {
+      toast.error('닉네임 중복 확인이 필요합니다.')
+      return
+    }
 
+    // 여기에 실제 API 호출 로직이 들어갈 수 있음
+    toast.success('정보가 성공적으로 저장되었습니다.')
+    setIsEdited(false)
+    setOriginalNickname(profile.nickname) // 저장 후 원래 닉네임 업데이트
+    setIsNicknameVerified(true) // 저장 후 닉네임 검증 상태 업데이트
+    setIsNicknameChanged(false) // 저장 후 닉네임 변경 상태 초기화
+  }
 
-  const {
-    data: settlementListData,
-    isLoading: settlementListLoading,
-    error: settlementListError,
-    refetch: settlementListRefetch } = GetSettlementList(1, 1, 10);
+  // 입력 핸들러
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>, field: keyof typeof profile) => {
+    // 계좌번호는 숫자만 입력 가능하도록 처리
+    if (field === 'accountNumber' && !/^\d*$/.test(e.target.value)) {
+      return
+    }
 
-  const incomeHistory = [
-    { date: '25.03.17', source: '캐릭터 채팅', amount: 170.5, character: '캐릭터1' },
-    { date: '25.03.15', source: '캐릭터 채팅', amount: 215.8, character: '캐릭터2' },
-    { date: '25.03.12', source: '캐릭터 채팅', amount: 89.3, character: '캐릭터3' },
-    { date: '25.03.10', source: '캐릭터 채팅', amount: 125.7, character: '캐릭터1' },
-    { date: '25.03.05', source: '캐릭터 채팅', amount: 77.2, character: '캐릭터2' },
-    { date: '25.03.02', source: '캐릭터 채팅', amount: 193.6, character: '캐릭터3' },
-    { date: '25.02.28', source: '캐릭터 채팅', amount: 110.9, character: '캐릭터1' },
-  ]
+    // 예금주는 한글만 입력 가능하도록 처리
+    if (field === 'accountHolder' && !/^[가-힣]*$/.test(e.target.value)) {
+      return
+    }
 
-  const withdrawalHistory = [
-    { date: '25.03.05', amount: 1500, status: '완료' },
-    { date: '25.02.03', amount: 2500, status: '완료' },
-  ]
+    // 계좌번호는 최대 14자리
+    if (field === 'accountNumber' && e.target.value.length > 14) {
+      return
+    }
 
-  const totalIncome = incomeHistory.reduce((sum, item) => sum + item.amount, 0)
-  const totalWithdrawal = withdrawalHistory.reduce((sum, item) => sum + item.amount, 0)
+    // 예금주는 최대 8자리
+    if (field === 'accountHolder' && e.target.value.length > 8) {
+      return
+    }
+
+    setProfile(prev => ({ ...prev, [field]: e.target.value }))
+    setIsEdited(true)
+  }
+
+  // 페르소나 입력 핸들러
+  const handlePersonaChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>, field: keyof typeof persona) => {
+    if (field === 'name' && e.target.value.length > 25) {
+      return
+    }
+
+    setPersona(prev => ({ ...prev, [field]: e.target.value }))
+    setIsEdited(true)
+  }
+
+  // 성별 변경 핸들러
+  const handleGenderChange = (gender: '남성' | '여성') => {
+    setPersona(prev => ({ ...prev, gender }))
+    setIsEdited(true)
+  }
+
+  // 언어 변경 핸들러
+  const handleLanguageChange = (language: 'ko' | 'en') => {
+    setProfile(prev => ({ ...prev, language }))
+    setIsEdited(true)
+  }
+
+  // 이미지 업로드 핸들러
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setProfile(prev => ({ ...prev, profileImage: reader.result as string }))
+        setIsEdited(true)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  // 이미지 삭제 핸들러
+  const handleDeleteImage = () => {
+    setProfile(prev => ({ ...prev, profileImage: null }))
+    setIsEdited(true)
+  }
+
+  // 로그아웃 핸들러
+  const handleLogout = () => {
+    // 여기에 실제 로그아웃 로직이 들어갈 수 있음
+    router.push('/login')
+  }
+
+  // 뒤로가기 핸들러
+  const handleBack = () => {
+    if (isEdited) {
+      const confirm = window.confirm('변경 사항이 저장되지 않았습니다. 그래도 나가시겠습니까?')
+      if (confirm) {
+        router.push('/home')
+      }
+    } else {
+      router.push('/home')
+    }
+  }
 
   // 탭 변경 핸들러
-  const handleTabChange = (tab: 'income' | 'withdrawal') => {
+  const handleTabChange = (tab: 'support' | 'terms' | 'privacy' | 'paid' | 'policy') => {
     setActiveTab(tab)
+
+    // 각 탭에 따라 다른 페이지로 이동
+    switch (tab) {
+      case 'support':
+        window.open('https://pf.kakao.com/_xoIvlxj', '_blank')
+        break
+      case 'terms':
+        window.open('/terms?tab=terms', '_blank')
+        break
+      case 'privacy':
+        window.open('/terms?tab=privacy', '_blank')
+        break
+      case 'paid':
+        window.open('/terms?tab=paid', '_blank')
+        break
+      case 'policy':
+        window.open('/terms?tab=policy', '_blank')
+        break
+    }
   }
 
-  // 차트 데이터 (더미)
-  const chartData = [25, 40, 60, 30, 65, 45, 80]
+  // 은행 선택 핸들러
+  const handleBankSelect = (bank: string) => {
+    setProfile(prev => ({ ...prev, bank }))
+    setShowBankList(false)
+    setIsEdited(true)
+  }
+
+  // 창 외부 클릭 감지를 위한 참조
+  const bankDropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (bankDropdownRef.current && !bankDropdownRef.current.contains(event.target as Node)) {
+        setShowBankList(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
+  // 가상의 펜 사용 내역
+  const penUsageHistory = [
+    { date: '2023.05.15', type: '캐릭터 생성', amount: 100 },
+    { date: '2023.05.12', type: '채팅 사용', amount: 50 },
+    { date: '2023.05.10', type: '이미지 생성', amount: 200 },
+    { date: '2023.05.05', type: '캐릭터 수정', amount: 30 },
+    { date: '2023.05.01', type: '채팅 사용', amount: 45 },
+  ]
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
-      {/* 헤더 섹션 */}
-      <div className="bg-gradient-to-r from-violet-600 to-fuchsia-600 pt-10 pb-16 px-4 md:px-6 lg:px-8 text-white">
-        <div className="max-w-[1280px] mx-auto">
-          <h1 className="text-3xl font-bold mb-3 flex items-center">
-            <FontAwesomeIcon icon={faWallet} className="mr-3 text-violet-200" />
-            My 정산
-          </h1>
-          <p className="text-violet-100 mb-1 text-lg">내가 만든 캐릭터로 수익을 창출하세요!</p>
-          <p className="text-violet-200 opacity-90">확실한 보상! 채팅 수익은 현금으로 정산해 드립니다.</p>
+      {/* 헤더 */}
+      <div className="bg-white shadow-sm px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+        <div className="max-w-[1300px] mx-auto w-full flex items-center justify-between">
+          <div className="flex items-center">
+            <button
+              onClick={handleBack}
+              className="w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded-full mr-2"
+            >
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </button>
+            <h1 className="text-xl font-semibold">내 정보</h1>
+          </div>
+          <button
+            onClick={handleSave}
+            disabled={!isEdited}
+            className={`px-4 py-2 rounded-lg ${
+              isEdited ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white' : 'bg-gray-200 text-gray-400'
+            }`}
+          >
+            저장
+          </button>
         </div>
       </div>
 
-      {/* 메인 콘텐츠 컨테이너 */}
-      <div className="max-w-[1280px] mx-auto w-full px-4 md:px-6 lg:px-8 -mt-10">
-        {/* 프로필 카드 */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.4 }}
-          className="bg-white rounded-2xl shadow-lg p-6 flex items-center justify-between mb-6"
-        >
-          <div className="flex items-center">
-            <div className="w-16 h-16 bg-gradient-to-br from-violet-100 to-fuchsia-100 rounded-full flex items-center justify-center overflow-hidden mr-4 border-2 border-white shadow-md">
-              <Image
-                src="/images/character1.jpg"
-                alt="프로필"
-                width={64}
-                height={64}
-                className="object-cover"
-                onError={e => {
-                  const target = e.target as HTMLImageElement
-                  target.src =
-                    'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXVzZXIiPjxwYXRoIGQ9Ik0xOSAyMXYtMmE0IDQgMCAwIDAtNC00SDlhNCA0IDAgMCAwLTQgNHYyIi8+PGNpcmNsZSBjeD0iMTIiIGN5PSI3IiByPSI0Ii8+PC9zdmc+'
-                }}
-              />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-800">{userInfo.nickname}</h2>
-              <p className="text-gray-500">크리에이터</p>
+      {/* 메인 콘텐츠 */}
+      <div className="max-w-[1300px] mx-auto w-full p-4 pb-16">
+        {/* 프로필 이미지 섹션 */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-6">프로필</h2>
+          <div className="flex flex-col items-center">
+            <div className="relative mb-4">
+              <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                {profile.profileImage ? (
+                  <Image
+                    src={profile.profileImage}
+                    alt="프로필"
+                    width={96}
+                    height={96}
+                    className="object-cover w-full h-full"
+                  />
+                ) : (
+                  <FontAwesomeIcon icon={faCircleUser} className="text-5xl text-gray-400" />
+                )}
+              </div>
+              <div className="absolute bottom-0 right-0 flex space-x-1">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-8 h-8 rounded-full bg-violet-600 text-white flex items-center justify-center shadow-md hover:bg-violet-700"
+                >
+                  <FontAwesomeIcon icon={faImage} className="text-sm" />
+                </button>
+                {profile.profileImage && (
+                  <button
+                    onClick={handleDeleteImage}
+                    className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shadow-md hover:bg-red-600"
+                  >
+                    <FontAwesomeIcon icon={faTrash} className="text-sm" />
+                  </button>
+                )}
+              </div>
+              <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
             </div>
           </div>
-          <div className="bg-gradient-to-r from-violet-50 to-fuchsia-50 py-2 px-4 rounded-full text-violet-800 font-medium border border-violet-100">
-            내 캐릭터 관리
-          </div>
-        </motion.div>
+        </div>
 
-        {/* 통계 카드 */}
-        <div className="grid grid-cols-2 lg:grid-cols-2 gap-10 mb-6">
-          {/* 쌓인 금액 카드 */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="bg-white rounded-2xl shadow-lg overflow-hidden"
-          >
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-700 font-medium flex items-center">
-                  <FontAwesomeIcon icon={faCoins} className="mr-2 text-amber-500" />
-                  쌓인 금액
-                </h3>
-                <button className="text-xs bg-violet-50 hover:bg-violet-100 transition-colors py-1.5 px-3 rounded-full text-violet-700">
-                  정산 안내 <FontAwesomeIcon icon={faChevronRight} className="ml-1 text-xs" />
+        {/* 계정 정보 섹션 */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4">계정 정보</h2>
+          <div className="space-y-5">
+            {/* 연동된 플랫폼 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">연동된 플랫폼</label>
+              <div className="px-4 py-3 bg-gray-100 rounded-lg text-gray-700">{profile.platform}</div>
+            </div>
+
+            {/* 닉네임 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                닉네임
+                {isNicknameChanged && <span className="text-red-500 ml-2 text-xs">중복 확인이 필요합니다</span>}
+              </label>
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={profile.nickname}
+                  onChange={e => handleInputChange(e, 'nickname')}
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
+                  placeholder="닉네임을 입력하세요"
+                />
+                <button
+                  onClick={handleDuplicateCheck}
+                  className="px-4 py-2 bg-violet-600 text-white rounded-lg whitespace-nowrap hover:bg-violet-700 focus:bg-violet-700 focus:ring-2 focus:ring-violet-400 focus:ring-offset-2"
+                >
+                  중복 확인
                 </button>
               </div>
-              <div className="flex items-end">
-                <span className="text-3xl font-bold text-gray-800">{userInfo?.getBalance().toLocaleString()}</span>
-                <span className="text-gray-500 text-lg ml-2 mb-0.5">펜</span>
-              </div>
-              <p className="text-gray-500 text-sm mt-1">≈ {(userInfo?.getBalance() * 10).toLocaleString()}원</p>
-            </div>
-            <div className="bg-gradient-to-r from-violet-50 to-fuchsia-50 px-6 py-3 border-t border-violet-100">
-              <div className="flex items-center text-sm text-violet-700">
-                <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                  <div
-                    className="bg-gradient-to-r from-violet-500 to-fuchsia-500 h-full rounded-full"
-                    style={{ width: `${Math.min((userInfo?.getBalance() / 1500) * 100, 100)}%` }}
-                  ></div>
-                </div>
-                <div className="whitespace-nowrap ml-3">{userInfo?.getBalance()} / 1,500 펜</div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* 수익 트렌드 카드 */}
-          {/* <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-lg p-6 flex flex-col"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-gray-700 font-medium flex items-center">
-                <FontAwesomeIcon icon={faChartSimple} className="mr-2 text-emerald-500" />
-                수익 트렌드
-              </h3>
-              <span className="text-xs bg-emerald-50 py-1 px-2 rounded-full text-emerald-700">+12.5%</span>
             </div>
 
-            <div className="flex-1 flex items-end mt-4 space-x-1">
-              {chartData.map((value, index) => (
-                <div key={index} className="flex-1 flex flex-col items-center">
-                  <div
-                    className="w-full bg-gradient-to-t from-violet-500 to-fuchsia-500 rounded-t-sm"
-                    style={{ height: `${value}px` }}
-                  ></div>
-                  <div className="text-xs text-gray-400 mt-1">{index + 1}일</div>
-                </div>
-              ))}
+            {/* 이메일 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+              <div className="px-4 py-3 bg-gray-100 rounded-lg text-gray-700">{profile.email}</div>
             </div>
-          </motion.div> */}
-
-          {/* 지급 계좌 카드 */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-            className="bg-white rounded-2xl shadow-lg p-6"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-gray-700 font-medium flex items-center">
-                <FontAwesomeIcon icon={faMoneyBillWave} className="mr-2 text-blue-500" />
-                지급 계좌
-              </h3>
-              <button className="text-xs bg-blue-50 hover:bg-blue-100 transition-colors py-1.5 px-3 rounded-full text-blue-700">
-                <FontAwesomeIcon icon={faPen} className="mr-1" /> 변경
-              </button>
-            </div>
-            <div className="bg-gradient-to-r from-slate-50 to-blue-50 p-4 rounded-xl border border-slate-200 mb-4">
-              <div className="space-y-1.5">
-                <p className="text-gray-700 font-medium">{userInfo.bank}</p>
-                <p className="text-gray-700">{userInfo.accountHolder}</p>
-                <p className="text-gray-700">{userInfo.accountNumber}</p>
-              </div>
-            </div>
-            <button className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white py-3 px-4 rounded-xl w-full transition-all shadow-md hover:shadow-lg text-sm font-medium flex items-center justify-center">
-              <FontAwesomeIcon icon={faDownload} className="mr-2" />
-              출금 신청하기
-            </button>
-          </motion.div>
+          </div>
         </div>
 
-        {/* 안내사항 */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.4 }}
-          className="mb-6"
-        >
-          <div className="bg-gradient-to-r from-violet-50 to-fuchsia-50 p-5 rounded-2xl border border-violet-100 shadow-sm">
-            <h3 className="font-medium text-violet-800 mb-3">출금 안내</h3>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li className="flex items-start">
-                <span className="inline-block w-5 h-5 rounded-full bg-violet-200 text-violet-800 flex-shrink-0 flex items-center justify-center text-xs mr-2 mt-0.5">
-                  1
-                </span>
-                출금은 <span className="font-semibold">1,500펜</span>부터 가능하며, 매달 1회씩, 1~5일에 출금 신청이
-                가능합니다.
-              </li>
-              <li className="flex items-start">
-                <span className="inline-block w-5 h-5 rounded-full bg-violet-200 text-violet-800 flex-shrink-0 flex items-center justify-center text-xs mr-2 mt-0.5">
-                  2
-                </span>
-                출금액은 <span className="font-semibold">1펜당 10원</span>으로 계산됩니다.
-              </li>
-              <li className="flex items-start">
-                <span className="inline-block w-5 h-5 rounded-full bg-violet-200 text-violet-800 flex-shrink-0 flex items-center justify-center text-xs mr-2 mt-0.5">
-                  3
-                </span>
-                출금 신청한 금액은 6~10일에 순차적으로 지급됩니다.
-              </li>
-            </ul>
-          </div>
-        </motion.div>
-
-        {/* 내역 탭 */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.4, delay: 0.5 }}
-          className="bg-white rounded-2xl shadow-lg overflow-hidden mb-10"
-        >
-          <div className="flex p-1 border-b bg-gray-50">
-            <button
-              className={`flex-1 py-3 text-center transition-all relative rounded-xl ${
-                activeTab === 'income'
-                  ? 'bg-white text-violet-700 font-medium shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-              onClick={() => handleTabChange('income')}
-            >
-              수익 내역
-            </button>
-            <button
-              className={`flex-1 py-3 text-center transition-all relative rounded-xl ${
-                activeTab === 'withdrawal'
-                  ? 'bg-white text-violet-700 font-medium shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-              onClick={() => handleTabChange('withdrawal')}
-            >
-              출금 내역
-            </button>
-          </div>
-
-          {/* 총 금액 섹션 */}
-          <div className="p-5 border-b">
-            {activeTab === 'income' ? (
-              <div className="flex items-center justify-between">
-                <div className="text-gray-600">총 수익</div>
-                <div className="font-semibold text-lg">{totalIncome.toLocaleString()} 펜</div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between">
-                <div className="text-gray-600">총 출금 금액</div>
-                <div className="font-semibold text-lg">{totalWithdrawal.toLocaleString()} 펜</div>
-              </div>
-            )}
-          </div>
-
-          {/* 내역 리스트 */}
-          <div className="max-h-[500px] overflow-y-auto">
-            <AnimatePresence mode="wait">
-              {activeTab === 'income' ? (
-                <motion.div
-                  key="income"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {incomeHistory.map((item, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="p-5 border-b last:border-b-0 hover:bg-slate-50 transition-colors"
+        {/* 정산 정보 섹션 */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4">정산 정보</h2>
+          <div className="space-y-5">
+            {/* 은행 선택 */}
+            <div className="relative" ref={bankDropdownRef}>
+              <label className="block text-sm font-medium text-gray-700 mb-2">은행</label>
+              <button
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-violet-500 bg-violet-100 hover:bg-violet-200"
+                onClick={() => setShowBankList(!showBankList)}
+              >
+                <span>{profile.bank || '은행 선택'}</span>
+                <FontAwesomeIcon icon={faChevronDown} className="text-gray-600" />
+              </button>
+              {showBankList && (
+                <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                  {bankList.map(bank => (
+                    <div
+                      key={bank}
+                      className="px-4 py-2 hover:bg-violet-100 cursor-pointer"
+                      onClick={() => handleBankSelect(bank)}
                     >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-medium text-gray-800">{item.source}</div>
-                          <div className="text-sm text-gray-500 mt-1">
-                            {item.date} · {item.character}
-                          </div>
-                        </div>
-                        <div className="font-semibold text-violet-700">{item.amount.toLocaleString()} 펜</div>
-                      </div>
-                    </motion.div>
+                      {bank}
+                    </div>
                   ))}
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="withdrawal"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {withdrawalHistory.map((item, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="p-5 border-b last:border-b-0 hover:bg-slate-50 transition-colors"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-medium text-gray-800">출금</div>
-                          <div className="text-sm text-gray-500 mt-1">{item.date}</div>
-                        </div>
-                        <div className="flex items-center">
-                          <div className="font-semibold text-violet-700 mr-3">{item.amount.toLocaleString()} 펜</div>
-                          <span className="bg-emerald-100 text-emerald-700 text-xs py-1 px-2 rounded-full">
-                            {item.status}
-                          </span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </motion.div>
+                </div>
               )}
-            </AnimatePresence>
+            </div>
+
+            {/* 계좌번호 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                계좌번호 <span className="text-xs text-gray-500">(숫자만 입력)</span>
+              </label>
+              <input
+                type="text"
+                value={profile.accountNumber}
+                onChange={e => handleInputChange(e, 'accountNumber')}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
+                placeholder="계좌번호"
+                maxLength={14}
+              />
+            </div>
+
+            {/* 예금주 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                예금주 <span className="text-xs text-gray-500">(이름만 입력)</span>
+              </label>
+              <input
+                type="text"
+                value={profile.accountHolder}
+                onChange={e => handleInputChange(e, 'accountHolder')}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
+                placeholder="예금주"
+                maxLength={8}
+              />
+            </div>
           </div>
-        </motion.div>
+        </div>
+
+        {/* 페르소나 설정 섹션 */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4">페르소나 설정</h2>
+          <div className="space-y-5">
+            {/* 페르소나 이름 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">이름 (최대 25자)</label>
+              <input
+                type="text"
+                value={persona.name}
+                onChange={e => handlePersonaChange(e, 'name')}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
+                placeholder="페르소나 이름"
+                maxLength={25}
+              />
+            </div>
+
+            {/* 페르소나 성별 - BaseButton 사용 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">성별</label>
+              <div className="flex space-x-3">
+                <BaseButton
+                  onClick={() => handleGenderChange('남성')}
+                  color="primary"
+                  className={persona.gender === '남성' ? '!bg-violet-600 !text-white !border-violet-600' : ''}
+                >
+                  남성
+                </BaseButton>
+                <BaseButton
+                  onClick={() => handleGenderChange('여성')}
+                  color="primary"
+                  className={persona.gender === '여성' ? '!bg-violet-600 !text-white !border-violet-600' : ''}
+                >
+                  여성
+                </BaseButton>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 언어 설정 섹션 */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4">언어 설정</h2>
+          <div className="flex space-x-3">
+            <button
+              onClick={() => handleLanguageChange('ko')}
+              className={`flex-1 py-3 px-3 rounded-lg border ${
+                profile.language === 'ko'
+                  ? 'bg-violet-600 border-violet-600 text-white font-bold'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              한국어
+            </button>
+            <button
+              onClick={() => handleLanguageChange('en')}
+              className={`flex-1 py-3 px-3 rounded-lg border ${
+                profile.language === 'en'
+                  ? 'bg-violet-600 border-violet-600 text-white font-bold'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              English
+            </button>
+          </div>
+        </div>
+
+        {/* 펜 사용 내역 섹션 */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4">펜 사용 내역</h2>
+          <div className="space-y-3">
+            {penUsageHistory.map((item, index) => (
+              <div key={index} className="flex items-center justify-between p-3 border-b border-gray-100 last:border-0">
+                <div>
+                  <div className="font-medium">{item.type}</div>
+                  <div className="text-sm text-gray-500">{item.date}</div>
+                </div>
+                <div className="font-semibold text-violet-700">{item.amount} 펜</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 고객 지원 및 법적 정보 섹션 */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4">고객 지원 및 약관</h2>
+
+          {/* 세로 버튼 목록으로 변경 */}
+          <div className="space-y-3">
+            <button
+              onClick={() => handleTabChange('support')}
+              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-violet-100 text-gray-700 hover:bg-violet-200 focus:outline-none"
+            >
+              <span>카카오톡 문의</span>
+              <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+            </button>
+            <button
+              onClick={() => handleTabChange('terms')}
+              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-violet-100 text-gray-700 hover:bg-violet-200 focus:outline-none"
+            >
+              <span>서비스 이용약관</span>
+              <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+            </button>
+            <button
+              onClick={() => handleTabChange('privacy')}
+              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-violet-100 text-gray-700 hover:bg-violet-200 focus:outline-none"
+            >
+              <span>개인정보 처리방침</span>
+              <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+            </button>
+            <button
+              onClick={() => handleTabChange('paid')}
+              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-violet-100 text-gray-700 hover:bg-violet-200 focus:outline-none"
+            >
+              <span>유료 서비스 이용약관</span>
+              <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+            </button>
+            <button
+              onClick={() => handleTabChange('policy')}
+              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-violet-100 text-gray-700 hover:bg-violet-200 focus:outline-none"
+            >
+              <span>운영 정책</span>
+              <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+            </button>
+          </div>
+        </div>
+
+        {/* 로그아웃 버튼 */}
+        <button
+          onClick={handleLogout}
+          className="w-full py-3 text-red-600 font-medium border border-red-300 rounded-lg bg-red-100 hover:bg-red-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
+        >
+          로그아웃
+        </button>
       </div>
+
+      {/* react-toastify 컨테이너 */}
+      <ToastContainer position="top-center" autoClose={3000} />
     </div>
   )
 }

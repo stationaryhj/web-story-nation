@@ -40,7 +40,6 @@ const LatestCharactersSection = memo(() => {
             더 보기
           </button>
         </div>
-        <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-6">{updateTime} 업데이트</p>
 
         {/* 최신 캐릭터 그리드 */}
         <SectionTransition>
