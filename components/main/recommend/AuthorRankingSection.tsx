@@ -1,0 +1,133 @@
+'use client'
+
+import { useState, memo } from 'react'
+import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
+import AuthorGrid from '@/components/elements/card/AuthorGrid'
+import { SectionTransition } from '@/components/motion/PageTransition'
+import AuthorRankingSidebar from '@/components/elements/sidebar/AuthorRankingSidebar'
+
+// 작가 랭킹 탭 정의
+const authorRankingTabs: TabItem[] = [
+  { id: 'weekly', label: '주간' },
+  { id: 'monthly', label: '월간' },
+  { id: 'all', label: '전체' },
+]
+
+// 랭킹 탭에 따른 업데이트 문구
+const getRankingUpdateMessage = (tabId: string) => {
+  switch (tabId) {
+    case 'realtime':
+      return `${Math.floor(Math.random() * 60)}분 전 업데이트`
+    case 'daily':
+      return '매일 밤 12시 업데이트'
+    case 'weekly':
+      return '매주 월요일 00시 업데이트'
+    case 'monthly':
+      return '매월 1일 00시 업데이트'
+    default:
+      return ''
+  }
+}
+
+// 작가 목업 데이터
+const mockAuthors = [
+  {
+    id: '1',
+    name: '스토리텔러',
+    nickname: '스토리텔러',
+    description: '다양한 장르의 캐릭터를 만드는 창작자입니다. 판타지부터 현대물까지 다양한 스토리를 다룹니다.',
+    profileImageUrl: '/images/profile/author1.jpg',
+    characterCount: 15,
+    isVerified: true,
+  },
+  {
+    id: '2',
+    name: '판타지작가',
+    nickname: '판타지작가',
+    description: '판타지 세계관에 특화된 작가입니다. 마법과 모험이 가득한 캐릭터를 주로 창작합니다.',
+    profileImageUrl: '/images/profile/author2.jpg',
+    characterCount: 8,
+    isVerified: false,
+  },
+  {
+    id: '3',
+    name: '로맨스퀸',
+    nickname: '로맨스퀸',
+    description: '로맨스 전문 작가입니다. 달콤하고 설레는 캐릭터를 만듭니다.',
+    profileImageUrl: '/images/profile/author3.jpg',
+    characterCount: 12,
+    isVerified: true,
+  },
+  {
+    id: '4',
+    name: '미스터리마스터',
+    nickname: '미스터리마스터',
+    description: '추리와 미스터리를 좋아하는 작가입니다. 복잡한 사건과 캐릭터를 다룹니다.',
+    profileImageUrl: null,
+    characterCount: 5,
+    isVerified: false,
+  },
+]
+
+// 작가 랭킹 섹션 컴포넌트
+const AuthorRankingSection = memo(() => {
+  const [authorActiveTab, setAuthorActiveTab] = useState('weekly')
+  const [isAuthorRankingSidebarOpen, setIsAuthorRankingSidebarOpen] = useState(false)
+
+  const handleAuthorRankingTabChange = (tabId: string) => {
+    setAuthorActiveTab(tabId)
+    // 여기서 실제로는 해당 탭에 맞는 데이터를 가져오는 API 호출이 필요합니다.
+  }
+
+  const getAuthorRankingData = () => {
+    // 실제로는 탭에 따라 다른 데이터를 반환하는 로직이 필요함
+    return mockAuthors
+  }
+
+  const handleAuthorClick = (author: any) => {
+    console.log('작가 선택:', author)
+    // 작가 프로필 페이지로 이동 또는 모달 표시
+  }
+
+  return (
+    <section className="py-8 bg-secondary-50 dark:bg-dark-secondary-900/30">
+      <div className="container mx-auto px-4">
+        {/* 작가 랭킹 탭 */}
+        <div className="mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold text-secondary-900 dark:text-dark-secondary-700 relative inline-block">
+              작가 랭킹
+              <span className="absolute bottom-0 left-0 w-1/2 h-1 bg-primary-500 dark:bg-dark-primary-500 rounded-full"></span>
+            </h2>
+            <button
+              onClick={() => setIsAuthorRankingSidebarOpen(true)}
+              className="text-sm text-primary-600 hover:text-primary-700 dark:text-dark-primary-400 dark:hover:text-dark-primary-300 flex items-center"
+            >
+              랭킹 더보기
+            </button>
+          </div>
+          <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-4">
+            {getRankingUpdateMessage(authorActiveTab)}
+          </p>
+          <ButtonTabs tabs={authorRankingTabs} defaultTabId="weekly" onTabChange={handleAuthorRankingTabChange} />
+        </div>
+
+        {/* 작가 랭킹 그리드 */}
+        <SectionTransition>
+          <AuthorGrid
+            customData={getAuthorRankingData()}
+            cardsPerRow={4}
+            hasRanking={true}
+            onAuthorClick={handleAuthorClick}
+          />
+        </SectionTransition>
+      </div>
+
+      <AuthorRankingSidebar isOpen={isAuthorRankingSidebarOpen} onClose={() => setIsAuthorRankingSidebarOpen(false)} />
+    </section>
+  )
+})
+
+AuthorRankingSection.displayName = 'AuthorRankingSection'
+
+export default AuthorRankingSection

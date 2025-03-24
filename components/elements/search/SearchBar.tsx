@@ -45,12 +45,12 @@ export default function SearchBar({
   autoFocus = false,
 }: SearchBarProps) {
   const [query, setQuery] = useState(initialValue)
-  const [isFocused, setIsFocused] = useState(false)
+  // const [isFocused, setIsFocused] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const [selectedOption, setSelectedOption] = useState<SearchOption>({ value: 'character', label: '캐릭터명' })
-  const [debouncedQuery, setDebouncedQuery] = useState(initialValue)
-  const [searchResults, setSearchResults] = useState<any[]>([])
-  const [showNoResults, setShowNoResults] = useState(false)
+  // const [debouncedQuery, setDebouncedQuery] = useState(initialValue)
+  // const [searchResults, setSearchResults] = useState<any[]>([])
+  // const [showNoResults, setShowNoResults] = useState(false)
 
   const searchOptions: SearchOption[] = [
     { value: 'character', label: '캐릭터명' },
@@ -67,25 +67,25 @@ export default function SearchBar({
   }, [])
 
   // 검색어 변경 시 디바운스 적용
-  useEffect(() => {
-    const handler = debounce((value: string) => {
-      setDebouncedQuery(value)
-      if (value.trim().length > 0) {
-        // 실제로는 API 호출하지만, 여기서는 목데이터 필터링
-        const filteredResults = MOCK_SEARCH_RESULTS[selectedOption.value as keyof typeof MOCK_SEARCH_RESULTS].filter(
-          item => item.name.toLowerCase().includes(value.toLowerCase())
-        )
-        setSearchResults(filteredResults)
-        setShowNoResults(filteredResults.length === 0)
-      } else {
-        setSearchResults([])
-        setShowNoResults(false)
-      }
-    }, 300)
+  // useEffect(() => {
+  //   const handler = debounce((value: string) => {
+  //     setDebouncedQuery(value)
+  //     if (value.trim().length > 0) {
+  //       // 실제로는 API 호출하지만, 여기서는 목데이터 필터링
+  //       const filteredResults = MOCK_SEARCH_RESULTS[selectedOption.value as keyof typeof MOCK_SEARCH_RESULTS].filter(
+  //         item => item.name.toLowerCase().includes(value.toLowerCase())
+  //       )
+  //       setSearchResults(filteredResults)
+  //       setShowNoResults(filteredResults.length === 0)
+  //     } else {
+  //       setSearchResults([])
+  //       setShowNoResults(false)
+  //     }
+  //   }, 300)
 
-    handler(query)
-    return () => clearTimeout(handler as unknown as NodeJS.Timeout)
-  }, [query, selectedOption.value, debounce])
+  //   handler(query)
+  //   return () => clearTimeout(handler as unknown as NodeJS.Timeout)
+  // }, [query, selectedOption.value, debounce])
 
   useEffect(() => {
     if (autoFocus && inputRef.current) {
@@ -93,18 +93,18 @@ export default function SearchBar({
     }
   }, [autoFocus])
 
-  const handleClear = () => {
-    setQuery('')
-    setDebouncedQuery('')
-    setSearchResults([])
-    setShowNoResults(false)
-    if (inputRef.current) {
-      inputRef.current.focus()
-    }
-    if (onSearch) {
-      onSearch('', selectedOption.value)
-    }
-  }
+  // const handleClear = () => {
+  //   setQuery('')
+  //   setDebouncedQuery('')
+  //   setSearchResults([])
+  //   setShowNoResults(false)
+  //   if (inputRef.current) {
+  //     inputRef.current.focus()
+  //   }
+  //   if (onSearch) {
+  //     onSearch('', selectedOption.value)
+  //   }
+  // }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -120,8 +120,8 @@ export default function SearchBar({
       const filteredResults = MOCK_SEARCH_RESULTS[option.value as keyof typeof MOCK_SEARCH_RESULTS].filter(item =>
         item.name.toLowerCase().includes(query.toLowerCase())
       )
-      setSearchResults(filteredResults)
-      setShowNoResults(filteredResults.length === 0)
+      // setSearchResults(filteredResults)
+      // setShowNoResults(filteredResults.length === 0)
     }
   }
 
@@ -130,7 +130,7 @@ export default function SearchBar({
       <div className="mx-auto w-full">
         <div className="bg-white dark:bg-dark-background-DEFAULT p-3 rounded-xl shadow-sm">
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-            <div className="w-full sm:w-1/5 sm:min-w-[120px] z-50">
+            <div className="w-full sm:w-1/5 sm:min-w-[120px] z-49">
               <BaseSelectBox options={searchOptions} selectedOption={selectedOption} onChange={handleOptionChange} />
             </div>
             <div className="flex flex-1 rounded-r-xl overflow-hidden">
@@ -145,8 +145,8 @@ export default function SearchBar({
                   }
                 }}
                 className="rounded-l-none rounded-r-none border-l border-gray-200"
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
+                // onFocus={() => setIsFocused(true)}
+                // onBlur={() => setIsFocused(false)}
               />
               <BaseButton
                 color="primary"
@@ -160,7 +160,7 @@ export default function SearchBar({
           </form>
 
           {/* 검색 결과 표시 영역 */}
-          {debouncedQuery.trim() && (
+          {/* {debouncedQuery.trim() && (
             <div className="absolute top-full left-0 right-0 mt-2 rounded-lg bg-white dark:bg-dark-background-light shadow-lg overflow-hidden z-50 w-full">
               {showNoResults ? (
                 <div className="p-6 text-center text-gray-500">
@@ -226,7 +226,7 @@ export default function SearchBar({
                 )
               )}
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </div>

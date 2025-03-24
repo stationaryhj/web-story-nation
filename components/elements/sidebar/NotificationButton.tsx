@@ -3,7 +3,7 @@
 import { faBell } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useModalStore } from '@/store/useStoreModal'
 
 interface NotificationButtonProps {
   count?: number
@@ -12,10 +12,10 @@ interface NotificationButtonProps {
 
 export default function NotificationButton({ count = 0, className = '' }: NotificationButtonProps) {
   const [isHovered, setIsHovered] = useState(false)
-  const router = useRouter()
+  const { openModal } = useModalStore()
 
   const handleClick = () => {
-    router.push('/shop-recharge')
+    openModal('notification') // 알림 사이드바 모달 열기
   }
 
   return (

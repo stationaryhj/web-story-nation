@@ -1,7 +1,7 @@
 'use client'
 
 import DeleteConfirmModal from '@/components/modal/DeleteConfirmModal'
-import Card from '@/components/elements/card/Card'
+import CardGrid from '@/components/elements/card/CardGrid'
 import { SectionTransition } from '@/components/motion/PageTransition'
 import type { Character } from '@/store/useStoreData'
 import { useStoreData } from '@/store/useStoreData'
@@ -16,11 +16,6 @@ export default function MyCharacterPage() {
   const { characters } = useStoreData()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [characterToDelete, setCharacterToDelete] = useState<Character | null>(null)
-
-  // 캐릭터 카드 클릭 처리
-  const handleCardClick = (character: Character) => {
-    router.push(`/chat/${character.id}`)
-  }
 
   // 수정 버튼 클릭 처리
   const handleEditClick = (character: Character) => {
@@ -70,19 +65,12 @@ export default function MyCharacterPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {characters.map((character, index) => (
-              <Card
-                key={character.id}
-                character={character}
-                index={index}
-                variant="my-character"
-                onCardClick={() => handleCardClick(character)}
-                onEdit={() => handleEditClick(character)}
-                onDelete={() => handleDeleteClick(character)}
-              />
-            ))}
-          </div>
+          <CardGrid
+            customData={characters}
+            variant="my-character"
+            onEdit={handleEditClick}
+            onDelete={handleDeleteClick}
+          />
         )}
 
         <DeleteConfirmModal

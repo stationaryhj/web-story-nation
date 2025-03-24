@@ -18,9 +18,20 @@ interface CardProps {
   onEdit?: () => void
   onDelete?: () => void
   onCardClick?: () => void
+  rank?: number
+  hasRank?: boolean
 }
 
-export default function Card({ character, index = 0, variant = 'default', onEdit, onDelete, onCardClick }: CardProps) {
+export default function Card({
+  character,
+  index = 0,
+  variant = 'default',
+  onEdit,
+  onDelete,
+  onCardClick,
+  rank,
+  hasRank = false,
+}: CardProps) {
   const { name, description, imageUrl, commentCount, hashtags, isAdult, creator } = character
   const { openModal, setSelectedCharacter } = useModalStore()
   const [imageError, setImageError] = React.useState(false)
@@ -28,8 +39,7 @@ export default function Card({ character, index = 0, variant = 'default', onEdit
   // 카드 클릭 기본 핸들러 - 캐릭터 모달 열기
   const defaultCardClick = () => {
     setSelectedCharacter(character)
-    // openModal('character')
-    router.push(`/chat/${1}`)
+    openModal('character')
   }
 
   // 실제 카드 클릭 핸들러
@@ -58,6 +68,14 @@ export default function Card({ character, index = 0, variant = 'default', onEdit
     if (onDelete) onDelete()
   }
 
+  // 랭킹에 따른 배경색 설정
+  const getRankBgColor = (rank: number) => {
+    if (rank === 1) return 'bg-yellow-500' // 1위: 금색
+    if (rank === 2) return 'bg-gray-400' // 2위: 은색
+    if (rank === 3) return 'bg-amber-600' // 3위: 동색
+    return 'bg-primary-500' // 그 외
+  }
+
   return (
     <CardTransition index={index}>
       <div
@@ -66,6 +84,15 @@ export default function Card({ character, index = 0, variant = 'default', onEdit
       >
         <div className="block">
           <div className="relative aspect-[3/4] overflow-hidden rounded-t-xl">
+            {/* 랭킹 표시 */}
+            {hasRank && rank !== undefined && (
+              <div
+                className={`absolute top-0 left-0 z-10 w-8 h-8 ${getRankBgColor(rank)} text-white flex items-center justify-center font-bold shadow-md`}
+              >
+                {rank}
+              </div>
+            )}
+
             <Image
               src={getImageUri(imageUrl)}
               alt={name}
@@ -77,11 +104,11 @@ export default function Card({ character, index = 0, variant = 'default', onEdit
 
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-            {variant === 'default' && (
+            {/* {variant === 'default' && (
               <div className="absolute top-3 left-3 bg-primary-500/90 dark:bg-dark-primary-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
                 스토리네이션
               </div>
-            )}
+            )} */}
 
             {isAdult && (
               <div className="absolute top-3 right-3 bg-red-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">

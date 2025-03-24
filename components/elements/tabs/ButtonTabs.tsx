@@ -22,6 +22,7 @@ interface ButtonTabsProps {
   className?: string
   hashTags?: Record<string, HashTagItem[]>
   onTagSelect?: (tagIds: string[]) => void
+  onTabChange?: (tabId: string) => void
 }
 
 export default function ButtonTabs({
@@ -30,6 +31,7 @@ export default function ButtonTabs({
   className = '',
   hashTags = {},
   onTagSelect,
+  onTabChange,
 }: ButtonTabsProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -120,6 +122,10 @@ export default function ButtonTabs({
     // 태그 선택 이벤트 핸들러 호출
     if (onTagSelect) {
       onTagSelect([])
+    }
+
+    if (onTabChange) {
+      onTabChange(tabId)
     }
   }
 
