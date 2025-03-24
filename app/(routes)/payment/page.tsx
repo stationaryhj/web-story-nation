@@ -70,6 +70,7 @@ export default function PaymentTestPage() {
         {/* 결제 모달 */}
         <PaymentModal 
           isOpen={isModalOpen}
+          orderId={''}
           onClose={() => setIsModalOpen(false)}
           amount={amount}
           clientKey={clientKey}

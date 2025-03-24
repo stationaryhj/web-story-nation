@@ -61,12 +61,21 @@ export default function Header() {
 
   // 네비게이션 링크
   const navLinks = [
-    { href: '/', label: '홈' },
-    { href: '/chat-list', label: '대화' },
-    { href: '/live', label: 'Live' },
-    { href: '/my-characters', label: '나의 캐릭터' },
-    { href: '/my-page', label: '마이페이지' },
+    { href: '/', label: '홈', requireLogin: false },
+    { href: '/chat-list', label: '대화', requireLogin: true },
+    { href: '/my-characters', label: '나의 캐릭터', requireLogin: true },
+    { href: '/live', label: 'Live', requireLogin: true },
+    { href: '/shop-recharge', label: '수익 관리', requireLogin: true },
+    { href: '/my-page', label: '마이페이지', requireLogin: true },
   ]
+
+  // 로그인 필요한 링크 체크 핸들러
+  const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, link: typeof navLinks[0]) => {
+    if (link.requireLogin && !isLogin) {
+      e.preventDefault();
+      openModal('login');
+    }
+  }
 
   // 컴포넌트가 마운트되었는지 확인
   useEffect(() => {
@@ -111,7 +120,7 @@ export default function Header() {
 
   return (
     <motion.header
-      className="sticky top-0 z-50 bg-white dark:bg-dark-background-light shadow-sm dark:shadow-dark-primary-300/20"
+      className="sticky top-0 z-[50] bg-white dark:bg-dark-background-light shadow-sm dark:shadow-dark-primary-300/20"
       initial={{ y: 0 }}
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -128,6 +137,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
+                onClick={(e) => handleNavLinkClick(e, link)}
                 className={`text-sm font-medium transition-colors hover:text-primary-500 dark:hover:text-dark-primary-500 ${
                   activeLink === link.href
                     ? 'text-primary-500 dark:text-dark-primary-500'
@@ -273,9 +283,15 @@ export default function Header() {
                             ? 'text-primary-600 dark:text-dark-primary-600'
                             : 'text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600'
                         }`}
-                        onClick={() => {
-                          setActiveLink(link.href)
-                          setIsSidebarOpen(false)
+                        onClick={(e) => {
+                          if (link.requireLogin && !isLogin) {
+                            e.preventDefault();
+                            setIsSidebarOpen(false);
+                            openModal('login');
+                          } else {
+                            setActiveLink(link.href);
+                            setIsSidebarOpen(false);
+                          }
                         }}
                       >
                         {link.label}
