@@ -11,11 +11,13 @@ type ModalType =
   | 'liquidity'
   | 'character'
   | 'login'
+  | 'signup'
   | 'confirmAction'
   | 'notification'
   | 'credit'
   | 'adultVerification'
   | 'chatMode'
+  | 'report'
 
 interface ModalState {
   isOpen: boolean

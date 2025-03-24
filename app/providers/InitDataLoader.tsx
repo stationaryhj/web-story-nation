@@ -22,6 +22,8 @@ export function InitDataLoader({ children }: InitDataLoaderProps) {
     setChatMode: state.setChatMode
   }));
   
+  const version = 1.0;
+  
   // 데이터가 비어있는지 확인
   const shouldFetchCoinList = !coinList || coinList.length === 0;
   const shouldFetchChatMode = !chatMode || chatMode.length === 0;
