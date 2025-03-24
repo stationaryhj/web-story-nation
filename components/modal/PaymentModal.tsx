@@ -8,7 +8,7 @@ import { loadTossPayments, ANONYMOUS } from '@tosspayments/tosspayments-sdk';
 // 결제 모달 Props 정의
 export interface PaymentModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  orderId: number;
   amount: number;
   clientKey: string;
   successUrl?: string;
@@ -17,10 +17,12 @@ export interface PaymentModalProps {
   customerName?: string;
   onSuccess?: (paymentResult: any) => void;
   onFail?: (error: any) => void;
+  onClose: () => void;
 }
 
 export default function PaymentModal({
   isOpen,
+  orderId,
   onClose,
   amount,
   clientKey,
@@ -93,18 +95,19 @@ export default function PaymentModal({
   };
   
   // 실제 결제 요청
-  const handleRequestPayment = async () => {
+  const handleRequestPayment = async (orderId: number) => {
     if (!widgetsRef.current) {
       alert('결제 위젯이 초기화되지 않았습니다.');
       return;
     }
+
+    console.log('@@ orderId :: ', orderId);
     
     try {
-      setIsProcessing(true);
-      
-      // 결제 요청에 필요한 정보
+      // orderID 는 서버에서 받은것으로 해야함
       const orderId = nanoid();
-      
+
+      setIsProcessing(true);
       // 결제 요청
       const paymentResult = await widgetsRef.current.requestPayment({
         orderId,
@@ -206,7 +209,7 @@ export default function PaymentModal({
                 </button>
                 
                 <button 
-                  onClick={handleRequestPayment}
+                  onClick={() => handleRequestPayment(orderId)}
                   disabled={isProcessing}
                   className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >

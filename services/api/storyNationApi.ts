@@ -12,7 +12,13 @@ import type {
     CharbotChatListResponse,
     CoinListResponse,
     OrderIdResponse,
-    CharbotChatModeResponse
+    CharbotChatModeResponse,
+    CharbotResponse,
+    CharbotInprogressResponse,
+    CharbotGetListMineResponse,
+    ChatUseResponse,
+    CoinChargeUseHistoryResponse,
+    ConfirmTossPaymentResponse
 } from '../../types/api';
 
 // API 기본 설정
@@ -53,7 +59,8 @@ const createApiInstance = (baseURL: string) => {
 //   process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL :
 //   process.env.NEXT_PUBLIC_STORYNATION_API_URL;
 
-const API_URL = process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL;
+// const API_URL = process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL;
+const API_URL = process.env.NEXT_PUBLIC_STORYNATION_API_URL;
 
 const CHAT_URL = process.env.NODE_ENV === 'production' ?
   process.env.NEXT_PUBLIC_STORYNATION_PROD_CHAT_URL :
@@ -263,7 +270,22 @@ export const contentApi = {
 
 // 채팅 API
 export const chatApi = {
+  // 펜 사용
+  UseChat: async(
+    chrbot_chat_key: number,
+    chat_mode: number,
+  ): Promise<ApiResponse<ChatUseResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
+    api.defaults.headers.common['Authorization'] = account_token;
+    return chatApiInstance.post('/api/charbot/chat/user', {
+      chrbot_chat_key,
+      chat_mode,
+    });
+  },
+  
   OpenChat: async(chrbot_chat_key: number, chat_mode: number, nsfw: number): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
+    chatApiInstance.defaults.headers.common['Authorization'] = account_token;
     return chatApiInstance.post('/api/charbot/chat/open', {
       chrbot_chat_key,
       chat_mode,
@@ -272,6 +294,8 @@ export const chatApi = {
   },
 
   CloseChat: async(chrbot_chat_key: number): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
+    chatApiInstance.defaults.headers.common['Authorization'] = account_token;
     return chatApiInstance.post('/api/charbot/chat/close', {
       chrbot_chat_key,
     });
@@ -342,16 +366,6 @@ export const chatApi = {
     });
   },
 
-  // 펜 사용
-  UseChat: async(
-    chrbot_chat_key: number,
-    chat_mode: number,
-  ): Promise<ApiResponse> => {
-    return chatApiInstance.post('/api/charbot/chat/user', {
-      chrbot_chat_key,
-      chat_mode,
-    });
-  },
 
   // 채팅방 메세지 초기화
   InitChat: async(
@@ -369,6 +383,7 @@ export const chatApi = {
 
 // 정산 API
 export const settlementApi = {
+  // 수익 내역
   GetSettlementList: async(type: number, page: number, paginate: number): Promise<ApiResponse> => {
     return api.post('/api/sales/monthlyIncomeList_v2', {
       type,
@@ -384,11 +399,32 @@ export const settlementApi = {
   GetCoinList: async(): Promise<ApiResponse<CoinListResponse>> => {
     return api.post('/api/coinlist');
   },
+
+  // 코인 사용 내역
+  GetCoinChargeUseHistory: async(page: number, paginate: number, charge_type: number): Promise<ApiResponse<CoinChargeUseHistoryResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
+    api.defaults.headers.common['Authorization'] = account_token;
+    return api.post('/api/getcoinchargeusehistory_v2', {
+      page,
+      paginate,
+      charge_type,
+    });
+  },
+
+  ConfirmTossPayment: async(paymentKey: string, orderId: string, amount: number): Promise<ApiResponse<ConfirmTossPaymentResponse>> => {
+    return api.post('/api/web/toss/confirm', {
+      paymentKey,
+      orderId,
+      amount,
+    });
+  },
 };
 
 // 크리에이트 API
 export const createApi = {
-  GetCreateChatBotInProgress: async(world_list_detail_chrbot_key: number): Promise<ApiResponse> => {
+  GetCreateChatBotInProgress: async(world_list_detail_chrbot_key: number | null): Promise<ApiResponse<CharbotInprogressResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
+    api.defaults.headers.common['Authorization'] = account_token;
     return api.post('/api/charbot/inprogress/get', {
       world_list_detail_chrbot_key,
     });
@@ -464,7 +500,9 @@ export const createApi = {
     target_nick_nm: string,
     page: number,
     paginate: number,
-  ): Promise<ApiResponse> => {
+  ): Promise<ApiResponse<CharbotGetListMineResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
+    api.defaults.headers.common['Authorization'] = account_token;
     return api.post('/api/charbot/getlist/mine', {
       target_nick_nm,
       page,
@@ -472,13 +510,13 @@ export const createApi = {
     });
   },
 
-  GetCreateChatBot: async(world_list_detail_chrbot_key: number): Promise<ApiResponse> => {
+  GetChatBot: async(world_list_detail_chrbot_key: number): Promise<ApiResponse<CharbotResponse>> => {
     return api.post('/api/charbot/get', {
       world_list_detail_chrbot_key,
     });
   },
 
-  GetCreateChatBotAuth: async(): Promise<ApiResponse> => {
+  GetChatBotAuth: async(): Promise<ApiResponse> => {
     return api.post('/api/charbot/get/auth');
   },
 };
