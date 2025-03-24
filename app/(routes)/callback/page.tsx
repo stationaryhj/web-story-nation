@@ -40,7 +40,7 @@ export default function Page() {
         console.error('OAuth 콜백 처리 오류:', err)
         // 컴포넌트가 마운트된 상태일 때만 리다이렉트
         if (isMounted) {
-          router.replace('/login')
+          router.replace('/')
         }
       } finally {
         if (isMounted) {
@@ -66,7 +66,7 @@ export default function Page() {
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
           <div className="text-red-700 mb-4">{error}</div>
           <button
-            onClick={() => router.replace('/login')}
+            onClick={() => router.replace('/')}
             className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
           >
             로그인 페이지로 돌아가기

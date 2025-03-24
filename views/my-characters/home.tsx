@@ -39,7 +39,7 @@ export default function MyCharacterPage() {
 
   // 캐릭터 카드 클릭 처리
   const handleCardClick = (character: Character) => {
-    router.push(`/chat/${character.id}`)
+    router.push(`/my-characters/edit/${character.id}`)
   }
 
   // 수정 버튼 클릭 처리
@@ -54,11 +54,15 @@ export default function MyCharacterPage() {
   }
 
   // 캐릭터 삭제 확인
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (characterToDelete) {
       // 실제로는 API 호출 등으로 삭제 처리
-      console.log('캐릭터 삭제:', characterToDelete.id)
-      // 삭제 후 모달 닫기
+      const response = await createApi.DeleteChatBot(Number(characterToDelete.id));
+
+      if (response.data?.result.err === 0) {
+        refetchInProgress();
+      }
+
       setIsDeleteModalOpen(false)
       setCharacterToDelete(null)
     }
@@ -69,7 +73,7 @@ export default function MyCharacterPage() {
     const data = response.data as CharbotInprogressResponse;
 
     if (data?.chrbot && data?.result.err === 0) {
-      router.push(`/my-characters/create/${data.chrbot.world_list_detail_chrbot_key}`);
+      router.push(`/my-characters/edit/${data.chrbot.world_list_detail_chrbot_key}`);
     }
   }
 
@@ -101,7 +105,7 @@ export default function MyCharacterPage() {
         ) : (
 
           <CardGrid
-            customData={characters}
+            customData={myCharacters}
             variant="my-character"
             onEdit={handleEditClick}
             onDelete={handleDeleteClick}

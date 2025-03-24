@@ -5,6 +5,7 @@ import { useEffect, useState, Suspense } from 'react'
 import PageTransition from '@/components/motion/PageTransition'
 import { useAccountStore } from '@/store/useAccountStore'
 
+
 // 에러 메시지 컴포넌트
 function ErrorMessage({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
@@ -18,10 +19,10 @@ function ErrorMessage({ message, onRetry }: { message: string; onRetry: () => vo
           다시 시도
         </button>
         <button
-          onClick={() => window.location.href = '/login'}
+          onClick={() => window.location.href = '/'}
           className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
         >
-          로그인으로 돌아가기
+          돌아가기
         </button>
       </div>
     </div>

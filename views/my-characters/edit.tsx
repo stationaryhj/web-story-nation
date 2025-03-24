@@ -7,6 +7,10 @@ import { useEffect, useState } from 'react'
 import { useCharacterFormStore } from '@/store/useCharacterFormStore'
 import CharacterForm from '@/components/form/CharacterForm'
 
+import { ReqGetCreateChatBotInProgress, ReqSaveCreateChatBotInProgress } from '@/services/hooks/DataListManager'
+import { bridgeCharacterInProgressToCharacter } from '@/lib/utils/storyNationUtil'
+
+
 // 임시 데이터 (실제로는 API에서 가져옴)
 const MOCK_CHARACTER = {
   id: '1',
@@ -43,27 +47,38 @@ export default function EditCharacterPage() {
   const router = useRouter()
   const { activeTab, setActiveTab, formData, setFormField, resetForm } = useCharacterFormStore()
 
+  const {
+    data: inProgressData,
+    isLoading: inProgressLoading,
+    error: inProgressError, 
+    refetch: inProgressRefetch
+  } = ReqGetCreateChatBotInProgress(Number(characterId));
+  
   // 유효성 검사 상태
   const [isFormValid, setIsFormValid] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
 
-  // 캐릭터 데이터 로드 (실제로는 API에서 가져옴)
+  // 캐릭터 데이터 로드
   useEffect(() => {
-    // API 호출 대신 임시 데이터 사용
     const loadCharacter = async () => {
       try {
         setIsLoading(true)
-        // 실제 API 호출로 대체될 부분 - 지금은 mock 데이터 사용
-
-        resetForm() // 이전 데이터 초기화
-
-        // 캐릭터 데이터를 스토어에 설정
-        Object.entries(MOCK_CHARACTER).forEach(([key, value]) => {
-          if (key !== 'id') {
-            setFormField(key as any, value)
-          }
-        })
+        
+        if (inProgressData) {
+          resetForm() // 이전 데이터 초기화
+          
+          // API 데이터 브릿지 함수를 사용하여 변환
+          const characterData = bridgeCharacterInProgressToCharacter(inProgressData?.chrbot)
+          
+          // 캐릭터 데이터를 스토어에 설정
+          Object.entries(characterData).forEach(([key, value]) => {
+            if (key !== 'id') {
+              setFormField(key as any, value)
+            }
+          })
+        }
 
         setIsLoading(false)
       } catch (error) {
@@ -73,22 +88,24 @@ export default function EditCharacterPage() {
       }
     }
 
-    loadCharacter()
+    if (!inProgressLoading && inProgressData) {
+      loadCharacter()
+    }
 
     // 컴포넌트 언마운트 시 폼 초기화
     return () => {
       resetForm()
     }
-  }, [characterId, resetForm, setFormField])
+  }, [characterId, resetForm, setFormField, inProgressData, inProgressLoading])
 
   // 폼 유효성 검사
   useEffect(() => {
     const validateForm = () => {
       if (activeTab === 'basic') {
-        return formData.name.trim() !== '' && formData.bio.trim() !== '' && formData.firstMessage.trim() !== ''
+        return formData.name?.trim() !== '' && formData.bio?.trim() !== '' && formData.firstMessage?.trim() !== ''
       } else if (activeTab === 'detail') {
         // 상세 설정에서의 유효성 검사 - 최소한 상세 설명이 있어야 함
-        return formData.bioDetail.trim() !== ''
+        return formData.bioDetail?.trim() !== ''
       }
 
       return true
@@ -97,31 +114,78 @@ export default function EditCharacterPage() {
     setIsFormValid(validateForm())
   }, [activeTab, formData])
 
+  // API 호출하여 현재 진행 상태 저장
+  const saveProgress = async (finishYn = 0) => {
+    try {
+      setIsSaving(true);
+      
+      // 폼 데이터에서 API 요청에 필요한 데이터 추출
+      const payload = {
+        world_list_detail_chrbot_key: characterId,
+        img_url: inProgressData?.chrbot?.img_url || '',
+        title: formData.name || '',
+        gender: formData.gender === 'male' ? 1 : (formData.gender === 'female' ? 2 : 0),
+        intro: formData.bio || '',
+        first_talk: formData.firstMessage || '',
+        content: formData.bioDetail || '',
+        example: formData.conversationExamples?.map(example => example.text).join('\n\n') || '',
+        nsfw: inProgressData?.chrbot?.nsfw || 0,
+        img_url_nsfw: inProgressData?.chrbot?.img_url_nsfw || '',
+        show_yn: formData.visibility === 'public' ? 1 : 0,
+        content_show_yn: inProgressData?.chrbot?.content_show_yn || 0,
+        example_show_yn: inProgressData?.chrbot?.example_show_yn || 0,
+        finish_yn: finishYn,
+      };
+      
+      // API 호출
+      const response = await ReqSaveCreateChatBotInProgress(payload);
+      
+      if (response.error) {
+        throw new Error(response.error.toString());
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('저장 실패:', error);
+      alert('저장에 실패했습니다. 다시 시도해주세요.');
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   // 다음 버튼 클릭 핸들러
-  const handleNext = () => {
+  const handleNext = async () => {
+    // 현재 단계 저장
+    const saveResult = await saveProgress();
+    if (!saveResult) return;
+    
     if (activeTab === 'basic') {
-      setActiveTab('detail')
+      setActiveTab('detail');
     } else if (activeTab === 'detail') {
-      setActiveTab('image')
+      setActiveTab('image');
     } else if (activeTab === 'image') {
       // 최종 완료 처리
-      handleSubmit()
+      handleSubmit();
     }
-  }
+  };
 
   // 폼 제출 핸들러
   const handleSubmit = async () => {
     try {
-      // 실제 API 호출로 대체될 부분
-      alert('캐릭터가 성공적으로 수정되었습니다!')
-      router.push('/my-characters')
+      // 완료 상태로 저장
+      const saveResult = await saveProgress(1);
+      if (!saveResult) return;
+      
+      alert('캐릭터가 성공적으로 수정되었습니다!');
+      router.push('/my-characters');
     } catch (error) {
-      console.error('캐릭터 수정 실패:', error)
-      alert('캐릭터 수정에 실패했습니다. 다시 시도해주세요.')
+      console.error('캐릭터 수정 실패:', error);
+      alert('캐릭터 수정에 실패했습니다. 다시 시도해주세요.');
     }
-  }
+  };
 
-  if (isLoading) {
+  if (inProgressLoading || isLoading) {
     return (
       <div className="min-h-screen bg-secondary-50 dark:bg-dark-background flex items-center justify-center">
         <div className="animate-pulse text-secondary-500 dark:text-dark-secondary-500">
@@ -131,10 +195,10 @@ export default function EditCharacterPage() {
     )
   }
 
-  if (error) {
+  if (inProgressError || error) {
     return (
       <div className="min-h-screen bg-secondary-50 dark:bg-dark-background flex items-center justify-center">
-        <div className="text-red-500 dark:text-red-400">{error}</div>
+        <div className="text-red-500 dark:text-red-400">{error || '데이터를 불러오는데 실패했습니다.'}</div>
       </div>
     )
   }
@@ -191,20 +255,21 @@ export default function EditCharacterPage() {
                 type="button"
                 onClick={() => router.back()}
                 className="px-6 py-3 bg-secondary-100 hover:bg-secondary-200 text-secondary-700 rounded-lg transition-colors dark:bg-dark-secondary-100/10 dark:hover:bg-dark-secondary-100/20 dark:text-dark-secondary-400"
+                disabled={isSaving}
               >
                 취소
               </button>
               <button
                 type="button"
                 onClick={handleNext}
-                disabled={!isFormValid}
+                disabled={!isFormValid || isSaving}
                 className={`px-6 py-3 rounded-lg transition-colors ${
-                  isFormValid
+                  isFormValid && !isSaving
                     ? 'bg-primary-500 hover:bg-primary-600 text-white dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600'
                     : 'bg-primary-300 text-white cursor-not-allowed dark:bg-dark-primary-800 dark:text-dark-secondary-300'
                 }`}
               >
-                {activeTab === 'image' ? '완료' : '다음'}
+                {isSaving ? '저장 중...' : activeTab === 'image' ? '완료' : '다음'}
               </button>
             </div>
           </div>

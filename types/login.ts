@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
     Login 타입 정의
 */

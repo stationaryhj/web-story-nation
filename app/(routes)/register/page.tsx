@@ -119,7 +119,7 @@ export default function RegisterPage() {
       loginData(responseUserInfo.data);
 
       alert('회원가입이 완료되었습니다.');
-      router.push('/login');
+      router.push('/');
     }
   };
 

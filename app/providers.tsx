@@ -9,7 +9,6 @@ import { AnimatePresence } from 'framer-motion'
 import type { ReactNode } from 'react'
 import { useState, useEffect } from 'react'
 import { InitDataLoader } from '@/app/providers/InitDataLoader'
-import { NakamaProvider, useNakama } from './providers/NakamaProviders'
 
 import { API_URL, CHAT_URL } from '@/services/api/storyNationApi'
 import { useAccountStore } from '@/store/useStoreData'
@@ -105,16 +104,6 @@ export default function Providers({ children }: { children: ReactNode }) {
     )
   }
 
-  const serverConfig = {
-    serverUrl: 'qauschat.storynation.io',
-    // serverUrl: 'chat.storynation.io',
-    serverPort: '443',
-    useSSL: true,
-    autoConnect: false,
-    serverKey: 'defaultkey'
-  };
-
-
   return (
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} />
@@ -125,10 +114,8 @@ export default function Providers({ children }: { children: ReactNode }) {
         duration={1.5}
       >
         <InitDataLoader>
-          <NakamaProvider {...serverConfig}>
             <AnimatePresence mode="wait">{children}</AnimatePresence>
             <ModalManager />
-          </NakamaProvider>
         </InitDataLoader>
       </SkeletonThemeProvider>
 

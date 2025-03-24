@@ -16,7 +16,7 @@ export default function SignupCompleteModal({ isOpen, onClose }: SignupCompleteM
 
   const handleConfirm = () => {
     onClose()
-    router.push('/login') // 로그인 페이지로 이동
+    router.push('/') // 로그인 페이지로 이동
   }
 
   return (
