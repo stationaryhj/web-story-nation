@@ -108,7 +108,7 @@ export default function Providers({ children }: { children: ReactNode }) {
   const serverConfig = {
     serverUrl: 'qauschat.storynation.io',
     // serverUrl: 'chat.storynation.io',
-    serverPort: 443,
+    serverPort: '443',
     useSSL: true,
     autoConnect: false,
     serverKey: 'defaultkey'
