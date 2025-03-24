@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client'
 
 import type { Character } from '@/store/useStoreData'

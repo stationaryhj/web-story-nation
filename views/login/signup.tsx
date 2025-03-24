@@ -32,7 +32,7 @@ export default function SignupPage() {
   }
 
   const handleClose = () => {
-    router.push('/login')
+    router.push('/')
   }
 
   return (
