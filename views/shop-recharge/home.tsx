@@ -9,9 +9,10 @@ import PageTransition from '@/components/motion/PageTransition'
 import Image from 'next/image'
 import { useAccountStore } from '@/store/useAccountStore'
 import { useCoinStore } from '@/store/useStoreData'
-import { CoinData, OrderIdResponse } from '@/types/api'
+import { CoinData, OrderIdResponse, UseHistoryData } from '@/types/api'
 import { settlementApi } from '@/services/api/storyNationApi'
 import PaymentModal from '@/components/modal/PaymentModal'
+import { ReqGetCoinChargeUseHistory } from '@/services/hooks/DataListManager'
 
 // 더미 거래 내역 데이터
 const transactions = [
@@ -42,9 +43,20 @@ export default function ShopRecharge() {
   
   // user Data
   const accountData = useAccountStore(state => state.data)
-  const freePen = accountData?.coin_free ?? 0
-  const paidPen = accountData?.coin_register ?? 0
+  const freePen = Number(accountData?.coin_free || 0) + Number(accountData?.coin_register || 0)
+  const paidPen = Number(accountData?.coin_user || 0)
   
+
+  const {
+    data: coinChargeUseHistoryData,
+    isLoading: coinChargeUseHistoryLoading,
+    error: coinChargeUseHistoryError,
+    refetch: coinChargeUseHistoryRefetch } = ReqGetCoinChargeUseHistory(0, 1, 50);
+
+    console.log('@@ coinChargeUseHistoryData :: ', coinChargeUseHistoryData)
+
+  const coinChargeUseHistoryDataList = coinChargeUseHistoryData?.historyList?.data as UseHistoryData[] || []
+
   // 안전한 content 파싱 함수
   const getWebPrice = useCallback((content: string | undefined): number => {
     if (!content) return 0;
@@ -253,34 +265,70 @@ export default function ShopRecharge() {
                       </tr>
                     </thead>
                     <tbody className="bg-white dark:bg-dark-background-light divide-y divide-gray-200 dark:divide-gray-700">
-                      {transactions.map(transaction => (
-                        <tr key={transaction.id}>
+                      {coinChargeUseHistoryDataList?.map((transaction, index) => (
+                        <tr key={index}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                            {transaction.date}
+                            {transaction.create_dt}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                transaction.type === '충전' || transaction.type === '보너스'
-                                  ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                  : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                              }`}
-                            >
-                              {transaction.type}
-                            </span>
+                            {(() => {
+                              try {
+                                // JSON 문자열 파싱
+                                const propertyData = JSON.parse(transaction.property || '{}');
+                                const chatMode = propertyData.chat_mode;
+                                
+                                // chat_mode에 따른 스타일과 텍스트 지정
+                                let styleClass = '';
+                                let modeText = '';
+                                
+                                if (chatMode === '1') {
+                                  styleClass = 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+                                  modeText = '가성비모드';
+                                } else if (chatMode === '2') {
+                                  styleClass = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+                                  modeText = '스토리모드';
+                                } else if (chatMode === '3') {
+                                  styleClass = 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400';
+                                  modeText = '짜릿모드 1';
+                                } else if (chatMode === '4') {
+                                  styleClass = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+                                  modeText = '짜릿모드 2';
+                                } else {
+                                  styleClass = 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+                                  modeText = transaction.content || '기타';
+                                }
+                                
+                                return (
+                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${styleClass}`}>
+                                    {modeText}
+                                  </span>
+                                );
+                              } catch (e) {
+                                // JSON 파싱 오류 시 기본값 표시
+                                return (
+                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    transaction.property === '충전' || transaction.property === '보너스'
+                                      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                      : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                                  }`}>
+                                    {transaction.content || '오류'}
+                                  </span>
+                                );
+                              }
+                            })()}
                           </td>
                           <td
                             className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
-                              transaction.amount > 0
+                              transaction.coin > 0
                                 ? 'text-green-600 dark:text-green-400'
                                 : 'text-red-600 dark:text-red-400'
                             }`}
                           >
-                            {transaction.amount > 0 ? '+' : ''}
-                            {transaction.amount}
+                            {transaction.coin > 0 ? '+' : ''}
+                            {transaction.coin}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                            {transaction.details}
+                            {transaction.content}
                           </td>
                         </tr>
                       ))}

@@ -28,13 +28,6 @@ export default function MyPageView() {
 
 
   const {
-    data: coinChargeUseHistoryData,
-    isLoading: coinChargeUseHistoryLoading,
-    error: coinChargeUseHistoryError,
-    refetch: coinChargeUseHistoryRefetch } = ReqGetCoinChargeUseHistory(121, 1, 10);
-
-
-  const {
     data: settlementListData,
     isLoading: settlementListLoading,
     error: settlementListError,

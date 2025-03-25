@@ -396,7 +396,7 @@ export interface CoinData {
 
 // CoinChargeUseHistory Response
 export interface CoinChargeUseHistoryResponse {
-  historyList: Array<CoinChargeUseHistoryData>;
+  historyList: CoinChargeUseHistoryData;
   result: ApiResult;
 }
 
@@ -417,10 +417,12 @@ export interface CoinChargeUseHistoryData {
 }
 
 export interface UseHistoryData {
-  // charge_type: number;
-  // charge_dt: string;
-  // charge_amount: number;
-  // charge_status: number;
+  charge_type: number;
+  coin: number;
+  content: string;
+  create_dt: string;
+  item_key: any;
+  property: string;
 }
 
 // Use Coin Response
