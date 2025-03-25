@@ -2,11 +2,9 @@
 
 import MyCharacterPage from '@/views/my-characters/home'
 import Header from '@/components/common/header'
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { useAccountStore } from '@/store/useStoreData'
 
 export default function Page() {
+<<<<<<< HEAD
   // const router = useRouter()
   // const { isLogin } = useAccountStore()
 
@@ -24,6 +22,8 @@ export default function Page() {
   //     </div>
   //   )
   // }
+=======
+>>>>>>> a64ebb071c261020f10e2e54958d9ba48b4558e3
 
   return (
     <>

@@ -1,11 +1,4 @@
-import {
-  CharbotChatData,
-  CharbotChatListData,
-  CharbotMineData,
-  ChrbotData,
-  LoginResponse,
-  ModuleCharacter,
-} from '@/types/api'
+import { CharbotChatData, CharbotChatListData, CharbotMineData, ChrbotData, LoginResponse, ModuleCharacter } from '@/types/api';
 
 /**
   get image Uri
@@ -201,7 +194,62 @@ export function bridgeLoginDataToUserInfo(data: LoginResponse | null) {
     getBalance: (): number => {
       return Number(data.coin_free) + Number(data.coin_free_dt) + Number(data.coin_register)
     },
-  }
+  };
+}
+
+/**
+ * 진행 중인 캐릭터 생성 데이터를 Character 타입으로 변환하는 함수
+ * @param data - 진행 중인 캐릭터 생성 데이터
+ * @returns Character 타입으로 변환된 데이터
+ */
+export function bridgeCharacterInProgressToCharacter(data: any) {
+  return {
+    id: data.world_list_detail_chrbot_key?.toString() || '',
+    name: data.title || '',
+    gender: getCategory(Number(data.gender)),
+    visibility: data.show_yn === 1 ? 'public' : 'private',
+    bio: data.intro || '',
+    firstMessage: data.first_talk || '',
+    hashtags: data.tags ? data.tags.split(',') : [],
+    bioDetail: data.content || '',
+    detailVisibility: data.content_show_yn === 1 ? 'public' : 'private',
+    conversationExamples: data.example ? 
+      data.example.split('\n\n').map((text: string, index: number) => ({
+        id: index.toString(),
+        text,
+        isEditing: false,
+        visibility: data.example_show_yn === 1 ? 'public' : 'private',
+      })) : [],
+    imageUrl: getImageUri(data.img_url) || '',
+    isAdult: data.nsfw === 1,
+    createDate: data.create_dt || '',
+    world_list_detail_chrbot_key: data.world_list_detail_chrbot_key,
+    world_list_detail_key: data.world_list_detail_key,
+    user_key: data.user_key,
+    intro: data.intro,
+    first_talk: data.first_talk,
+    content: data.content,
+    example: data.example,
+    nsfw: data.nsfw,
+    img_url: data.img_url,
+    img_url_nsfw: data.img_url_nsfw,
+    show_yn: data.show_yn,
+    content_show_yn: data.content_show_yn,
+    example_show_yn: data.example_show_yn,
+    finish_yn: data.finish_yn,
+    delete_yn: data.delete_yn,
+    block_type: data.block_type,
+    comment_cnt: data.comment_cnt,
+    like_cnt: data.like_cnt,
+    chat_cnt: data.chat_cnt,
+    msg_cnt: data.msg_cnt,
+    create_dt: data.create_dt,
+    update_dt: data.update_dt,
+    tags: data.tags,
+    sort: data.sort,
+    countryCode: data.countryCode,
+    world_key: data.world_key
+  };
 }
 
 function getCategory(gender: number) {

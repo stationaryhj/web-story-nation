@@ -1,3 +1,4 @@
+// @ts-nocheck
 // NakamaContext.jsx
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { Client } from '@heroiclabs/nakama-js';

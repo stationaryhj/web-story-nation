@@ -2,8 +2,10 @@
 
 import { useState, useTransition, useCallback } from 'react'
 import TagList from '@/components/elements/tags/TagList'
+import { ReqGetTags } from '@/services/hooks/DataListManager'
 // 필터 컨트롤 컴포넌트 타입 정의
 export interface FilterControlsProps {
+  categoryId: number
   order: number
   setOrder: (order: number) => void
   nsfw: number
@@ -15,9 +17,11 @@ export interface FilterControlsProps {
  * - 정렬 옵션 (인기순/최신순)
  * - 이용등급 필터 (전체 이용가/짜릿모드/이용등급 전체)
  */
-export default function FilterControls({ order, setOrder, nsfw, setNsfw }: FilterControlsProps) {
+export default function FilterControls({ categoryId, order, setOrder, nsfw, setNsfw }: FilterControlsProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
+
+  const { data: tagList, isLoading, error } = ReqGetTags(categoryId)
 
   const handleOrderChange = useCallback(
     (newOrder: number) => {
@@ -49,24 +53,9 @@ export default function FilterControls({ order, setOrder, nsfw, setNsfw }: Filte
         {/* 상단: 태그 리스트 */}
         <div className="w-full mb-10">
           <TagList
-            tags={[
-              { c_chrbot_tag_key: 1, tag: '로맨스' },
-              { c_chrbot_tag_key: 2, tag: '로멘스2' },
-              { c_chrbot_tag_key: 3, tag: '로맨스3' },
-              { c_chrbot_tag_key: 4, tag: '로맨스4' },
-              { c_chrbot_tag_key: 5, tag: '로맨스5' },
-              { c_chrbot_tag_key: 6, tag: '로맨스6' },
-              { c_chrbot_tag_key: 7, tag: '로맨스7' },
-              { c_chrbot_tag_key: 8, tag: '로맨스8' },
-              { c_chrbot_tag_key: 9, tag: '로맨스9' },
-              { c_chrbot_tag_key: 10, tag: '로맨스10' },
-              { c_chrbot_tag_key: 11, tag: '로맨스11' },
-              { c_chrbot_tag_key: 12, tag: '로맨스12' },
-              { c_chrbot_tag_key: 13, tag: '로맨스13' },
-              { c_chrbot_tag_key: 14, tag: '로맨스14' },
-            ]}
-            categoryId={''}
-            isLoading={false}
+            tags={tagList?.charbot_tag || []}
+            categoryId={categoryId.toString()}
+            isLoading={isLoading}
             onTagSelect={handleTagSelect}
           />
         </div>

@@ -1,14 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { nanoid } from 'nanoid';
 import { motion, AnimatePresence } from 'framer-motion';
 import { loadTossPayments, ANONYMOUS } from '@tosspayments/tosspayments-sdk';
 
 // 결제 모달 Props 정의
 export interface PaymentModalProps {
   isOpen: boolean;
-  orderId: number;
+  orderId: string;
   amount: number;
   clientKey: string;
   successUrl?: string;
@@ -59,13 +58,24 @@ export default function PaymentModal({
     
     try {
       setIsProcessing(true);
+
+      console.log('@@ clientKey :: ', clientKey);
+      console.log('@@ orderID :: ', orderId);
+      console.log('@@ amount :: ', amount);
+      console.log('@@ orderName :: ', orderName);
+      console.log('@@ customerName :: ', customerName);
+
       
       // 토스페이먼츠 SDK 로드
-      const tossPayments = await loadTossPayments(clientKey);
-      
+      const tossPayments = await loadTossPayments(process.env.NEXT_PUBLIC_TOSS_PAYMENT_CLIENT_KEY || clientKey);
+
+
+
       // 위젯 초기화
       const widgets = tossPayments.widgets({ customerKey: ANONYMOUS });
       widgetsRef.current = widgets;
+
+      console.log('@@ widgets :: ', widgets);
       
       // 금액 설정
       widgets.setAmount({
@@ -95,7 +105,7 @@ export default function PaymentModal({
   };
   
   // 실제 결제 요청
-  const handleRequestPayment = async (orderId: number) => {
+  const handleRequestPayment = async (orderId: string) => {
     if (!widgetsRef.current) {
       alert('결제 위젯이 초기화되지 않았습니다.');
       return;
@@ -104,8 +114,6 @@ export default function PaymentModal({
     console.log('@@ orderId :: ', orderId);
     
     try {
-      // orderID 는 서버에서 받은것으로 해야함
-      const orderId = nanoid();
 
       setIsProcessing(true);
       // 결제 요청

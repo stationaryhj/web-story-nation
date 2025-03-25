@@ -64,6 +64,12 @@ export interface ModuleCharacter {
   sort: number;
 }
 
+export interface TagListResponse {
+  result: ApiResult;
+  tagList: Array<TagRanking>;
+}
+
+
 // Tag Top Ranking List
 export interface TagRankingListResponse {
   result: ApiResult;
@@ -366,6 +372,7 @@ export interface CharbotSearchData {
 // GetOrderId Response
 export interface OrderIdResponse {
   orderId: string;
+  toss_client_key: string;
   result: ApiResult;
 }
 

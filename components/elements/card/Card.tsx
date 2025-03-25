@@ -17,7 +17,7 @@ interface CardProps {
   variant?: 'default' | 'my-character'
   onEdit?: () => void
   onDelete?: () => void
-  onCardClick?: () => void
+  onCardClick?: (character: Character) => void
   rank?: number
   hasRank?: boolean
 
@@ -95,7 +95,7 @@ export default function Card({
             )}
 
             <Image
-              src={getImageUri(imageUrl)}
+              src={imageUrl}
               alt={name}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"

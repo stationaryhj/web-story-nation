@@ -4,6 +4,16 @@ import { Suspense, use } from 'react'
 import ChatDetailClient from '@/views/chat/detail'
 import { ReqGetChatBot } from '@/services/hooks/DataListManager';
 import type { ChrbotData } from '@/types/api';
+import { NakamaProvider, useNakama } from '@/app/providers/NakamaProviders'
+
+const serverConfig = {
+  serverUrl: 'qauschat.storynation.io',
+  // serverUrl: 'chat.storynation.io',
+  serverPort: '443',
+  useSSL: true,
+  autoConnect: false,
+  serverKey: 'defaultkey'
+};
 
 export default function ChatDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params)
@@ -36,7 +46,9 @@ export default function ChatDetailPage({ params }: { params: Promise<{ id: strin
             </div>
           }
         >
-          <ChatDetailClient characterId={unwrappedParams.id} charbotData={charbotData} />
+          <NakamaProvider {...serverConfig}>
+            <ChatDetailClient characterId={unwrappedParams.id} charbotData={charbotData} />
+          </NakamaProvider>
         </Suspense>
       </div>
     </div>

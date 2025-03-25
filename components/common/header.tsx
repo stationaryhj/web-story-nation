@@ -4,7 +4,16 @@
 import { FadeIn } from '@/components/motion/PageTransition'
 import { useThemeStore, useAccountStore } from '@/store/useStoreData'
 import { useModalStore } from '@/store/useStoreModal'
-import { faBell, faShoppingBag, faCog, faMoon, faSun, faBars, faTimes } from '@fortawesome/free-solid-svg-icons'
+import {
+  faBell,
+  faShoppingBag,
+  faCog,
+  faMoon,
+  faSun,
+  faBars,
+  faTimes,
+  faSignOutAlt,
+} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion, AnimatePresence } from 'framer-motion'
 import NotificationButton from '@/components/elements/sidebar/NotificationButton'
@@ -37,7 +46,6 @@ const SimpleToggle = ({ isOn, onToggle }: { isOn: boolean; onToggle: () => void 
 }
 
 export default function Header() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const { isDarkMode, toggleDarkMode } = useThemeStore()
   const [mounted, setMounted] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -45,8 +53,7 @@ export default function Header() {
   const [activeLink, setActiveLink] = useState('/')
   const { openModal } = useModalStore()
   const { isAdultModeEnabled, toggleAdultMode } = useSettingsStore()
-
-  const { isLogin, removeAccountInfo } = useAccountStore()
+  const { isLogin, logout } = useAccountStore()
 
   // 짜릿모드 토글 핸들러
   const handleAdultModeToggle = () => {
@@ -61,13 +68,21 @@ export default function Header() {
 
   // 네비게이션 링크
   const navLinks = [
-    { href: '/', label: '홈' },
-    { href: '/chat-list', label: '대화' },
-    { href: '/my-characters', label: '나의 캐릭터' },
-    { href: '/live', label: 'Live' },
-    { href: '/my-account', label: '수익 관리' },
-    { href: '/my-profile', label: '마이페이지' },
+    { href: '/', label: '홈', requireLogin: false },
+    { href: '/chat-list', label: '대화', requireLogin: true },
+    { href: '/my-characters', label: '나의 캐릭터', requireLogin: true },
+    { href: '/live', label: 'Live', requireLogin: true },
+    { href: '/my-account', label: '수익 관리', requireLogin: true },
+    { href: '/my-profile', label: '마이페이지', requireLogin: true },
   ]
+
+  // 로그인 필요한 링크 체크 핸들러
+  const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, link: (typeof navLinks)[0]) => {
+    if (link.requireLogin && !isLogin) {
+      e.preventDefault()
+      openModal('login')
+    }
+  }
 
   // 컴포넌트가 마운트되었는지 확인
   useEffect(() => {
@@ -129,6 +144,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
+                onClick={e => handleNavLinkClick(e, link)}
                 className={`text-sm font-medium transition-colors hover:text-primary-500 dark:hover:text-dark-primary-500 ${
                   activeLink === link.href
                     ? 'text-primary-500 dark:text-dark-primary-500'
@@ -201,34 +217,23 @@ export default function Header() {
             </motion.button>
           </Link>
 
-          {isLoggedIn ? (
-            <motion.button
-              className="p-2 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <FontAwesomeIcon icon={faCog} className="text-lg" />
-            </motion.button>
-          ) : (
-            <FadeIn>
-              {mounted &&
-                (!isLogin ? (
-                  <button
-                    onClick={() => openModal('login')}
-                    className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
-                  >
-                    로그인
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => removeAccountInfo()}
-                    className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
-                  >
+          <FadeIn>
+            {mounted && (
+              <button
+                onClick={isLogin ? logout : () => openModal('login')}
+                className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700 flex items-center gap-2"
+              >
+                {isLogin ? (
+                  <>
+                    <FontAwesomeIcon icon={faSignOutAlt} className="text-sm" />
                     로그아웃
-                  </button>
-                ))}
-            </FadeIn>
-          )}
+                  </>
+                ) : (
+                  '로그인'
+                )}
+              </button>
+            )}
+          </FadeIn>
         </div>
       </div>
 
@@ -274,9 +279,15 @@ export default function Header() {
                             ? 'text-primary-600 dark:text-dark-primary-600'
                             : 'text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600'
                         }`}
-                        onClick={() => {
-                          setActiveLink(link.href)
-                          setIsSidebarOpen(false)
+                        onClick={e => {
+                          if (link.requireLogin && !isLogin) {
+                            e.preventDefault()
+                            setIsSidebarOpen(false)
+                            openModal('login')
+                          } else {
+                            setActiveLink(link.href)
+                            setIsSidebarOpen(false)
+                          }
                         }}
                       >
                         {link.label}
