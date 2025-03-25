@@ -62,9 +62,13 @@ export default function MyCharacterPage() {
     }
   }
 
-  const handleCreateCharacter = () => {
-    // API 호출 없이 직접 페이지 이동
-    router.push('/my-characters/create/temp')
+  const handleCreateCharacter = async () => {
+    const response = await createApi.GetCreateChatBotInProgress(null)
+    const data = response.data as CharbotInprogressResponse
+
+    if (data?.chrbot && data?.result.err === 0) {
+      router.push(`/my-characters/create/${data.chrbot.world_list_detail_chrbot_key}`)
+    }
   }
 
   return (

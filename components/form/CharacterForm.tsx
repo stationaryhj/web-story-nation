@@ -11,7 +11,6 @@ import DetailCharacterPage from '../../app/(routes)/my-characters/create/detail/
 import { useSettingsStore } from '../../store/useStoreSettings'
 import { useModalStore } from '@/store/useStoreModal'
 import ToggleSwitch from './ToggleSwitch'
-import CharacterVisibilityWarningModal from '@/components/modal/CharacterVisibilityWarningModal'
 
 // 해시태그 데이터
 const AVAILABLE_HASHTAGS = [
@@ -47,7 +46,7 @@ interface CharacterFormProps {
   onValidationChange?: (isValid: boolean) => void
 }
 
-export default function CharacterForm({ formType = 'create', mode, onValidationChange }: CharacterFormProps) {
+export default function CharacterForm({ mode, onValidationChange }: CharacterFormProps) {
   const { formData, setFormField, addHashtag, removeHashtag } = useCharacterFormStore()
 
   const { images, activeImageTab, setActiveImageTab, addImage, removeImage } = useImageStore()
@@ -56,9 +55,6 @@ export default function CharacterForm({ formType = 'create', mode, onValidationC
 
   const { isAdultModeEnabled, toggleAdultMode } = useSettingsStore()
   const { openModal } = useModalStore()
-
-  const [isVisibilityWarningOpen, setIsVisibilityWarningOpen] = useState(false)
-  const [pendingVisibility, setPendingVisibility] = useState<'public' | 'private' | null>(null)
 
   // 이미지 배열이 없는 경우를 대비한 안전 조치
   useEffect(() => {
@@ -94,43 +90,7 @@ export default function CharacterForm({ formType = 'create', mode, onValidationC
 
   // 게시 범위 선택 핸들러
   const handleVisibilitySelect = (visibility: 'public' | 'private') => {
-    // 디버깅을 위한 로그 추가
-    console.log(`가시성 선택 요청: ${visibility}, 현재 폼타입: ${formType}, 현재 가시성: ${formData.visibility}`)
-
-    // 수정 모드에서는 변경 불가능
-    if (formType === 'edit') {
-      console.log('수정 모드에서는 가시성을 변경할 수 없습니다.')
-      return
-    }
-
-    if (visibility === 'private') {
-      // 비공개 선택 시 바로 적용
-      setFormField('visibility', visibility)
-      console.log('비공개 상태로 변경됨, 변경 후 상태:', visibility)
-    } else {
-      // 공개 선택 시 경고 모달 표시
-      console.log('공개 버튼 클릭 - 경고 모달 열기')
-      setPendingVisibility('public')
-      setIsVisibilityWarningOpen(true)
-    }
-  }
-
-  // 모달 확인 버튼 핸들러
-  const handleVisibilityConfirm = () => {
-    console.log('모달 확인 버튼 클릭됨, 변경 전 상태:', formData.visibility)
-
-    // 공개로 상태 변경
-    setFormField('visibility', 'public')
-
-    // 약간의 지연 후 변경된 상태 확인 (비동기 업데이트 확인용)
-    console.log('공개 상태로 변경 요청됨')
-    setTimeout(() => {
-      console.log('지연 후 visibility 상태:', formData.visibility)
-    }, 100)
-
-    // 모달 닫기
-    setIsVisibilityWarningOpen(false)
-    setPendingVisibility(null)
+    setFormField('visibility', visibility)
   }
 
   // 해시태그 토글 핸들러
@@ -350,23 +310,17 @@ export default function CharacterForm({ formType = 'create', mode, onValidationC
           </div>
           <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2 w-full">
             캐릭터의 게시범위를 정해요!
-            {formType === 'edit' && (
-              <span className="ml-1 text-red-500 font-medium">(캐릭터 생성 후에는 게시 범위를 변경할 수 없습니다)</span>
-            )}
           </p>
-          <div className="flex flex-col gap-5 items-start">
+          <div className="flex space-x-6 items-start">
             {/* 왼쪽 버튼 영역 */}
-            <div className="flex gap-3 w-full">
+            <div className="flex gap-3">
               <button
                 type="button"
                 onClick={() => handleVisibilitySelect('private')}
-                disabled={formType === 'edit'}
                 className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
                   formData.visibility === 'private'
                     ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                    : formType === 'edit'
-                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                      : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
                 }`}
               >
                 비공개
@@ -374,13 +328,10 @@ export default function CharacterForm({ formType = 'create', mode, onValidationC
               <button
                 type="button"
                 onClick={() => handleVisibilitySelect('public')}
-                disabled={formType === 'edit'}
                 className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
                   formData.visibility === 'public'
                     ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                    : formType === 'edit'
-                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                      : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
                 }`}
               >
                 공개
@@ -388,7 +339,7 @@ export default function CharacterForm({ formType = 'create', mode, onValidationC
             </div>
 
             {/* 오른쪽 설명 영역 */}
-            <div className="flex-1 bg-secondary-50 dark:bg-dark-secondary-100/5 rounded-lg p-3 w-full">
+            <div className="flex-1 bg-secondary-50 dark:bg-dark-secondary-100/5 rounded-lg p-3">
               {formData.visibility === 'private' ? (
                 <div>
                   <h3 className="font-medium text-sm text-secondary-800 dark:text-dark-secondary-300 mb-1">비공개</h3>
@@ -645,12 +596,6 @@ export default function CharacterForm({ formType = 'create', mode, onValidationC
             초상권, 저작권 침해 이미지는 통보 없이 삭제될 수 있습니다.
           </p>
         </div>
-
-        <CharacterVisibilityWarningModal
-          isOpen={isVisibilityWarningOpen}
-          onClose={() => setIsVisibilityWarningOpen(false)}
-          onConfirm={handleVisibilityConfirm}
-        />
       </div>
     )
   }
@@ -730,23 +675,17 @@ export default function CharacterForm({ formType = 'create', mode, onValidationC
         </div>
         <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2 w-full">
           캐릭터의 게시범위를 정해요!
-          {formType === 'edit' && (
-            <span className="ml-1 text-red-500 font-medium">(캐릭터 생성 후에는 게시 범위를 변경할 수 없습니다)</span>
-          )}
         </p>
-        <div className="flex flex-col gap-5 items-start">
+        <div className="flex space-x-6 items-start">
           {/* 왼쪽 버튼 영역 */}
-          <div className="flex gap-3 w-full">
+          <div className="flex gap-3">
             <button
               type="button"
               onClick={() => handleVisibilitySelect('private')}
-              disabled={formType === 'edit'}
               className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
                 formData.visibility === 'private'
                   ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                  : formType === 'edit'
-                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                  : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
               }`}
             >
               비공개
@@ -754,13 +693,10 @@ export default function CharacterForm({ formType = 'create', mode, onValidationC
             <button
               type="button"
               onClick={() => handleVisibilitySelect('public')}
-              disabled={formType === 'edit'}
               className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
                 formData.visibility === 'public'
                   ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                  : formType === 'edit'
-                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                  : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
               }`}
             >
               공개

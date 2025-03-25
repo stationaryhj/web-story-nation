@@ -1,7 +1,7 @@
 'use client'
 
 import { SectionTransition, FadeIn } from '@/components/motion/PageTransition'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { useCharacterFormStore } from '@/store/useCharacterFormStore'
@@ -9,14 +9,7 @@ import CharacterForm from '@/components/form/CharacterForm'
 
 export default function CreateCharacterPage() {
   const router = useRouter()
-  const params = useParams()
-  const characterId = params?.id // URL에서 id 추출
   const { activeTab, setActiveTab, formData } = useCharacterFormStore()
-
-  useEffect(() => {
-    // characterId가 'temp'인 경우에도 정상적으로 계속 진행
-    console.log('캐릭터 생성 페이지 마운트, ID:', characterId)
-  }, [characterId])
 
   // 유효성 검사 상태
   const [isFormValid, setIsFormValid] = useState(false)

@@ -39,14 +39,13 @@ const createApiInstance = (baseURL: string) => {
     },
     error => {
       if (error.response) {
-        // 콘솔 에러 로깅을 임시로 비활성화
-        // console.error('API Error:', error.response.data)
+        console.error('API Error:', error.response.data)
         return Promise.reject(error.response.data)
       } else if (error.request) {
-        // console.error('Network Error:', error.request)
+        console.error('Network Error:', error.request)
         return Promise.reject({ message: '네트워크 오류가 발생했습니다.' })
       } else {
-        // console.error('Request Error:', error.message)
+        console.error('Request Error:', error.message)
         return Promise.reject({ message: '요청 중 오류가 발생했습니다.' })
       }
     }
@@ -497,45 +496,13 @@ export const createApi = {
     page: number,
     paginate: number
   ): Promise<ApiResponse<CharbotGetListMineResponse>> => {
-    try {
-      const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
-      api.defaults.headers.common['Authorization'] = account_token
-      return await api.post('/api/charbot/getlist/mine', {
-        target_nick_nm,
-        page,
-        paginate,
-      })
-    } catch (error) {
-      // API 호출이 실패하면 빈 데이터 반환
-      console.log('임시로 더미 데이터 반환: GetCreateChatBotListMine API')
-      return {
-        data: {
-          chrbotList: {
-            current_page: page,
-            data: [],
-            first_page_url: '',
-            from: 0,
-            last_page: 0,
-            last_page_url: '',
-            links: [],
-            next_page_url: null,
-            path: '',
-            per_page: paginate,
-            prev_page_url: null,
-            to: 0,
-            total: 0,
-            result: {
-              err: 0,
-              msg: '',
-            },
-          },
-          result: {
-            err: 0,
-            msg: '',
-          },
-        },
-      } as any
-    }
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/charbot/getlist/mine', {
+      target_nick_nm,
+      page,
+      paginate,
+    })
   },
 
   GetChatBot: async (world_list_detail_chrbot_key: number): Promise<ApiResponse<CharbotResponse>> => {

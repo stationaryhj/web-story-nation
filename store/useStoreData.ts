@@ -322,19 +322,17 @@ export const useThemeStore = create<ThemeStore>()(
   )
 )
 
-export interface AccountStore {
+interface AccountStore {
   isLogin: boolean
   data: LoginResponse | null
   setAccountInfo: (accountInfo: AccountStore) => void
   removeAccountInfo: () => void
 }
 
-// 계정 스토어
 export const useAccountStore = create<AccountStore>()(
   persist(
     set => ({
-      // 임시로 로그인 상태를 true로 설정
-      isLogin: true, // 기본값을 true로 변경
+      isLogin: false,
       data: null,
       setAccountInfo: (accountInfo: AccountStore) => set(accountInfo),
       removeAccountInfo: () =>

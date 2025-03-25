@@ -214,45 +214,9 @@ export const GetCreateChatBotListMine = (target_nick_nm: string, page: number, p
   const { data, isLoading, error, refetch } = useQuery<CharbotGetListMineResponse>({
     queryKey: ['createChatBotListMine', target_nick_nm, page, paginate],
     queryFn: async () => {
-      try {
-        const response = await createApi.GetCreateChatBotListMine(target_nick_nm, page, paginate)
-        return response.data as CharbotGetListMineResponse
-      } catch (err) {
-        // 에러 발생 시 임시 더미 데이터 반환
-        console.log('임시로 더미 데이터 반환: GetCreateChatBotListMine')
-
-        // 타입 맞춰서 더미 데이터 생성
-        const emptyResponse: CharbotGetListMineResponse = {
-          chrbotList: {
-            current_page: page,
-            data: [],
-            first_page_url: '',
-            from: 0,
-            last_page: 0,
-            last_page_url: '',
-            links: [],
-            next_page_url: null,
-            path: '',
-            per_page: paginate,
-            prev_page_url: null,
-            to: 0,
-            total: 0,
-            result: {
-              err: 0,
-              msg: '',
-            },
-          },
-          result: {
-            err: 0,
-            msg: '',
-          },
-        }
-
-        return emptyResponse
-      }
+      const response = await createApi.GetCreateChatBotListMine(target_nick_nm, page, paginate)
+      return response.data as CharbotGetListMineResponse
     },
-    // 에러 발생 시 React Query가 자동으로 재시도하지 않도록 설정
-    retry: false,
   })
 
   return { data, isLoading, error, refetch }
