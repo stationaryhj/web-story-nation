@@ -1,6 +1,7 @@
 'use client'
 
-import { faCheck, faUpload, faTimes, faPlus } from '@fortawesome/free-solid-svg-icons'
+import React from 'react'
+import { faCheck, faUpload, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import type { ChangeEvent, MouseEvent } from 'react'
@@ -10,8 +11,8 @@ import { useCharacterFormStore, useImageStore } from '../../store/useCharacterFo
 import DetailCharacterPage from '../../app/(routes)/my-characters/create/detail/page'
 import { useSettingsStore } from '../../store/useStoreSettings'
 import { useModalStore } from '@/store/useStoreModal'
-import ToggleSwitch from './ToggleSwitch'
 
+import ConfirmActionModal from '../modal/ConfirmActionModal'
 // 해시태그 데이터
 const AVAILABLE_HASHTAGS = [
   '#집착',
@@ -52,6 +53,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
   const { images, activeImageTab, setActiveImageTab, addImage, removeImage } = useImageStore()
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [visibleWarnigModal, setVisibleWarnigModal] = useState(false)
 
   const { isAdultModeEnabled, toggleAdultMode } = useSettingsStore()
   const { openModal } = useModalStore()
@@ -91,6 +93,10 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
   // 게시 범위 선택 핸들러
   const handleVisibilitySelect = (visibility: 'public' | 'private') => {
     setFormField('visibility', visibility)
+    console.log(visibility)
+    if (visibility === 'public') {
+      setVisibleWarnigModal(true)
+    }
   }
 
   // 해시태그 토글 핸들러
@@ -207,11 +213,6 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
     // 이미지 삭제
     removeImage(id)
 
-    // 약간의 지연 후 로그 확인
-    setTimeout(() => {
-      console.log('Images after deletion:', images)
-    }, 100)
-
     // 선택된 이미지인 경우 선택 취소
     if (selectedImage === id) {
       setSelectedImage(null)
@@ -237,242 +238,264 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
   // 기본 설정 폼 렌더링
   if (mode === 'basic') {
     return (
-      <div className="space-y-6">
-        {/* 이름 입력 */}
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <label htmlFor="name" className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-              이름
-            </label>
-            <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">{formData.name.length}/25</span>
+      <>
+        <ConfirmActionModal
+          isOpen={visibleWarnigModal}
+          onClose={() => setVisibleWarnigModal(false)}
+          title="캐릭터 공개 시 주의사항"
+          description="한 번 공개한 캐릭터는 비공개로 전환할 수 없어요."
+          confirmText="확인했어요"
+          cancelText="돌아갈래요"
+          onConfirm={() => setVisibleWarnigModal(false)}
+        />
+        <div className="space-y-6">
+          {/* 이름 입력 */}
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400"
+              >
+                이름
+              </label>
+              <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">{formData.name.length}/25</span>
+            </div>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              placeholder="캐릭터 이름을 입력해 주세요."
+              className="w-full px-4 py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400"
+              maxLength={25}
+            />
           </div>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            placeholder="캐릭터 이름을 입력해 주세요."
-            className="w-full px-4 py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400"
-            maxLength={25}
-          />
-        </div>
 
-        {/* 성별 선택 */}
-        <div>
-          <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400 mb-2">성별</label>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => handleGenderSelect('male')}
-              className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
-                formData.gender === 'male'
-                  ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                  : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-              }`}
-            >
-              남성
-            </button>
-            <button
-              type="button"
-              onClick={() => handleGenderSelect('female')}
-              className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
-                formData.gender === 'female'
-                  ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                  : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-              }`}
-            >
-              여성
-            </button>
-            <button
-              type="button"
-              onClick={() => handleGenderSelect('unspecified')}
-              className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
-                formData.gender === 'unspecified'
-                  ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                  : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-              }`}
-            >
-              알 수 없음
-            </button>
-          </div>
-        </div>
-
-        {/* 게시 범위 */}
-        <div>
-          <div className="flex justify-between items-start mb-2">
-            <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-              게시 범위 0 / 3
+          {/* 성별 선택 */}
+          <div>
+            <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400 mb-2">
+              성별
             </label>
-            <button type="button" className="text-xs text-primary-500 dark:text-dark-primary-500 underline">
-              게시 범위에 따라 무엇이 달라지나요?
-            </button>
-          </div>
-          <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2 w-full">
-            캐릭터의 게시범위를 정해요!
-          </p>
-          <div className="flex space-x-6 items-start">
-            {/* 왼쪽 버튼 영역 */}
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => handleVisibilitySelect('private')}
+                onClick={() => handleGenderSelect('male')}
                 className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
-                  formData.visibility === 'private'
+                  formData.gender === 'male'
                     ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                     : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
                 }`}
               >
-                비공개
+                남성
               </button>
               <button
                 type="button"
-                onClick={() => handleVisibilitySelect('public')}
+                onClick={() => handleGenderSelect('female')}
                 className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
-                  formData.visibility === 'public'
+                  formData.gender === 'female'
                     ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                     : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
                 }`}
               >
-                공개
+                여성
+              </button>
+              <button
+                type="button"
+                onClick={() => handleGenderSelect('unspecified')}
+                className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
+                  formData.gender === 'unspecified'
+                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                }`}
+              >
+                알 수 없음
               </button>
             </div>
-
-            {/* 오른쪽 설명 영역 */}
-            <div className="flex-1 bg-secondary-50 dark:bg-dark-secondary-100/5 rounded-lg p-3">
-              {formData.visibility === 'private' ? (
-                <div>
-                  <h3 className="font-medium text-sm text-secondary-800 dark:text-dark-secondary-300 mb-1">비공개</h3>
-                  <ul className="text-xs text-secondary-600 dark:text-dark-secondary-500 space-y-1">
-                    <li>• 나만 캐릭터와 대화할 수 있어요.</li>
-                    <li>• 캐릭터가 검색되지 않아요.</li>
-                    <li>• 최대 3개만 보유할 수 있어요.</li>
-                  </ul>
-                </div>
-              ) : (
-                <div>
-                  <h3 className="font-medium text-sm text-secondary-800 dark:text-dark-secondary-300 mb-1">공개</h3>
-                  <ul className="text-xs text-secondary-600 dark:text-dark-secondary-500 space-y-1">
-                    <li>• 모든 유저가 캐릭터와 대화할 수 있어요.</li>
-                    <li>• 생성한 공개 캐릭터는 비공개로 바꿀 수 없어요.</li>
-                  </ul>
-                </div>
-              )}
-            </div>
           </div>
-        </div>
 
-        {/* 한줄 소개 */}
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <label htmlFor="bio" className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-              한줄 소개
-            </label>
-            <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">{formData.bio.length}/80</span>
-          </div>
-          <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2">
-            내 캐릭터를 간단히 소개해 보세요!
-          </p>
-          <textarea
-            id="bio"
-            name="bio"
-            value={formData.bio}
-            onChange={handleInputChange}
-            placeholder="예시)까칠한 뱀파이어"
-            rows={2}
-            className="w-full px-4 py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
-            maxLength={80}
-          />
-        </div>
-
-        {/* 첫 메시지 */}
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <label
-              htmlFor="firstMessage"
-              className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400"
-            >
-              첫 메세지
-            </label>
-            <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-              {formData.firstMessage.length}/80
-            </span>
-          </div>
-          <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2">
-            재미있는 선톡으로 유저의 답장을 이끌어내 보세요!
-          </p>
-          <textarea
-            id="firstMessage"
-            name="firstMessage"
-            value={formData.firstMessage}
-            onChange={handleInputChange}
-            placeholder="캐릭터가 보내는 첫 메세지를 입력하세요"
-            rows={2}
-            className="w-full px-4 py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
-            maxLength={80}
-          />
-        </div>
-
-        {/* 캐릭터 태그 */}
-        <div>
-          <div className="flex justify-between items-center mb-2">
-            <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-              캐릭터 태그
-            </label>
-            <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-              {formData.hashtags.length}/7
-            </span>
-          </div>
-          <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2">
-            내 캐릭터를 태그로 설명한다면? (최대7개)
-          </p>
-          <div className="relative w-full">
-            <div className="flex flex-wrap gap-1.5 items-center w-full px-3 py-2 min-h-[52px] rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light">
-              {formData.hashtags.length > 0 ? (
-                formData.hashtags.map(tag => (
-                  <div
-                    key={tag}
-                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs bg-primary-100 text-primary-700 dark:bg-dark-primary-900/20 dark:text-dark-primary-400"
-                  >
-                    <span>{tag}</span>
+          {/* 게시 범위 */}
+          <div className="flex flex-col gap-7">
+            <div>
+              <div className="flex justify-between items-start mb-2">
+                <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
+                  <span>게시 범위</span>
+                </label>
+              </div>
+              <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2 w-full">
+                캐릭터의 게시범위를 정해요!
+              </p>
+              <div className="flex space-x-6 items-start">
+                {/* 왼쪽 버튼 영역 */}
+                <div className="flex justify-between items-center gap-8">
+                  <div className="flex  gap-3">
                     <button
                       type="button"
-                      className="ml-1.5 text-primary-500 hover:text-primary-700 dark:text-dark-primary-400 dark:hover:text-dark-primary-300"
-                      onClick={() => removeHashtag(tag)}
+                      onClick={() => handleVisibilitySelect('private')}
+                      className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
+                        formData.visibility === 'private'
+                          ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                          : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                      }`}
                     >
-                      ×
+                      비공개
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleVisibilitySelect('public')}
+                      className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
+                        formData.visibility === 'public'
+                          ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                          : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                      }`}
+                    >
+                      공개
                     </button>
                   </div>
-                ))
-              ) : (
-                <span className="text-secondary-400 dark:text-dark-secondary-600">
-                  캐릭터의 특징을 나타내는 태그를 선택하세요!
-                </span>
-              )}
+                  <div>생산 가능한 비공개 캐릭터 0 / 3</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div className="text-md text-primary-4 00 dark:text-dark-primary-500 mb-2">
+                게시 범위에 따라 무엇이 달라지나요?
+              </div>
+
+              <div className="flex-1 bg-secondary-50 dark:bg-dark-secondary-100/5 rounded-lg p-3">
+                {formData.visibility === 'private' ? (
+                  <div>
+                    <h3 className="font-medium text-sm text-secondary-800 dark:text-dark-secondary-300 mb-1">비공개</h3>
+                    <ul className="text-xs text-secondary-600 dark:text-dark-secondary-500 space-y-1">
+                      <li>• 나만 캐릭터와 대화할 수 있어요.</li>
+                      <li>• 캐릭터가 검색되지 않아요.</li>
+                      <li>• 최대 3개만 보유할 수 있어요.</li>
+                    </ul>
+                  </div>
+                ) : (
+                  <div>
+                    <h3 className="font-medium text-sm text-secondary-800 dark:text-dark-secondary-300 mb-1">공개</h3>
+                    <ul className="text-xs text-secondary-600 dark:text-dark-secondary-500 space-y-1">
+                      <li>• 모든 유저가 캐릭터와 대화할 수 있어요.</li>
+                      <li>• 생성한 공개 캐릭터는 비공개로 바꿀 수 없어요.</li>
+                    </ul>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2 mt-3">
-            {AVAILABLE_HASHTAGS.map(tag => (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => handleHashtagToggle(tag)}
-                className={`px-3 py-1.5 rounded-full text-xs transition-colors ${
-                  formData.hashtags.includes(tag)
-                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-                }`}
+
+          {/* 한줄 소개 */}
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label
+                htmlFor="bio"
+                className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400"
               >
-                {tag}
-                {formData.hashtags.includes(tag) && <FontAwesomeIcon icon={faCheck} className="ml-1" />}
-              </button>
-            ))}
+                한줄 소개
+              </label>
+              <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">{formData.bio.length}/80</span>
+            </div>
+            <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2">
+              내 캐릭터를 간단히 소개해 보세요!
+            </p>
+            <textarea
+              id="bio"
+              name="bio"
+              value={formData.bio}
+              onChange={handleInputChange}
+              placeholder="예시)까칠한 뱀파이어"
+              rows={2}
+              className="w-full px-4 py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
+              maxLength={80}
+            />
+          </div>
+
+          {/* 첫 메시지 */}
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label
+                htmlFor="firstMessage"
+                className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400"
+              >
+                첫 메세지
+              </label>
+              <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
+                {formData.firstMessage.length}/80
+              </span>
+            </div>
+            <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2">
+              재미있는 선톡으로 유저의 답장을 이끌어내 보세요!
+            </p>
+            <textarea
+              id="firstMessage"
+              name="firstMessage"
+              value={formData.firstMessage}
+              onChange={handleInputChange}
+              placeholder="캐릭터가 보내는 첫 메세지를 입력하세요"
+              rows={2}
+              className="w-full px-4 py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
+              maxLength={80}
+            />
+          </div>
+
+          {/* 캐릭터 태그 */}
+          <div>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
+                캐릭터 태그
+              </label>
+              <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
+                {formData.hashtags.length}/7
+              </span>
+            </div>
+            <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2">
+              내 캐릭터를 태그로 설명한다면? (최대7개)
+            </p>
+            <div className="relative w-full">
+              <div className="flex flex-wrap gap-1.5 items-center w-full px-3 py-2 min-h-[52px] rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light">
+                {formData.hashtags.length > 0 ? (
+                  formData.hashtags.map(tag => (
+                    <div
+                      key={tag}
+                      className="inline-flex items-center px-2.5 py-1 rounded-full text-xs bg-primary-100 text-primary-700 dark:bg-dark-primary-900/20 dark:text-dark-primary-400"
+                    >
+                      <span>{tag}</span>
+                      <button
+                        type="button"
+                        className="ml-1.5 text-primary-500 hover:text-primary-700 dark:text-dark-primary-400 dark:hover:text-dark-primary-300"
+                        onClick={() => removeHashtag(tag)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <span className="text-secondary-400 dark:text-dark-secondary-600">
+                    캐릭터의 특징을 나타내는 태그를 선택하세요!
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-3">
+              {AVAILABLE_HASHTAGS.map(tag => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => handleHashtagToggle(tag)}
+                  className={`px-3 py-1.5 rounded-full text-xs transition-colors ${
+                    formData.hashtags.includes(tag)
+                      ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                      : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                  }`}
+                >
+                  {tag}
+                  {formData.hashtags.includes(tag) && <FontAwesomeIcon icon={faCheck} className="ml-1" />}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-
-        {/* 성인 모드 토글 스위치 */}
-        <ToggleSwitch className="mt-4" />
-      </div>
+      </>
     )
   }
 
@@ -480,15 +503,6 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
   if (mode === 'image') {
     // 이미지 필터링
     const filteredImages = images?.filter(img => img.type === activeImageTab) || []
-
-    // 성인 탭 클릭 핸들러 - 짜릿모드 체크
-    const handleAdultTabClick = () => {
-      if (!isAdultModeEnabled) {
-        alert('짜릿모드 이미지를 보려면 짜릿모드를 활성화해주세요!')
-      } else {
-        setActiveImageTab('adult')
-      }
-    }
 
     // 기본 이미지 설정 메시지
     const renderValidationMessage = () => {
@@ -515,31 +529,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
             >
               전체
             </button>
-            <button
-              onClick={handleAdultTabClick}
-              className={`px-4 py-2 rounded-lg text-sm ${
-                activeImageTab === 'adult' && isAdultModeEnabled
-                  ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                  : !isAdultModeEnabled
-                    ? 'bg-secondary-100/70 text-secondary-400 dark:bg-dark-secondary-700/30 dark:text-dark-secondary-500 cursor-not-allowed'
-                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-              }`}
-            >
-              짜릿모드
-            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => setSelectedImage(selectedImage ? null : filteredImages[0]?.id)}
-            className={`px-4 py-2 rounded-lg text-sm ${
-              selectedImage
-                ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-            }`}
-            disabled={filteredImages.length === 0}
-          >
-            {selectedImage ? '기본 이미지 해제' : '기본 이미지 설정'}
-          </button>
         </div>
 
         {/* 이미지 그리드 */}
@@ -599,242 +589,4 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
       </div>
     )
   }
-
-  // 기본 설정 폼 렌더링
-  return (
-    <div className="space-y-6">
-      {/* 이름 입력 */}
-      <div>
-        <div className="flex justify-between items-center mb-2">
-          <label htmlFor="name" className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-            이름
-          </label>
-          <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">{formData.name.length}/25</span>
-        </div>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleInputChange}
-          placeholder="캐릭터 이름을 입력해 주세요."
-          className="w-full px-4 py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400"
-          maxLength={25}
-        />
-      </div>
-
-      {/* 성별 선택 */}
-      <div>
-        <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400 mb-2">성별</label>
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={() => handleGenderSelect('male')}
-            className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
-              formData.gender === 'male'
-                ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-            }`}
-          >
-            남성
-          </button>
-          <button
-            type="button"
-            onClick={() => handleGenderSelect('female')}
-            className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
-              formData.gender === 'female'
-                ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-            }`}
-          >
-            여성
-          </button>
-          <button
-            type="button"
-            onClick={() => handleGenderSelect('unspecified')}
-            className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
-              formData.gender === 'unspecified'
-                ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-            }`}
-          >
-            알 수 없음
-          </button>
-        </div>
-      </div>
-
-      {/* 게시 범위 */}
-      <div>
-        <div className="flex justify-between items-start mb-2">
-          <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-            게시 범위 0 / 3
-          </label>
-          <button type="button" className="text-xs text-primary-500 dark:text-dark-primary-500 underline">
-            게시 범위에 따라 무엇이 달라지나요?
-          </button>
-        </div>
-        <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2 w-full">
-          캐릭터의 게시범위를 정해요!
-        </p>
-        <div className="flex space-x-6 items-start">
-          {/* 왼쪽 버튼 영역 */}
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => handleVisibilitySelect('private')}
-              className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
-                formData.visibility === 'private'
-                  ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                  : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-              }`}
-            >
-              비공개
-            </button>
-            <button
-              type="button"
-              onClick={() => handleVisibilitySelect('public')}
-              className={`px-3 py-2 rounded-lg text-center transition-colors text-sm ${
-                formData.visibility === 'public'
-                  ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                  : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-              }`}
-            >
-              공개
-            </button>
-          </div>
-
-          {/* 오른쪽 설명 영역 */}
-          <div className="flex-1 bg-secondary-50 dark:bg-dark-secondary-100/5 rounded-lg p-3">
-            {formData.visibility === 'private' ? (
-              <div>
-                <h3 className="font-medium text-sm text-secondary-800 dark:text-dark-secondary-300 mb-1">비공개</h3>
-                <ul className="text-xs text-secondary-600 dark:text-dark-secondary-500 space-y-1">
-                  <li>• 나만 캐릭터와 대화할 수 있어요.</li>
-                  <li>• 캐릭터가 검색되지 않아요.</li>
-                  <li>• 최대 3개만 보유할 수 있어요.</li>
-                </ul>
-              </div>
-            ) : (
-              <div>
-                <h3 className="font-medium text-sm text-secondary-800 dark:text-dark-secondary-300 mb-1">공개</h3>
-                <ul className="text-xs text-secondary-600 dark:text-dark-secondary-500 space-y-1">
-                  <li>• 모든 유저가 캐릭터와 대화할 수 있어요.</li>
-                  <li>• 생성한 공개 캐릭터는 비공개로 바꿀 수 없어요.</li>
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* 한줄 소개 */}
-      <div>
-        <div className="flex justify-between items-center mb-2">
-          <label htmlFor="bio" className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-            한줄 소개
-          </label>
-          <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">{formData.bio.length}/80</span>
-        </div>
-        <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2">
-          내 캐릭터를 간단히 소개해 보세요!
-        </p>
-        <textarea
-          id="bio"
-          name="bio"
-          value={formData.bio}
-          onChange={handleInputChange}
-          placeholder="예시)까칠한 뱀파이어"
-          rows={2}
-          className="w-full px-4 py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
-          maxLength={80}
-        />
-      </div>
-
-      {/* 첫 메시지 */}
-      <div>
-        <div className="flex justify-between items-center mb-2">
-          <label
-            htmlFor="firstMessage"
-            className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400"
-          >
-            첫 메세지
-          </label>
-          <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-            {formData.firstMessage.length}/80
-          </span>
-        </div>
-        <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2">
-          재미있는 선톡으로 유저의 답장을 이끌어내 보세요!
-        </p>
-        <textarea
-          id="firstMessage"
-          name="firstMessage"
-          value={formData.firstMessage}
-          onChange={handleInputChange}
-          placeholder="캐릭터가 보내는 첫 메세지를 입력하세요"
-          rows={2}
-          className="w-full px-4 py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
-          maxLength={80}
-        />
-      </div>
-
-      {/* 캐릭터 태그 */}
-      <div>
-        <div className="flex justify-between items-center mb-2">
-          <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-            캐릭터 태그
-          </label>
-          <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">{formData.hashtags.length}/7</span>
-        </div>
-        <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2">
-          내 캐릭터를 태그로 설명한다면? (최대7개)
-        </p>
-        <div className="relative w-full">
-          <div className="flex flex-wrap gap-1.5 items-center w-full px-3 py-2 min-h-[52px] rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light">
-            {formData.hashtags.length > 0 ? (
-              formData.hashtags.map(tag => (
-                <div
-                  key={tag}
-                  className="inline-flex items-center px-2.5 py-1 rounded-full text-xs bg-primary-100 text-primary-700 dark:bg-dark-primary-900/20 dark:text-dark-primary-400"
-                >
-                  <span>{tag}</span>
-                  <button
-                    type="button"
-                    className="ml-1.5 text-primary-500 hover:text-primary-700 dark:text-dark-primary-400 dark:hover:text-dark-primary-300"
-                    onClick={() => removeHashtag(tag)}
-                  >
-                    ×
-                  </button>
-                </div>
-              ))
-            ) : (
-              <span className="text-secondary-400 dark:text-dark-secondary-600">
-                캐릭터의 특징을 나타내는 태그를 선택하세요!
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-2 mt-3">
-          {AVAILABLE_HASHTAGS.map(tag => (
-            <button
-              key={tag}
-              type="button"
-              onClick={() => handleHashtagToggle(tag)}
-              className={`px-3 py-1.5 rounded-full text-xs transition-colors ${
-                formData.hashtags.includes(tag)
-                  ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                  : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-              }`}
-            >
-              {tag}
-              {formData.hashtags.includes(tag) && <FontAwesomeIcon icon={faCheck} className="ml-1" />}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 성인 모드 토글 스위치 */}
-      <ToggleSwitch className="mt-4" />
-    </div>
-  )
 }
