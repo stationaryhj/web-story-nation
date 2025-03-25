@@ -441,6 +441,18 @@ export interface ConfirmTossPaymentResponse {
 }
 
 
+// ChatMessageResponse
+export interface ChatMessageResponse {
+  msg_len: number;
+  prompt_key: string;
+  response: string;
+  summary_position: number
+  result: ApiResult;
+}
+
+
+
+
 // API Result
 export type ApiResult = {
   err: number;

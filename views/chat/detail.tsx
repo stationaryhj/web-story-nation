@@ -28,14 +28,22 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { FormEvent } from 'react'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { useModalStore } from '@/store/useStoreModal'
 import type { ChatMode } from '@/components/modal/ChatModeModal'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import type { ChrbotData } from '@/types/api'
 import { bridgeCharbotDataToCharacter } from '@/lib/utils/storyNationUtil'
 import { useNakama } from '@/app/providers/NakamaProviders'
+import { chatApi } from '@/services/api/storyNationApi'
 
+// 메시지 타입 정의
+interface ChatMessage {
+  id: string;
+  sender: 'user' | 'character';
+  message: string;
+  timestamp: Date;
+}
 
 interface ChatDetailClientProps {
   characterId: string,
@@ -48,12 +56,13 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     data: state.data 
   }));
   
+  // Nakama 컨텍스트 사용
+  const nakamaContext = useNakama();
   const {
     client,
     session,
     isConnected,
     isConnecting,
-    setSession,
     chatRoomInit,
     connectSocket,
     disconnectSocket,
@@ -62,59 +71,154 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     sendMessage,
     addChannelMessageListener,
     removeChannelMessageListener,
-    addConnectionListener,
-    removeConnectionListener,
-    addDisconnectionListener,
-    removeDisconnectionListener
-  } = useNakama();
+    currentChatMode,
+    chrBotChatKey,
+    channelId,
+    roomName,
+    isInitRoom,
+    // 새로운 메시지 관련 필드와 메서드들
+    chatMessages,
+    sendChatMessage,
+    refreshLastAIMessage,
+    clearChatHistory,
+    addChatMessage
+  } = nakamaContext;
   
   const { characters } = useStoreData()
   const [message, setMessage] = useState('')
   const isFirstRender = useRef(true);
   const hasInitialized = useRef(false);
-  const [chatHistory, setChatHistory] = useState<
-    Array<{
-      id: string
-      sender: 'user' | 'character'
-      message: string
-      timestamp: Date
-    }>
-  >([])
   const [showModeDropdown, setShowModeDropdown] = useState(false)
   const [currentMode, setCurrentMode] = useState('짜릿모드2')
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [isAdultMode, setIsAdultMode] = useState(false)
   const [currentModeId, setCurrentModeId] = useState('')
-  const [isInitRoom, setIsInitRoom] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const { openModal, closeModal } = useModalStore()
 
+  // 캐릭터 데이터 변환
   const character = bridgeCharbotDataToCharacter(charbotData as ChrbotData);
 
+  // 연결 상태 표시 관련 상태
+  const [showConnectedStatus, setShowConnectedStatus] = useState(false);
+  
+  // 메시지 디버깅을 위한 로깅 추가
   useEffect(() => {
-    if (hasInitialized.current || !character?.id) {
+    console.log('🗨️ chatMessages 변경 감지:', chatMessages.length);
+    if (chatMessages.length > 0) {
+      const lastMsg = chatMessages[chatMessages.length - 1];
+      console.log('마지막 메시지:', { 
+        sender: lastMsg.sender, 
+        id: lastMsg.id, 
+        message: lastMsg.message.substring(0, 50) + (lastMsg.message.length > 50 ? '...' : ''),
+        timestamp: lastMsg.timestamp,
+        isTemp: lastMsg.id.startsWith('temp_'),
+      });
+      
+      // 타입별 메시지 수 계산
+      const userCount = chatMessages.filter(msg => msg.sender === 'user').length;
+      const aiCount = chatMessages.filter(msg => msg.sender === 'character').length;
+      console.log(`메시지 통계: 총 ${chatMessages.length}개 (사용자: ${userCount}, AI: ${aiCount})`);
+    }
+  }, [chatMessages]);
+  
+  // 연결 상태 변화 로깅
+  useEffect(() => {
+    console.log('🔌 연결 상태 변경 감지:', { isConnected, isConnecting, channelId });
+    
+    if (isConnected) {
+      setShowConnectedStatus(true);
+      const timer = setTimeout(() => {
+        setShowConnectedStatus(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowConnectedStatus(false);
+    }
+  }, [isConnected, isConnecting]);
+  
+  // 서버 상태와 채널 ID에 따른 UI 처리
+  useEffect(() => {
+    console.log('🔄 현재 채널 상태:', { 
+      channelId, isConnected, isConnecting, isInitRoom 
+    });
+    
+    if (!isConnected && !isConnecting && isInitRoom) {
+      // 초기화는 됐지만 연결이 끊어진 경우
+      setError('채팅 서버와의 연결이 끊어졌습니다.');
+    } else if (isConnected && !channelId && isInitRoom) {
+      // 연결은 됐지만 채널 ID가 없는 경우
+      setError('채팅 채널 연결에 문제가 발생했습니다.');
+    } else {
+      // 정상 상태이거나 연결 중인 경우
+      setError(null);
+    }
+  }, [isConnected, isConnecting, channelId, isInitRoom]);
+
+  // 채팅방 초기화 로직
+  useEffect(() => {
+    // 이미 초기화되었거나 필요한 데이터가 없으면 중단
+    if (hasInitialized.current || !character?.id || !accountData?.user_key) {
       return;
     }
 
-    const createChat = async () => {
+    const initializeChatRoom = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
         hasInitialized.current = true;
-        console.log('@@@ Initializing chat room...');
-        await chatRoomInit(accountData?.user_key, characterId, 2);
+        
+        console.log('채팅방 초기화 시작...');
+        const chatMode = 2; // 기본값으로 스토리 모드 사용
+        
+        // 채팅방 초기화 (Nakama 서버 연결 및 인증, 채팅방 참여까지 모두 수행)
+        // 이제 chatRoomInit이 객체를 반환하므로 구조 분해 할당으로 받음
+        const { success, channelId: newChannelId } = await chatRoomInit(accountData.user_key, characterId, chatMode);
+        console.log('채팅방 초기화 완료, 연결 상태:', success, '채널 ID:', newChannelId);
+        
+        // 초기화 상태 확인
+        console.log('현재 chrBotChatKey:', chrBotChatKey);
+        console.log('소켓 연결 상태:', isConnected);
+        
+        if (!success) {
+          console.log('채팅방 초기화에 실패했습니다.');
+          throw new Error('채팅방 초기화에 실패했습니다. 다시 시도해주세요.');
+        }
+        
+        // 초기 메시지 설정 (Provider의 메서드 사용)
+        clearChatHistory(); // 기존 메시지 초기화
+        addChatMessage({
+          id: '1',
+          sender: 'character',
+          message: `*반갑게* 안녕하세요! ${character.name}입니다. 채팅을 시작합니다.`,
+          timestamp: new Date(),
+        });
+        
+        setCurrentModeId('exciting2');
+        setCurrentMode('짜릿모드 2.0');
+        
       } catch (error) {
         console.error('채팅방 초기화 실패:', error);
+        setError('채팅방을 초기화하는 중 오류가 발생했습니다. 다시 시도해주세요.');
         hasInitialized.current = false;
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    createChat();
-  }, [character?.id, characterId, chatRoomInit]);
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-    }
-  }, [character, isConnected]);
+    initializeChatRoom();
+    
+    // 컴포넌트 언마운트 시 정리
+    return () => {
+      if (channelId) {
+        console.log('채팅방 정리: 리스너 제거 및 채팅방 나가기');
+        leaveChat(channelId).catch(err => console.error('채팅방 나가기 오류:', err));
+      }
+      disconnectSocket();
+    };
+  }, [character?.id, characterId, accountData?.user_key, chatRoomInit, isConnected, disconnectSocket, channelId, leaveChat, clearChatHistory, addChatMessage]);
 
   // 드롭다운 외부 클릭 감지
   useEffect(() => {
@@ -125,174 +229,58 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      disconnectSocket();
-      leaveChat();
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [])
+  }, []);
 
-  // 캐릭터 정보 로드 - 최적화된 버전
-  useEffect(() => {
-    // 데이터가 없으면 빈 캐릭터 정보를 생성하여 빠르게 UI 렌더링
-    if (!characters || characters.length === 0) {
-      // 캐릭터 데이터가 없는 경우 기본값 설정
-      const defaultCharacter: Character = {
-        id: characterId,
-        name: '캐릭터',
-        description: '로딩 중...',
-        imageUrl: '/images/character1.jpg',
-        commentCount: 0,
-        hashtags: ['로딩중'],
-        isAdult: false,
-        creator: {
-          id: '',
-          nickname: '',
-          username: '',
-          profileImageUrl: null,
-          isActive: true,
-        },
-        category: 'unspecified',
-      }
-
-      // setCharacter(defaultCharacter)
-      setCurrentModeId('exciting2')
-      setCurrentMode('짜릿모드 2.0')
-
-      // 기본 메시지 설정
-      setChatHistory([
-        {
-          id: '1',
-          sender: 'character',
-          message: `*반갑게* 안녕하세요! 채팅을 시작합니다.`,
-          timestamp: new Date(),
-        },
-      ])
-      return
-    }
-
-    // 캐릭터 정보 찾기
-    const foundCharacter = characters.find(char => char.id === characterId)
-    if (foundCharacter) {
-      // setCharacter(foundCharacter)
-      setCurrentModeId('exciting2')
-      setCurrentMode('짜릿모드 2.0')
-
-      // 초기 메시지 설정
-      setChatHistory([
-        {
-          id: '1',
-          sender: 'character',
-          message: `*미소를 지으며 반갑게 인사한다* 안녕하세요! 저는 ${foundCharacter.name}입니다. 당신과 대화하게 되어 기쁩니다. 어떤 이야기를 나누고 싶으신가요?`,
-          timestamp: new Date(Date.now() - 3600000),
-        },
-        {
-          id: '2',
-          sender: 'user',
-          message: '*호기심 가득한 표정으로* 안녕하세요! 저는 당신이 어떤 캐릭터인지 궁금해요.',
-          timestamp: new Date(Date.now() - 3500000),
-        },
-        {
-          id: '3',
-          sender: 'character',
-          message: `*생각에 잠긴 듯 고개를 살짝 기울이며* 저는 ${foundCharacter.name}입니다. ${foundCharacter.description || '다양한 주제에 대해 이야기할 수 있어요. 특히 제가 관심있는 분야에 대해 대화하는 것을 좋아합니다.'}`,
-          timestamp: new Date(Date.now() - 3400000),
-        },
-        {
-          id: '4',
-          sender: 'user',
-          message: '오늘 날씨가 정말 좋네요. 당신은 어떤 날씨를 좋아하나요?',
-          timestamp: new Date(Date.now() - 3300000),
-        },
-        {
-          id: '5',
-          sender: 'character',
-          message:
-            '*창밖을 바라보는 듯한 표정으로* 저는 비가 내리는 날을 좋아해요. 창문에 떨어지는 빗방울 소리를 들으며 책을 읽거나 음악을 듣는 것이 저의 취미입니다. 당신은 어떤 날씨를 좋아하시나요?',
-          timestamp: new Date(Date.now() - 3200000),
-        },
-      ])
-    }
-  }, [characterId, characters])
-
-  const connectChatRoom = async () => {
-    if(!client) {
-      console.log('@@@ client is not connected');
-      return;
-    }
-    // accountData?.user_key, characterId, 2
-
-    const user_key = accountData?.user_key;
-    const _chatBotId = characterId;
-    const _chat_mode = 2;
-    const roomName = 'chat_' + user_key + '_' + _chatBotId;
-    const persistence = true;
-    const hidden = false;
-
-    let deviceId = 'chatbot_jackpot_' + user_key;
-    console.log('>> deviceId :: ', deviceId);
-
-    // session 생성
-    const newSession = await client.authenticateDevice(deviceId, false, user_key?.toString());
-    const isSuccess = await connectSocket(newSession);
-    if(!isSuccess) {
-      console.log('@@@ connectSocket failed');
-      return;
-    }
-
-    const channel = await joinChat(roomName, persistence, hidden);
-    if(!channel) {
-      console.log('@@@ joinChat failed');
-      return;
-    }
-
-    let _chrbot_chat_key = 0;
-
-    let split = channel['room_name'].split('|');
-
-    console.log('split :: ', split);
-    if(split.length >= 2) {
-      _chrbot_chat_key = parseInt(split[1]);
-    }
-
-    console.log('@@@@ End ChatRoomInit @@@@ :: ', _chrbot_chat_key);
-  }
-
-
-  // 메시지 전송 처리
+  // 메시지 전송 처리 (Provider의 메서드 사용)
   const handleSendMessage = async (e: FormEvent) => {
-    e.preventDefault()
-
-    if (!message.trim() || !character) return
-
-    // 사용자 메시지 추가
-    const userMessage = {
-      id: Date.now().toString(),
-      sender: 'user' as const,
-      message: message.trim(),
-      timestamp: new Date(),
+    e.preventDefault();
+    console.log('handleSendMessage 호출됨 :: ', message);
+    
+    // 필요한 값들이 모두 있는지 확인
+    if (!message.trim()) {
+      console.log('메시지가 비어있습니다.');
+      return;
     }
+    
+    if (!character) {
+      console.error('캐릭터 정보가 없습니다.');
+      setError('캐릭터 정보를 불러오는 중 오류가 발생했습니다.');
+      return;
+    }
+    
+    // if (!isConnected) {
+    //   console.error('Nakama 서버에 연결되어 있지 않습니다.');
+    //   setError('채팅 서버에 연결되어 있지 않습니다. 페이지를 새로고침하고 다시 시도해주세요.');
+    //   return;
+    // }
+    
+    // if (!channelId) {
+    //   console.error('채널 ID가 없습니다');
+    //   setError('채팅 채널에 연결할 수 없습니다. 페이지를 새로고침하고 다시 시도해주세요.');
+    //   return;
+    // }
 
-    setChatHistory(prev => [...prev, userMessage])
-    setMessage('')
+    // 입력창 초기화 (먼저 수행하여 UX 향상)
+    const messageText = message.trim();
+    setMessage('');
 
-    // 현재 선택된 모드에 따른 펜 차감 로직 (실제로는 API 호출)
-    const penCost = getPenCostByMode(currentModeId)
-    console.log(`${penCost} 펜이 차감되었습니다.`)
+    try {
+      // 현재 선택된 모드에 따른 펜 차감 로직
+      const penCost = getPenCostByMode(currentModeId);
+      console.log(`${penCost} 펜이 차감되었습니다.`);
 
-    // 캐릭터 응답 시뮬레이션 - 딜레이 단축
-    setTimeout(() => {
-      const characterResponse = {
-        id: (Date.now() + 1).toString(),
-        sender: 'character' as const,
-        message: `*잠시 생각하는 표정을 짓더니* ${message.trim()}에 대한 ${character.name}의 응답입니다. 이것은 데모용 응답입니다. *미소를 지으며* 더 궁금한 점이 있으신가요?`,
-        timestamp: new Date(),
-      }
+      // Provider의 메서드를 사용하여 메시지 전송
+      await sendChatMessage(messageText);
+      
+    } catch (error) {
+      console.error('메시지 전송 중 오류:', error);
+      setError('메시지 전송에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
 
-      setChatHistory(prev => [...prev, characterResponse])
-    }, 300) // 딜레이 시간 단축
-  }
-
-  // 모드에 따른 펜 비용 계산 함수 추가
+  // 모드에 따른 펜 비용 계산 함수
   const getPenCostByMode = (modeId: string): number => {
     switch (modeId) {
       case 'economic':
@@ -318,53 +306,40 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     setShowModeDropdown(false)
   }
 
-  // 마지막 AI 응답 새로고침 함수 수정 (펜 차감 추가)
-  const handleRefreshLastAIMessage = () => {
-    // 마지막 AI 메시지 찾기
-    const lastAIMessageIndex = [...chatHistory].reverse().findIndex(msg => msg.sender === 'character')
-
-    if (lastAIMessageIndex !== -1) {
-      const actualIndex = chatHistory.length - 1 - lastAIMessageIndex
-
+  // 마지막 AI 응답 새로고침 함수 (Provider의 메서드 사용)
+  const handleRefreshLastAIMessage = async () => {
+    try {
       // 펜 차감 로직
-      const penCost = getPenCostByMode(currentModeId)
-      console.log(`새로고침: ${penCost} 펜이 차감되었습니다.`)
+      const penCost = getPenCostByMode(currentModeId);
+      console.log(`새로고침: ${penCost} 펜이 차감되었습니다.`);
 
-      // 새 메시지로 교체 (실제로는 API 호출)
-      const updatedMessages = [...chatHistory]
-      updatedMessages[actualIndex] = {
-        ...updatedMessages[actualIndex],
-        message: `*표정이 밝아지며* 새로고침된 ${character?.name}의 응답입니다. 이것은 데모용 응답입니다. *살짝 웃으며* 더 이야기해볼까요?`,
-        timestamp: new Date(),
-      }
-
-      setChatHistory(updatedMessages)
+      // Provider의 메서드를 사용하여 마지막 AI 메시지 새로고침
+      await refreshLastAIMessage();
+      
+    } catch (error) {
+      console.error('메시지 새로고침 중 오류:', error);
+      setError('메시지 새로고침에 실패했습니다. 다시 시도해주세요.');
     }
-  }
+  };
 
-  // 마지막 AI 응답 삭제 함수 수정 (모달 사용)
+  // 마지막 AI 응답 삭제 함수
   const handleDeleteLastAIMessage = () => {
     // 마지막 AI 메시지 찾기
-    const lastAIMessageIndex = [...chatHistory].reverse().findIndex(msg => msg.sender === 'character')
+    const lastAIMessageIndex = [...chatMessages].reverse().findIndex(msg => msg.sender === 'character')
 
-    if (lastAIMessageIndex !== -1) {
-      const actualIndex = chatHistory.length - 1 - lastAIMessageIndex
-
-      // 삭제 모달 표시
-      openModal('confirmAction', {
-        title: '메시지 삭제',
-        description: '삭제된 채팅 내용은 복구할 수 없습니다. 그래도 삭제하시겠습니까?',
-        onConfirm: () => {
-          // 메시지 삭제
-          const updatedMessages = [...chatHistory]
-          updatedMessages.splice(actualIndex, 1)
-          setChatHistory(updatedMessages)
-        },
-        confirmText: '삭제',
-        confirmButtonClass: 'bg-red-500 hover:bg-red-600 text-white',
-      })
+    if (lastAIMessageIndex === -1) {
+      console.log('삭제할 AI 메시지가 없습니다.');
+      return;
     }
-  }
+
+    const actualIndex = chatMessages.length - 1 - lastAIMessageIndex;
+    
+    // Provider의 메서드를 사용하여 메시지 목록 업데이트
+    const newMessages = [...chatMessages];
+    newMessages.splice(actualIndex, 1);
+    clearChatHistory();
+    newMessages.forEach(msg => addChatMessage(msg));
+  };
 
   // 상황 설명 모드 토글
   const [isActionMode, setIsActionMode] = useState(false)
@@ -377,7 +352,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     }
   }
 
-  // 상황 설명 모드 입력 처리 함수 추가
+  // 상황 설명 모드 입력 처리 함수
   const handleActionInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value
     setMessage(inputValue)
@@ -388,13 +363,28 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     }
   }
 
-  // 채팅 삭제 핸들러
-  const handleDeleteChat = () => {
-    // 삭제 로직 구현
-    console.log('채팅을 삭제합니다')
-    // 삭제 후 채팅 목록으로 이동
-    window.location.href = '/chat'
-  }
+  // 채팅방 삭제 함수
+  const handleDeleteChat = async () => {
+    try {
+      // 채팅방에서 나가기
+      if (channelId) {
+        await leaveChat(channelId);
+      }
+      
+      // 상태 초기화
+      clearChatHistory();
+      hasInitialized.current = false;
+      
+      // 모달 닫기
+      closeModal();
+      
+      // 페이지 리디렉션
+      window.location.href = '/chat';
+    } catch (error) {
+      console.error('채팅방 삭제 중 오류:', error);
+      setError('채팅방 삭제에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
 
   // 메시지 내용에서 상황 설명(*로 감싸진 텍스트)를 찾아 스타일을 적용하는 함수
   const formatMessageWithSituations = (message: string) => {
@@ -448,6 +438,102 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     document.body.removeChild(link)
   }
 
+  // 채팅 메시지 항목 렌더링 함수
+  const renderChatMessage = (chat: ChatMessage, index: number) => {
+    const isLastAiMessage = 
+      chat.sender === 'character' && 
+      chat.id === chatMessages.filter(msg => msg.sender === 'character').slice(-1)[0]?.id &&
+      chat.id !== '1';
+      
+    return (
+      <motion.div
+        key={chat.id}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+        className={`flex ${chat.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+      >
+        {chat.sender === 'character' && (
+          <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0 shadow-sm border border-gray-200">
+            <Image
+              src={character.imageUrl || '/images/character1.jpg'}
+              alt={character.name}
+              fill
+              className="object-cover"
+            />
+          </div>
+        )}
+
+        <motion.div
+          initial={{ scale: 0.95 }}
+          animate={{ scale: 1 }}
+          className={`max-w-[85%] md:max-w-[75%] rounded-2xl px-5 py-4 shadow-sm ${
+            chat.sender === 'user'
+              ? 'bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white rounded-tr-none'
+              : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none'
+          }`}
+        >
+          <p className="text-base whitespace-pre-wrap leading-relaxed">
+            {formatMessageWithSituations(chat.message)}
+          </p>
+          <p
+            className={`text-xs mt-2 text-right ${
+              chat.sender === 'user' ? 'text-violet-200' : 'text-gray-500'
+            }`}
+          >
+            {formatTime(chat.timestamp)}
+          </p>
+        </motion.div>
+
+        {/* 마지막 AI 메시지인 경우 새로고침/삭제 버튼 표시 */}
+        {isLastAiMessage && (
+          <div className="flex ml-2 items-center">
+            {/* 새로고침 버튼 */}
+            <button
+              onClick={handleRefreshLastAIMessage}
+              className="w-10 h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-500 hover:text-violet-600 hover:bg-violet-100 transition-colors mr-1.5 shadow-sm"
+              title="응답 새로고침"
+            >
+              <FontAwesomeIcon icon={faSync} className="text-base" />
+            </button>
+
+            {/* 삭제 버튼 */}
+            <button
+              onClick={handleDeleteLastAIMessage}
+              className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-100 transition-colors shadow-sm"
+              title="응답 삭제"
+            >
+              <FontAwesomeIcon icon={faTrashAlt} className="text-base" />
+            </button>
+          </div>
+        )}
+      </motion.div>
+    );
+  };
+
+  // 로딩 상태 표시
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
+      </div>
+    )
+  }
+
+  // 에러 상태 표시
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-red-600">
+          <p>{error}</p>
+        </div>
+        <BaseButton color="primary" onClick={() => window.location.reload()}>
+          다시 시도
+        </BaseButton>
+      </div>
+    )
+  }
+
   if (!character) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -456,6 +542,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     )
   }
 
+  // 나머지 UI 부분은 이전과 동일하게 유지
   return (
     <div className="flex flex-col h-screen max-h-screen w-full bg-gray-50">
       {/* 상단 헤더 */}
@@ -544,7 +631,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
               <FontAwesomeIcon icon={faGift} />
             </div>
-            <span className="ml-1.5 text-sm font-semibold text-gray-700">121</span>
+            <span className="ml-1.5 text-sm font-semibold text-gray-700">
+              {accountData?.coin_free || 0}
+            </span>
           </div>
 
           {/* 유료 재화 (펜) - 클릭 시 사이드바 */}
@@ -552,7 +641,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
               <FontAwesomeIcon icon={faCoins} className="h-4 w-4" />
             </div>
-            <span className="ml-1.5 text-sm font-semibold text-gray-700">600</span>
+            <span className="ml-1.5 text-sm font-semibold text-gray-700">
+              {accountData?.coin_user || 0}
+            </span>
           </div>
 
           {/* 채팅방 삭제 버튼 */}
@@ -618,75 +709,73 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
         {/* 오른쪽 채팅 영역 - 남은 공간 모두 차지 */}
         <div className="flex-1 flex flex-col bg-gradient-to-b from-gray-50 to-white">
+          {/* 연결 상태 표시 */}
+          {!isConnected && !isConnecting && (
+            <div className="bg-red-50 p-3 border-b border-red-100 flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-2 h-2 rounded-full bg-red-500 mr-2 animate-pulse"></div>
+                <p className="text-red-700 text-sm">
+                  서버 연결이 끊어졌습니다. 메시지를 보낼 수 없습니다.
+                  {error && <span className="ml-2 font-medium">({error})</span>}
+                </p>
+              </div>
+              <button 
+                onClick={() => window.location.reload()}
+                className="px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded text-xs font-medium transition-colors flex items-center"
+              >
+                <FontAwesomeIcon icon={faSync} className="mr-1.5" />
+                새로고침
+              </button>
+            </div>
+          )}
+          
+          {isConnecting && (
+            <div className="bg-yellow-50 p-3 border-b border-yellow-100 flex items-center">
+              <div className="w-2 h-2 rounded-full bg-yellow-500 mr-2 animate-pulse"></div>
+              <p className="text-yellow-700 text-sm flex items-center">
+                서버에 연결 중입니다. 잠시만 기다려주세요...
+                <span className="ml-2 bg-yellow-100 px-2 py-0.5 rounded-full text-xs">
+                  채팅 초기화 중
+                </span>
+              </p>
+            </div>
+          )}
+          
+          {showConnectedStatus && (
+            <div className="bg-green-50 p-2.5 border-b border-green-100 flex items-center justify-between">
+              <div className="flex items-center">
+                <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                <p className="text-green-700 text-sm">
+                  서버에 연결됨
+                  {isInitRoom ? 
+                    <span className="ml-2 bg-green-100 px-2 py-0.5 rounded-full text-xs">채팅방 초기화 완료</span> : 
+                    <span className="ml-2 bg-yellow-100 px-2 py-0.5 rounded-full text-xs">채팅방 초기화 필요</span>
+                  }
+                </p>
+              </div>
+              {channelId && (
+                <div className="flex items-center">
+                  <p className="text-xs text-green-600">채널: {channelId.substring(0, 8)}...</p>
+                  {chrBotChatKey && (
+                    <span className="ml-2 text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded">
+                      Chat ID: {chrBotChatKey}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+          
           {/* 채팅 내용 */}
           <div className="flex-1 overflow-y-auto p-4 md:p-6">
             <div className="flex flex-col space-y-12 max-w-3xl mx-auto">
-              {chatHistory.map(chat => (
-                <motion.div
-                  key={chat.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className={`flex ${chat.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  {chat.sender === 'character' && (
-                    <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0 shadow-sm border border-gray-200">
-                      <Image
-                        src={character.imageUrl || '/images/character1.jpg'}
-                        alt={character.name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
-
-                  <motion.div
-                    initial={{ scale: 0.95 }}
-                    animate={{ scale: 1 }}
-                    className={`max-w-[85%] md:max-w-[75%] rounded-2xl px-5 py-4 shadow-sm ${
-                      chat.sender === 'user'
-                        ? 'bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white rounded-tr-none'
-                        : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none'
-                    }`}
-                  >
-                    <p className="text-base whitespace-pre-wrap leading-relaxed">
-                      {formatMessageWithSituations(chat.message)}
-                    </p>
-                    <p
-                      className={`text-xs mt-2 text-right ${
-                        chat.sender === 'user' ? 'text-violet-200' : 'text-gray-500'
-                      }`}
-                    >
-                      {formatTime(chat.timestamp)}
-                    </p>
-                  </motion.div>
-
-                  {/* 마지막 AI 메시지인 경우 새로고침/삭제 버튼 표시 */}
-                  {chat.sender === 'character' &&
-                    chat.id === chatHistory.filter(msg => msg.sender === 'character').slice(-1)[0]?.id &&
-                    chat.id !== '1' && ( // 첫 번째 자동 메시지(id가 1인 경우)에는 버튼 표시하지 않음
-                      <div className="flex ml-2 items-center">
-                        {/* 새로고침 버튼 */}
-                        <button
-                          onClick={handleRefreshLastAIMessage}
-                          className="w-10 h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-500 hover:text-violet-600 hover:bg-violet-100 transition-colors mr-1.5 shadow-sm"
-                          title="응답 새로고침"
-                        >
-                          <FontAwesomeIcon icon={faSync} className="text-base" />
-                        </button>
-
-                        {/* 삭제 버튼 */}
-                        <button
-                          onClick={handleDeleteLastAIMessage}
-                          className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-100 transition-colors shadow-sm"
-                          title="응답 삭제"
-                        >
-                          <FontAwesomeIcon icon={faTrashAlt} className="text-base" />
-                        </button>
-                      </div>
-                    )}
-                </motion.div>
-              ))}
+              {chatMessages.length === 0 ? (
+                <div className="text-center text-gray-500 py-10">
+                  <p>메시지가 없습니다. 채팅을 시작해보세요!</p>
+                </div>
+              ) : (
+                chatMessages.map((chat, index) => renderChatMessage(chat, index))
+              )}
             </div>
           </div>
 

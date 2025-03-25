@@ -18,7 +18,8 @@ import type {
     CharbotGetListMineResponse,
     ChatUseResponse,
     CoinChargeUseHistoryResponse,
-    ConfirmTossPaymentResponse
+    ConfirmTossPaymentResponse,
+    ChatMessageResponse
 } from '../../types/api';
 
 // API 기본 설정
@@ -311,19 +312,21 @@ export const chatApi = {
     prompt_key: string,
     chrbot_chat_key: number,
     stream: boolean,
-    ai_message: string = '',
-    user_message: string = '',
-  ): Promise<ApiResponse> => {
-    return chatApiInstance.post('/api/charbot/chat/send', {
-      chat_mode,
-      nsfw: 1,
-      prompt_key,
-      chrbot_chat_key,
+  ): Promise<ApiResponse<ChatMessageResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
+    chatApiInstance.defaults.headers.common['Authorization'] = account_token;
+    const response = await chatApiInstance.post('/api/charbot/chat/send', {
+      chat_mode: chat_mode,
+      nsfw: nsfw,
+      prompt_key: prompt_key,
+      chrbot_chat_key: chrbot_chat_key,
       stream: stream ? 1 : 0,
-      countryCode: 'KR',
-      ai_message,
-      user_message,
+      countryCode: "KR"
     });
+    return {
+      success: response.status === 200,
+      data: response.data
+    };
   },
 
   // 메세지 정렬

@@ -9,11 +9,11 @@ import { NakamaProvider, useNakama } from '@/app/providers/NakamaProviders'
 const serverConfig = {
   serverUrl: 'qauschat.storynation.io',
   // serverUrl: 'chat.storynation.io',
-  serverPort: '443',
+  serverPort: 443,
   useSSL: true,
   autoConnect: false,
   serverKey: 'defaultkey'
-};
+} as const;
 
 export default function ChatDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params)
