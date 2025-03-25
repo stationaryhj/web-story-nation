@@ -151,31 +151,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     console.log('🔌 세션 변화 감지 => session:', session, 'socketRef.current:', socketRef.current); 
   }, [session, socketRef.current])
 
-  // 소켓 상태 모니터링
-  // useEffect(() => {
-  //   const checkSocketStatus = () => {
-  //     if (socketRef.current) {
-  //       const socketConnected = socketRef.current.isConnected;
-        
-  //       // 소켓 상태와 React 상태가 다른 경우에만 로그 출력
-  //       if (socketConnected !== isConnected) {
-  //         console.log(`🔌 소켓 상태 불일치 감지! => 소켓: ${socketConnected ? '연결됨' : '연결 안됨'}, 상태: ${isConnected ? '연결됨' : '연결 안됨'}`);
-          
-  //         // React 상태 업데이트
-  //         if (socketConnected !== isConnected) {
-  //           setIsConnected(socketConnected);
-  //         }
-  //       }
-  //     }
-  //   };
-
-  //   // 2초마다 소켓 상태 확인
-  //   const intervalId = setInterval(checkSocketStatus, 2000);
-
-  //   // 컴포넌트 언마운트시 인터벌 제거
-  //   return () => clearInterval(intervalId);
-  // }, [isConnected]);
-
   // 자동 재연결 로직
   useEffect(() => {
     // 세션이 있고 소켓이 연결되지 않은 상태라면 재연결 시도
@@ -196,7 +171,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           }
           
           // 이미 연결된 상태라면 재연결하지 않음
-          if (socketRef.current && socketRef.current.isConnected) {
+          if (socketRef.current) {
             setSocket(socketRef.current);
             setIsConnected(true);
             setIsConnecting(false);
@@ -335,22 +310,19 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       setChatMessages(prev => {
         // 임시 메시지 대체 로직 (사용자가 보낸 메시지인 경우)
         if (type === 'user') {
-          // 최근 10개 메시지 중에서 같은 내용의 임시 메시지를 찾아 대체
-          const recentMessages = prev.slice(-10);
-          const tempMessageIndex = recentMessages.findIndex(msg => 
+          // 최근 10개 메시지 중에서 같은 내용과 타입을 가진 임시 메시지를 찾아 대체
+          const tempMessage = prev.find(msg => 
             msg.sender === 'user' && 
             msg.message === content && 
             msg.id.startsWith('temp_')
           );
           
-          if (tempMessageIndex >= 0) {
-            const actualTempIndex = prev.length - 10 + tempMessageIndex;
-            if (actualTempIndex >= 0) {
-              console.log('✅ 임시 메시지를 실제 메시지로 대체:', prev[actualTempIndex].id, '->', messageId);
-              const newMessages = [...prev];
-              newMessages[actualTempIndex] = newMessage;
-              return newMessages;
-            }
+          if (tempMessage) {
+            console.log('✅ 임시 메시지를 실제 메시지로 대체:', tempMessage.id, '->', messageId);
+            // 임시 메시지만 대체하고 나머지는 유지
+            return prev.map(msg => 
+              msg.id === tempMessage.id ? newMessage : msg
+            );
           }
         }
         
@@ -451,7 +423,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         
         console.log('📨 파싱된 메시지 타입:', contentObj.type || '알 수 없음');
         
-        // 'user' 타입 메시지인 경우 SendChat API 호출 처리
+        // 메시지 내용이 파싱되면 처리
         if (contentObj.type === 'user') {
           const channelId = message.channel_id;
           if (!channelId) {
@@ -459,6 +431,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
             return;
           }
           
+          // 자신이 보낸 메시지라도 응답은 처리 (ACK를 통한 메시지 확인)
           console.log('👤 사용자 메시지 수신, SendChat API 호출:', {
             content: contentObj.content,
             channel: channelId,
@@ -467,45 +440,76 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           
           // 저장된 채팅 키 사용
           if (chrBotChatKey) {
+            try {
+              // 저장된 채팅 모드 사용
+              const response = await chatApi.SendChat(
+                currentChatMode,
+                nsfw, // nsfw 설정
+                sendPrompt_key || '',
+                chrBotChatKey,
+                false // stream 설정
+              );
+              console.log('🤖 AI 응답 수신:', response);
+              
+              // 응답 상태 확인
+              if (response && response.success && response.data && response.data.result && response.data.result.err === 0) {
+                // AI의 응답을 다시 채널에 전송
+                const chatMessageResponse = response.data;
 
-            // 저장된 채팅 모드 사용
-            const response = await chatApi.SendChat(
-              currentChatMode,
-              nsfw, // nsfw 설정
-              sendPrompt_key || '',
-              chrBotChatKey,
-              false // stream 설정
-            );
-
-
-            console.log('🤖 AI 응답 수신:', response);
-          
-            // 응답 상태 확인
-            if (response && response.success && response.data) {
-              // AI의 응답을 다시 채널에 전송
-              const chatMessageResponse = response.data;
-
-              if (socketRef.current) {
-                try {
-                  // 응답 JSON 파싱 및 content 추출
-                  const responseObj = JSON.parse(chatMessageResponse.response);
-                  const messageContent = responseObj.content[0].text;
-                  
-                  console.log('🤖 AI 응답 내용 (채널로 전송 중):', messageContent);
-                  const content = { content: messageContent, type: 'ai' };
-                  
-                  // AI 응답을 채널에 전송 - 이 메시지는 다시 소켓의 onchannelmessage 이벤트로 수신되어 UI에 표시됨
-                  await socketRef.current.writeChatMessage(channelId, content);
-                  console.log('✅ AI 응답 채널 전송 완료 - 소켓을 통해 수신될 예정');
-                } catch (parseError) {
-                  console.error('AI 응답 파싱 오류:', parseError);
-                  // 파싱 오류 시 원본 응답 전송
-                  const content = { content: chatMessageResponse.response, type: 'ai' };
-                  await socketRef.current.writeChatMessage(channelId, content);
+                if (socketRef.current) {
+                  try {
+                    // 응답 JSON 파싱 및 content 추출
+                    const responseObj = JSON.parse(chatMessageResponse.response);
+                    const messageContent = responseObj.content[0].text;
+                    
+                    console.log('🤖 AI 응답 내용 (채널로 전송 중):', messageContent);
+                    const content = { content: messageContent, type: 'ai' };
+                    
+                    // AI 응답을 채널에 전송 - 이 메시지는 다시 소켓의 onchannelmessage 이벤트로 수신되어 UI에 표시됨
+                    await socketRef.current.writeChatMessage(channelId, content);
+                    console.log('✅ AI 응답 채널 전송 완료 - 소켓을 통해 수신될 예정');
+                  } catch (parseError) {
+                    console.error('AI 응답 파싱 오류:', parseError);
+                    // 파싱 오류 시 원본 응답 전송
+                    const content = { content: chatMessageResponse.response, type: 'ai' };
+                    await socketRef.current.writeChatMessage(channelId, content);
+                  }
+                }
+              } else {
+                console.error('AI 응답 오류:', response?.data);
+                // 오류 발생 시 사용자에게 알림
+                if (socketRef.current) {
+                  const errorContent = {
+                    content: '죄송합니다. 응답을 생성하는 중 오류가 발생했습니다.',
+                    type: 'system'
+                  };
+                  await socketRef.current.writeChatMessage(channelId, errorContent);
                 }
               }
+            } catch (error) {
+              console.error('SendChat API 호출 또는 응답 전송 오류:', error);
+              // 오류 발생 시 클라이언트에게 오류 메시지 전송
+              try {
+                if (socketRef.current) {
+                  const errorContent = {
+                    content: '*오류 발생* 메시지 처리 중 오류가 발생했습니다. 다시 시도해주세요.',
+                    type: 'system'
+                  };
+                  await socketRef.current.writeChatMessage(channelId, errorContent);
+                }
+              } catch (sendError) {
+                console.error('오류 메시지 전송 실패:', sendError);
+              }
             }
+          } else {
+            console.error('chrBotChatKey가 없습니다. API 호출 불가능.');
           }
+        } else if (contentObj.type === 'ai') {
+          // AI 메시지는 handleMessage에서 이미 처리됨
+          console.log('🤖 AI 메시지 수신: 이미 처리됨', contentObj.content.substring(0, 50) + '...');
+        } else {
+          // 다른 타입의 메시지 처리
+          console.log('ℹ️ 기타 메시지 타입:', contentObj.type);
         }
 
         // 등록된 채널별 리스너 호출
@@ -536,8 +540,18 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
   // 메시지 전송 함수 (캡슐화)
   const sendChatMessage = async (messageText: string): Promise<boolean> => {
     try {
+      if (!channelId) {
+        throw new Error('채널 ID가 없습니다.');
+      }
+
+      if (!socketRef.current) {
+        throw new Error('소켓이 초기화되지 않았습니다.');
+      }
+      
+      // 고유한 임시 ID 생성 (현재 시간 + 난수)
+      const tempMessageId = `temp_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+      
       // UI에 사용자 메시지 즉시 표시 (낙관적 UI 업데이트)
-      const tempMessageId = `temp_${Date.now()}`;
       const userMessage: ChatMessage = {
         id: tempMessageId,
         sender: 'user',
@@ -545,31 +559,28 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         timestamp: new Date(),
       };
       
+      console.log('📤 메시지 전송 준비:', {
+        tempId: tempMessageId,
+        content: messageText,
+        channelId
+      });
+      
       // 임시 메시지 저장 (소켓에서 실제 메시지가 도착하면 대체될 예정)
       setChatMessages(prev => [...prev, userMessage]);
       
-      // Nakama 메시지 전송
-      // if (!socketRef.current || !socketRef.current.isConnected) {
-      //   throw new Error('소켓이 연결되어 있지 않습니다.');
-      // }
-      
-      if (!channelId) {
-        throw new Error('채널 ID가 없습니다.');
-      }
-      
-      console.log('Nakama 메시지 전송 중:', { channelId, message: messageText });
+      // 소켓을 통해 메시지 전송 (이후 ACK로 수신되면 실제 메시지로 대체)
+      console.log('Nakama 메시지 전송 중...');
       const content = { content: messageText, type: 'user' };
       await socketRef.current.writeChatMessage(channelId, content);
-      console.log('메시지 전송 완료 - 소켓을 통해 메시지가 수신될 예정');
+      console.log('✅ 메시지 전송 완료 - 소켓을 통해 응답이 수신될 예정');
       
-      // 실제 메시지는 소켓의 onchannelmessage 이벤트를 통해 수신되어 처리됨
       return true;
     } catch (error) {
       console.error('메시지 전송 중 오류:', error);
       
       // 오류 메시지 표시
       const errorMessage: ChatMessage = {
-        id: Date.now().toString(),
+        id: `error_${Date.now()}`,
         sender: 'character',
         message: '*오류 발생* 메시지 전송에 실패했습니다. 다시 시도해주세요.',
         timestamp: new Date(),
@@ -592,8 +603,8 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       throw new Error('채팅 채널에 연결할 수 없습니다.');
     }
     
-    if (!socketRef.current || !socketRef.current.isConnected) {
-      console.error('소켓이 연결되어 있지 않습니다.');
+    if (!socketRef.current) {
+      console.error('소켓 참조가 없습니다.');
       throw new Error('채팅 서버에 연결되어 있지 않습니다.');
     }
     
@@ -832,7 +843,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     if (isConnecting) return false;
     
     // 이미 연결된 상태라면 재연결하지 않음
-    if (socketRef.current && socketRef.current.isConnected) {
+    if (socketRef.current) {
       setSocket(socketRef.current);
       setIsConnected(true);
       return true;
@@ -896,15 +907,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         return;
       }
 
-      // 이미 연결이 끊겼는지 확인
-      if (!socketRef.current.isConnected) {
-        socketRef.current = null;
-        setSocket(null);
-        setIsConnected(false);
-        resolve();
-        return;
-      }
-
       // 연결 끊기 전 이벤트 처리를 위한 임시 핸들러
       const originalOnDisconnect = socketRef.current.ondisconnect;
       
@@ -946,7 +948,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
   // 채널 참가 함수
   const joinChat = async (roomId: string, persistence = false, hidden = false): Promise<any> => {
-    if (!socketRef.current || !socketRef.current.isConnected) {
+    if (!socketRef.current) {
       throw new Error('소켓이 연결되지 않았습니다');
     }
 
@@ -962,7 +964,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
   // 채널 나가기 함수
   const leaveChat = async (channelId: string): Promise<boolean> => {
-    if (!socketRef.current || !socketRef.current.isConnected) {
+    if (!socketRef.current) {
       return false;
     }
 
