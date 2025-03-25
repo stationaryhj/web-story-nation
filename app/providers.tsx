@@ -114,8 +114,8 @@ export default function Providers({ children }: { children: ReactNode }) {
         duration={1.5}
       >
         <InitDataLoader>
-            <AnimatePresence mode="wait">{children}</AnimatePresence>
-            <ModalManager />
+          <AnimatePresence mode="wait">{children}</AnimatePresence>
+          <ModalManager />
         </InitDataLoader>
       </SkeletonThemeProvider>
 

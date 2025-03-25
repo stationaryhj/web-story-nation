@@ -59,7 +59,10 @@ const createApiInstance = (baseURL: string) => {
 //   process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL :
 //   process.env.NEXT_PUBLIC_STORYNATION_API_URL;
 
+// release
 // const API_URL = process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL;
+
+// dev
 const API_URL = process.env.NEXT_PUBLIC_STORYNATION_API_URL;
 
 const CHAT_URL = process.env.NODE_ENV === 'production' ?

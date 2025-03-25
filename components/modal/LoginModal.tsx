@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import BaseModal from './BaseModal'
 import SignupModal from './SignupModal'
 import { useAccountStore } from '@/store/useAccountStore'
 import { OAuthProvider } from '@/types/login'
+import GuestLoginForm from '@/components/form/GuestLoginForm'
 
 interface LoginModalProps {
   isOpen: boolean
@@ -12,6 +14,7 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+  const router = useRouter()
   const [showSignup, setShowSignup] = useState(false)
 
   const handleSignupClick = () => {
@@ -22,7 +25,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setShowSignup(false)
   }
 
-  const { socialLogin, loading } = useAccountStore()
+  const { socialLogin, guestLogin, loading } = useAccountStore()
 
   const handleSocialLogin = async (provider: OAuthProvider) => {
     try {
@@ -30,6 +33,18 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     } catch (error) {
       console.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', error)
       // toast.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+    }
+  }
+
+  const handleGuestLogin = async (nickname: string) => {
+    try {
+      let isSuccess = await guestLogin(nickname)
+      if(isSuccess) {
+        onClose()
+        router.push('/')
+      }
+    } catch (err) {
+      console.error('게스트 로그인 오류:', err)
     }
   }
 
@@ -75,9 +90,16 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             </button>
           </div>
 
-          <div className="text-center text-sm text-gray-500 dark:text-gray-400">
-            <p>또는</p>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white dark:bg-dark-background text-gray-500">또는</span>
+            </div>
           </div>
+
+          <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} />
 
           <div className="space-y-4">
             <button

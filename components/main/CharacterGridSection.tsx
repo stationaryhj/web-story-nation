@@ -56,6 +56,7 @@ export default function CharacterGridSection({
   const categoryInfo = CATEGORIES.find(cat => cat.id === categoryId)
   const categoryName = categoryInfo?.name || '캐릭터'
   const categoryType = categoryInfo?.type || ''
+  const categoryIdNumber = Number(categoryInfo?.type || 0)
 
   // 컴포넌트 내부에서 직접 데이터 로드
   const {
@@ -67,7 +68,7 @@ export default function CharacterGridSection({
     categoryId,
     nsfw, // nsfw
     1, // page (항상 1)
-    50, // paginate - 한 번에 50개 로드
+    10, // paginate - 한 번에 50개 로드
     order, // order
     selectedTags.join(',') // tag 검색어 - 쉼표로 구분된 합집합 형태로 전달
   )
@@ -130,7 +131,7 @@ export default function CharacterGridSection({
       <SectionTransition className="py-12 bg-white dark:bg-dark-background-light">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold mb-6">{categoryName}</h2>
-          <FilterControls order={order} setOrder={setOrder} nsfw={nsfw} setNsfw={setNsfw} />
+          <FilterControls categoryId={categoryIdNumber} order={order} setOrder={setOrder} nsfw={nsfw} setNsfw={setNsfw} />
           <p className="mt-8 text-center text-gray-500 dark:text-dark-secondary-400">
             {selectedTags.length > 0 ? '선택한 태그에 해당하는 캐릭터가 없습니다.' : '데이터가 없습니다.'}
           </p>
@@ -143,7 +144,7 @@ export default function CharacterGridSection({
     <SectionTransition className="py-12 bg-white dark:bg-dark-background-light">
       <div className="container mx-auto px-4">
         {/* 공통 필터 컴포넌트 적용 */}
-        <FilterControls order={order} setOrder={setOrder} nsfw={nsfw} setNsfw={setNsfw} />
+        <FilterControls categoryId={categoryIdNumber} order={order} setOrder={setOrder} nsfw={nsfw} setNsfw={setNsfw} />
 
         {/* 카드 그리드 */}
         <CardGrid categoryId={categoryId} customData={characters} />

@@ -8,6 +8,8 @@ import { faChevronDown, faChevronUp, faRotate } from '@fortawesome/free-solid-sv
 interface Tag {
   c_chrbot_tag_key: number
   tag: string
+  group: number
+  sort: number
 }
 
 interface TagListProps {
@@ -319,7 +321,7 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
             .filter(tag => !visibleTags.some(vTag => vTag.c_chrbot_tag_key === tag.c_chrbot_tag_key))
             .map(tag => (
               <button
-                key={tag.c_chrbot_tag_key}
+                key={tag.c_chrbot_tag_key.toString() + tag.group.toString()}
                 className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
                   selectedTags.includes(tag.c_chrbot_tag_key.toString())
                     ? 'bg-primary-100 text-primary-700 dark:bg-dark-primary-900/50 dark:text-dark-primary-300'

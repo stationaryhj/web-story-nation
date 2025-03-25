@@ -4,7 +4,7 @@
 import { FadeIn } from '@/components/motion/PageTransition'
 import { useThemeStore, useAccountStore } from '@/store/useStoreData'
 import { useModalStore } from '@/store/useStoreModal'
-import { faBell, faShoppingBag, faCog, faMoon, faSun, faBars, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faBell, faShoppingBag, faCog, faMoon, faSun, faBars, faTimes, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion, AnimatePresence } from 'framer-motion'
 import NotificationButton from '@/components/elements/sidebar/NotificationButton'
@@ -37,7 +37,6 @@ const SimpleToggle = ({ isOn, onToggle }: { isOn: boolean; onToggle: () => void 
 }
 
 export default function Header() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const { isDarkMode, toggleDarkMode } = useThemeStore()
   const [mounted, setMounted] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -45,8 +44,7 @@ export default function Header() {
   const [activeLink, setActiveLink] = useState('/')
   const { openModal } = useModalStore()
   const { isAdultModeEnabled, toggleAdultMode } = useSettingsStore()
-
-  const { isLogin, removeAccountInfo } = useAccountStore()
+  const { isLogin, logout } = useAccountStore()
 
   // 짜릿모드 토글 핸들러
   const handleAdultModeToggle = () => {
@@ -210,34 +208,23 @@ export default function Header() {
             </motion.button>
           </Link>
 
-          {isLoggedIn ? (
-            <motion.button
-              className="p-2 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <FontAwesomeIcon icon={faCog} className="text-lg" />
-            </motion.button>
-          ) : (
-            <FadeIn>
-              {mounted &&
-                (!isLogin ? (
-                  <button
-                    onClick={() => openModal('login')}
-                    className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
-                  >
-                    로그인
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => removeAccountInfo()}
-                    className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
-                  >
+          <FadeIn>
+            {mounted && (
+              <button
+                onClick={isLogin ? logout : () => openModal('login')}
+                className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-full text-sm font-medium transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700 flex items-center gap-2"
+              >
+                {isLogin ? (
+                  <>
+                    <FontAwesomeIcon icon={faSignOutAlt} className="text-sm" />
                     로그아웃
-                  </button>
-                ))}
-            </FadeIn>
-          )}
+                  </>
+                ) : (
+                  '로그인'
+                )}
+              </button>
+            )}
+          </FadeIn>
         </div>
       </div>
 

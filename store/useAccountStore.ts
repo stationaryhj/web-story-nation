@@ -269,7 +269,7 @@ export const useAccountStore = create<AccountState>()(
           const { clientId, snsauth } = response.data
           console.log('@@@@@@@@ clientId', clientId)
           console.log('@@@@@@@@ snsauth', snsauth)
-          
+
           const state: OAuthState = {
             provider: providerConfig.name as OAuthProvider,
             snsauth,
@@ -353,7 +353,7 @@ export const useAccountStore = create<AccountState>()(
     }),
     {
       name: 'account-storage',
-      skipHydration: true
+      // skipHydration: true
     }
   )
 )

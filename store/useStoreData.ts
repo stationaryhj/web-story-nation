@@ -322,34 +322,6 @@ export const useThemeStore = create<ThemeStore>()(
   )
 )
 
-interface AccountStore {
-  isLogin: boolean
-  data: LoginResponse | null
-  setAccountInfo: (accountInfo: AccountStore) => void
-  removeAccountInfo: () => void
-}
-
-export const useAccountStore = create<AccountStore>()(
-  persist(
-    set => ({
-      isLogin: false,
-      data: null,
-      setAccountInfo: (accountInfo: AccountStore) => set(accountInfo),
-      removeAccountInfo: () =>
-        set({
-          isLogin: false,
-          data: null,
-        }),
-    }),
-    {
-      name: 'account-storage',
-      storage: createJSONStorage(() => safeStorage),
-
-      // skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
-    }
-  )
-)
-
 interface CoinStore {
   coinList: Array<CoinData>
   orderId: string
@@ -391,3 +363,6 @@ export const useChatModeStore = create<ChatModeStore>()(
     }
   )
 )
+
+// login Data 통합
+export { useAccountStore } from './useAccountStore'
