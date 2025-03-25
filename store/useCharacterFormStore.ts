@@ -314,16 +314,7 @@ export const useCharacterFormStore = create<CharacterFormStore>()(
     }),
     {
       name: 'character-form-storage',
-      storage: createJSONStorage(() => sessionStorage),
-      // 이미지 데이터는 저장하지 않도록 설정
-      partialize: state => ({
-        ...state,
-        formData: {
-          ...state.formData,
-          // 이미지 데이터는 제외하고 저장
-          images: [],
-        },
-      }),
+      storage: createJSONStorage(() => localStorage),
     }
   )
 )
