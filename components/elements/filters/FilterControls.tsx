@@ -88,29 +88,6 @@ export default function FilterControls({ categoryId, order, setOrder, nsfw, setN
 
           {/* 오른쪽: 등급 드롭다운 */}
           <div className="relative">
-            <button
-              className={`flex items-center px-4 py-2 border rounded-lg bg-white dark:bg-dark-background-lighter text-sm ${
-                nsfw === 1
-                  ? 'border-red-500 text-red-600 dark:text-red-400'
-                  : nsfw === 2
-                    ? 'border-green-500 text-green-600 dark:text-green-400'
-                    : 'border-blue-500 text-blue-600 dark:text-blue-400'
-              }`}
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              disabled={isPending}
-            >
-              {nsfw === 1 ? '짜릿모드 가능' : nsfw === 2 ? '전체 이용가' : '이용등급 전체'}
-              <svg
-                className="w-4 h-4 ml-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-background-light rounded-lg shadow-lg z-10 border overflow-hidden">
                 <button

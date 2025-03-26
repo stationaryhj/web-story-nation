@@ -118,7 +118,7 @@ export default function NewCharacterSidebar({ isOpen, onClose }: NewCharacterSid
           onClick={onClose}
         >
           <motion.div
-            className="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-dark-background-DEFAULT overflow-hidden z-50"
+            className="fixed top-0 right-0 h-full w-[600px] bg-white dark:bg-dark-background-DEFAULT overflow-hidden z-50"
             initial="hidden"
             animate="visible"
             exit="hidden"
