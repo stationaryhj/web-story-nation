@@ -559,7 +559,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         {/* 왼쪽 그룹: 뒤로가기 + 캐릭터 프로필 */}
         <div className="flex items-center min-w-0">
           {/* 1: 뒤로가기 버튼 */}
-          <Link href="/chat" className="mr-3">
+          <Link href="/chat-list" className="mr-3">
             <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center transition-colors hover:bg-gray-200">
               <FontAwesomeIcon icon={faArrowLeft} className="text-gray-600" />
             </div>
@@ -632,7 +632,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           </BaseButton>
 
           {/* 무료 재화 (펜) - 클릭 시 사이드바 */}
-          <div className="flex items-center cursor-pointer" onClick={() => openModal('credit')}>
+          <div className="flex items-center">
             <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
               <FontAwesomeIcon icon={faGift} />
             </div>
@@ -640,7 +640,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           </div>
 
           {/* 유료 재화 (펜) - 클릭 시 사이드바 */}
-          <div className="hidden md:flex items-center cursor-pointer" onClick={() => openModal('credit')}>
+          <div className="hidden md:flex items-center">
             <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
               <FontAwesomeIcon icon={faCoins} className="h-4 w-4" />
             </div>
