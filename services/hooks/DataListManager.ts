@@ -166,7 +166,7 @@ export const ReqGetOrderId = () => {
   const { data, isLoading, error, refetch } = useQuery<OrderIdResponse>({
     queryKey: ['orderId'],
     queryFn: async () => {
-      const response = await settlementApi.GetOrderId(0)
+      const response = await settlementApi.GetOrderId('0')
       return response.data as OrderIdResponse
     },
   })

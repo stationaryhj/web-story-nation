@@ -155,6 +155,8 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
   // 자동 재연결 로직
   useEffect(() => {
+    console.log('@@@@@@ session 변경됨 ::: ', session);
+
     // 세션이 있고 소켓이 연결되지 않은 상태라면 재연결 시도
     if (session && !isConnected && !isConnecting && socketRef.current) {
       const attemptReconnect = async () => {
@@ -759,7 +761,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
   // 채팅 기록 초기화
   const clearChatHistory = (): void => {
-    setChatMessages([]);
+    // setChatMessages([]);
   };
 
   // 메시지 직접 추가
@@ -898,6 +900,51 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         console.warn('채팅 초기화 API 응답이 실패했습니다:', response?.data?.result?.msg || '알 수 없는 오류');
         return { success: false };
       }
+
+
+
+      console.log('💬 채팅 메시지 목록 조회 시작');
+      console.log('newSession :: ', newSession);
+      console.log('channel.id :: ', channel.id);
+      // const messages = await client?.listChannelMessages(newSession, channel.id, 20, true);
+      try {
+
+        let waiting = 0;
+        let max_count = 50
+        let cursor = ''
+
+        while(max_count > 0) {
+          const result = await _client?.listChannelMessages(newSession, channel.id, max_count, true, cursor);
+          console.log('💬 채팅 메시지 목록:', result);
+
+          result.messages.map((message) => {
+            addChatMessage({
+              id: message.sender_id,
+              sender: message.content.type === 'user' ? 'user' : 'character',
+              message: message.content.content,
+              timestamp: new Date(message.create_time)
+            })
+          })
+
+          cursor = result.next_cursor
+
+          if(result.messages?.length < max_count) {
+            max_count = -1
+          }
+          else {
+            max_count = 50
+          }
+
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          console.log('💬 채팅 메시지 목록 대기중... ');
+        }
+
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+      // console.log('💬 채팅 메시지 목록:', messages);
+
+
       
       return { 
         success: isSuccess,
