@@ -6,60 +6,60 @@
   :root {
     --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
-    
+
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-    
+
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    
+
     --primary: 246 80% 60%;
     --primary-foreground: 210 40% 98%;
-    
+
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-    
+
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    
+
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
-    
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    
+
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
-    
+
     --radius: 0.5rem;
   }
-  
+
   .dark {
     --background: 240 21% 9%;
     --foreground: 210 40% 98%;
-    
+
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-    
+
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    
+
     --primary: 217 77% 36%;
     --primary-foreground: 210 40% 98%;
-    
+
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-    
+
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    
+
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-    
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    
+
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
@@ -68,22 +68,22 @@
 
 @layer base {
   body {
-    @apply bg-background text-secondary-900 transition-colors duration-300;
+    @apply bg-white text-gray-900 transition-colors duration-300;
   }
-  
+
   .dark body {
-    @apply bg-gradient-dark text-dark-secondary-700;
+    @apply bg-gray-900 text-gray-200;
   }
 }
 
 /* 스크롤바 숨기기 */
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari, Opera */
+  display: none; /* Chrome, Safari, Opera */
 }
 
 :root {
@@ -106,8 +106,8 @@
 }
 
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 /* 페이지 전환 애니메이션 */
@@ -119,7 +119,9 @@
 .page-transition-enter-active {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 300ms, transform 300ms;
+  transition:
+    opacity 300ms,
+    transform 300ms;
 }
 
 .page-transition-exit {
@@ -130,7 +132,9 @@
 .page-transition-exit-active {
   opacity: 0;
   transform: translateY(-20px);
-  transition: opacity 300ms, transform 300ms;
+  transition:
+    opacity 300ms,
+    transform 300ms;
 }
 
 /* 부드러운 스크롤 */
@@ -145,5 +149,165 @@ body {
 
 /* 다크모드 전환 애니메이션 */
 .dark-transition {
-  transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+  transition:
+    background-color 0.5s ease,
+    color 0.5s ease,
+    border-color 0.5s ease,
+    box-shadow 0.5s ease;
+}
+
+/* 스와이퍼 공통 스타일 */
+.swiper-container-wrapper {
+  position: relative;
+  margin: 0;
+  margin-bottom: 20px;
+}
+
+.swiper-container-wrapper .swiper-button-disabled {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+.swiper-pagination {
+  bottom: 0 !important;
+}
+
+/* 다크 모드 대응 */
+.dark .swiper-button-next,
+.dark .swiper-button-prev {
+  color: #e5e7eb;
+}
+
+.dark .swiper-pagination-bullet {
+  background: #e5e7eb;
+}
+
+/* 네비게이션 버튼 공통 스타일 */
+.navigation-button {
+  color: #6b7280 !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+
+  margin-top: -18px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease,
+    box-shadow 0.3s ease !important;
+  pointer-events: auto !important;
+  isolation: isolate !important;
+  border: none !important;
+  outline: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.navigation-button:hover {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  transform: translateY(-50%) scale(1.05) !important;
+}
+
+.navigation-button:active {
+  transform: translateY(-50%) scale(0.95) !important;
+}
+
+.navigation-button:after {
+  font-size: 16px !important;
+  font-weight: bold !important;
+  font-family: 'swiper-icons';
+  text-transform: none !important;
+  letter-spacing: 0;
+  font-variant: initial;
+  line-height: 1;
+}
+
+.navigation-next-button:after {
+  content: 'next';
+}
+
+.navigation-prev-button:after {
+  content: 'prev';
+}
+
+.navigation-next-button {
+  right: -25px !important;
+}
+
+.navigation-prev-button {
+  left: -25px !important;
+}
+
+.dark .navigation-button {
+  background-color: rgba(31, 41, 55, 0.8) !important;
+  color: #e5e7eb !important;
+}
+
+.dark .navigation-button:hover {
+  background-color: rgba(31, 41, 55, 0.95) !important;
+}
+
+/* 스와이퍼 스타일 */
+.custom-swiper {
+  padding-bottom: 40px;
+  position: relative !important;
+  isolation: isolate !important;
+}
+
+@media (max-width: 768px) {
+  .navigation-button {
+    width: 30px !important;
+    height: 30px !important;
+    margin-top: -15px !important;
+  }
+  .navigation-button:after {
+    font-size: 14px !important;
+  }
+  .navigation-next-button {
+    right: -20px !important;
+  }
+  .navigation-prev-button {
+    left: -20px !important;
+  }
+}
+
+/* 카드 그리드 스와이퍼 스타일 */
+.card-grid-swiper .swiper-wrapper {
+  padding-bottom: 30px;
+}
+
+/* 작가 그리드 스와이퍼 스타일 */
+.author-grid-swiper .swiper-wrapper {
+  padding-bottom: 30px;
+}
+
+/* 카드 그리드 네비게이션 버튼 스타일 */
+.card-grid-prev-button:after,
+.card-grid-next-button:after {
+  color: #4f46e5;
+}
+
+.dark .card-grid-prev-button:after,
+.dark .card-grid-next-button:after {
+  color: #6366f1;
+}
+
+/* 작가 그리드 네비게이션 버튼 스타일 */
+.author-grid-prev-button:after,
+.author-grid-next-button:after {
+  color: #4f46e5;
+}
+
+.dark .author-grid-prev-button:after,
+.dark .author-grid-next-button:after {
+  color: #6366f1;
 }

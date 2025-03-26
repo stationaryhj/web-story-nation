@@ -35,7 +35,6 @@ const mockConversationExamples = [
   },
 ]
 
-
 interface CharactorModalProps {
   isOpen: boolean
   onClose: () => void
@@ -65,14 +64,16 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
       // 스크롤바 너비만큼 패딩을 추가하여 레이아웃 이동 방지
       document.body.style.overflow = 'hidden'
       document.body.style.paddingRight = `${scrollbarWidth}px`
+    } else {
+      // 모달이 닫힐 때 스크롤 상태 복원
+      document.body.style.overflow = originalStyle
+      document.body.style.paddingRight = '0px'
     }
 
     return () => {
-      // 컴포넌트 언마운트 또는 isOpen 상태 변경 시 원래 스타일로 복원
-      if (isOpen) {
-        document.body.style.overflow = originalStyle
-        document.body.style.paddingRight = '0px'
-      }
+      // 컴포넌트 언마운트 시에만 원래 스타일로 복원
+      document.body.style.overflow = originalStyle
+      document.body.style.paddingRight = '0px'
     }
   }, [isOpen])
 
@@ -126,7 +127,6 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   }
 
   return (
-
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -139,7 +139,6 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
             variants={overlayVariants}
             onClick={handleClose}
           />
-
 
           {/* 모달 */}
           <motion.div
@@ -218,7 +217,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                         key={`tag-${index}`}
                         className="rounded-full bg-primary-50 px-3 py-1 text-sm text-primary-700 dark:bg-dark-primary-900 dark:text-dark-primary-300"
                       >
-                        #{tag}
+                        {tag}
                       </span>
                     ))}
                   </div>

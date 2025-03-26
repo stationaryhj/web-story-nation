@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { CSSProperties, ReactNode, MouseEvent as ReactMouseEvent } from 'react'
 import { useEffect } from 'react'
+import { lockScroll, unlockScroll, resetScrollLock } from '@/lib/utils/scrollLock'
 
 interface BaseModalProps {
   isOpen: boolean
@@ -29,6 +30,8 @@ interface BaseModalProps {
   zIndex?: number
   onBackdropClick?: () => void
   onAnimationComplete?: () => void
+  icon?: ReactNode
+  isIcon?: boolean
 }
 
 export default function BaseModal({
@@ -54,24 +57,19 @@ export default function BaseModal({
   zIndex = 50,
   onBackdropClick,
   onAnimationComplete,
+  icon,
+  isIcon = false,
 }: BaseModalProps) {
   // 모달이 열릴 때 배경 스크롤 방지
   useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
-
     if (isOpen) {
-      // 스크롤바 너비만큼 패딩을 추가하여 레이아웃 이동 방지
-      document.body.style.overflow = 'hidden'
-      document.body.style.paddingRight = `${scrollbarWidth}px`
+      lockScroll()
+    } else {
+      unlockScroll()
     }
 
     return () => {
-      // 컴포넌트 언마운트 또는 isOpen 상태 변경 시 원래 스타일로 복원
-      if (isOpen) {
-        document.body.style.overflow = originalStyle
-        document.body.style.paddingRight = '0px'
-      }
+      resetScrollLock()
     }
   }, [isOpen])
 
@@ -176,26 +174,44 @@ export default function BaseModal({
             style={style}
           >
             <div className={`flex flex-col ${contentClassName}`}>
-              {/* 모달 헤더 */}
-              {!hideHeader && (
-                <div className={`mb-4 flex items-center justify-between p-5 pb-0 ${headerClassName}`}>
-                  {title && (
-                    <h2 className="text-xl font-bold text-secondary-900 dark:text-dark-secondary-100">{title}</h2>
-                  )}
-                  {showCloseButton && (
-                    <button
-                      onClick={onClose}
-                      className="text-secondary-500 transition-colors hover:text-secondary-700 dark:text-dark-secondary-400 dark:hover:text-dark-secondary-300"
-                      aria-label="닫기"
-                    >
-                      <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
-                    </button>
-                  )}
+              {/* 모달 헤더 - 닫기 버튼만 포함 */}
+              {!hideHeader && showCloseButton && (
+                <div className={`relative mb-4 flex justify-end p-5 pb-0 ${headerClassName}`}>
+                  <button
+                    onClick={onClose}
+                    className="text-secondary-500 transition-colors hover:text-secondary-700 dark:text-dark-secondary-400 dark:hover:text-dark-secondary-300"
+                    aria-label="닫기"
+                  >
+                    <FontAwesomeIcon icon={faTimes} className="h-6 w-6" />
+                  </button>
+                </div>
+              )}
+
+              {/* 닫기 버튼이 필요하지만 헤더가 숨겨진 경우 */}
+              {hideHeader && showCloseButton && (
+                <div className="absolute right-4 top-4 z-10">
+                  <button
+                    onClick={onClose}
+                    className="text-secondary-500 transition-colors hover:text-secondary-700 dark:text-dark-secondary-400 dark:hover:text-dark-secondary-300"
+                    aria-label="닫기"
+                  >
+                    <FontAwesomeIcon icon={faTimes} className="h-6 w-6" />
+                  </button>
                 </div>
               )}
 
               {/* 모달 내용 */}
-              <div className={`p-5 ${bodyClassName}`}>{children}</div>
+              <div className={`p-5 ${bodyClassName}`}>
+                {/* 아이콘이 있는 경우 타이틀 위에 표시 */}
+                {isIcon && icon && <div className="mb-3 flex justify-center">{icon}</div>}
+                {/* 타이틀을 바디에 포함 (가운데 정렬) */}
+                {title && (
+                  <h2 className="mb-4 text-center text-xl font-bold text-secondary-900 dark:text-dark-secondary-100">
+                    {title}
+                  </h2>
+                )}
+                {children}
+              </div>
 
               {/* 모달 푸터 */}
               {footerContent && <div className={`mt-2 p-5 pt-0 ${footerClassName}`}>{footerContent}</div>}

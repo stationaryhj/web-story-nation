@@ -6,8 +6,10 @@ import {
   faChevronDown,
   faChevronRight,
   faCircleUser,
+  faCopy,
   faImage,
   faTrash,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
@@ -18,51 +20,32 @@ import { bridgeLoginDataToUserInfo } from '@/lib/utils/storyNationUtil'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { BaseButton } from '@/components/elements/button/BaseButton'
-import { useSettingsStore, BANK_LIST } from '@/store/useStoreSettings'
+import { useSettingsStore } from '@/store/useStoreSettings'
 
-const getPlatform = (sns_type: number) => {
-  switch (sns_type) {
-    case 0:
-      return 'Guest'
-    case 1:
-      return 'Kakao'
-    case 2:
-      return 'Naver'
-    case 3:
-      return 'Google'
-    case 4:
-      return 'Apple'
-    case 7:
-      return 'GooglePlayGames'
-    case 8:
-      return 'Facebook'
-    default:
-      return ''
-  }
-}
-
-export default function SettingsForm() {
+export default function MyAccountView() {
   const router = useRouter()
   const [isEdited, setIsEdited] = useState(false)
-  const [isNicknameVerified, setIsNicknameVerified] = useState(true)
-  const [isNicknameChanged, setIsNicknameChanged] = useState(false)
-  const [originalNickname, setOriginalNickname] = useState('')
+  const [isNicknameVerified, setIsNicknameVerified] = useState(true) // 초기값은 true로 설정 (기존 닉네임은 검증됨)
+  const [isNicknameChanged, setIsNicknameChanged] = useState(false) // 닉네임이 변경되었는지 추적
+  const [originalNickname, setOriginalNickname] = useState('닉네임') // 초기 닉네임 저장
   const [activeTab, setActiveTab] = useState<'support' | 'terms' | 'privacy' | 'paid' | 'policy'>('support')
+
+  // 사용자 정보 상태
+  const [profile, setProfile] = useState({
+    nickname: '닉네임',
+    email: 'user@example.com',
+    platform: 'Google',
+    bank: '',
+    accountNumber: '',
+    accountHolder: '',
+    language: 'ko', // 'ko' 또는 'en'
+    profileImage: null as string | null,
+  })
 
   const { settings, updateProfile, updateBankAccount, setLanguage, uploadProfileImage } = useSettingsStore()
   const { data: userInfo } = useAccountStore()
 
-  // 사용자 정보 상태
-  const [profile, setProfile] = useState({
-    nickname: userInfo?.nick_nm || '',
-    email: '',
-    platform: getPlatform(Number(userInfo?.sns_type)) || '',
-    bank: settings.bankAccount.bank || '',
-    accountNumber: settings.bankAccount.accountNumber || '',
-    accountHolder: settings.bankAccount.accountHolder || '',
-    language: settings.language || 'ko',
-    profileImage: settings.profile.profileImageUrl || null,
-  })
+  console.log('@@ userInfo :: ', userInfo)
 
   // 페르소나 설정
   const [persona, setPersona] = useState({
@@ -73,40 +56,19 @@ export default function SettingsForm() {
   // 이미지 업로드를 위한 참조
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // 은행 목록 드롭다운
+  // 은행 목록
   const [showBankList, setShowBankList] = useState(false)
-  const bankDropdownRef = useRef<HTMLDivElement>(null)
-
-  // 닉네임이 원래 닉네임과 같은지 확인
-  useEffect(() => {
-    if (userInfo?.nick_nm) {
-      setOriginalNickname(userInfo.nick_nm)
-      setProfile(prev => ({ ...prev, nickname: userInfo.nick_nm }))
-    }
-  }, [userInfo])
-
-  useEffect(() => {
-    if (profile.nickname === originalNickname) {
-      setIsNicknameVerified(true)
-      setIsNicknameChanged(false)
-    } else {
-      setIsNicknameChanged(true)
-    }
-  }, [profile.nickname, originalNickname])
-
-  // 은행 드롭다운 외부 클릭 감지
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (bankDropdownRef.current && !bankDropdownRef.current.contains(event.target as Node)) {
-        setShowBankList(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
+  const bankList = [
+    '국민은행',
+    '신한은행',
+    '우리은행',
+    '하나은행',
+    '농협은행',
+    '기업은행',
+    '새마을금고',
+    '카카오뱅크',
+    '토스뱅크',
+  ]
 
   // 닉네임 중복 체크 핸들러
   const handleDuplicateCheck = () => {
@@ -123,6 +85,16 @@ export default function SettingsForm() {
     }
   }
 
+  // 닉네임이 원래 닉네임과 같은지 확인
+  useEffect(() => {
+    if (profile.nickname === originalNickname) {
+      setIsNicknameVerified(true)
+      setIsNicknameChanged(false)
+    } else {
+      setIsNicknameChanged(true)
+    }
+  }, [profile.nickname, originalNickname])
+
   // 저장 핸들러
   const handleSave = () => {
     // 닉네임이 변경되었고 중복 확인을 하지 않은 경우
@@ -131,22 +103,7 @@ export default function SettingsForm() {
       return
     }
 
-    // 프로필 정보 업데이트
-    updateProfile({
-      nickname: profile.nickname,
-    })
-
-    // 계좌 정보 업데이트
-    updateBankAccount({
-      bank: profile.bank,
-      accountNumber: profile.accountNumber,
-      accountHolder: profile.accountHolder,
-    })
-
-    // 언어 설정 업데이트
-    setLanguage(profile.language as 'ko' | 'en')
-
-    // 저장 완료 알림
+    // 여기에 실제 API 호출 로직이 들어갈 수 있음
     toast.success('정보가 성공적으로 저장되었습니다.')
     setIsEdited(false)
     setOriginalNickname(profile.nickname) // 저장 후 원래 닉네임 업데이트
@@ -196,35 +153,6 @@ export default function SettingsForm() {
     setIsEdited(true)
   }
 
-  // 페르소나 저장 핸들러
-  const handleSavePersona = () => {
-    // 현재 페르소나 상태와 userInfo의 페르소나 데이터 출력
-    console.log('===== 페르소나 데이터 =====')
-    console.log('현재 페르소나 상태:', {
-      name: persona.name,
-      gender: persona.gender,
-      koreanGender: persona.gender === '남성' ? 'male' : persona.gender === '여성' ? 'female' : 'unknown',
-      inputValue: userInfo?.persona || '페르소나 없음',
-    })
-
-    // 성별 데이터 영문 변환
-    const genderMap = {
-      남성: 'male',
-      여성: 'female',
-      '알 수 없음': 'unknown',
-    }
-
-    // 최종 저장될 페르소나 데이터 출력
-    console.log('저장될 데이터:', {
-      name: userInfo?.persona || persona.name,
-      gender: genderMap[persona.gender],
-      updatedAt: new Date().toISOString(),
-    })
-
-    // 토스트 메시지 표시
-    toast.success('페르소나 데이터를 저장했습니다.')
-  }
-
   // 언어 변경 핸들러
   const handleLanguageChange = (language: 'ko' | 'en') => {
     setProfile(prev => ({ ...prev, language }))
@@ -237,9 +165,7 @@ export default function SettingsForm() {
     if (file) {
       const reader = new FileReader()
       reader.onloadend = () => {
-        const imageUrl = reader.result as string
-        setProfile(prev => ({ ...prev, profileImage: imageUrl }))
-        uploadProfileImage(imageUrl)
+        setProfile(prev => ({ ...prev, profileImage: reader.result as string }))
         setIsEdited(true)
       }
       reader.readAsDataURL(file)
@@ -249,7 +175,6 @@ export default function SettingsForm() {
   // 이미지 삭제 핸들러
   const handleDeleteImage = () => {
     setProfile(prev => ({ ...prev, profileImage: null }))
-    uploadProfileImage('')
     setIsEdited(true)
   }
 
@@ -301,6 +226,22 @@ export default function SettingsForm() {
     setShowBankList(false)
     setIsEdited(true)
   }
+
+  // 창 외부 클릭 감지를 위한 참조
+  const bankDropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (bankDropdownRef.current && !bankDropdownRef.current.contains(event.target as Node)) {
+        setShowBankList(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   // 가상의 펜 사용 내역
   const penUsageHistory = [
@@ -358,7 +299,7 @@ export default function SettingsForm() {
               <div className="absolute bottom-0 right-0 flex space-x-1">
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center shadow-md hover:bg-primary-700"
+                  className="w-8 h-8 rounded-full bg-violet-600 text-white flex items-center justify-center shadow-md hover:bg-violet-700"
                 >
                   <FontAwesomeIcon icon={faImage} className="text-sm" />
                 </button>
@@ -397,7 +338,7 @@ export default function SettingsForm() {
                   type="text"
                   value={profile.nickname}
                   onChange={e => handleInputChange(e, 'nickname')}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
                   placeholder="닉네임을 입력하세요"
                 />
                 <button
@@ -425,7 +366,7 @@ export default function SettingsForm() {
             <div className="relative" ref={bankDropdownRef}>
               <label className="block text-sm font-medium text-gray-700 mb-2">은행</label>
               <button
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-primary-500 hover:bg-primary-50"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-violet-500 hover:bg-violet-200"
                 onClick={() => setShowBankList(!showBankList)}
               >
                 <span>{profile.bank || '은행 선택'}</span>
@@ -433,10 +374,10 @@ export default function SettingsForm() {
               </button>
               {showBankList && (
                 <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
-                  {BANK_LIST.map(bank => (
+                  {bankList.map(bank => (
                     <div
                       key={bank}
-                      className="px-4 py-2 hover:bg-primary-100 cursor-pointer"
+                      className="px-4 py-2 hover:bg-violet-100 cursor-pointer"
                       onClick={() => handleBankSelect(bank)}
                     >
                       {bank}
@@ -455,7 +396,7 @@ export default function SettingsForm() {
                 type="text"
                 value={profile.accountNumber}
                 onChange={e => handleInputChange(e, 'accountNumber')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
                 placeholder="계좌번호"
                 maxLength={14}
               />
@@ -470,7 +411,7 @@ export default function SettingsForm() {
                 type="text"
                 value={profile.accountHolder}
                 onChange={e => handleInputChange(e, 'accountHolder')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
                 placeholder="예금주"
                 maxLength={8}
               />
@@ -480,21 +421,16 @@ export default function SettingsForm() {
 
         {/* 페르소나 설정 섹션 */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold mb-4">페르소나 설정</h2>
-            <BaseButton color="primary" onClick={handleSavePersona}>
-              저장
-            </BaseButton>
-          </div>
+          <h2 className="text-lg font-semibold mb-4">페르소나 설정</h2>
           <div className="space-y-5">
             {/* 페르소나 이름 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">이름 (최대 25자)</label>
               <input
                 type="text"
-                value={userInfo?.persona}
+                value={persona.name}
                 onChange={e => handlePersonaChange(e, 'name')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500 bg-white"
                 placeholder="페르소나 이름"
                 maxLength={25}
               />
@@ -507,21 +443,21 @@ export default function SettingsForm() {
                 <BaseButton
                   onClick={() => handleGenderChange('남성')}
                   color="primary"
-                  className={persona.gender === '남성' ? '!bg-primary-500 !text-white !border-primary-500' : ''}
+                  className={persona.gender === '남성' ? '!bg-violet-600 !text-white !border-violet-600' : ''}
                 >
                   남성
                 </BaseButton>
                 <BaseButton
                   onClick={() => handleGenderChange('여성')}
                   color="primary"
-                  className={persona.gender === '여성' ? '!bg-primary-500 !text-white !border-primary-500' : ''}
+                  className={persona.gender === '여성' ? '!bg-violet-600 !text-white !border-violet-600' : ''}
                 >
                   여성
                 </BaseButton>
                 <BaseButton
                   onClick={() => handleGenderChange('알 수 없음')}
                   color="primary"
-                  className={persona.gender === '알 수 없음' ? '!bg-primary-500 !text-white !border-primary-500' : ''}
+                  className={persona.gender === '알 수 없음' ? '!bg-violet-600 !text-white !border-violet-600' : ''}
                 >
                   알 수 없음
                 </BaseButton>
@@ -538,7 +474,7 @@ export default function SettingsForm() {
               onClick={() => handleLanguageChange('ko')}
               className={`flex-1 py-3 px-3 rounded-lg border ${
                 profile.language === 'ko'
-                  ? 'bg-primary-500 border-primary-600 text-white font-bold'
+                  ? 'bg-primary-500 border-violet-600 text-white font-bold'
                   : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
               }`}
             >
@@ -567,7 +503,7 @@ export default function SettingsForm() {
                   <div className="font-medium">{item.type}</div>
                   <div className="text-sm text-gray-500">{item.date}</div>
                 </div>
-                <div className="font-semibold text-primary-700">{item.amount} 펜</div>
+                <div className="font-semibold text-violet-700">{item.amount} 펜</div>
               </div>
             ))}
           </div>

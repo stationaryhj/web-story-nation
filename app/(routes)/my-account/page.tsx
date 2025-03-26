@@ -1,14 +1,13 @@
 'use client'
 
 import Header from '@/components/common/header'
-import MyPageView from '@/views/my-page/home'
+import MyAccountView from '@/views/my-account/home'
 
 export default function MyPage() {
-
   return (
     <>
       <Header />
-      <MyPageView />
+      <MyAccountView />
     </>
   )
 }

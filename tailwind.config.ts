@@ -1,17 +1,18 @@
 // tailwind.config.ts
-import type { Config } from 'tailwindcss';
+import type { Config } from 'tailwindcss'
 
 const config: Config = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './views/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   darkMode: 'class', // 다크모드 클래스 기반으로 설정
   theme: {
     extend: {
       fontFamily: {
-        sans: [ 'var(--font-poppins)', 'sans-serif' ], //
+        sans: ['var(--font-poppins)', 'sans-serif'], //
       },
       width: {
         '1/10': '10%',
@@ -114,6 +115,6 @@ const config: Config = {
     },
   },
   plugins: [],
-};
+}
 
-export default config;
+export default config

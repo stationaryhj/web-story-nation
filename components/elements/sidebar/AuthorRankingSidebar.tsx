@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
 import AuthorGrid from '@/components/elements/card/AuthorGrid'
+import { lockScroll, unlockScroll, resetScrollLock } from '@/lib/utils/scrollLock'
 
 // 작가 랭킹 탭 정의
 const rankingTabs: TabItem[] = [
@@ -93,21 +94,14 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
 
   // 모달이 열릴 때 배경 스크롤 방지
   useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
-
     if (isOpen) {
-      // 스크롤바 너비만큼 패딩을 추가하여 레이아웃 이동 방지
-      document.body.style.overflow = 'hidden'
-      document.body.style.paddingRight = `${scrollbarWidth}px`
+      lockScroll()
+    } else {
+      unlockScroll()
     }
 
     return () => {
-      // 컴포넌트 언마운트 또는 isOpen 상태 변경 시 원래 스타일로 복원
-      if (isOpen) {
-        document.body.style.overflow = originalStyle
-        document.body.style.paddingRight = '0px'
-      }
+      resetScrollLock()
     }
   }, [isOpen])
 
@@ -171,6 +165,7 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
                 subtitle={`${rankingTabs.find(tab => tab.id === activeTab)?.label || ''} 작가 랭킹`}
                 onAuthorClick={handleAuthorClick}
                 isSidebar={isSidebar}
+                useSwiper={false}
               />
             </div>
           </motion.div>
