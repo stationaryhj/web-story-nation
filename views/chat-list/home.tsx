@@ -13,15 +13,17 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import type { FormEvent } from 'react'
 import { useState } from 'react'
+import DeleteConfirmModal from '@/components/modal/DeleteConfirmModal'
 
 export default function ChatListPage() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('all') // 'all', 'favorites'
   const [searchQuery, setSearchQuery] = useState('')
-  
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [chatToDelete, setChatToDelete] = useState<{ id: number; name: string } | null>(null)
 
-  const { data: chatDataList, isLoading, error, refetch } = ReqGetChatList(10, 1);
-  const chatList = bridgeCharbotChatDataToChatList(chatDataList?.chrbot_chat?.data || []);
+  const { data: chatDataList, isLoading, error, refetch } = ReqGetChatList(10, 1)
+  const chatList = bridgeCharbotChatDataToChatList(chatDataList?.chrbot_chat?.data || [])
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault()
@@ -29,28 +31,42 @@ export default function ChatListPage() {
     console.log('검색어:', searchQuery)
   }
 
-  const handleDeleteChat = async (e: React.MouseEvent, bot_key: number) => {
-    e.stopPropagation();  // 버블링 방지
+  const handleDeleteClick = (e: React.MouseEvent, chat: { id: number; name: string }) => {
+    e.stopPropagation() // 버블링 방지
+    setChatToDelete(chat)
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!chatToDelete) return
+
     try {
-      await chatApi.CloseChat(bot_key);
+      await chatApi.CloseChat(chatToDelete.id)
       // API 호출이 성공하면 목록 다시 불러오기
-      await refetch();
+      await refetch()
+      setIsDeleteModalOpen(false)
+      setChatToDelete(null)
     } catch (error) {
-      console.error('Failed to update chat fixed status:', error);
+      console.error('Failed to delete chat:', error)
     }
-  };
+  }
+
+  const handleDeleteCancel = () => {
+    setIsDeleteModalOpen(false)
+    setChatToDelete(null)
+  }
 
   const handleTogglePin = async (e: React.MouseEvent, bot_key: number, _fixed: number) => {
-    e.stopPropagation();  // 버블링 방지
+    e.stopPropagation() // 버블링 방지
 
     try {
-      await contentApi.GetChatTopFixed(bot_key, _fixed > 0 ? 0 : 1);
+      await contentApi.GetChatTopFixed(bot_key, _fixed > 0 ? 0 : 1)
       // API 호출이 성공하면 목록 다시 불러오기
-      await refetch();
+      await refetch()
     } catch (error) {
-      console.error('Failed to update chat fixed status:', error);
+      console.error('Failed to update chat fixed status:', error)
     }
-  };
+  }
 
   return (
     <PageTransition>
@@ -141,15 +157,17 @@ export default function ChatListPage() {
                       </div>
                       <div className="grid grid-cols-2 gap-2 ml-3 transition-opacity">
                         <button
-                          onClick={(e) => handleTogglePin(e, Number(chat.id), Number(chat.fixed))}
+                          onClick={e => handleTogglePin(e, Number(chat.id), Number(chat.fixed))}
                           className={`p-2 rounded-full hover:bg-secondary-100 dark:hover:bg-dark-secondary-200/10 transition-colors ${
-                            Number(chat.fixed) === 1 ? 'text-yellow-500 dark:text-yellow-400' : 'text-secondary-400 dark:text-dark-secondary-400'
+                            Number(chat.fixed) === 1
+                              ? 'text-yellow-500 dark:text-yellow-400'
+                              : 'text-secondary-400 dark:text-dark-secondary-400'
                           }`}
                         >
                           <FontAwesomeIcon icon={faThumbtack} className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={(e) => handleDeleteChat(e, Number(chat.id))}
+                          onClick={e => handleDeleteClick(e, { id: Number(chat.id), name: chat.name })}
                           className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/10 text-red-400 dark:text-red-400 hover:text-red-500 dark:hover:text-red-500 transition-colors"
                         >
                           <FontAwesomeIcon icon={faTrash} className="w-4 h-4" />
@@ -170,6 +188,14 @@ export default function ChatListPage() {
         </main>
 
         <Footer />
+
+        <DeleteConfirmModal
+          isOpen={isDeleteModalOpen}
+          onClose={handleDeleteCancel}
+          title="채팅 삭제"
+          entityName={chatToDelete?.name}
+          onConfirm={handleDeleteConfirm}
+        />
       </div>
     </PageTransition>
   )
