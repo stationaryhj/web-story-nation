@@ -140,7 +140,7 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
           onClick={onClose}
         >
           <motion.div
-            className="fixed top-0 right-0 h-full w-full max-w-[600px] bg-white dark:bg-dark-background-DEFAULT overflow-y-auto z-50"
+            className="fixed top-0 right-0 h-full w-[600px] bg-white dark:bg-dark-background-DEFAULT overflow-y-auto z-50"
             initial="hidden"
             animate="visible"
             exit="hidden"
@@ -149,7 +149,7 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
             onClick={e => e.stopPropagation()}
           >
             {/* 헤더 */}
-            <div className="sticky top-0 bg-white dark:bg-dark-background-DEFAULT z-10 px-6 py-4 border-b dark:border-dark-secondary-200/10 flex justify-between items-center">
+            <div className="sticky top-0 bg-white dark:bg-dark-background-DEFAULT z-50 px-6 py-4 border-b dark:border-dark-secondary-200/10 flex justify-between items-center">
               <h2 className="text-xl font-bold text-secondary-900 dark:text-dark-secondary-200">캐릭터 랭킹</h2>
               <button
                 onClick={onClose}
@@ -184,11 +184,12 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
             <div className="px-4 py-6">
               <CardGrid
                 customData={rankingData}
-                cardsPerRow={2}
+                cardsPerRow={1}
                 hasRanking={true}
                 isLoading={isLoading}
                 subtitle={`${selectedGender.label} · ${rankingTabs.find(tab => tab.id === activeTab)?.label || ''} 랭킹`}
                 useSwiper={false}
+                variant="horizontal"
               />
             </div>
           </motion.div>

@@ -24,7 +24,7 @@ interface CardGridProps {
   subtitle?: string | null
   categoryId?: string
   customData?: Array<Character>
-  variant?: 'default' | 'my-character'
+  variant?: 'default' | 'my-character' | 'horizontal'
   onEdit?: (character: Character) => void
   onDelete?: (character: Character) => void
   cardsPerRow?: number // 한 줄에 표시할 카드 수
@@ -316,7 +316,7 @@ export default function CardGrid({
           </Swiper>
         </div>
       ) : (
-        <div className={`grid ${getGridColumns()} gap-4 md:gap-6`}>
+        <div className={`grid ${getGridColumns()} ${variant === 'horizontal' ? 'gap-2' : 'gap-4 md:gap-6'}`}>
           {isDataLoading
             ? Array(cardsPerRow)
                 .fill(0)
