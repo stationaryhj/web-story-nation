@@ -130,7 +130,7 @@ export default function ShopRecharge() {
   // OrderId 가져오기 (재사용 가능한 함수로 분리)
   const fetchOrderId = useCallback(async (coinKey: number) => {
     try {
-      const response = await settlementApi.GetOrderId(coinKey)
+      const response = await settlementApi.GetOrderId(coinKey.toString())
       return response.data as OrderIdResponse
     } catch (error) {
       console.error('OrderId 가져오기 실패:', error)

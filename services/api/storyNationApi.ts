@@ -382,8 +382,10 @@ export const settlementApi = {
     })
   },
 
-  GetOrderId: async (): Promise<ApiResponse<OrderIdResponse>> => {
-    return api.post('/api/getorderid')
+  GetOrderId: async (coinKey: string): Promise<ApiResponse<OrderIdResponse>> => {
+    return api.post('/api/getorderid', {
+      coinKey,
+    })
   },
 
   GetCoinList: async (): Promise<ApiResponse<CoinListResponse>> => {
