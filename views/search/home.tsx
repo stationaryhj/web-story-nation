@@ -207,7 +207,7 @@ export default function searchPage({}: Props) {
       openModal('login')
       return
     }
-    router.push('/character/create')
+    router.push('/my-characters/create')
   }
 
   return (
