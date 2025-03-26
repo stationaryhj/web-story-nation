@@ -172,7 +172,13 @@ export default function NewCharacterSidebar({ isOpen, onClose }: NewCharacterSid
 
             {/* 컨텐츠 영역 */}
             <div ref={contentRef} className="h-[calc(100%-74px)] overflow-y-auto px-4 py-6">
-              <CardGrid customData={newCharacters} cardsPerRow={2} subtitle="최신 등록순" useSwiper={false} />
+              <CardGrid
+                customData={newCharacters}
+                cardsPerRow={1}
+                subtitle="최신 등록순"
+                useSwiper={false}
+                variant="horizontal"
+              />
             </div>
 
             {/* 맨 위로 스크롤 버튼 */}
