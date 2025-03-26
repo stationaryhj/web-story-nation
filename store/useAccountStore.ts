@@ -261,12 +261,18 @@ export const useAccountStore = create<AccountState>()(
         set({ loading: true, error: null })
         try {
           const response = await contentApi.LoginGuest(nickname)
-          set({
-            isLogin: true,
-            data: response.data,
-            loading: false,
-          })
-          return true
+          if(response.data.result.err === 0) {
+            set({
+              isLogin: true,
+              data: response.data,
+              loading: false,
+            })
+            return true
+          }
+          else {
+            console.error('@@ guestLogin error :: ', response.data.result.msg)
+            return false
+          }
         } catch (error) {
           const errorMessage = handleNetworkError(error)
           set({ error: errorMessage, loading: false })

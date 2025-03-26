@@ -605,6 +605,7 @@ interface ThemeStore {
   toggleDarkMode: () => void
   enableDarkMode: () => void
   disableDarkMode: () => void
+  initializeTheme: () => void
 }
 
 // 안전한 localStorage 접근을 위한 커스텀 스토리지 객체
@@ -629,15 +630,21 @@ const safeStorage = {
 export const useThemeStore = create<ThemeStore>()(
   persist(
     set => ({
-      isDarkMode: false,
+      isDarkMode: true,
       toggleDarkMode: () => set(state => ({ isDarkMode: !state.isDarkMode })),
       enableDarkMode: () => set({ isDarkMode: true }),
       disableDarkMode: () => set({ isDarkMode: false }),
+      initializeTheme: () => {
+        const savedTheme = localStorage.getItem('theme-storage');
+        if (!savedTheme) {
+          set({ isDarkMode: true });
+        }
+      }
     }),
     {
-      name: 'theme-storage', // 로컬 스토리지 키 이름
+      name: 'theme-storage',
       storage: createJSONStorage(() => safeStorage),
-      skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
+      skipHydration: true,
     }
   )
 )

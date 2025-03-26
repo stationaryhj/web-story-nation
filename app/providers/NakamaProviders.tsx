@@ -47,6 +47,8 @@ interface NakamaContextType {
   refreshLastAIMessage: () => Promise<boolean>;           // 마지막 AI 메시지 재생성
   clearChatHistory: () => void;                          // 채팅 기록 초기화
   addChatMessage: (message: ChatMessage) => void;         // 메시지 추가
+
+  updateChatMode: (mode: number) => void;
 }
 
 // 채팅 메시지 인터페이스
@@ -90,7 +92,9 @@ const defaultContextValue: NakamaContextType = {
   sendChatMessage: async () => false,
   refreshLastAIMessage: async () => false,
   clearChatHistory: () => {},
-  addChatMessage: () => {}
+  addChatMessage: () => {},
+
+  updateChatMode: () => {}
 };
 
 // Nakama 컨텍스트 생성
@@ -151,6 +155,8 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
   // 자동 재연결 로직
   useEffect(() => {
+    console.log('@@@@@@ session 변경됨 ::: ', session);
+
     // 세션이 있고 소켓이 연결되지 않은 상태라면 재연결 시도
     if (session && !isConnected && !isConnecting && socketRef.current) {
       const attemptReconnect = async () => {
@@ -217,14 +223,14 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
   }, [isConnected, isConnecting, session, client, useSSL]);
 
   // 자동 연결 처리
-  useEffect(() => {
-    console.log('client :: ', client);
+  // useEffect(() => {
+  //   console.log('client :: ', client);
 
-    if (autoConnect && client && session && !socket && !isConnecting) {
-      console.log('자동 연결 시작...');
-      connectSocket(session);
-    }
-  }, [client, session, autoConnect]);
+  //   if (autoConnect && client && session && !socket && !isConnecting) {
+  //     console.log('자동 연결 시작...');
+  //     connectSocket(session);
+  //   }
+  // }, [client, session, autoConnect]);
 
   // 클라이언트 생성 함수
   const createClient = async (): Promise<Client> => {
@@ -478,7 +484,22 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
                   try {
                     // 응답 JSON 파싱 및 content 추출
                     const responseObj = JSON.parse(chatMessageResponse.response);
-                    const messageContent = responseObj.candidates[0]?.content?.parts[0]?.text;
+
+                    let messageContent = '';
+                    
+                    // Gemini AI 모델 응답인지 확인 (candidates 속성 존재)
+                    if (responseObj.candidates) {
+                      // Gemini AI 모델 응답 형식
+                      messageContent = responseObj.candidates[0]?.content?.parts[0]?.text;
+                      console.log('🤖 Gemini AI 응답 감지');
+                    } else if (responseObj.content) {
+                      // 다른 AI 모델 응답 형식
+                      messageContent = responseObj.content[0].text;
+                      console.log('🤖 일반 AI 응답 감지');
+                    } else {
+                      console.error('알 수 없는 AI 응답 형식:', responseObj);
+                      messageContent = "응답 형식이 잘못되었습니다. 다시 시도해주세요.";
+                    }
                     
                     console.log('🤖 AI 응답 내용 (채널로 전송 중):', messageContent);
                     
@@ -682,7 +703,23 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       try {
         // 응답 JSON 파싱 및 content 추출
         const responseObj = JSON.parse(response.data.response);
-        const messageContent = responseObj.content[0].text;
+        let messageContent = '';
+        
+        // Gemini AI 모델 응답인지 확인 (candidates 속성 존재)
+        if (responseObj.candidates) {
+          // Gemini AI 모델 응답 형식
+          messageContent = responseObj.candidates[0]?.content?.parts[0]?.text;
+          console.log('🤖 Gemini AI 응답 감지');
+        } else if (responseObj.content) {
+          // 다른 AI 모델 응답 형식
+          messageContent = responseObj.content[0].text;
+          console.log('🤖 일반 AI 응답 감지');
+        } else {
+          console.error('알 수 없는 AI 응답 형식:', responseObj);
+          messageContent = "응답 형식이 잘못되었습니다. 다시 시도해주세요.";
+        }
+        
+        console.log('🤖 AI 응답 내용 (채널로 전송 중):', messageContent);
         
         // 단순화된 메시지 형식 - content와 type만 포함
         const content = { 
@@ -724,7 +761,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
   // 채팅 기록 초기화
   const clearChatHistory = (): void => {
-    setChatMessages([]);
+    // setChatMessages([]);
   };
 
   // 메시지 직접 추가
@@ -763,6 +800,8 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           throw new Error('Nakama 클라이언트 생성 실패');
         }
       }
+
+      console.log('@@ _client :: ', _client)
 
       // 2. 디바이스 ID 생성 및 인증
       const deviceId = `chatbot_jackpot_${userKey}`;
@@ -863,6 +902,51 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         console.warn('채팅 초기화 API 응답이 실패했습니다:', response?.data?.result?.msg || '알 수 없는 오류');
         return { success: false };
       }
+
+
+
+      console.log('💬 채팅 메시지 목록 조회 시작');
+      console.log('newSession :: ', newSession);
+      console.log('channel.id :: ', channel.id);
+      // const messages = await client?.listChannelMessages(newSession, channel.id, 20, true);
+      try {
+
+        let waiting = 0;
+        let max_count = 50
+        let cursor = ''
+
+        while(max_count > 0) {
+          const result = await _client?.listChannelMessages(newSession, channel.id, max_count, true, cursor);
+          console.log('💬 채팅 메시지 목록:', result);
+
+          result.messages.map((message) => {
+            addChatMessage({
+              id: message.sender_id,
+              sender: message.content.type === 'user' ? 'user' : 'character',
+              message: message.content.content,
+              timestamp: new Date(message.create_time)
+            })
+          })
+
+          cursor = result.next_cursor
+
+          if(result.messages?.length < max_count) {
+            max_count = -1
+          }
+          else {
+            max_count = 50
+          }
+
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          console.log('💬 채팅 메시지 목록 대기중... ');
+        }
+
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+      // console.log('💬 채팅 메시지 목록:', messages);
+
+
       
       return { 
         success: isSuccess,
@@ -1080,6 +1164,12 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     });
   };
 
+
+  const updateChatMode = (mode: number) => {
+    setCurrentChatMode(mode);
+    console.log('🔄 채팅 모드 업데이트:', mode);
+  };
+
   const contextValue: NakamaContextType = {
     client,
     socket: socketRef.current,
@@ -1111,7 +1201,8 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     sendChatMessage,
     refreshLastAIMessage,
     clearChatHistory,
-    addChatMessage
+    addChatMessage,
+    updateChatMode
   };
 
   return (
