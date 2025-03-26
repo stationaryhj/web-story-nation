@@ -202,6 +202,8 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       }
     };
 
+    initializeChatRoom();
+
     // 컴포넌트 언마운트 시 정리
     return () => {
       if (channelId) {
