@@ -135,7 +135,7 @@ export default function NotificationSidebar() {
 
       {/* 사이드바 */}
       <motion.div
-        className="fixed top-0 right-0 h-full w-80 bg-white dark:bg-dark-background-light shadow-xl z-50 overflow-hidden flex flex-col"
+        className="fixed top-0 right-0 h-full min-w-[600px] bg-white dark:bg-dark-background-light shadow-xl z-50 overflow-hidden flex flex-col"
         initial={{ x: '100%' }}
         animate={{ x: 0 }}
         exit={{ x: '100%' }}

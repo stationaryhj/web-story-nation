@@ -128,7 +128,7 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
           onClick={onClose}
         >
           <motion.div
-            className="fixed top-0 right-0 h-full w-[600px] bg-white dark:bg-dark-background-DEFAULT overflow-y-auto z-50"
+            className="fixed top-0 right-0 h-full min-w-[600px] bg-white dark:bg-dark-background-DEFAULT overflow-y-auto z-50"
             initial="hidden"
             animate="visible"
             exit="hidden"
