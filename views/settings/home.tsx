@@ -225,12 +225,6 @@ export default function SettingsForm() {
     toast.success('페르소나 데이터를 저장했습니다.')
   }
 
-  // 언어 변경 핸들러
-  const handleLanguageChange = (language: 'ko' | 'en') => {
-    setProfile(prev => ({ ...prev, language }))
-    setIsEdited(true)
-  }
-
   // 이미지 업로드 핸들러
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -527,49 +521,6 @@ export default function SettingsForm() {
                 </BaseButton>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* 언어 설정 섹션 */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">언어 설정</h2>
-          <div className="flex space-x-3">
-            <button
-              onClick={() => handleLanguageChange('ko')}
-              className={`flex-1 py-3 px-3 rounded-lg border ${
-                profile.language === 'ko'
-                  ? 'bg-primary-500 border-primary-600 text-white font-bold'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              한국어
-            </button>
-            <button
-              onClick={() => handleLanguageChange('en')}
-              className={`flex-1 py-3 px-3 rounded-lg border ${
-                profile.language === 'en'
-                  ? 'bg-primary-600 border-primary-600 text-white font-bold'
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              English
-            </button>
-          </div>
-        </div>
-
-        {/* 펜 사용 내역 섹션 */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">펜 사용 내역</h2>
-          <div className="space-y-3">
-            {penUsageHistory.map((item, index) => (
-              <div key={index} className="flex items-center justify-between p-3 border-b border-gray-100 last:border-0">
-                <div>
-                  <div className="font-medium">{item.type}</div>
-                  <div className="text-sm text-gray-500">{item.date}</div>
-                </div>
-                <div className="font-semibold text-primary-700">{item.amount} 펜</div>
-              </div>
-            ))}
           </div>
         </div>
 
