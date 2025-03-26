@@ -34,15 +34,18 @@ export const BaseButton = ({
 
   // 색상에 따른 스타일
   const colorStyles = {
-    primary: 'bg-gray-50 hover:bg-violet-500 text-gray-700 hover:text-white shadow-sm',
-    secondary: 'bg-gray-100 hover:bg-gray-200 text-gray-700 shadow-sm',
-    tertiary: 'bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 shadow-sm',
+    primary:
+      'bg-white text-gray-700 border border-gray-300 hover:bg-violet-700 hover:text-white hover:border-violet-700 focus:bg-violet-600 focus:text-white focus:border-violet-600 shadow-sm focus:ring-2 focus:ring-violet-400 focus:ring-offset-2',
+    secondary:
+      'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:bg-gray-200 shadow-sm focus:ring-2 focus:ring-gray-400 focus:ring-offset-2',
+    tertiary:
+      'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 focus:bg-gray-50 shadow-sm focus:ring-2 focus:ring-gray-300 focus:ring-offset-2',
     gradient:
-      'bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 text-white shadow-sm',
+      'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:bg-gradient-to-r focus:from-violet-500 focus:to-fuchsia-500 focus:text-white focus:border-violet-500 shadow-sm focus:ring-2 focus:ring-fuchsia-400 focus:ring-offset-2',
   }
 
   // 비활성화 스타일
-  const disabledStyles = 'opacity-60 cursor-not-allowed'
+  const disabledStyles = 'opacity-60 cursor-not-allowed focus:ring-0 bg-gray-100 text-gray-400 border border-gray-200'
 
   return (
     <button

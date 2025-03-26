@@ -19,10 +19,9 @@ export default function MyCharacterPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [characterToDelete, setCharacterToDelete] = useState<Character | null>(null)
 
-
-  const myNickName = useAccountStore.getState().data?.nick_nm;
-  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 10);
-  console.log(inProgressData);
+  const myNickName = useAccountStore.getState().data?.nick_nm
+  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 10)
+  console.log(inProgressData)
 
   const myCharacters = bridgeCharbotGetListMineDataToCharacter(inProgressData?.chrbotList.data || []).map(char => ({
     ...char,
@@ -31,11 +30,10 @@ export default function MyCharacterPage() {
       nickname: '',
       username: '',
       profileImageUrl: null,
-      isActive: true
+      isActive: true,
     },
-    category: (char.category || 'unspecified') as 'unspecified' | 'male' | 'female'
-  }));
-
+    category: (char.category || 'unspecified') as 'unspecified' | 'male' | 'female',
+  }))
 
   // 캐릭터 카드 클릭 처리
   const handleCardClick = (character: Character) => {
@@ -57,10 +55,10 @@ export default function MyCharacterPage() {
   const confirmDelete = async () => {
     if (characterToDelete) {
       // 실제로는 API 호출 등으로 삭제 처리
-      const response = await createApi.DeleteChatBot(Number(characterToDelete.id));
+      const response = await createApi.DeleteChatBot(Number(characterToDelete.id))
 
       if (response.data?.result.err === 0) {
-        refetchInProgress();
+        refetchInProgress()
       }
 
       setIsDeleteModalOpen(false)
@@ -69,11 +67,11 @@ export default function MyCharacterPage() {
   }
 
   const handleCreateCharacter = async () => {
-    const response = await createApi.GetCreateChatBotInProgress(null);
-    const data = response.data as CharbotInprogressResponse;
+    const response = await createApi.GetCreateChatBotInProgress(null)
+    const data = response.data as CharbotInprogressResponse
 
     if (data?.chrbot && data?.result.err === 0) {
-      router.push(`/my-characters/edit/${data.chrbot.world_list_detail_chrbot_key}`);
+      router.push(`/my-characters/edit/${data.chrbot.world_list_detail_chrbot_key}`)
     }
   }
 
@@ -103,14 +101,12 @@ export default function MyCharacterPage() {
             </button>
           </div>
         ) : (
-
           <CardGrid
             customData={myCharacters}
             variant="my-character"
             onEdit={handleEditClick}
             onDelete={handleDeleteClick}
           />
-
         )}
 
         <DeleteConfirmModal

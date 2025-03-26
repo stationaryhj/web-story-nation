@@ -1,12 +1,12 @@
 import React from 'react'
-import TermsPage from '@/views/terms/home'
+import SearchPage from '@/views/search/home'
 
 type Props = {}
 
 export default function page({}: Props) {
   return (
     <>
-      <TermsPage />
+      <SearchPage />
     </>
   )
 }

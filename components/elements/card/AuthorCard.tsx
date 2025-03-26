@@ -57,7 +57,7 @@ export default function AuthorCard({
         className="flex flex-col relative rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-dark-background-light dark:border dark:border-dark-secondary-200/10 cursor-pointer"
         onClick={onClick}
       >
-        <div className={`${isSidebar ? 'flex gap-4 p-2' : 'p-4'}`}>
+        <div className={`${isSidebar ? 'flex gap-2 p-2' : 'p-4'}`}>
           {/* 상단 이미지와 랭킹 */}
           <div className="relative mb-3">
             {/* 랭킹 표시 */}

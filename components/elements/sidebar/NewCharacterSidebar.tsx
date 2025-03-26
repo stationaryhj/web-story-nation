@@ -90,14 +90,16 @@ export default function NewCharacterSidebar({ isOpen, onClose }: NewCharacterSid
       // 스크롤바 너비만큼 패딩을 추가하여 레이아웃 이동 방지
       document.body.style.overflow = 'hidden'
       document.body.style.paddingRight = `${scrollbarWidth}px`
+    } else {
+      // 사이드바가 닫힐 때 스크롤 상태 복원
+      document.body.style.overflow = originalStyle
+      document.body.style.paddingRight = '0px'
     }
 
     return () => {
-      // 컴포넌트 언마운트 또는 isOpen 상태 변경 시 원래 스타일로 복원
-      if (isOpen) {
-        document.body.style.overflow = originalStyle
-        document.body.style.paddingRight = '0px'
-      }
+      // 컴포넌트 언마운트 시에만 원래 스타일로 복원
+      document.body.style.overflow = originalStyle
+      document.body.style.paddingRight = '0px'
     }
   }, [isOpen])
 

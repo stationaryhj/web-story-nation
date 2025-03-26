@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { BaseInput } from '@/components/elements/input/BaseInput'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import { BaseSelectBox } from '@/components/elements/selectbox/BaseSelectBox'
+import { useRouter } from 'next/navigation'
 
 // 검색 결과를 위한 목데이터
 const MOCK_SEARCH_RESULTS = {
@@ -44,6 +45,7 @@ export default function SearchBar({
   initialValue = '',
   autoFocus = false,
 }: SearchBarProps) {
+  const router = useRouter()
   const [query, setQuery] = useState(initialValue)
   // const [isFocused, setIsFocused] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -111,6 +113,7 @@ export default function SearchBar({
     if (onSearch && query.trim()) {
       onSearch(query, selectedOption.value)
     }
+    router.push(`/search?query=${query}&option=${selectedOption.value}`)
   }
 
   const handleOptionChange = (option: SearchOption) => {
