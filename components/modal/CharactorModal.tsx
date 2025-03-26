@@ -244,55 +244,18 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                 </div>
 
                 {/* 첫 메시지 미리보기 */}
-                <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-4">
-                    첫 메시지
-                  </h3>
-                  <div className="bg-secondary-50 dark:bg-dark-secondary-800 rounded-lg p-4">
-                    <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mb-2">
-                      {mockFirstMessage.situation}
-                    </p>
-                    <p className="text-secondary-700 dark:text-dark-secondary-300">{mockFirstMessage.message}</p>
+                <div className="flex flex-col justify-between md:min-h-[600px] sm:min-h-[300px] mb-8 bg-secondary-50 dark:bg-dark-secondary-800 rounded-lg p-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-4">
+                      첫 메시지
+                    </h3>
+                    <div className="p-4">
+                      <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mb-2">
+                        {mockFirstMessage.situation}
+                      </p>
+                      <p className="text-secondary-700 dark:text-dark-secondary-300">{mockFirstMessage.message}</p>
+                    </div>
                   </div>
-                </div>
-
-                {/* 대화 예시 */}
-                <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-4">
-                    대화 예시
-                  </h3>
-                  <div className="space-y-4">
-                    {mockConversationExamples.map((conv, index) => (
-                      <div key={`conv-${index}`} className="space-y-2">
-                        <div className="flex items-start">
-                          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-secondary-200 dark:bg-dark-secondary-700"></div>
-                          <div className="ml-2 p-3 bg-secondary-100 dark:bg-dark-secondary-800 rounded-lg max-w-[90%]">
-                            <p className="text-secondary-800 dark:text-dark-secondary-200">{conv.user}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-start justify-end">
-                          <div className="mr-2 p-3 bg-primary-100 dark:bg-dark-primary-900/30 rounded-lg max-w-[90%]">
-                            <p className="text-secondary-800 dark:text-dark-secondary-200">{conv.character}</p>
-                          </div>
-                          <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden">
-                            {selectedCharacter.imageUrl && (
-                              <Image
-                                src={getImageUri(selectedCharacter.imageUrl)}
-                                alt={selectedCharacter.name || '캐릭터'}
-                                width={32}
-                                height={32}
-                                className="object-cover"
-                              />
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 대화 시작 버튼 */}
-                <div className="mt-auto">
                   <button
                     onClick={handleStartChat}
                     className="w-full flex items-center justify-center rounded-lg bg-primary-500 px-6 py-4 font-medium text-white transition-colors hover:bg-primary-600 dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600"
