@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import BaseModal from './BaseModal'
+import { useSettingsStore } from '@/store/useStoreSettings'
 
 interface AdultVerificationModalProps {
   isOpen: boolean
@@ -11,6 +12,7 @@ interface AdultVerificationModalProps {
 
 export default function AdultVerificationModal({ isOpen, onClose, onVerify }: AdultVerificationModalProps) {
   const [isVerifying, setIsVerifying] = useState(false)
+  const { enableAdultMode } = useSettingsStore()
 
   // 본인인증 처리 함수
   const handleVerify = async () => {
@@ -43,6 +45,16 @@ export default function AdultVerificationModal({ isOpen, onClose, onVerify }: Ad
 
       // 임시 구현: 바로 성공으로 처리 (실제 API 연동 전까지만 사용)
       console.log('본인인증 프로세스 시작')
+
+      // 성인 모드 활성화 전 상태 확인
+      console.log('성인 모드 활성화 전 상태:', useSettingsStore.getState().isAdultModeEnabled)
+
+      // 성인 모드 활성화
+      const success = enableAdultMode()
+
+      // 성인 모드 활성화 후 상태 확인
+      console.log('성인 모드 활성화 성공 여부:', success)
+      console.log('성인 모드 활성화 후 상태:', useSettingsStore.getState().isAdultModeEnabled)
 
       // 인증 성공 시 콜백 실행
       if (onVerify) {

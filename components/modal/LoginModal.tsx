@@ -44,7 +44,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     try {
       setLoading(true)
       let isSuccess = await guestLogin(nickname)
-      if(isSuccess) {
+      if (isSuccess) {
         onClose()
         router.push('/')
       }

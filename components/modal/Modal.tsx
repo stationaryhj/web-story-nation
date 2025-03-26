@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { ReactNode, MouseEvent as ReactMouseEvent } from 'react'
 import { useEffect } from 'react'
+import { lockScroll, unlockScroll, resetScrollLock } from '@/lib/utils/scrollLock'
 
 interface ModalProps {
   isOpen: boolean
@@ -36,6 +37,20 @@ export default function Modal({
     window.addEventListener('keydown', handleEsc)
     return () => window.removeEventListener('keydown', handleEsc)
   }, [isOpen, onClose, preventBackdropClose])
+
+  // 모달이 열릴 때 스크롤 락 적용
+  useEffect(() => {
+    if (isOpen) {
+      lockScroll()
+    } else {
+      unlockScroll()
+    }
+
+    return () => {
+      // 컴포넌트 언마운트 시 스크롤 락 초기화
+      resetScrollLock()
+    }
+  }, [isOpen])
 
   // 백드롭 클릭으로 모달 닫기
   const handleBackdropClick = () => {

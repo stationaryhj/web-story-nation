@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark, faArrowUp, faRotate } from '@fortawesome/free-solid-svg-icons'
 import { useStoreData } from '@/store/useStoreData'
 import CardGrid from '@/components/elements/card/CardGrid'
+import { lockScroll, unlockScroll, resetScrollLock } from '@/lib/utils/scrollLock'
 
 interface NewCharacterSidebarProps {
   isOpen: boolean
@@ -83,23 +84,33 @@ export default function NewCharacterSidebar({ isOpen, onClose }: NewCharacterSid
 
   // 모달이 열릴 때 배경 스크롤 방지
   useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+    // 이전 사이드바의 스크롤 락 상태 확인
+    console.log('NewCharacterSidebar - isOpen 변경됨:', isOpen)
 
     if (isOpen) {
-      // 스크롤바 너비만큼 패딩을 추가하여 레이아웃 이동 방지
-      document.body.style.overflow = 'hidden'
-      document.body.style.paddingRight = `${scrollbarWidth}px`
+      try {
+        lockScroll()
+        console.log('NewCharacterSidebar - 스크롤 락 적용됨')
+      } catch (error) {
+        console.error('NewCharacterSidebar - 스크롤 락 적용 실패:', error)
+      }
     } else {
-      // 사이드바가 닫힐 때 스크롤 상태 복원
-      document.body.style.overflow = originalStyle
-      document.body.style.paddingRight = '0px'
+      try {
+        unlockScroll()
+        console.log('NewCharacterSidebar - 스크롤 락 해제됨')
+      } catch (error) {
+        console.error('NewCharacterSidebar - 스크롤 락 해제 실패:', error)
+      }
     }
 
     return () => {
-      // 컴포넌트 언마운트 시에만 원래 스타일로 복원
-      document.body.style.overflow = originalStyle
-      document.body.style.paddingRight = '0px'
+      console.log('NewCharacterSidebar - 컴포넌트 언마운트')
+      try {
+        resetScrollLock()
+        console.log('NewCharacterSidebar - 스크롤 락 초기화됨')
+      } catch (error) {
+        console.error('NewCharacterSidebar - 스크롤 락 초기화 실패:', error)
+      }
     }
   }, [isOpen])
 
@@ -126,7 +137,7 @@ export default function NewCharacterSidebar({ isOpen, onClose }: NewCharacterSid
           onClick={onClose}
         >
           <motion.div
-            className="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-dark-background-DEFAULT overflow-hidden z-50"
+            className="fixed top-0 right-0 h-full w-[600px] bg-white dark:bg-dark-background-DEFAULT overflow-y-auto z-50"
             initial="hidden"
             animate="visible"
             exit="hidden"
@@ -161,7 +172,13 @@ export default function NewCharacterSidebar({ isOpen, onClose }: NewCharacterSid
 
             {/* 컨텐츠 영역 */}
             <div ref={contentRef} className="h-[calc(100%-74px)] overflow-y-auto px-4 py-6">
-              <CardGrid customData={newCharacters} cardsPerRow={2} subtitle="최신 등록순" />
+              <CardGrid
+                customData={newCharacters}
+                cardsPerRow={1}
+                subtitle="최신 등록순"
+                useSwiper={false}
+                variant="horizontal"
+              />
             </div>
 
             {/* 맨 위로 스크롤 버튼 */}

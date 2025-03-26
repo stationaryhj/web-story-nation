@@ -73,7 +73,7 @@ export default function Header() {
     { href: '/my-characters', label: '나의 캐릭터', requireLogin: true },
     { href: '/live', label: 'Live', requireLogin: true },
     { href: '/my-account', label: '수익 관리', requireLogin: true },
-    { href: '/my-profile', label: '마이페이지', requireLogin: true },
+    { href: '/shop-recharge', label: '상점', requireLogin: true },
   ]
 
   // 로그인 필요한 링크 체크 핸들러
@@ -199,14 +199,13 @@ export default function Header() {
             <NotificationButton count={3} />
           </motion.div>
 
-          <motion.div
+          {/* <motion.div
             className="ml-1 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
           >
             <CreditButton credits={1000} />
-            {/* <FontAwesomeIcon icon={faShoppingBag} className="text-lg" /> */}
-          </motion.div>
+          </motion.div> */}
 
           <Link href="/settings">
             <motion.button

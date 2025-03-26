@@ -35,13 +35,13 @@ export const BaseButton = ({
   // 색상에 따른 스타일
   const colorStyles = {
     primary:
-      'bg-white text-gray-700 border border-gray-300 hover:bg-violet-700 hover:text-white hover:border-violet-700 focus:bg-violet-600 focus:text-white focus:border-violet-600 shadow-sm focus:ring-2 focus:ring-violet-400 focus:ring-offset-2',
+      'bg-white text-gray-700 border border-gray-300 hover:bg-primary-700 hover:text-white hover:border-primary-700 focus:bg-primary-600 focus:text-white focus:border-primary-600 shadow-sm',
     secondary:
-      'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:bg-gray-200 shadow-sm focus:ring-2 focus:ring-gray-400 focus:ring-offset-2',
+      'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:bg-gray-200 shadow-sm focus:ring-gray-400',
     tertiary:
-      'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 focus:bg-gray-50 shadow-sm focus:ring-2 focus:ring-gray-300 focus:ring-offset-2',
+      'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 focus:bg-gray-50 shadow-sm focus:ring-gray-300',
     gradient:
-      'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:bg-gradient-to-r focus:from-violet-500 focus:to-fuchsia-500 focus:text-white focus:border-violet-500 shadow-sm focus:ring-2 focus:ring-fuchsia-400 focus:ring-offset-2',
+      'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:bg-gradient-to-r focus:from-primary-500 focus:to-fuchsia-500 focus:text-white focus:border-primary-500 shadow-sm',
   }
 
   // 비활성화 스타일

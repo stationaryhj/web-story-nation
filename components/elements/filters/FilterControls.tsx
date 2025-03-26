@@ -10,6 +10,7 @@ export interface FilterControlsProps {
   setOrder: (order: number) => void
   nsfw: number
   setNsfw: (nsfw: number) => void
+  onTagsChange?: (tags: string[]) => void
 }
 
 /**
@@ -17,7 +18,14 @@ export interface FilterControlsProps {
  * - 정렬 옵션 (인기순/최신순)
  * - 이용등급 필터 (전체 이용가/짜릿모드/이용등급 전체)
  */
-export default function FilterControls({ categoryId, order, setOrder, nsfw, setNsfw }: FilterControlsProps) {
+export default function FilterControls({
+  categoryId,
+  order,
+  setOrder,
+  nsfw,
+  setNsfw,
+  onTagsChange,
+}: FilterControlsProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -42,9 +50,16 @@ export default function FilterControls({ categoryId, order, setOrder, nsfw, setN
     [setNsfw]
   )
 
-  const handleTagSelect = useCallback((tagIds: string[]) => {
-    console.log('tagIds', tagIds)
-  }, [])
+  const handleTagSelect = useCallback(
+    (tagIds: string[]) => {
+      console.log('선택된 태그:', tagIds)
+      // 상위 컴포넌트로 선택된 태그 전달
+      if (onTagsChange) {
+        onTagsChange(tagIds)
+      }
+    },
+    [onTagsChange]
+  )
 
   return (
     <>
@@ -88,29 +103,6 @@ export default function FilterControls({ categoryId, order, setOrder, nsfw, setN
 
           {/* 오른쪽: 등급 드롭다운 */}
           <div className="relative">
-            <button
-              className={`flex items-center px-4 py-2 border rounded-lg bg-white dark:bg-dark-background-lighter text-sm ${
-                nsfw === 1
-                  ? 'border-red-500 text-red-600 dark:text-red-400'
-                  : nsfw === 2
-                    ? 'border-green-500 text-green-600 dark:text-green-400'
-                    : 'border-blue-500 text-blue-600 dark:text-blue-400'
-              }`}
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              disabled={isPending}
-            >
-              {nsfw === 1 ? '짜릿모드 가능' : nsfw === 2 ? '전체 이용가' : '이용등급 전체'}
-              <svg
-                className="w-4 h-4 ml-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-background-light rounded-lg shadow-lg z-10 border overflow-hidden">
                 <button

@@ -20,6 +20,7 @@ import { bridgeLoginDataToUserInfo } from '@/lib/utils/storyNationUtil'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { BaseButton } from '@/components/elements/button/BaseButton'
+import { useSettingsStore } from '@/store/useStoreSettings'
 
 export default function MyAccountView() {
   const router = useRouter()
@@ -40,6 +41,11 @@ export default function MyAccountView() {
     language: 'ko', // 'ko' 또는 'en'
     profileImage: null as string | null,
   })
+
+  const { settings, updateProfile, updateBankAccount, setLanguage, uploadProfileImage } = useSettingsStore()
+  const { data: userInfo } = useAccountStore()
+
+  console.log('@@ userInfo :: ', userInfo)
 
   // 페르소나 설정
   const [persona, setPersona] = useState({
@@ -263,9 +269,7 @@ export default function MyAccountView() {
           <button
             onClick={handleSave}
             disabled={!isEdited}
-            className={`px-4 py-2 rounded-lg ${
-              isEdited ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white' : 'bg-gray-200 text-gray-400'
-            }`}
+            className={`px-4 py-2 rounded-lg ${isEdited ? 'bg-primary-500 text-white' : 'bg-secondary-200 text-secondary-400'}`}
           >
             저장
           </button>
@@ -339,7 +343,7 @@ export default function MyAccountView() {
                 />
                 <button
                   onClick={handleDuplicateCheck}
-                  className="px-4 py-2 bg-violet-600 text-white rounded-lg whitespace-nowrap hover:bg-violet-700 focus:bg-violet-700 focus:ring-2 focus:ring-violet-400 focus:ring-offset-2"
+                  className="px-4 py-2 bg-primary-500 text-white rounded-lg whitespace-nowrap hover:bg-primary-700"
                 >
                   중복 확인
                 </button>
@@ -362,7 +366,7 @@ export default function MyAccountView() {
             <div className="relative" ref={bankDropdownRef}>
               <label className="block text-sm font-medium text-gray-700 mb-2">은행</label>
               <button
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-violet-500 bg-violet-100 hover:bg-violet-200"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-violet-500 hover:bg-violet-200"
                 onClick={() => setShowBankList(!showBankList)}
               >
                 <span>{profile.bank || '은행 선택'}</span>
@@ -470,7 +474,7 @@ export default function MyAccountView() {
               onClick={() => handleLanguageChange('ko')}
               className={`flex-1 py-3 px-3 rounded-lg border ${
                 profile.language === 'ko'
-                  ? 'bg-violet-600 border-violet-600 text-white font-bold'
+                  ? 'bg-primary-500 border-violet-600 text-white font-bold'
                   : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
               }`}
             >
@@ -480,7 +484,7 @@ export default function MyAccountView() {
               onClick={() => handleLanguageChange('en')}
               className={`flex-1 py-3 px-3 rounded-lg border ${
                 profile.language === 'en'
-                  ? 'bg-violet-600 border-violet-600 text-white font-bold'
+                  ? 'bg-primary-600 border-primary-600 text-white font-bold'
                   : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
               }`}
             >
@@ -513,35 +517,35 @@ export default function MyAccountView() {
           <div className="space-y-3">
             <button
               onClick={() => handleTabChange('support')}
-              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-violet-100 text-gray-700 hover:bg-violet-200 focus:outline-none"
+              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
             >
               <span>카카오톡 문의</span>
               <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
             </button>
             <button
               onClick={() => handleTabChange('terms')}
-              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-violet-100 text-gray-700 hover:bg-violet-200 focus:outline-none"
+              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
             >
               <span>서비스 이용약관</span>
               <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
             </button>
             <button
               onClick={() => handleTabChange('privacy')}
-              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-violet-100 text-gray-700 hover:bg-violet-200 focus:outline-none"
+              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
             >
               <span>개인정보 처리방침</span>
               <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
             </button>
             <button
               onClick={() => handleTabChange('paid')}
-              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-violet-100 text-gray-700 hover:bg-violet-200 focus:outline-none"
+              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
             >
               <span>유료 서비스 이용약관</span>
               <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
             </button>
             <button
               onClick={() => handleTabChange('policy')}
-              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-violet-100 text-gray-700 hover:bg-violet-200 focus:outline-none"
+              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
             >
               <span>운영 정책</span>
               <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
@@ -552,7 +556,7 @@ export default function MyAccountView() {
         {/* 로그아웃 버튼 */}
         <button
           onClick={handleLogout}
-          className="w-full py-3 text-red-600 font-medium border border-red-300 rounded-lg bg-red-100 hover:bg-red-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
+          className="w-full py-3 text-accent-dark font-medium border border-accent-light rounded-lg bg-white hover:bg-red-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
         >
           로그아웃
         </button>
