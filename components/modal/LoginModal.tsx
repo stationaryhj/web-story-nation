@@ -16,6 +16,7 @@ interface LoginModalProps {
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const router = useRouter()
   const [showSignup, setShowSignup] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const handleSignupClick = () => {
     setShowSignup(true)
@@ -25,19 +26,23 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     setShowSignup(false)
   }
 
-  const { socialLogin, guestLogin, loading } = useAccountStore()
+  const { socialLogin, guestLogin, loading: loginLoading } = useAccountStore()
 
   const handleSocialLogin = async (provider: OAuthProvider) => {
     try {
+      setLoading(true)
       await socialLogin(provider)
     } catch (error) {
       console.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', error)
       // toast.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+    } finally {
+      setLoading(false)
     }
   }
 
   const handleGuestLogin = async (nickname: string) => {
     try {
+      setLoading(true)
       let isSuccess = await guestLogin(nickname)
       if(isSuccess) {
         onClose()
@@ -45,6 +50,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       }
     } catch (err) {
       console.error('게스트 로그인 오류:', err)
+    } finally {
+      setLoading(false)
     }
   }
 

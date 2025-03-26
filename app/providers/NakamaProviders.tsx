@@ -223,14 +223,14 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
   }, [isConnected, isConnecting, session, client, useSSL]);
 
   // 자동 연결 처리
-  useEffect(() => {
-    console.log('client :: ', client);
+  // useEffect(() => {
+  //   console.log('client :: ', client);
 
-    if (autoConnect && client && session && !socket && !isConnecting) {
-      console.log('자동 연결 시작...');
-      connectSocket(session);
-    }
-  }, [client, session, autoConnect]);
+  //   if (autoConnect && client && session && !socket && !isConnecting) {
+  //     console.log('자동 연결 시작...');
+  //     connectSocket(session);
+  //   }
+  // }, [client, session, autoConnect]);
 
   // 클라이언트 생성 함수
   const createClient = async (): Promise<Client> => {
@@ -800,6 +800,8 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           throw new Error('Nakama 클라이언트 생성 실패');
         }
       }
+
+      console.log('@@ _client :: ', _client)
 
       // 2. 디바이스 ID 생성 및 인증
       const deviceId = `chatbot_jackpot_${userKey}`;
