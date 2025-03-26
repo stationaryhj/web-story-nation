@@ -13,6 +13,15 @@ import { useSettingsStore } from '../../store/useStoreSettings'
 import { useModalStore } from '@/store/useStoreModal'
 
 import ConfirmActionModal from '../modal/ConfirmActionModal'
+
+// 필수 입력값 표시 컴포넌트
+const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
+  <div className="flex items-center gap-1">
+    {children}
+    <span className="text-orange-500">*</span>
+  </div>
+)
+
 // 해시태그 데이터
 const AVAILABLE_HASHTAGS = [
   '#집착',
@@ -245,14 +254,6 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
 
   // 기본 설정 폼 렌더링
   if (mode === 'basic') {
-    // 필수 입력값 표시 컴포넌트
-    const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
-      <div className="flex items-center gap-1">
-        {children}
-        <span className="text-orange-500">*</span>
-      </div>
-    )
-
     return (
       <>
         <ConfirmActionModal
@@ -274,6 +275,42 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         <div className="space-y-8">
           {/* 기본 설정 */}
           <div className="space-y-6">
+            {/* 이용등급 */}
+            <div>
+              <RequiredLabel>
+                <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
+                  이용등급
+                </label>
+              </RequiredLabel>
+              <div className="mt-2 grid grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  onClick={() => handleRatingSelect('all')}
+                  className={`rounded-lg px-4 py-3 text-center transition-colors ${
+                    formData.rating === 'all'
+                      ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                      : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                  }`}
+                >
+                  전체 이용가
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleRatingSelect('adult')}
+                  disabled={!isAdultModeEnabled}
+                  className={`rounded-lg px-4 py-3 text-center transition-colors ${
+                    formData.rating === 'adult'
+                      ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                      : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                  } ${!isAdultModeEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  성인 전용
+                </button>
+              </div>
+              {!isAdultModeEnabled && formData.rating === 'adult' && (
+                <p className="mt-2 text-sm text-red-500">성인 인증이 필요합니다.</p>
+              )}
+            </div>
             {/* 이름 */}
             <div>
               <RequiredLabel>
@@ -336,43 +373,6 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
               </div>
             </div>
 
-            {/* 이용등급 */}
-            <div>
-              <RequiredLabel>
-                <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-                  이용등급
-                </label>
-              </RequiredLabel>
-              <div className="mt-2 grid grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => handleRatingSelect('all')}
-                  className={`rounded-lg px-4 py-3 text-center transition-colors ${
-                    formData.rating === 'all'
-                      ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                      : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-                  }`}
-                >
-                  전체 이용가
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleRatingSelect('adult')}
-                  disabled={!isAdultModeEnabled}
-                  className={`rounded-lg px-4 py-3 text-center transition-colors ${
-                    formData.rating === 'adult'
-                      ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                      : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-                  } ${!isAdultModeEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  성인 전용
-                </button>
-              </div>
-              {!isAdultModeEnabled && formData.rating === 'adult' && (
-                <p className="mt-2 text-sm text-red-500">성인 인증이 필요합니다.</p>
-              )}
-            </div>
-
             {/* 게시 범위 */}
             <div>
               <RequiredLabel>
@@ -409,12 +409,14 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
             {/* 한줄 소개 */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label
-                  htmlFor="bio"
-                  className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400"
-                >
-                  한줄 소개
-                </label>
+                <RequiredLabel>
+                  <label
+                    htmlFor="bio"
+                    className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400"
+                  >
+                    한줄 소개
+                  </label>
+                </RequiredLabel>
                 <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
                   {formData.bio.length}/80
                 </span>
@@ -437,12 +439,15 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
             {/* 첫 메시지 */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label
-                  htmlFor="firstMessage"
-                  className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400"
-                >
-                  첫 메세지
-                </label>
+                <RequiredLabel>
+                  <label
+                    htmlFor="firstMessage"
+                    className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400"
+                  >
+                    첫 메세지
+                  </label>
+                </RequiredLabel>
+
                 <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
                   {formData.firstMessage.length}/80
                 </span>
@@ -465,9 +470,11 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
             {/* 캐릭터 태그 */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-                  캐릭터 태그
-                </label>
+                <RequiredLabel>
+                  <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
+                    캐릭터 태그
+                  </label>
+                </RequiredLabel>
                 <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
                   {formData.hashtags.length}/7
                 </span>
@@ -543,17 +550,41 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
       <div className="space-y-6">
         {/* 이미지 탭 */}
         <div className="flex justify-between items-center mb-4">
-          <div className="flex gap-2">
-            <button
-              onClick={() => setActiveImageTab('normal')}
-              className={`px-4 py-2 rounded-lg text-sm ${
-                activeImageTab === 'normal'
-                  ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                  : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-              }`}
-            >
-              전체
-            </button>
+          {/* 이용등급 */}
+          <div>
+            <RequiredLabel>
+              <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
+                이용등급
+              </label>
+            </RequiredLabel>
+            <div className="mt-2 grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                onClick={() => handleRatingSelect('all')}
+                className={`rounded-lg px-4 py-3 text-center transition-colors ${
+                  formData.rating === 'all'
+                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                }`}
+              >
+                전체 이용가
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRatingSelect('adult')}
+                disabled={!isAdultModeEnabled}
+                className={`rounded-lg px-4 py-3 text-center transition-colors ${
+                  formData.rating === 'adult'
+                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                } ${!isAdultModeEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                성인 전용
+              </button>
+            </div>
+            {!isAdultModeEnabled && formData.rating === 'adult' && (
+              <p className="mt-2 text-sm text-red-500">성인 인증이 필요합니다.</p>
+            )}
           </div>
         </div>
 
