@@ -59,7 +59,7 @@ export default function ModalManager() {
       <ChatModeModal
         isOpen={isOpen}
         onClose={closeModal}
-        currentMode={modalProps?.currentMode || 'economic'}
+        currentModeId={modalProps?.currentModeId || 1}
         onSelectMode={modalProps?.onSelectMode || (() => {})}
       />
     )

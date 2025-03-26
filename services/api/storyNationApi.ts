@@ -281,7 +281,7 @@ export const chatApi = {
   ): Promise<ApiResponse<ChatUseResponse>> => {
     const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
     api.defaults.headers.common['Authorization'] = account_token;
-    return chatApiInstance.post('/api/charbot/chat/user', {
+    return chatApiInstance.post('/api/charbot/chat/use', {
       chrbot_chat_key,
       chat_mode,
     });
@@ -361,14 +361,12 @@ export const chatApi = {
     chat_mode: number,
     nsfw: number,
     delete_id: string,
-    delete_idx: number,
   ): Promise<ApiResponse> => {
     return chatApiInstance.post('/api/charbot/chat/delete', {
       chrbot_chat_key,
       chat_mode,
       nsfw,
       delete_id,
-      delete_idx,
     });
   },
 

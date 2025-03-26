@@ -1,18 +1,14 @@
-// @ts-nocheck
 'use client'
 
-import type { Character } from '@/store/useStoreData'
-import { useAccountStore, useStoreData } from '@/store/useStoreData'
+import { useAccountStore } from '@/store/useStoreData'
 import {
   faPaperPlane,
   faArrowLeft,
   faGift,
   faCaretDown,
-  faEllipsisH,
   faSync,
   faTrashAlt,
   faInfoCircle,
-  faTimes,
   faSignOutAlt,
   faCoins,
   faAsterisk,
@@ -28,14 +24,14 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { FormEvent } from 'react'
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useModalStore } from '@/store/useStoreModal'
 import type { ChatMode } from '@/components/modal/ChatModeModal'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import type { ChrbotData } from '@/types/api'
 import { bridgeCharbotDataToCharacter } from '@/lib/utils/storyNationUtil'
 import { useNakama } from '@/app/providers/NakamaProviders'
-import { chatApi } from '@/services/api/storyNationApi'
+import { useChatModeStore } from '@/store/useStoreData'
 
 // 메시지 타입 정의
 interface ChatMessage {
@@ -50,8 +46,21 @@ interface ChatDetailClientProps {
   charbotData: ChrbotData | null
 }
 
+
+const defaultNames: Record<number, string> = {
+  1: '가성비 모드',
+  2: '스토리 모드',
+  3: '짜릿모드 1.0',
+  4: '짜릿모드 2.0'
+};
+
+// 채팅 모드 이름 가져오기 함수
+const getChatModeName = (modeId: number) => {
+  return defaultNames[modeId] || defaultNames[0]
+}
+
 export default function ChatDetailClient({ characterId, charbotData }: ChatDetailClientProps) {
-  const { isLogin, data: accountData } = useAccountStore(state => ({ 
+  const { data: accountData } = useAccountStore(state => ({ 
     isLogin: state.isLogin, 
     data: state.data 
   }));
@@ -59,22 +68,13 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   // Nakama 컨텍스트 사용
   const nakamaContext = useNakama();
   const {
-    client,
-    session,
     isConnected,
     isConnecting,
     chatRoomInit,
-    connectSocket,
     disconnectSocket,
-    joinChat,
     leaveChat,
-    sendMessage,
-    addChannelMessageListener,
-    removeChannelMessageListener,
-    currentChatMode,
     chrBotChatKey,
     channelId,
-    roomName,
     isInitRoom,
     // 새로운 메시지 관련 필드와 메서드들
     chatMessages,
@@ -84,17 +84,13 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     addChatMessage
   } = nakamaContext;
   
-  const { characters } = useStoreData()
   const [message, setMessage] = useState('')
-  const isFirstRender = useRef(true);
   const hasInitialized = useRef(false);
-  const [showModeDropdown, setShowModeDropdown] = useState(false)
-  const [currentMode, setCurrentMode] = useState('짜릿모드2')
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const [isAdultMode, setIsAdultMode] = useState(false)
-  const [currentModeId, setCurrentModeId] = useState('')
+  const [currentModeId, setCurrentModeId] = useState(1)
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isWaitingForAI, setIsWaitingForAI] = useState<boolean>(false); // AI 응답 대기 상태
+  const { chatMode } = useChatModeStore();
 
   const { openModal, closeModal } = useModalStore()
 
@@ -121,13 +117,23 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       const userCount = chatMessages.filter(msg => msg.sender === 'user').length;
       const aiCount = chatMessages.filter(msg => msg.sender === 'character').length;
       console.log(`메시지 통계: 총 ${chatMessages.length}개 (사용자: ${userCount}, AI: ${aiCount})`);
+      
+      // 마지막 메시지 발신자에 따라 AI 응답 대기 상태 업데이트
+      // 임시 메시지는 제외하고 실제 메시지만 고려
+      if (!lastMsg.id.startsWith('temp_')) {
+        if (lastMsg.sender === 'user') {
+          setIsWaitingForAI(true);
+          console.log('🕒 AI 응답 대기 시작');
+        } else if (lastMsg.sender === 'character') {
+          setIsWaitingForAI(false);
+          console.log('✓ AI 응답 수신 완료, 대기 상태 해제');
+        }
+      }
     }
   }, [chatMessages]);
   
   // 연결 상태 변화 로깅
   useEffect(() => {
-    console.log('🔌 연결 상태 변경 감지:', { isConnected, isConnecting, channelId });
-    
     if (isConnected) {
       setShowConnectedStatus(true);
       const timer = setTimeout(() => {
@@ -141,10 +147,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   
   // 서버 상태와 채널 ID에 따른 UI 처리
   useEffect(() => {
-    console.log('🔄 현재 채널 상태:', { 
-      channelId, isConnected, isConnecting, isInitRoom 
-    });
-    
     if (!isConnected && !isConnecting && isInitRoom) {
       // 초기화는 됐지만 연결이 끊어진 경우
       setError('채팅 서버와의 연결이 끊어졌습니다.');
@@ -170,20 +172,16 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         setError(null);
         hasInitialized.current = true;
         
-        console.log('채팅방 초기화 시작...');
-        const chatMode = 2; // 기본값으로 스토리 모드 사용
+        // 사용 가능한 채팅 모드 중 첫번째 선택 (또는 기본값 2번)
+        const selectedModeId = chatMode && chatMode.length > 0 
+          ? chatMode[0].chat_mode 
+          : 2; // 기본값 스토리 모드
         
         // 채팅방 초기화 (Nakama 서버 연결 및 인증, 채팅방 참여까지 모두 수행)
-        // 이제 chatRoomInit이 객체를 반환하므로 구조 분해 할당으로 받음
-        const { success, channelId: newChannelId } = await chatRoomInit(accountData.user_key, characterId, chatMode);
+        const { success, channelId: newChannelId } = await chatRoomInit(accountData.user_key.toString(), characterId, selectedModeId);
         console.log('채팅방 초기화 완료, 연결 상태:', success, '채널 ID:', newChannelId);
         
-        // 초기화 상태 확인
-        console.log('현재 chrBotChatKey:', chrBotChatKey);
-        console.log('소켓 연결 상태:', isConnected);
-        
         if (!success) {
-          console.log('채팅방 초기화에 실패했습니다.');
           throw new Error('채팅방 초기화에 실패했습니다. 다시 시도해주세요.');
         }
         
@@ -196,8 +194,8 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           timestamp: new Date(),
         });
         
-        setCurrentModeId('exciting2');
-        setCurrentMode('짜릿모드 2.0');
+        // 현재 모드 설정 업데이트
+        setCurrentModeId(selectedModeId);
         
       } catch (error) {
         console.error('채팅방 초기화 실패:', error);
@@ -213,87 +211,79 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     // 컴포넌트 언마운트 시 정리
     return () => {
       if (channelId) {
-        console.log('채팅방 정리: 리스너 제거 및 채팅방 나가기');
         leaveChat(channelId).catch(err => console.error('채팅방 나가기 오류:', err));
       }
       disconnectSocket();
     };
-  }, [character?.id, characterId, accountData?.user_key, chatRoomInit, isConnected, disconnectSocket, channelId, leaveChat, clearChatHistory, addChatMessage]);
+  }, [character?.id, characterId, accountData?.user_key, chatRoomInit, isConnected, disconnectSocket, channelId, leaveChat, clearChatHistory, addChatMessage, chatMode]);
 
   // 드롭다운 외부 클릭 감지
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowModeDropdown(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, []);
+  // useEffect(() => {
+  //   function handleClickOutside(event: MouseEvent) {
+  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+  //       setShowModeDropdown(false)
+  //     }
+  //   }
+  //   document.addEventListener('mousedown', handleClickOutside)
+  //   return () => {
+  //     document.removeEventListener('mousedown', handleClickOutside)
+  //   }
+  // }, []);
 
   // 메시지 전송 처리 (Provider의 메서드 사용)
   const handleSendMessage = async (e: FormEvent) => {
     e.preventDefault();
-    console.log('handleSendMessage 호출됨 :: ', message);
+    
+    // AI 응답 대기 중이면 메시지 전송 금지
+    if (isWaitingForAI) {
+      console.log('⚠️ AI 응답을 기다리는 중입니다. 메시지 전송이 중단되었습니다.');
+      return;
+    }
     
     // 필요한 값들이 모두 있는지 확인
     if (!message.trim()) {
-      console.log('메시지가 비어있습니다.');
       return;
     }
     
     if (!character) {
-      console.error('캐릭터 정보가 없습니다.');
       setError('캐릭터 정보를 불러오는 중 오류가 발생했습니다.');
       return;
     }
-    
-    // if (!isConnected) {
-    //   console.error('Nakama 서버에 연결되어 있지 않습니다.');
-    //   setError('채팅 서버에 연결되어 있지 않습니다. 페이지를 새로고침하고 다시 시도해주세요.');
-    //   return;
-    // }
-    
-    // if (!channelId) {
-    //   console.error('채널 ID가 없습니다');
-    //   setError('채팅 채널에 연결할 수 없습니다. 페이지를 새로고침하고 다시 시도해주세요.');
-    //   return;
-    // }
 
     // 입력창 초기화 (먼저 수행하여 UX 향상)
     const messageText = message.trim();
     setMessage('');
 
     try {
-      // 현재 선택된 모드에 따른 펜 차감 로직
-      const penCost = getPenCostByMode(currentModeId);
-      console.log(`${penCost} 펜이 차감되었습니다.`);
-
       // Provider의 메서드를 사용하여 메시지 전송
       await sendChatMessage(messageText);
+      
+      // 메시지 전송 후 AI 응답 대기 상태로 변경
+      setIsWaitingForAI(true);
       
     } catch (error) {
       console.error('메시지 전송 중 오류:', error);
       setError('메시지 전송에 실패했습니다. 다시 시도해주세요.');
+      setIsWaitingForAI(false); // 오류 발생 시 대기 상태 해제
     }
   };
 
-  // 모드에 따른 펜 비용 계산 함수
-  const getPenCostByMode = (modeId: string): number => {
-    switch (modeId) {
-      case 'economic':
-        return 1
-      case 'story':
-        return 3
-      case 'exciting1':
-        return 4
-      case 'exciting2':
-        return 7
-      default:
-        return 1
-    }
+  // 모드에 따른 펜 비용 계산 함수 수정
+  const getPenCostByMode = (modeId: number): number => {
+    const mode = chatMode.find(m => m.chat_mode === modeId);
+    return mode ? mode.coin : 1; // 기본값 1
+  }
+  
+  // 모드별 원래 코인 가격 가져오기
+  const getOriginalCoinByMode = (modeId: number): number => {
+    const mode = chatMode.find(m => m.chat_mode === modeId);
+    return mode ? mode.original_coin : 2; // 기본값 2
+  }
+  
+  // 모드별 할인율 가져오기
+  const getDiscountByMode = (modeId: number): number => {
+    const mode = chatMode.find(m => m.chat_mode === modeId);
+    return mode ? mode.discount : 0; // 기본값 0
   }
 
   // 날짜 포맷팅 함수
@@ -301,18 +291,31 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
 
-  const handleModeSelect = (mode: string) => {
-    setCurrentMode(mode)
-    setShowModeDropdown(false)
+  // 모드 선택 핸들러 업데이트
+  const handleModeSelect = (mode: ChatMode) => {
+    // 이전 모드와 다른 경우에만 처리
+    if (currentModeId !== mode.id) {
+      setCurrentModeId(mode.id);
+      
+      // 모드 변경 시 알림 메시지 추가 (선택사항)
+      // addChatMessage({
+      //   id: `system_${Date.now()}`,
+      //   sender: 'character',
+      //   message: `*시스템* 채팅 모드가 "${getChatModeName(mode.id)}"로 변경되었습니다.`,
+      //   timestamp: new Date(),
+      // });
+      
+      // 필요시 서버에 모드 변경 알림
+      // TODO: 서버에 모드 변경 요청을 보내는 로직 추가
+    }
+    
+    // 모달 닫기
+    closeModal();
   }
 
   // 마지막 AI 응답 새로고침 함수 (Provider의 메서드 사용)
   const handleRefreshLastAIMessage = async () => {
     try {
-      // 펜 차감 로직
-      const penCost = getPenCostByMode(currentModeId);
-      console.log(`새로고침: ${penCost} 펜이 차감되었습니다.`);
-
       // Provider의 메서드를 사용하여 마지막 AI 메시지 새로고침
       await refreshLastAIMessage();
       
@@ -328,7 +331,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     const lastAIMessageIndex = [...chatMessages].reverse().findIndex(msg => msg.sender === 'character')
 
     if (lastAIMessageIndex === -1) {
-      console.log('삭제할 AI 메시지가 없습니다.');
       return;
     }
 
@@ -406,16 +408,16 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     })
   }
 
-  // 모드 아이콘 가져오기 함수
-  const getModeIcon = (modeId: string) => {
+  // 모드 아이콘 가져오기 함수 수정
+  const getModeIcon = (modeId: number) => {
     switch (modeId) {
-      case 'economic':
+      case 1:
         return faPiggyBank
-      case 'story':
+      case 2:
         return faBookOpen
-      case 'exciting1':
+      case 3:
         return faFire
-      case 'exciting2':
+      case 4:
         return faRocket
       default:
         return faRocket
@@ -611,18 +613,14 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             size="sm"
             onClick={() =>
               openModal('chatMode', {
-                currentMode: currentModeId,
-                onSelectMode: (mode: ChatMode) => {
-                  setCurrentMode(mode.name)
-                  setCurrentModeId(mode.id)
-                  closeModal()
-                },
+                currentModeId: currentModeId,
+                onSelectMode: handleModeSelect
               })
             }
             className="flex items-center"
           >
             <FontAwesomeIcon icon={getModeIcon(currentModeId)} className="mr-1.5" />
-            <span className="text-sm font-medium md:inline hidden">{currentMode}</span>
+            <span className="text-sm font-medium md:inline hidden">{getChatModeName(currentModeId)}</span>
             <FontAwesomeIcon icon={faCaretDown} className="text-xs ml-1.5" />
           </BaseButton>
 
@@ -790,6 +788,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                   isActionMode ? 'bg-violet-100 text-violet-600' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                 }`}
                 title={isActionMode ? '일반 대화 모드로 전환' : '상황 설명 모드로 전환'}
+                disabled={isWaitingForAI}
               >
                 <FontAwesomeIcon icon={faAsterisk} className="text-lg" />
               </button>
@@ -800,13 +799,18 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                   value={message}
                   onChange={isActionMode ? handleActionInput : e => setMessage(e.target.value)}
                   placeholder={
-                    isActionMode
+                    isWaitingForAI
+                      ? "AI가 응답 중입니다. 잠시만 기다려주세요..."
+                      : isActionMode
                       ? '상황 설명을 입력하세요. (예: 캐릭터가 웃으며)'
                       : '대화를 입력하세요. (예: 안녕! 뭐해?)'
                   }
-                  className="w-full py-4 px-5 text-base bg-gray-100 text-gray-800 rounded-l-xl border-0 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
+                  className={`w-full py-4 px-5 text-base bg-gray-100 text-gray-800 rounded-l-xl border-0 focus:outline-none focus:ring-2 ${
+                    isWaitingForAI ? 'bg-gray-200 text-gray-500' : 'focus:ring-violet-200'
+                  } transition-all`}
+                  disabled={isWaitingForAI}
                 />
-                {isActionMode && (
+                {isActionMode && !isWaitingForAI && (
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
                     <span className="bg-violet-100 px-2 py-0.5 rounded text-violet-600 font-medium">
                       <FontAwesomeIcon icon={faAsterisk} className="mr-1 text-xs" />
@@ -814,13 +818,22 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                     </span>
                   </div>
                 )}
+                {isWaitingForAI && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="flex items-center space-x-1">
+                      <div className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* 전송 버튼 - BaseButton으로 변경 */}
               <BaseButton
                 type="submit"
-                color={message.trim() ? 'gradient' : 'secondary'}
-                disabled={!message.trim()}
+                color={message.trim() && !isWaitingForAI ? 'gradient' : 'secondary'}
+                disabled={!message.trim() || isWaitingForAI}
                 className="rounded-l-none rounded-r-xl py-4 px-5"
               >
                 <FontAwesomeIcon icon={faPaperPlane} className="text-lg" />
@@ -829,11 +842,18 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
             {/* 사용중인 모드와 펜 소모량 안내 */}
             <div className="mt-3 text-center text-sm text-gray-500">
-              <span className="mr-2">현재 모드: {currentMode}</span>
+              <span className="mr-2">현재 모드: {getChatModeName(currentModeId)}</span>
               <span className="text-primary-600 flex items-center justify-center">
-                ( <FontAwesomeIcon icon={faPen} className="mr-1" size="xs" />
+                (<FontAwesomeIcon icon={getModeIcon(currentModeId)} className="mr-1" size="xs" />
                 {getPenCostByMode(currentModeId)}
-                /메시지)
+                /메시지
+                {getDiscountByMode(currentModeId) > 0 && (
+                  <span className="ml-1 text-green-500">
+                    {getDiscountByMode(currentModeId)}% 할인
+                    <span className="line-through text-gray-400 ml-1">{getOriginalCoinByMode(currentModeId)}</span>
+                  </span>
+                )}
+                )
               </span>
             </div>
           </div>

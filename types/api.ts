@@ -35,6 +35,7 @@ export interface LoginResponse {
   result: ApiResult;
 }
 
+
 // Charbot Top 10 List
 export type CharbotTop10Response = {
   module_1: Array<ModuleCharacter>;

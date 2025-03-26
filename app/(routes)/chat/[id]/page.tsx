@@ -46,7 +46,7 @@ export default function ChatDetailPage({ params }: { params: Promise<{ id: strin
             </div>
           }
         >
-          <NakamaProvider {...serverConfig}>
+          <NakamaProvider {...serverConfig} charbotData={charbotData}>
             <ChatDetailClient characterId={unwrappedParams.id} charbotData={charbotData} />
           </NakamaProvider>
         </Suspense>
