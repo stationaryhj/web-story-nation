@@ -35,7 +35,6 @@ const mockConversationExamples = [
   },
 ]
 
-
 interface CharactorModalProps {
   isOpen: boolean
   onClose: () => void
@@ -126,7 +125,6 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   }
 
   return (
-
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -139,7 +137,6 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
             variants={overlayVariants}
             onClick={handleClose}
           />
-
 
           {/* 모달 */}
           <motion.div
@@ -218,7 +215,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                         key={`tag-${index}`}
                         className="rounded-full bg-primary-50 px-3 py-1 text-sm text-primary-700 dark:bg-dark-primary-900 dark:text-dark-primary-300"
                       >
-                        #{tag}
+                        {tag}
                       </span>
                     ))}
                   </div>

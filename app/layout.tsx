@@ -7,6 +7,7 @@ import Script from 'next/script'
 import type { ReactNode } from 'react'
 
 import Providers from './providers'
+import DraggableButtonGrid from '@/components/grid/DraggableButtonGrid'
 
 // Poppins 폰트 설정
 const poppins = Poppins({
@@ -62,6 +63,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body className="font-sans bg-white dark:bg-gray-900 transition-colors duration-300" suppressHydrationWarning>
         <Providers>{children}</Providers>
+        <DraggableButtonGrid />
       </body>
     </html>
   )

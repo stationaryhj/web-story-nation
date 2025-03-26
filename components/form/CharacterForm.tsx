@@ -57,7 +57,6 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
 
   const { isAdultModeEnabled, toggleAdultMode } = useSettingsStore()
   const { openModal } = useModalStore()
-  
 
   // 이미지 배열이 없는 경우를 대비한 안전 조치
   useEffect(() => {
@@ -546,7 +545,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
               }`}
               onClick={() => setSelectedImage(img.id)}
             >
-              <Image src={img.url} alt="Character image" fill className="object-cover" />
+              <Image src={img.url} alt={`캐릭터 이미지 ${img.id}`} fill className="object-cover" />
               <button
                 onClick={e => handleImageDelete(img.id, e)}
                 className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center"

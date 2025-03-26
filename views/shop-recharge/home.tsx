@@ -7,7 +7,6 @@ import { faChevronLeft, faPen, faHistory, faCrown } from '@fortawesome/free-soli
 import { useRouter } from 'next/navigation'
 import PageTransition from '@/components/motion/PageTransition'
 import Image from 'next/image'
-<<<<<<< HEAD
 
 // 더미 상품 데이터
 const penPackages = [
@@ -66,13 +65,11 @@ const penPackages = [
     image: '/images/pen6.png',
   },
 ]
-=======
 import { useAccountStore } from '@/store/useAccountStore'
 import { useCoinStore } from '@/store/useStoreData'
 import { CoinData, OrderIdResponse } from '@/types/api'
 import { settlementApi } from '@/services/api/storyNationApi'
 import PaymentModal from '@/components/modal/PaymentModal'
->>>>>>> a64ebb071c261020f10e2e54958d9ba48b4558e3
 
 // 더미 거래 내역 데이터
 const transactions = [
@@ -90,77 +87,80 @@ export default function ShopRecharge() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'recharge' | 'history'>('recharge')
   const { coinList } = useCoinStore(state => ({ coinList: state.coinList }))
-  
+
   // 결제 모달 관련 상태
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
   const [paymentAmount, setPaymentAmount] = useState(0)
   const [paymentOrderId, setPaymentOrderId] = useState('')
   const [tossClientKey, setTossClientKey] = useState('')
-  
+
   // 디바운스 및 API 중복 호출 방지를 위한 refs
   const isProcessing = useRef(false)
   const selectedCoinRef = useRef<CoinData | null>(null)
-  
+
   // user Data
   const accountData = useAccountStore(state => state.data)
   const freePen = accountData?.coin_free ?? 0
   const paidPen = accountData?.coin_register ?? 0
-  
+
   // 안전한 content 파싱 함수
   const getWebPrice = useCallback((content: string | undefined): number => {
-    if (!content) return 0;
+    if (!content) return 0
     try {
-      const contentData = JSON.parse(content);
-      return contentData.web_price || 0;
+      const contentData = JSON.parse(content)
+      return contentData.web_price || 0
     } catch (e) {
-      console.error('JSON 파싱 오류:', e);
-      return 0;
+      console.error('JSON 파싱 오류:', e)
+      return 0
     }
-  }, []);
+  }, [])
 
   // OrderId 가져오기 (재사용 가능한 함수로 분리)
   const fetchOrderId = useCallback(async (coinKey: number) => {
     try {
-      const response = await settlementApi.GetOrderId(coinKey);
-      return response.data as OrderIdResponse;
+      const response = await settlementApi.GetOrderId(coinKey)
+      return response.data as OrderIdResponse
     } catch (error) {
-      console.error('OrderId 가져오기 실패:', error);
-      throw error;
+      console.error('OrderId 가져오기 실패:', error)
+      throw error
     }
-  }, []);
+  }, [])
 
   // 패키지 클릭 핸들러 (useCallback으로 메모이제이션)
-  const handlePackageClick = useCallback(async (coinKey: number, amount: number) => {
-    // 이미 처리 중이면 중복 호출 방지
-    if (isProcessing.current) {
-      console.log('이미 처리 중입니다.');
-      return;
-    }
-    
-    // 처리 상태 설정
-    isProcessing.current = true;
-    
-    try {
-      console.log('@@ coinKey :: ', coinKey);
-      
-      // API 호출로 주문 ID 가져오기
-      const orderIdData = await fetchOrderId(coinKey);
-      console.log('@@ orderIdData :: ', orderIdData);
+  const handlePackageClick = useCallback(
+    async (coinKey: number, amount: number) => {
+      // 이미 처리 중이면 중복 호출 방지
+      if (isProcessing.current) {
+        console.log('이미 처리 중입니다.')
+        return
+      }
 
-      // 상태 업데이트 (한 번에 모아서)
-      setPaymentAmount(amount);
-      setPaymentOrderId(orderIdData.orderId);
-      setTossClientKey(orderIdData.toss_client_key);
-      setIsPaymentModalOpen(true);
-    } catch (error) {
-      console.error('패키지 처리 중 오류 발생:', error);
-    } finally {
-      // 300ms 후에 처리 상태 해제 (디바운스)
-      setTimeout(() => {
-        isProcessing.current = false;
-      }, 300);
-    }
-  }, [fetchOrderId]);
+      // 처리 상태 설정
+      isProcessing.current = true
+
+      try {
+        console.log('@@ coinKey :: ', coinKey)
+
+        // API 호출로 주문 ID 가져오기
+        const orderIdData = await fetchOrderId(coinKey)
+        console.log('@@ orderIdData :: ', orderIdData)
+
+        // 상태 업데이트 (한 번에 모아서)
+        setPaymentAmount(amount)
+        setPaymentOrderId(orderIdData.orderId)
+        setTossClientKey(orderIdData.toss_client_key)
+        setIsPaymentModalOpen(true)
+      } catch (error) {
+        console.error('패키지 처리 중 오류 발생:', error)
+      } finally {
+        // 300ms 후에 처리 상태 해제 (디바운스)
+        setTimeout(() => {
+          isProcessing.current = false
+        }, 300)
+      }
+    },
+    [fetchOrderId]
+  )
 
   const handlePaymentSuccess = (result: any) => {
     console.log('@@ result :: ', result)
@@ -254,90 +254,39 @@ export default function ShopRecharge() {
             <div>
               <h2 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">펜 패키지</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-<<<<<<< HEAD
-                {penPackages.map(pkg => (
-                  <motion.div
-                    key={pkg.id}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="bg-white dark:bg-dark-background-light rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden cursor-pointer"
-                  >
-                    <div className="p-4">
-                      {/* 헤더 영역 - 할인률 표시 */}
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="bg-primary-100 dark:bg-dark-primary-900/30 px-3 py-1 rounded-full">
-                          <span className="text-sm font-medium text-primary-600 dark:text-primary-400">
-                            {pkg.discountRate}% 할인
-                          </span>
-                        </div>
-                      </div>
+                {coinList &&
+                  coinList.map(coin => {
+                    const webPrice = getWebPrice(coin.content)
 
-                      {/* 정보 영역 */}
-                      <div className="flex items-center space-x-3 mb-3">
-                        {/* 이미지 (크기 축소) */}
-                        <div className="w-16 h-16 bg-gray-100 dark:bg-dark-background-accent rounded-lg flex items-center justify-center flex-shrink-0">
-                          <FontAwesomeIcon icon={faPen} className="h-8 w-8 text-primary-500 dark:text-primary-400" />
-                        </div>
-
-                        {/* 획득 정보 */}
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="flex items-center space-x-1">
-                                <span className="text-lg font-bold text-gray-900 dark:text-white">
-                                  {pkg.pen + pkg.bonusPen}
-                                </span>
-                                <span className="text-xs text-gray-500 dark:text-gray-400">펜</span>
-                              </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                기본 {pkg.pen} + 보너스 {pkg.bonusPen}
-                              </div>
+                    return (
+                      <motion.div
+                        key={coin.coin_key}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="bg-white dark:bg-dark-background-light rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden cursor-pointer"
+                        onClick={() => handlePackageClick(coin.coin_key, webPrice)}
+                      >
+                        <div className="p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="bg-primary-100 dark:bg-dark-primary-900/30 px-3 py-1 rounded-full">
+                              <span className="text-sm font-medium text-primary-600 dark:text-primary-400">
+                                {coin.cnt} 펜
+                              </span>
+                            </div>
+                            <span className="text-lg font-bold text-gray-900 dark:text-white">
+                              ₩ {webPrice.toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="aspect-square relative bg-gray-100 dark:bg-dark-background-accent rounded-lg flex items-center justify-center">
+                            <div className="text-center text-gray-500 dark:text-gray-400 text-sm">
+                              <FontAwesomeIcon icon={faPen} className="h-10 w-10 mb-2" />
+                              <p>이미지</p>
                             </div>
                           </div>
                         </div>
-                      </div>
-
-                      {/* 가격 정보 */}
-                      <div className="border-t border-gray-100 dark:border-gray-700 pt-3">
-                        <div className="flex items-center justify-between">
-                          <div className="text-xs line-through text-gray-400 dark:text-gray-500">
-                            ₩ {pkg.originalPrice}
-                          </div>
-                          <div className="text-lg font-bold text-gray-900 dark:text-white">₩ {pkg.price}</div>
-=======
-                {coinList && coinList.map((coin) => {
-                  const webPrice = getWebPrice(coin.content);
-                  
-                  return (
-                    <motion.div
-                      key={coin.coin_key}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="bg-white dark:bg-dark-background-light rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden cursor-pointer"
-                      onClick={() => handlePackageClick(coin.coin_key, webPrice)}
-                    >
-                      <div className="p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="bg-primary-100 dark:bg-dark-primary-900/30 px-3 py-1 rounded-full">
-                            <span className="text-sm font-medium text-primary-600 dark:text-primary-400">
-                              {coin.cnt} 펜
-                            </span>
-                          </div>
-                          <span className="text-lg font-bold text-gray-900 dark:text-white">
-                            ₩ {webPrice.toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="aspect-square relative bg-gray-100 dark:bg-dark-background-accent rounded-lg flex items-center justify-center">
-                          <div className="text-center text-gray-500 dark:text-gray-400 text-sm">
-                            <FontAwesomeIcon icon={faPen} className="h-10 w-10 mb-2" />
-                            <p>이미지</p>
-                          </div>
->>>>>>> a64ebb071c261020f10e2e54958d9ba48b4558e3
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
+                      </motion.div>
+                    )
+                  })}
               </div>
             </div>
           )}
@@ -405,7 +354,7 @@ export default function ShopRecharge() {
           )}
         </div>
       </div>
-      
+
       <PaymentModal
         isOpen={isPaymentModalOpen}
         onClose={() => setIsPaymentModalOpen(false)}

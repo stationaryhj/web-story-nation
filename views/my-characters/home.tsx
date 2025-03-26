@@ -55,10 +55,10 @@ export default function MyCharacterPage() {
   const confirmDelete = async () => {
     if (characterToDelete) {
       // 실제로는 API 호출 등으로 삭제 처리
-      const response = await createApi.DeleteChatBot(Number(characterToDelete.id));
+      const response = await createApi.DeleteChatBot(Number(characterToDelete.id))
 
       if (response.data?.result.err === 0) {
-        refetchInProgress();
+        refetchInProgress()
       }
 
       setIsDeleteModalOpen(false)
@@ -71,11 +71,7 @@ export default function MyCharacterPage() {
     const data = response.data as CharbotInprogressResponse
 
     if (data?.chrbot && data?.result.err === 0) {
-<<<<<<< HEAD
-      router.push(`/my-characters/create/${data.chrbot.world_list_detail_chrbot_key}`)
-=======
-      router.push(`/my-characters/edit/${data.chrbot.world_list_detail_chrbot_key}`);
->>>>>>> a64ebb071c261020f10e2e54958d9ba48b4558e3
+      router.push(`/my-characters/edit/${data.chrbot.world_list_detail_chrbot_key}`)
     }
   }
 
