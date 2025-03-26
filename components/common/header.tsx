@@ -117,6 +117,7 @@ export default function Header() {
     }
 
     return () => {
+      // 컴포넌트 언마운트 시에만 스크롤 상태 복원
       document.body.style.overflow = 'auto'
     }
   }, [isSidebarOpen, mounted])

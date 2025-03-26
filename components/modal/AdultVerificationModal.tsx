@@ -101,15 +101,14 @@ export default function AdultVerificationModal({ isOpen, onClose, onVerify }: Ad
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title="성인인증이 필요한 서비스"
       size="md"
       animation="scale"
       showCloseButton={true}
       preventBackdropClose={isVerifying}
       footerContent={footerButtons}
     >
-      <div className="mb-6 text-center">
-        <div className="mb-4">
+      <div className="flex flex-col items-center mb-6 text-center">
+        <div className="mb-2">
           <svg
             className="mx-auto h-16 w-16 text-yellow-500"
             fill="none"
@@ -125,11 +124,9 @@ export default function AdultVerificationModal({ isOpen, onClose, onVerify }: Ad
             />
           </svg>
         </div>
-        <p className="text-lg text-gray-700 dark:text-gray-300">
+        <div className="text-[20px] font-bold mb-4">성인 인증이 필요한 서비스</div>
+        <p className="text-md text-gray-700 dark:text-gray-300">
           성인인증을 마친 뒤 성인모드 캐릭터를 생성할 수 있어요!
-        </p>
-        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-          본인확인 서비스를 통해 만 19세 이상 성인임을 인증해주세요.
         </p>
       </div>
     </BaseModal>
