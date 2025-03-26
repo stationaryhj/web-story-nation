@@ -125,7 +125,7 @@ export default function Providers({ children }: { children: ReactNode }) {
         </InitDataLoader>
       </SkeletonThemeProvider>
 
-      <DevNote />
+      {/* <DevNote /> */}
     </QueryClientProvider>
   )
 }
