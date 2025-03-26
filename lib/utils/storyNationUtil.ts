@@ -1,4 +1,4 @@
-import { CharbotChatData, CharbotChatListData, CharbotMineData, ChatModeData, ChrbotData, LoginResponse, ModuleCharacter } from '@/types/api';
+import { CharbotChatData, CharbotChatListData, CharbotMineData, ChatModeData, ChrbotData, InquiryData, LoginResponse, ModuleCharacter } from '@/types/api';
 import { ChatMode } from '@/components/modal/ChatModeModal';
 
 /**
@@ -261,6 +261,19 @@ export function bridgeChatModeDataToChatMode(data: ChatModeData, customData: Cha
     penCost: data.coin,
     discount: data.discount,
     original_coin: data.original_coin
+  }
+}
+
+
+export function bridgeInquiryDataToNotification(data: InquiryData) {
+  return {
+    id: data.notice_key.toString(),
+    title: data.title,
+    message: data.content,
+    type: 'info',
+    isRead: true,
+    date: new Date(data.create_dt),
+    sort: data.sort,
   }
 }
 

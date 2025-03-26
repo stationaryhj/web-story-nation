@@ -484,6 +484,69 @@ export interface WorldListDetailChrbot {
 }
 
 
+// InquiryList Response
+export interface InquiryListResponse {
+  notice: {
+    current_page: number;
+    data: Array<InquiryData>;
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: Array<PaginationLink>;
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number | null;
+    total: number;
+    result: ApiResult;
+  }
+}
+
+// Inquiry Data
+export interface InquiryData {
+  notice_key: number
+  title: string
+  content: string
+  sort: number
+  create_dt: string
+}
+
+// BankList Response
+export interface BankListResponse {
+  bank_list: Array<BankData>;
+  result: ApiResult;
+}
+
+export interface BankData {
+  bank_key: number
+  bank_nm: string
+  img_url: string
+  sort: number
+}
+
+// WriteRemailEdit Response
+export interface WriteRemailEditResponse {
+  result: ApiResult;
+}
+
+
+// BankAccountEdit Response
+export interface BankAccountEditResponse {
+  result: ApiResult;
+}
+
+// ChangePersonaName Response
+export interface ChangePersonaNameResponse {
+  result: ApiResult;
+}
+
+// ViewTerms Response
+export interface ViewTermsResponse {
+  result: ApiResult;
+}
+
 
 
 

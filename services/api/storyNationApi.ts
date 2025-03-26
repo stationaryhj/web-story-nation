@@ -19,6 +19,12 @@ import type {
   CoinChargeUseHistoryResponse,
   ConfirmTossPaymentResponse,
   OpenChatResponse,
+  InquiryListResponse,
+  BankListResponse,
+  BankAccountEditResponse,
+  WriteRemailEditResponse,
+  ChangePersonaNameResponse,
+  ViewTermsResponse,
 } from '../../types/api'
 
 // API 기본 설정
@@ -263,7 +269,9 @@ export const contentApi = {
   },
 
   // 페르소나 이름변경
-  ChangePersonaName: async (persona: string, persona_gender: number): Promise<ApiResponse> => {
+  ChangePersonaName: async (persona: string, persona_gender: number): Promise<ApiResponse<ChangePersonaNameResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/personachange', {
       persona,
       persona_gender,
@@ -273,6 +281,48 @@ export const contentApi = {
   // 캐봇 챗 모드 가져오기
   GetChatMode: async (): Promise<ApiResponse<CharbotChatModeResponse>> => {
     return api.post('/api/charbot/chatmode')
+  },
+
+  // notification
+  GetInquiryList: async (page: number, paginate: number): Promise<ApiResponse<InquiryListResponse>> => {
+    return api.post('/api/cs/inquiryList', {
+      page,
+      paginate,
+    })
+  },
+
+  // 은행 리스트
+  GetBankList: async (): Promise<ApiResponse<BankListResponse>> => {
+    return api.post('/api/banklist')
+  },
+
+  // 이메일 수정
+  WriteRemailEdit: async (email: string): Promise<ApiResponse<WriteRemailEditResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/writeremailedit', {
+      email,
+    })
+  },  
+
+  // 은행 계좌 수정
+  WriteRebankAccountEdit: async (bank_key: number, account_no: string, user_nm: string): Promise<ApiResponse<BankAccountEditResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/writerebankaccountedit', {
+      bank_key,
+      account_no,
+      user_nm,
+    })
+  },
+
+  // 운영 정책 Url 가져오기
+  ViewTerms: async (service_type: number, countrycode = 'KR', os_type = 1): Promise<ApiResponse<ViewTermsResponse>> => {
+    return api.post('/api/viewterms', {
+      service_type,
+      countrycode,
+      os_type,
+    })
   },
 }
 
@@ -514,6 +564,34 @@ export const createApi = {
 
   GetChatBotAuth: async (): Promise<ApiResponse> => {
     return api.post('/api/charbot/get/auth')
+  },
+
+
+  // 작가 정보
+  GetWriterInfo: async (): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/writerinfo')
+  },
+
+  // 작가 출금 현황
+  GetWriterWithdrawStatus: async (): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/sales/writerwithdraw')
+  },
+
+  // 작가 출금 신청
+  WithdrawRequest: async (price: number, locale = 0, user_nm: string, resno1:string, resno2:string): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/sales/withdrawrequest', {
+      price,
+      locale,
+      user_nm,
+      resno1,
+      resno2,
+    })
   },
 }
 

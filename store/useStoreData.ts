@@ -1,4 +1,4 @@
-import { ChatModeData, CoinData, LoginResponse } from '@/types/api'
+import { ChatModeData, CoinData, LoginResponse, InquiryData } from '@/types/api'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
@@ -685,6 +685,25 @@ export const useChatModeStore = create<ChatModeStore>()(
     }),
     {
       name: 'chatMode-storage',
+      storage: createJSONStorage(() => safeStorage),
+      // skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
+    }
+  )
+)
+
+interface InquiryStore {
+  inquiryList: Array<InquiryData>
+  setInquiryList: (inquiryList: Array<InquiryData>) => void
+}
+
+export const useInquiryStore = create<InquiryStore>()(
+  persist(
+    set => ({
+      inquiryList: [],
+      setInquiryList: (inquiryList: Array<InquiryData>) => set({ inquiryList }),
+    }),
+    {
+      name: 'inquiry-storage',
       storage: createJSONStorage(() => safeStorage),
       // skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
     }

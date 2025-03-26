@@ -29,6 +29,7 @@ interface AccountState {
   setError: (error: string | null) => void
   initialize: () => Promise<void>
   updateAccountData: (coin_free: number, coin_free_dt: number | string, coin_register: number, coin_user: number) => void
+  setPersona: (persona: string, persona_gender: number) => void
 }
 
 // 네트워크 에러 타입 정의
@@ -203,6 +204,20 @@ export const useAccountStore = create<AccountState>()(
       loading: false,
       error: null,
       isInitialized: false,
+
+      setPersona: (persona: string, persona_gender: number) => {
+        set((state) => {
+          if (!state.data) return state
+          return {
+            ...state,
+            data: {
+              ...state.data,
+              persona,
+              persona_gender,
+            }
+          }
+        })
+      },
 
       setLoginState: (isLogin, data) => {
         set({ isLogin, data })
