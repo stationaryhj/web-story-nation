@@ -442,8 +442,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           
           // 저장된 채팅 키 사용
           if (chrBotChatKey) {
-            console.log('chrBotChatKey :: ', chrBotChatKey);
-            console.log('sendPrompt_key :: ', promptKey);
             
             try {
               // 저장된 채팅 모드 사용
@@ -454,10 +452,9 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
                 chrBotChatKey,
                 false // stream 설정
               );
-              console.log('🤖 AI 응답 수신:', response);
               
               // 응답 상태 확인
-              if (response && response.success && response.data && response.data.result && response.data.result.err === 0) {
+              if (response && response.data && response.data.result && response.data.result.err === 0) {
                 // AI의 응답을 다시 채널에 전송
                 const chatMessageResponse = response.data;
 
@@ -481,10 +478,10 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
                 }
 
                 if (socketRef.current) {
+                  console.log('@@@@ socketRef.current :: ', socketRef.current)
                   try {
                     // 응답 JSON 파싱 및 content 추출
                     const responseObj = JSON.parse(chatMessageResponse.response);
-
                     let messageContent = '';
                     
                     // Gemini AI 모델 응답인지 확인 (candidates 속성 존재)
@@ -769,6 +766,26 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     setChatMessages(prev => [...prev, message]);
   };
 
+
+  const checkAccountExists = async (client, deviceId, username) => {
+    console.log('checkAccountExists :: ', client, deviceId, username);
+
+    try {
+      // 계정 생성 없이 인증 시도 (두 번째 매개변수가 false)
+      await client.authenticateDevice(deviceId, false, username);
+      return { exists: true, error: null };
+    } catch (error) {
+      // 에러 코드 5는 계정이 없음을 의미
+      if (error.code === 5) {
+        console.log('계정이 없습니다.');
+        return { exists: false, error: null };
+      }
+      // 다른 에러는 네트워크 문제 등
+      console.log('다른 에러는 네트워크 문제 등');
+      return { exists: false, error };
+    }
+  };
+
   /**
    * 채팅 룸 초기화 함수
    * @param userKey 사용자 고유 키
@@ -780,7 +797,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     channelId?: string;
     roomName?: string;
   }> => {
-    try {
+    // try {
       console.log('채팅방 초기화 시작:', { userKey, chatBotId, chatMode });
       
       // 초기화 상태 리셋
@@ -805,9 +822,21 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
       // 2. 디바이스 ID 생성 및 인증
       const deviceId = `chatbot_jackpot_${userKey}`;
-      console.log('디바이스 인증 시작:', deviceId);
+      console.log('디바이스 인증 시작@@@@@@@@@@@@@@@@@@@@@@@:', deviceId);
+
+      // const newSession = await _client.authenticateDevice(deviceId, true, userKey?.toString());
+
+      let newSession = null;
+      const accountExists = await checkAccountExists(_client, deviceId, userKey?.toString());
+      console.log('accountExists :: ', accountExists);
+      if(accountExists.exists) {
+        newSession = await _client.authenticateDevice(deviceId, false, userKey?.toString());
+      }
+      else {
+        newSession = await _client.authenticateDevice(deviceId, true, userKey?.toString());
+      }
       
-      const newSession = await _client.authenticateDevice(deviceId, false, userKey?.toString());
+      
       console.log('인증 성공, 세션 생성됨');
       setSession(newSession);
 
@@ -853,10 +882,10 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       
       // 7. 연결 상태 업데이트 및 결과 리턴
       const isSuccess = response && 
-                       response.status === 200 && 
-                       response.data && 
-                       response.data.result && 
-                       response.data.result.err === 0;
+        response.status === 200 && 
+        response.data && 
+        response.data.result && 
+        response.data.result.err === 0;
       
       console.log('🔌 채팅 초기화 결과 => isSuccess:', isSuccess,
       'socketConnected:', newSocket.isConnected);
@@ -954,13 +983,13 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         roomName: newRoomName
       };
       
-    } catch (error) {
-      console.error('채팅방 초기화 중 오류 발생:', error);
-      setIsConnecting(false);
-      setIsConnected(false);
-      setIsInitRoom(false);
-      throw error;
-    }
+    // } catch (error) {
+    //   console.error('채팅방 초기화 중 오류 발생:', error);
+    //   setIsConnecting(false);
+    //   setIsConnected(false);
+    //   setIsInitRoom(false);
+    //   throw error;
+    // }
   };
 
   // 소켓 연결 함수

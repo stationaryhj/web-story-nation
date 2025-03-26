@@ -282,7 +282,7 @@ export const chatApi = {
   UseChat: async (chrbot_chat_key: number, chat_mode: number): Promise<ApiResponse<ChatUseResponse>> => {
     const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
     api.defaults.headers.common['Authorization'] = account_token
-    return chatApiInstance.post('/api/charbot/chat/user', {
+    return chatApiInstance.post('/api/charbot/chat/use', {
       chrbot_chat_key,
       chat_mode,
     })
@@ -386,7 +386,7 @@ export const settlementApi = {
 
   GetOrderId: async (coinKey: string): Promise<ApiResponse<OrderIdResponse>> => {
     return api.post('/api/getorderid', {
-      coinKey,
+      coin_key: coinKey,
     })
   },
 
