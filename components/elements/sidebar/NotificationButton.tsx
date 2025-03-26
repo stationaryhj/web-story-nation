@@ -15,7 +15,7 @@ export default function NotificationButton({ count = 0, className = '' }: Notifi
   const { openModal } = useModalStore()
 
   const handleClick = () => {
-    openModal('notification')
+    openModal('notification') // 알림 사이드바 모달 열기
   }
 
   return (

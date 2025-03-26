@@ -35,6 +35,7 @@ export interface LoginResponse {
   result: ApiResult;
 }
 
+
 // Charbot Top 10 List
 export type CharbotTop10Response = {
   module_1: Array<ModuleCharacter>;
@@ -63,6 +64,12 @@ export interface ModuleCharacter {
   module_id: number;
   sort: number;
 }
+
+export interface TagListResponse {
+  result: ApiResult;
+  tagList: Array<TagRanking>;
+}
+
 
 // Tag Top Ranking List
 export interface TagRankingListResponse {
@@ -155,7 +162,13 @@ export interface ChrbotData {
   world_list_detail_key: number;
 }
 
+
 export interface CharbotChatListResponse {
+  chrbot_chat: CharbotChatListData,
+  result: ApiResult;
+}
+
+export interface CharbotChatListData {
   current_page: number;
   data: Array<CharbotChatData>;
   first_page_url: string;
@@ -213,8 +226,15 @@ export interface CharbotGetListResponse {
   result: ApiResult;
 }
 
+
 // CharbotGetListMine Response
 export interface CharbotGetListMineResponse {
+  chrbotList: CharbotGetListMineData;
+  result: ApiResult;
+}
+
+
+export interface CharbotGetListMineData {
   current_page: number;
   data: Array<CharbotMineData>;
   first_page_url: string;
@@ -353,6 +373,7 @@ export interface CharbotSearchData {
 // GetOrderId Response
 export interface OrderIdResponse {
   orderId: string;
+  toss_client_key: string;
   result: ApiResult;
 }
 
@@ -372,6 +393,66 @@ export interface CoinData {
   price: number;
   sort: number;
 }
+
+
+// CoinChargeUseHistory Response
+export interface CoinChargeUseHistoryResponse {
+  historyList: CoinChargeUseHistoryData;
+  result: ApiResult;
+}
+
+export interface CoinChargeUseHistoryData {
+  current_page: number;
+  data: Array<UseHistoryData>;
+  first_page_url: string;
+  from: number;
+  last_page: number;
+  last_page_url: string;
+  links: Array<PaginationLink>;
+  next_page_url: string | null;
+  path: string;
+  per_page: number;
+  prev_page_url: string | null;
+  to: number | null;
+  total: number;
+}
+
+export interface UseHistoryData {
+  charge_type: number;
+  coin: number;
+  content: string;
+  create_dt: string;
+  item_key: any;
+  property: string;
+}
+
+// Use Coin Response
+export interface ChatUseResponse {
+  coin: number;
+  charge_use_key: number;
+  result: ApiResult;
+}
+
+// ConfirmTossPayment Response
+export interface ConfirmTossPaymentResponse {
+  coin_user: number;
+  coin_free: number;
+  coin_register: number;
+  result: ApiResult;
+}
+
+
+// ChatMessageResponse
+export interface ChatMessageResponse {
+  msg_len: number;
+  prompt_key: string;
+  response: string;
+  summary_position: number
+  result: ApiResult;
+}
+
+
+
 
 // API Result
 export type ApiResult = {

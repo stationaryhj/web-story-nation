@@ -13,18 +13,25 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useAccountStore } from '@/store/useStoreData'
+import { bridgeLoginDataToUserInfo } from '@/lib/utils/storyNationUtil'
+import { ReqGetCoinChargeUseHistory, GetSettlementList } from '@/services/hooks/DataListManager'
 
 export default function MyPageView() {
   const [activeTab, setActiveTab] = useState<'income' | 'withdrawal'>('income')
 
-  // 더미 데이터
-  const userInfo = {
-    nickname: '닉네임',
-    balance: 1232.7,
-    bank: '신한 은행',
-    accountHolder: '이윤재',
-    accountNumber: '3333-05-9090944',
+  const userInfo = bridgeLoginDataToUserInfo(useAccountStore.getState().data || null)
+
+  if(userInfo === null) {
+    return <div>로그인 후 이용해주세요.</div>
   }
+
+
+  const {
+    data: settlementListData,
+    isLoading: settlementListLoading,
+    error: settlementListError,
+    refetch: settlementListRefetch } = GetSettlementList(1, 1, 10);
 
   const incomeHistory = [
     { date: '25.03.17', source: '캐릭터 채팅', amount: 170.5, character: '캐릭터1' },
@@ -120,20 +127,20 @@ export default function MyPageView() {
                 </button>
               </div>
               <div className="flex items-end">
-                <span className="text-3xl font-bold text-gray-800">{userInfo.balance.toLocaleString()}</span>
+                <span className="text-3xl font-bold text-gray-800">{userInfo?.getBalance().toLocaleString()}</span>
                 <span className="text-gray-500 text-lg ml-2 mb-0.5">펜</span>
               </div>
-              <p className="text-gray-500 text-sm mt-1">≈ {(userInfo.balance * 10).toLocaleString()}원</p>
+              <p className="text-gray-500 text-sm mt-1">≈ {(userInfo?.getBalance() * 10).toLocaleString()}원</p>
             </div>
             <div className="bg-gradient-to-r from-violet-50 to-fuchsia-50 px-6 py-3 border-t border-violet-100">
               <div className="flex items-center text-sm text-violet-700">
                 <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
                   <div
                     className="bg-gradient-to-r from-violet-500 to-fuchsia-500 h-full rounded-full"
-                    style={{ width: `${Math.min((userInfo.balance / 1500) * 100, 100)}%` }}
+                    style={{ width: `${Math.min((userInfo?.getBalance() / 1500) * 100, 100)}%` }}
                   ></div>
                 </div>
-                <div className="whitespace-nowrap ml-3">{userInfo.balance} / 1,500 펜</div>
+                <div className="whitespace-nowrap ml-3">{userInfo?.getBalance()} / 1,500 펜</div>
               </div>
             </div>
           </motion.div>

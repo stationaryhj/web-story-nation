@@ -9,6 +9,7 @@ import { faComment, faFire, faPencilAlt, faTrash } from '@fortawesome/free-solid
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import React from 'react'
+import { useRouter } from 'next/navigation'
 
 interface CardProps {
   character: Character
@@ -16,13 +17,26 @@ interface CardProps {
   variant?: 'default' | 'my-character'
   onEdit?: () => void
   onDelete?: () => void
-  onCardClick?: (data: Character) => void
+  onCardClick?: (character: Character) => void
+  rank?: number
+  hasRank?: boolean
+
 }
 
-export default function Card({ character, index = 0, variant = 'default', onEdit, onDelete, onCardClick }: CardProps) {
+export default function Card({
+  character,
+  index = 0,
+  variant = 'default',
+  onEdit,
+  onDelete,
+  onCardClick,
+  rank,
+  hasRank = false,
+}: CardProps) {
   const { name, description, imageUrl, commentCount, hashtags, isAdult, creator } = character
   const { openModal, setSelectedCharacter } = useModalStore()
-
+  const [imageError, setImageError] = React.useState(false)
+  const router = useRouter()
   // 카드 클릭 기본 핸들러 - 캐릭터 모달 열기
   const defaultCardClick = () => {
     setSelectedCharacter(character)
@@ -38,6 +52,11 @@ export default function Card({ character, index = 0, variant = 'default', onEdit
     }
   }
 
+  // 이미지 로드 에러 핸들러
+  const handleImageError = () => {
+    setImageError(true)
+  }
+
   // 수정 버튼 클릭 처리
   const handleEditClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation() // 카드 클릭 이벤트 전파 방지
@@ -50,6 +69,14 @@ export default function Card({ character, index = 0, variant = 'default', onEdit
     if (onDelete) onDelete()
   }
 
+  // 랭킹에 따른 배경색 설정
+  const getRankBgColor = (rank: number) => {
+    if (rank === 1) return 'bg-yellow-500' // 1위: 금색
+    if (rank === 2) return 'bg-gray-400' // 2위: 은색
+    if (rank === 3) return 'bg-amber-600' // 3위: 동색
+    return 'bg-primary-500' // 그 외
+  }
+
   return (
     <CardTransition index={index}>
       <div
@@ -58,21 +85,31 @@ export default function Card({ character, index = 0, variant = 'default', onEdit
       >
         <div className="block">
           <div className="relative aspect-[3/4] overflow-hidden rounded-t-xl">
+            {/* 랭킹 표시 */}
+            {hasRank && rank !== undefined && (
+              <div
+                className={`absolute top-0 left-0 z-10 w-8 h-8 ${getRankBgColor(rank)} text-white flex items-center justify-center font-bold shadow-md`}
+              >
+                {rank}
+              </div>
+            )}
+
             <Image
-              src={getImageUri(imageUrl)}
+              src={imageUrl}
               alt={name}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
               className="object-cover transition-transform duration-500 group-hover:scale-110"
+              onError={handleImageError}
             />
 
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-            {variant === 'default' && (
+            {/* {variant === 'default' && (
               <div className="absolute top-3 left-3 bg-primary-500/90 dark:bg-dark-primary-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
                 스토리네이션
               </div>
-            )}
+            )} */}
 
             {isAdult && (
               <div className="absolute top-3 right-3 bg-red-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
@@ -103,7 +140,7 @@ export default function Card({ character, index = 0, variant = 'default', onEdit
             <div className="mb-2 flex flex-wrap gap-1">
               {hashtags.slice(0, 3).map((tag, index) => (
                 <span
-                  key={index}
+                  key={`${character.id}-tag-${tag}-${index}`}
                   className="text-xs text-primary-500 dark:text-dark-primary-600 bg-primary-50 dark:bg-dark-primary-100/10 px-2 py-0.5 rounded-full"
                 >
                   {tag}

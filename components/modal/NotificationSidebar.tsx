@@ -162,7 +162,7 @@ export default function NotificationSidebar() {
         </div>
 
         {/* 알림 관리 버튼 */}
-        <div className="p-2 border-b border-secondary-200 dark:border-dark-secondary-700 flex justify-between">
+        <div className="flex justify-end space-x-2 p-2 border-b border-secondary-100 dark:border-dark-secondary-800">
           <button
             className="text-xs text-primary-600 hover:text-primary-700 dark:text-dark-primary-400 dark:hover:text-dark-primary-300 px-2 py-1"
             onClick={markAllAsRead}
@@ -198,7 +198,7 @@ export default function NotificationSidebar() {
                     !item.isRead ? 'bg-primary-50 dark:bg-dark-primary-900/20' : ''
                   }`}
                 >
-                  <div className="p-3 relative">
+                  <div className="p-4 relative">
                     {/* 읽지 않은 표시 */}
                     {!item.isRead && (
                       <div className="absolute left-0 top-0 w-1 h-full bg-primary-500 dark:bg-dark-primary-500"></div>
@@ -219,7 +219,7 @@ export default function NotificationSidebar() {
                           {item.title}
                         </h3>
                       </div>
-                      <div className="flex">
+                      <div className="flex space-x-1">
                         {/* 읽음 버튼 */}
                         {!item.isRead && (
                           <button

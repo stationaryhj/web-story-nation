@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react'
 import { InitDataLoader } from '@/app/providers/InitDataLoader'
 
 import { API_URL, CHAT_URL } from '@/services/api/storyNationApi'
+import { useAccountStore } from '@/store/useStoreData'
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
@@ -23,6 +24,7 @@ export default function Providers({ children }: { children: ReactNode }) {
   }))
   const { isDarkMode } = useThemeStore()
   const [mounted, setMounted] = useState(false)
+  const { isLogin, data } = useAccountStore()
 
   // 컴포넌트가 마운트되었는지 확인
   useEffect(() => {
@@ -87,7 +89,16 @@ export default function Providers({ children }: { children: ReactNode }) {
           <br />
           release : bslive1, bslive2, bslive1
           <br />
-          dev : BS1, BS2, BS3
+          dev : BS1, BS2, BS3, 천마신군
+        </pre><br />
+
+        <pre>
+          IS LOGIN : {isLogin ? 'true' : 'false'}<br />
+          {isLogin && (
+            <>
+              NICKNAME : {data?.nick_nm}<br />
+            </>
+          )}
         </pre>
       </div>
     )

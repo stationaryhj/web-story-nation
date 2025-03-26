@@ -1,14 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { nanoid } from 'nanoid';
 import { motion, AnimatePresence } from 'framer-motion';
 import { loadTossPayments, ANONYMOUS } from '@tosspayments/tosspayments-sdk';
 
 // 결제 모달 Props 정의
 export interface PaymentModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  orderId: string;
   amount: number;
   clientKey: string;
   successUrl?: string;
@@ -17,10 +16,12 @@ export interface PaymentModalProps {
   customerName?: string;
   onSuccess?: (paymentResult: any) => void;
   onFail?: (error: any) => void;
+  onClose: () => void;
 }
 
 export default function PaymentModal({
   isOpen,
+  orderId,
   onClose,
   amount,
   clientKey,
@@ -57,13 +58,24 @@ export default function PaymentModal({
     
     try {
       setIsProcessing(true);
+
+      console.log('@@ clientKey :: ', clientKey);
+      console.log('@@ orderID :: ', orderId);
+      console.log('@@ amount :: ', amount);
+      console.log('@@ orderName :: ', orderName);
+      console.log('@@ customerName :: ', customerName);
+
       
       // 토스페이먼츠 SDK 로드
-      const tossPayments = await loadTossPayments(clientKey);
-      
+      const tossPayments = await loadTossPayments(process.env.NEXT_PUBLIC_TOSS_PAYMENT_CLIENT_KEY || clientKey);
+
+
+
       // 위젯 초기화
       const widgets = tossPayments.widgets({ customerKey: ANONYMOUS });
       widgetsRef.current = widgets;
+
+      console.log('@@ widgets :: ', widgets);
       
       // 금액 설정
       widgets.setAmount({
@@ -93,18 +105,17 @@ export default function PaymentModal({
   };
   
   // 실제 결제 요청
-  const handleRequestPayment = async () => {
+  const handleRequestPayment = async (orderId: string) => {
     if (!widgetsRef.current) {
       alert('결제 위젯이 초기화되지 않았습니다.');
       return;
     }
+
+    console.log('@@ orderId :: ', orderId);
     
     try {
+
       setIsProcessing(true);
-      
-      // 결제 요청에 필요한 정보
-      const orderId = nanoid();
-      
       // 결제 요청
       const paymentResult = await widgetsRef.current.requestPayment({
         orderId,
@@ -206,7 +217,7 @@ export default function PaymentModal({
                 </button>
                 
                 <button 
-                  onClick={handleRequestPayment}
+                  onClick={() => handleRequestPayment(orderId)}
                   disabled={isProcessing}
                   className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >

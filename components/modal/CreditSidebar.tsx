@@ -3,10 +3,13 @@
 import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes, faPen, faGift, faHistory, faCoins } from '@fortawesome/free-solid-svg-icons'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { useModalStore } from '@/store/useStoreModal'
 import { useCoinStore, useAccountStore } from '@/store/useStoreData'
 import List, { ListItem } from '@/components/elements/list/List'
+import { CoinData, OrderIdResponse } from '@/types/api'
+import PaymentModal from '@/components/modal/PaymentModal';
+import { settlementApi } from '@/services/api/storyNationApi'
 
 interface CreditSidebarProps {}
 
@@ -15,10 +18,100 @@ export default function CreditSidebar({}: CreditSidebarProps) {
   const { coinList } = useCoinStore(state => ({ coinList: state.coinList }))
   const accountData = useAccountStore(state => state.data)
   const [activeTab, setActiveTab] = useState<'charge' | 'history'>('charge')
+
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
+  const [paymentAmount, setPaymentAmount] = useState(0)
+  const [paymentOrderId, setPaymentOrderId] = useState('')
+  const [tossClientKey, setTossClientKey] = useState('')
+  
+  // 디바운스 및 API 중복 호출 방지를 위한 refs
+  const isProcessing = useRef(false);
+  const selectedCoinRef = useRef<CoinData | null>(null);
   
   // 계정 데이터에서 펜 정보 가져오기
   const freePenCount = accountData?.coin_free ?? 0
   const paidPenCount = accountData?.coin_register ?? 0
+
+  // 안전한 content 파싱 함수
+  const getWebPrice = useCallback((content: string | undefined): number => {
+    if (!content) return 0;
+    try {
+      const contentData = JSON.parse(content);
+      return contentData.web_price || 0;
+    } catch (e) {
+      console.error('JSON 파싱 오류:', e);
+      return 0;
+    }
+  }, []);
+
+  // OrderId 가져오기 (재사용 가능한 함수로 분리)
+  const fetchOrderId = useCallback(async (coinKey: number) => {
+    try {
+      const response = await settlementApi.GetOrderId(coinKey);
+      return response.data as OrderIdResponse;
+    } catch (error) {
+      console.error('OrderId 가져오기 실패:', error);
+      throw error;
+    }
+  }, []);
+
+  // 패키지 클릭 핸들러 (useCallback으로 메모이제이션)
+  const handlePackageClick = useCallback(async (coinData: CoinData) => {
+    // 이미 처리 중이면 중복 호출 방지
+    if (isProcessing.current) {
+      console.log('이미 처리 중입니다.');
+      return;
+    }
+    
+    // 처리 상태 설정
+    isProcessing.current = true;
+    selectedCoinRef.current = coinData;
+    
+    try {
+      console.log('@@ coinKey :: ', coinData);
+
+      // content를 JSON으로 파싱하여 web_price 가져오기
+      const amount = getWebPrice(coinData.content);
+      
+      // API 호출로 주문 ID 가져오기
+      const orderIdData = await fetchOrderId(coinData.coin_key);
+      console.log('@@ orderIdData :: ', orderIdData);
+
+      // 상태 업데이트 (한 번에 모아서)
+      setPaymentAmount(amount);
+      setPaymentOrderId(orderIdData.orderId);
+      setTossClientKey(orderIdData.toss_client_key);
+      setIsPaymentModalOpen(true);
+    } catch (error) {
+      console.error('패키지 처리 중 오류 발생:', error);
+    } finally {
+      // 300ms 후에 처리 상태 해제 (디바운스)
+      setTimeout(() => {
+        isProcessing.current = false;
+      }, 300);
+    }
+  }, [getWebPrice, fetchOrderId]);
+
+  // 결제 모달이 열릴 때 중복 호출 방지
+  useEffect(() => {
+    if (isPaymentModalOpen) {
+      isProcessing.current = true;
+    } else {
+      // 모달이 닫힐 때 처리 상태 해제 (지연 적용)
+      setTimeout(() => {
+        isProcessing.current = false;
+        selectedCoinRef.current = null;
+      }, 300);
+    }
+  }, [isPaymentModalOpen]);
+
+  const handlePaymentSuccess = (result: any) => {
+    console.log('@@ result :: ', result)
+  }
+
+  const handlePaymentFail = (error: any) => {
+    console.log('@@ error :: ', error)
+  }
 
   if (!isOpen || modalType !== 'credit') {
     return null
@@ -180,37 +273,44 @@ export default function CreditSidebar({}: CreditSidebarProps) {
               <div className="space-y-3">
                 {/* coinList 데이터를 사용하여 패키지 렌더링 */}
                 {coinList && coinList.length > 0 ? (
-                  coinList.map((coin) => (
-                    <div 
-                      key={coin.coin_key}
-                      className="border border-secondary-200 dark:border-dark-secondary-700 rounded-lg p-4 hover:border-primary-300 dark:hover:border-dark-primary-600 transition-colors cursor-pointer"
-                    >
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium text-secondary-900 dark:text-dark-secondary-200">
-                          {coin.coin_nm}
-                        </span>
-                        {coin.sort > 0 && (
-                          <span className="bg-primary-100 dark:bg-dark-primary-900/60 text-primary-700 dark:text-dark-primary-400 text-xs font-medium px-2 py-1 rounded-full">
-                            인기
+                  coinList.map((coin) => {
+                    // content를 JSON으로 파싱하여 web_price 가져오기
+                    const contentData = JSON.parse(coin.content || '{}')
+                    const price = contentData.web_price || 0
+                    
+                    return (
+                      <div 
+                        key={coin.coin_key}
+                        className="border border-secondary-200 dark:border-dark-secondary-700 rounded-lg p-4 hover:border-primary-300 dark:hover:border-dark-primary-600 transition-colors cursor-pointer"
+                        onClick={() => handlePackageClick(coin)}
+                      >
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="font-medium text-secondary-900 dark:text-dark-secondary-200">
+                            {coin.coin_nm}
                           </span>
+                          {coin.sort > 0 && (
+                            <span className="bg-primary-100 dark:bg-dark-primary-900/60 text-primary-700 dark:text-dark-primary-400 text-xs font-medium px-2 py-1 rounded-full">
+                              인기
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center">
+                            <FontAwesomeIcon icon={faPen} className="text-primary-600 dark:text-dark-primary-400 mr-1.5" />
+                            <span className="text-secondary-800 dark:text-dark-secondary-300">{coin.cnt} 펜</span>
+                          </div>
+                          <span className="text-secondary-900 dark:text-dark-secondary-200 font-bold">
+                            ₩{price.toLocaleString()}
+                          </span>
+                        </div>
+                        {coin.content && (
+                          <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mt-2">
+                            {coin.content}
+                          </p>
                         )}
                       </div>
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center">
-                          <FontAwesomeIcon icon={faPen} className="text-primary-600 dark:text-dark-primary-400 mr-1.5" />
-                          <span className="text-secondary-800 dark:text-dark-secondary-300">{coin.cnt} 펜</span>
-                        </div>
-                        <span className="text-secondary-900 dark:text-dark-secondary-200 font-bold">
-                          ₩{coin.price.toLocaleString()}
-                        </span>
-                      </div>
-                      {coin.content && (
-                        <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mt-2">
-                          {coin.content}
-                        </p>
-                      )}
-                    </div>
-                  ))
+                    )
+                  })
                 ) : (
                   <div className="text-center py-4 text-secondary-500 dark:text-dark-secondary-400">
                     패키지 정보를 불러오는 중입니다...
@@ -231,6 +331,18 @@ export default function CreditSidebar({}: CreditSidebarProps) {
           </div>
         )}
       </motion.div>
+
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        amount={paymentAmount}
+        clientKey={tossClientKey}
+        orderId={paymentOrderId}
+        orderName="펜 충전"
+        customerName={accountData?.nick_nm}
+        onSuccess={handlePaymentSuccess}
+        onFail={handlePaymentFail}
+      />
     </>
   )
 }

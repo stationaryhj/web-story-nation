@@ -34,7 +34,7 @@ export const BaseButton = ({
 
   // 색상에 따른 스타일
   const colorStyles = {
-    primary: 'bg-violet-500 hover:bg-violet-600 text-white shadow-sm',
+    primary: 'bg-gray-50 hover:bg-violet-500 text-gray-700 hover:text-white shadow-sm',
     secondary: 'bg-gray-100 hover:bg-gray-200 text-gray-700 shadow-sm',
     tertiary: 'bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 shadow-sm',
     gradient:
