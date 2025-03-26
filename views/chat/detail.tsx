@@ -81,7 +81,8 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     sendChatMessage,
     refreshLastAIMessage,
     clearChatHistory,
-    addChatMessage
+    addChatMessage,
+    updateChatMode
   } = nakamaContext;
   
   const [message, setMessage] = useState('')
@@ -217,19 +218,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     };
   }, [character?.id, characterId, accountData?.user_key, chatRoomInit, isConnected, disconnectSocket, channelId, leaveChat, clearChatHistory, addChatMessage, chatMode]);
 
-  // 드롭다운 외부 클릭 감지
-  // useEffect(() => {
-  //   function handleClickOutside(event: MouseEvent) {
-  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-  //       setShowModeDropdown(false)
-  //     }
-  //   }
-  //   document.addEventListener('mousedown', handleClickOutside)
-  //   return () => {
-  //     document.removeEventListener('mousedown', handleClickOutside)
-  //   }
-  // }, []);
-
   // 메시지 전송 처리 (Provider의 메서드 사용)
   const handleSendMessage = async (e: FormEvent) => {
     e.preventDefault();
@@ -296,17 +284,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     // 이전 모드와 다른 경우에만 처리
     if (currentModeId !== mode.id) {
       setCurrentModeId(mode.id);
-      
-      // 모드 변경 시 알림 메시지 추가 (선택사항)
-      // addChatMessage({
-      //   id: `system_${Date.now()}`,
-      //   sender: 'character',
-      //   message: `*시스템* 채팅 모드가 "${getChatModeName(mode.id)}"로 변경되었습니다.`,
-      //   timestamp: new Date(),
-      // });
-      
-      // 필요시 서버에 모드 변경 알림
-      // TODO: 서버에 모드 변경 요청을 보내는 로직 추가
+      updateChatMode(mode.id);
     }
     
     // 모달 닫기

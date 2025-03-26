@@ -47,6 +47,8 @@ interface NakamaContextType {
   refreshLastAIMessage: () => Promise<boolean>;           // 마지막 AI 메시지 재생성
   clearChatHistory: () => void;                          // 채팅 기록 초기화
   addChatMessage: (message: ChatMessage) => void;         // 메시지 추가
+
+  updateChatMode: (mode: number) => void;
 }
 
 // 채팅 메시지 인터페이스
@@ -90,7 +92,9 @@ const defaultContextValue: NakamaContextType = {
   sendChatMessage: async () => false,
   refreshLastAIMessage: async () => false,
   clearChatHistory: () => {},
-  addChatMessage: () => {}
+  addChatMessage: () => {},
+
+  updateChatMode: () => {}
 };
 
 // Nakama 컨텍스트 생성
@@ -478,7 +482,22 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
                   try {
                     // 응답 JSON 파싱 및 content 추출
                     const responseObj = JSON.parse(chatMessageResponse.response);
-                    const messageContent = responseObj.candidates[0]?.content?.parts[0]?.text;
+
+                    let messageContent = '';
+                    
+                    // Gemini AI 모델 응답인지 확인 (candidates 속성 존재)
+                    if (responseObj.candidates) {
+                      // Gemini AI 모델 응답 형식
+                      messageContent = responseObj.candidates[0]?.content?.parts[0]?.text;
+                      console.log('🤖 Gemini AI 응답 감지');
+                    } else if (responseObj.content) {
+                      // 다른 AI 모델 응답 형식
+                      messageContent = responseObj.content[0].text;
+                      console.log('🤖 일반 AI 응답 감지');
+                    } else {
+                      console.error('알 수 없는 AI 응답 형식:', responseObj);
+                      messageContent = "응답 형식이 잘못되었습니다. 다시 시도해주세요.";
+                    }
                     
                     console.log('🤖 AI 응답 내용 (채널로 전송 중):', messageContent);
                     
@@ -682,7 +701,23 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       try {
         // 응답 JSON 파싱 및 content 추출
         const responseObj = JSON.parse(response.data.response);
-        const messageContent = responseObj.content[0].text;
+        let messageContent = '';
+        
+        // Gemini AI 모델 응답인지 확인 (candidates 속성 존재)
+        if (responseObj.candidates) {
+          // Gemini AI 모델 응답 형식
+          messageContent = responseObj.candidates[0]?.content?.parts[0]?.text;
+          console.log('🤖 Gemini AI 응답 감지');
+        } else if (responseObj.content) {
+          // 다른 AI 모델 응답 형식
+          messageContent = responseObj.content[0].text;
+          console.log('🤖 일반 AI 응답 감지');
+        } else {
+          console.error('알 수 없는 AI 응답 형식:', responseObj);
+          messageContent = "응답 형식이 잘못되었습니다. 다시 시도해주세요.";
+        }
+        
+        console.log('🤖 AI 응답 내용 (채널로 전송 중):', messageContent);
         
         // 단순화된 메시지 형식 - content와 type만 포함
         const content = { 
@@ -1080,6 +1115,12 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     });
   };
 
+
+  const updateChatMode = (mode: number) => {
+    setCurrentChatMode(mode);
+    console.log('🔄 채팅 모드 업데이트:', mode);
+  };
+
   const contextValue: NakamaContextType = {
     client,
     socket: socketRef.current,
@@ -1111,7 +1152,8 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     sendChatMessage,
     refreshLastAIMessage,
     clearChatHistory,
-    addChatMessage
+    addChatMessage,
+    updateChatMode
   };
 
   return (
