@@ -428,8 +428,11 @@ export interface UseHistoryData {
 
 // Use Coin Response
 export interface ChatUseResponse {
-  coin: number;
-  charge_use_key: number;
+  coin: number,
+  coin_free: number,
+  coin_free_dt: string,
+  coin_register: number,
+  charge_use_key: number,
   result: ApiResult;
 }
 
@@ -450,6 +453,36 @@ export interface ChatMessageResponse {
   summary_position: number
   result: ApiResult;
 }
+
+
+export interface OpenChatResponse {
+  arrangePrompt: number
+  prompt_key: string
+  world_list_detail_chrbot: WorldListDetailChrbot;
+  result: ApiResult
+}
+
+
+export interface WorldListDetailChrbot {
+  block_type: number
+  chat_cnt: number
+  comment_cnt: number
+  delete_yn: number
+  first_talk: string
+  gender: string
+  img_url: string
+  img_url_nsfw: string
+  like_cnt: number
+  lv: number
+  msg_cnt: number
+  nick_nm: string
+  nsfw: number
+  tags: string
+  title: string
+  user_key: number
+  world_list_detail_chrbot_key: number
+}
+
 
 
 

@@ -188,12 +188,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         
         // 초기 메시지 설정 (Provider의 메서드 사용)
         clearChatHistory(); // 기존 메시지 초기화
-        addChatMessage({
-          id: '1',
-          sender: 'character',
-          message: `*반갑게* 안녕하세요! ${character.name}입니다. 채팅을 시작합니다.`,
-          timestamp: new Date(),
-        });
         
         // 현재 모드 설정 업데이트
         setCurrentModeId(selectedModeId);

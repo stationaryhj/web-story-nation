@@ -6,7 +6,6 @@ import type {
   LoginResponse,
   ModuleCharacter,
   CharbotTop10Response,
-  CharbotListResponse,
   TagRankingListResponse,
   CharbotSearchResponse,
   CharbotChatListResponse,
@@ -19,6 +18,7 @@ import type {
   ChatUseResponse,
   CoinChargeUseHistoryResponse,
   ConfirmTossPaymentResponse,
+  OpenChatResponse,
 } from '../../types/api'
 
 // API 기본 설정
@@ -282,13 +282,13 @@ export const chatApi = {
   UseChat: async (chrbot_chat_key: number, chat_mode: number): Promise<ApiResponse<ChatUseResponse>> => {
     const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
     api.defaults.headers.common['Authorization'] = account_token
-    return chatApiInstance.post('/api/charbot/chat/user', {
+    return chatApiInstance.post('/api/charbot/chat/use', {
       chrbot_chat_key,
       chat_mode,
     })
   },
 
-  OpenChat: async (chrbot_chat_key: number, chat_mode: number, nsfw: number): Promise<ApiResponse> => {
+  OpenChat: async (chrbot_chat_key: number, chat_mode: number, nsfw: number): Promise<ApiResponse<OpenChatResponse>> => {
     const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
     chatApiInstance.defaults.headers.common['Authorization'] = account_token
     return chatApiInstance.post('/api/charbot/chat/open', {
@@ -313,8 +313,6 @@ export const chatApi = {
     prompt_key: string,
     chrbot_chat_key: number,
     stream: boolean,
-    ai_message: string = '',
-    user_message: string = ''
   ): Promise<ApiResponse> => {
     return chatApiInstance.post('/api/charbot/chat/send', {
       chat_mode,
@@ -323,8 +321,6 @@ export const chatApi = {
       chrbot_chat_key,
       stream: stream ? 1 : 0,
       countryCode: 'KR',
-      ai_message,
-      user_message,
     })
   },
 
