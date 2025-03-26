@@ -27,6 +27,10 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
   const [selectedTags, setSelectedTags] = useState<string[]>(searchParams.get('tags')?.split('&') || [])
   const [expanded, setExpanded] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [startX, setStartX] = useState(0)
+  const [scrollLeft, setScrollLeft] = useState(0)
+  const [recentlyClicked, setRecentlyClicked] = useState(false)
 
   // URL 파라미터가 변경될 때 태그 선택 상태 업데이트
   useEffect(() => {
@@ -64,7 +68,38 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
     [pathname, router, searchParams]
   )
 
-  // 가로 스크롤 호리젠탈 휠 이벤트 핸들러
+  // 마우스 다운 이벤트 핸들러
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (expanded || !scrollContainerRef.current) return
+
+    setIsDragging(true)
+    setStartX(e.pageX)
+    setScrollLeft(scrollContainerRef.current.scrollLeft)
+    document.body.style.userSelect = 'none' // 드래그 중 텍스트 선택 방지
+  }
+
+  // 마우스 무브 이벤트 핸들러
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollContainerRef.current) return
+
+    const x = e.pageX
+    const distance = x - startX
+    scrollContainerRef.current.scrollLeft = scrollLeft - distance
+  }
+
+  // 마우스 업 이벤트 핸들러
+  const handleMouseUp = () => {
+    setIsDragging(false)
+    document.body.style.userSelect = '' // 텍스트 선택 다시 활성화
+
+    // 클릭과 드래그를 구분하기 위한 타이머 설정
+    setRecentlyClicked(true)
+    setTimeout(() => {
+      setRecentlyClicked(false)
+    }, 300) // 300ms 이내에 클릭 이벤트가 발생하면 클릭으로 간주
+  }
+
+  // 가로 스크롤 휠 이벤트 핸들러
   const handleWheel = useCallback(
     (e: React.WheelEvent) => {
       if (expanded || !scrollContainerRef.current) return
@@ -79,9 +114,38 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
     [expanded]
   )
 
+  // 전역 마우스 이벤트 리스너 설정
+  useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      if (isDragging) {
+        setIsDragging(false)
+        document.body.style.userSelect = ''
+      }
+    }
+
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      if (isDragging && scrollContainerRef.current) {
+        const x = e.pageX
+        const distance = x - startX
+        scrollContainerRef.current.scrollLeft = scrollLeft - distance
+      }
+    }
+
+    document.addEventListener('mouseup', handleGlobalMouseUp)
+    document.addEventListener('mousemove', handleGlobalMouseMove)
+
+    return () => {
+      document.removeEventListener('mouseup', handleGlobalMouseUp)
+      document.removeEventListener('mousemove', handleGlobalMouseMove)
+    }
+  }, [isDragging, startX, scrollLeft])
+
   // 태그 클릭 핸들러
   const handleTagClick = useCallback(
     (tagId: string) => {
+      // 드래그 직후 클릭 이벤트가 발생하면 무시
+      if (isDragging || recentlyClicked) return
+
       let newSelectedTags: string[]
 
       if (selectedTags.includes(tagId)) {
@@ -100,7 +164,7 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
         onTagSelect(newSelectedTags)
       }
     },
-    [selectedTags, updateUrlParams, onTagSelect]
+    [selectedTags, updateUrlParams, onTagSelect, isDragging, recentlyClicked]
   )
 
   // 모든 태그 필터 초기화
@@ -190,8 +254,13 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
         <div
           ref={scrollContainerRef}
           className={`${
-            expanded ? 'flex flex-wrap gap-2 px-2' : 'flex flex-nowrap overflow-x-scroll space-x-2 px-2 scrollbar-hide'
+            expanded
+              ? 'flex flex-wrap gap-2 px-2'
+              : 'flex flex-nowrap overflow-x-scroll space-x-2 px-2 scrollbar-hide cursor-grab touch-pan-x'
           }`}
+          onMouseDown={expanded ? undefined : handleMouseDown}
+          onMouseMove={expanded ? undefined : handleMouseMove}
+          onMouseUp={expanded ? undefined : handleMouseUp}
           onWheel={handleWheel}
         >
           {tags.map(tag => (
