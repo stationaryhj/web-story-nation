@@ -35,6 +35,7 @@ export interface LoginResponse {
   result: ApiResult;
 }
 
+
 // Charbot Top 10 List
 export type CharbotTop10Response = {
   module_1: Array<ModuleCharacter>;
@@ -396,7 +397,7 @@ export interface CoinData {
 
 // CoinChargeUseHistory Response
 export interface CoinChargeUseHistoryResponse {
-  historyList: Array<CoinChargeUseHistoryData>;
+  historyList: CoinChargeUseHistoryData;
   result: ApiResult;
 }
 
@@ -417,10 +418,12 @@ export interface CoinChargeUseHistoryData {
 }
 
 export interface UseHistoryData {
-  // charge_type: number;
-  // charge_dt: string;
-  // charge_amount: number;
-  // charge_status: number;
+  charge_type: number;
+  coin: number;
+  content: string;
+  create_dt: string;
+  item_key: any;
+  property: string;
 }
 
 // Use Coin Response
@@ -437,6 +440,18 @@ export interface ConfirmTossPaymentResponse {
   coin_register: number;
   result: ApiResult;
 }
+
+
+// ChatMessageResponse
+export interface ChatMessageResponse {
+  msg_len: number;
+  prompt_key: string;
+  response: string;
+  summary_position: number
+  result: ApiResult;
+}
+
+
 
 
 // API Result

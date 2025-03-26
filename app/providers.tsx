@@ -92,9 +92,14 @@ export default function Providers({ children }: { children: ReactNode }) {
           <br />
           release : bslive1, bslive2, bslive1
           <br />
+<<<<<<< HEAD
           dev : BS1, BS2, BS3
         </pre>
         <br />
+=======
+          dev : BS1, BS2, BS3, 천마신군
+        </pre><br />
+>>>>>>> 0828c8be915eae3c263d0703c7cf338333acf4b2
 
         <pre>
           IS LOGIN : {isLogin ? 'true' : 'false'}

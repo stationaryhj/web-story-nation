@@ -1,4 +1,5 @@
-import { CharbotChatData, CharbotChatListData, CharbotMineData, ChrbotData, LoginResponse, ModuleCharacter } from '@/types/api';
+import { CharbotChatData, CharbotChatListData, CharbotMineData, ChatModeData, ChrbotData, LoginResponse, ModuleCharacter } from '@/types/api';
+import { ChatMode } from '@/components/modal/ChatModeModal';
 
 /**
   get image Uri
@@ -250,6 +251,17 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
     countryCode: data.countryCode,
     world_key: data.world_key
   };
+}
+
+
+export function bridgeChatModeDataToChatMode(data: ChatModeData, customData: ChatMode) {
+  return {
+    ...customData,
+    id: data.chat_mode,
+    penCost: data.coin,
+    discount: data.discount,
+    original_coin: data.original_coin
+  }
 }
 
 function getCategory(gender: number) {

@@ -227,7 +227,7 @@ export const ReqGetCoinChargeUseHistory = (charge_type: number, page: number, pa
   const { data, isLoading, error, refetch } = useQuery<CoinChargeUseHistoryResponse>({
     queryKey: ['coinChargeUseHistory', charge_type, page, paginate],
     queryFn: async () => {
-      const response = await settlementApi.GetCoinChargeUseHistory(charge_type, page, paginate)
+      const response = await settlementApi.GetCoinChargeUseHistory(page, paginate, charge_type)
       return response.data as CoinChargeUseHistoryResponse
     },
   })

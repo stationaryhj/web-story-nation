@@ -10,14 +10,29 @@ import { useRouter } from 'next/navigation'
 import type { ChangeEvent } from 'react'
 import { useState, useRef } from 'react'
 
+
+const getPlatform = (sns_type: number) => {
+  switch (sns_type) {
+    case 0: return 'Guest'
+    case 1: return 'Kakao'
+    case 2: return 'Naver'
+    case 3: return 'Google'
+    case 4: return 'Apple'
+    case 7: return 'GooglePlayGames'
+    case 8: return 'Facebook'
+    default: return ''
+  }
+}
+
+
 export default function SettingsForm() {
   const router = useRouter()
   const { settings, updateProfile, updateBankAccount, setLanguage, uploadProfileImage } = useSettingsStore()
   const { data: userInfo } = useAccountStore()
 
   // 입력 폼 상태
-  const [nickname, setNickname] = useState(settings.profile.nickname)
-  const [email, setEmail] = useState(settings.profile.email)
+  // const [nickname, setNickname] = useState(settings.profile.nickname)
+  // const [email, setEmail] = useState(settings.profile.email)
   const [bank, setBank] = useState(settings.bankAccount.bank)
   const [accountNumber, setAccountNumber] = useState(settings.bankAccount.accountNumber)
   const [accountHolder, setAccountHolder] = useState(settings.bankAccount.accountHolder)
@@ -29,6 +44,13 @@ export default function SettingsForm() {
 
   // 파일 입력 참조
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+
+  // UserInfo Data
+  const nickname = userInfo?.nick_nm
+  const email = ''
+  const platform = getPlatform(Number(userInfo?.sns_type))
+
 
   // 저장 버튼 클릭 핸들러
   const handleSave = () => {
@@ -123,7 +145,7 @@ export default function SettingsForm() {
             <div className="col-span-3">
               <input
                 type="text"
-                value={settings.profile.platform}
+                value={platform}
                 disabled
                 className="w-full p-3 bg-secondary-50 dark:bg-dark-secondary-900/30 text-secondary-900 dark:text-dark-secondary-200 rounded-lg border border-secondary-200 dark:border-dark-secondary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500"
               />
@@ -140,7 +162,7 @@ export default function SettingsForm() {
                 id="nickname"
                 type="text"
                 value={nickname}
-                onChange={e => setNickname(e.target.value)}
+                // onChange={e => setNickname(e.target.value)}
                 className="w-full p-3 bg-secondary-50 dark:bg-dark-secondary-900/30 text-secondary-900 dark:text-dark-secondary-200 rounded-lg border border-secondary-200 dark:border-dark-secondary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500"
               />
             </div>
@@ -156,7 +178,7 @@ export default function SettingsForm() {
                 id="email"
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                // onChange={e => setEmail(e.target.value)}
                 className="w-full p-3 bg-secondary-50 dark:bg-dark-secondary-900/30 text-secondary-900 dark:text-dark-secondary-200 rounded-lg border border-secondary-200 dark:border-dark-secondary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500"
               />
             </div>
