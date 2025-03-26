@@ -39,7 +39,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const handleGuestLogin = async (nickname: string) => {
     try {
       let isSuccess = await guestLogin(nickname)
-      if(isSuccess) {
+      if (isSuccess) {
         onClose()
         router.push('/')
       }

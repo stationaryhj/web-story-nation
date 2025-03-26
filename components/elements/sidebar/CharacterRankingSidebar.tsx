@@ -98,14 +98,33 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
 
   // 모달이 열릴 때 배경 스크롤 방지
   useEffect(() => {
+    // 이전 사이드바의 스크롤 락 상태 확인
+    console.log('CharacterRankingSidebar - isOpen 변경됨:', isOpen)
+
     if (isOpen) {
-      lockScroll()
+      try {
+        lockScroll()
+        console.log('CharacterRankingSidebar - 스크롤 락 적용됨')
+      } catch (error) {
+        console.error('CharacterRankingSidebar - 스크롤 락 적용 실패:', error)
+      }
     } else {
-      unlockScroll()
+      try {
+        unlockScroll()
+        console.log('CharacterRankingSidebar - 스크롤 락 해제됨')
+      } catch (error) {
+        console.error('CharacterRankingSidebar - 스크롤 락 해제 실패:', error)
+      }
     }
 
     return () => {
-      resetScrollLock()
+      console.log('CharacterRankingSidebar - 컴포넌트 언마운트')
+      try {
+        resetScrollLock()
+        console.log('CharacterRankingSidebar - 스크롤 락 초기화됨')
+      } catch (error) {
+        console.error('CharacterRankingSidebar - 스크롤 락 초기화 실패:', error)
+      }
     }
   }, [isOpen])
 

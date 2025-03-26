@@ -8,8 +8,9 @@ import { useModalStore } from '@/store/useStoreModal'
 import { useCoinStore, useAccountStore } from '@/store/useStoreData'
 import List, { ListItem } from '@/components/elements/list/List'
 import { CoinData, OrderIdResponse } from '@/types/api'
-import PaymentModal from '@/components/modal/PaymentModal';
+import PaymentModal from '@/components/modal/PaymentModal'
 import { settlementApi } from '@/services/api/storyNationApi'
+import { lockScroll, unlockScroll, resetScrollLock } from '@/lib/utils/scrollLock'
 
 interface CreditSidebarProps {}
 
@@ -23,87 +24,90 @@ export default function CreditSidebar({}: CreditSidebarProps) {
   const [paymentAmount, setPaymentAmount] = useState(0)
   const [paymentOrderId, setPaymentOrderId] = useState('')
   const [tossClientKey, setTossClientKey] = useState('')
-  
+
   // 디바운스 및 API 중복 호출 방지를 위한 refs
-  const isProcessing = useRef(false);
-  const selectedCoinRef = useRef<CoinData | null>(null);
-  
+  const isProcessing = useRef(false)
+  const selectedCoinRef = useRef<CoinData | null>(null)
+
   // 계정 데이터에서 펜 정보 가져오기
   const freePenCount = accountData?.coin_free ?? 0
   const paidPenCount = accountData?.coin_register ?? 0
 
   // 안전한 content 파싱 함수
   const getWebPrice = useCallback((content: string | undefined): number => {
-    if (!content) return 0;
+    if (!content) return 0
     try {
-      const contentData = JSON.parse(content);
-      return contentData.web_price || 0;
+      const contentData = JSON.parse(content)
+      return contentData.web_price || 0
     } catch (e) {
-      console.error('JSON 파싱 오류:', e);
-      return 0;
+      console.error('JSON 파싱 오류:', e)
+      return 0
     }
-  }, []);
+  }, [])
 
   // OrderId 가져오기 (재사용 가능한 함수로 분리)
   const fetchOrderId = useCallback(async (coinKey: number) => {
     try {
-      const response = await settlementApi.GetOrderId(coinKey);
-      return response.data as OrderIdResponse;
+      const response = await settlementApi.GetOrderId(coinKey)
+      return response.data as OrderIdResponse
     } catch (error) {
-      console.error('OrderId 가져오기 실패:', error);
-      throw error;
+      console.error('OrderId 가져오기 실패:', error)
+      throw error
     }
-  }, []);
+  }, [])
 
   // 패키지 클릭 핸들러 (useCallback으로 메모이제이션)
-  const handlePackageClick = useCallback(async (coinData: CoinData) => {
-    // 이미 처리 중이면 중복 호출 방지
-    if (isProcessing.current) {
-      console.log('이미 처리 중입니다.');
-      return;
-    }
-    
-    // 처리 상태 설정
-    isProcessing.current = true;
-    selectedCoinRef.current = coinData;
-    
-    try {
-      console.log('@@ coinKey :: ', coinData);
+  const handlePackageClick = useCallback(
+    async (coinData: CoinData) => {
+      // 이미 처리 중이면 중복 호출 방지
+      if (isProcessing.current) {
+        console.log('이미 처리 중입니다.')
+        return
+      }
 
-      // content를 JSON으로 파싱하여 web_price 가져오기
-      const amount = getWebPrice(coinData.content);
-      
-      // API 호출로 주문 ID 가져오기
-      const orderIdData = await fetchOrderId(coinData.coin_key);
-      console.log('@@ orderIdData :: ', orderIdData);
+      // 처리 상태 설정
+      isProcessing.current = true
+      selectedCoinRef.current = coinData
 
-      // 상태 업데이트 (한 번에 모아서)
-      setPaymentAmount(amount);
-      setPaymentOrderId(orderIdData.orderId);
-      setTossClientKey(orderIdData.toss_client_key);
-      setIsPaymentModalOpen(true);
-    } catch (error) {
-      console.error('패키지 처리 중 오류 발생:', error);
-    } finally {
-      // 300ms 후에 처리 상태 해제 (디바운스)
-      setTimeout(() => {
-        isProcessing.current = false;
-      }, 300);
-    }
-  }, [getWebPrice, fetchOrderId]);
+      try {
+        console.log('@@ coinKey :: ', coinData)
+
+        // content를 JSON으로 파싱하여 web_price 가져오기
+        const amount = getWebPrice(coinData.content)
+
+        // API 호출로 주문 ID 가져오기
+        const orderIdData = await fetchOrderId(coinData.coin_key)
+        console.log('@@ orderIdData :: ', orderIdData)
+
+        // 상태 업데이트 (한 번에 모아서)
+        setPaymentAmount(amount)
+        setPaymentOrderId(orderIdData.orderId)
+        setTossClientKey(orderIdData.toss_client_key)
+        setIsPaymentModalOpen(true)
+      } catch (error) {
+        console.error('패키지 처리 중 오류 발생:', error)
+      } finally {
+        // 300ms 후에 처리 상태 해제 (디바운스)
+        setTimeout(() => {
+          isProcessing.current = false
+        }, 300)
+      }
+    },
+    [getWebPrice, fetchOrderId]
+  )
 
   // 결제 모달이 열릴 때 중복 호출 방지
   useEffect(() => {
     if (isPaymentModalOpen) {
-      isProcessing.current = true;
+      isProcessing.current = true
     } else {
       // 모달이 닫힐 때 처리 상태 해제 (지연 적용)
       setTimeout(() => {
-        isProcessing.current = false;
-        selectedCoinRef.current = null;
-      }, 300);
+        isProcessing.current = false
+        selectedCoinRef.current = null
+      }, 300)
     }
-  }, [isPaymentModalOpen]);
+  }, [isPaymentModalOpen])
 
   const handlePaymentSuccess = (result: any) => {
     console.log('@@ result :: ', result)
@@ -112,6 +116,39 @@ export default function CreditSidebar({}: CreditSidebarProps) {
   const handlePaymentFail = (error: any) => {
     console.log('@@ error :: ', error)
   }
+
+  // 모달이 열릴 때 배경 스크롤 방지
+  useEffect(() => {
+    // 이전 사이드바의 스크롤 락 상태 확인
+    console.log('CreditSidebar - isOpen 변경됨:', isOpen)
+    console.log('CreditSidebar - modalType:', modalType)
+
+    if (isOpen && modalType === 'credit') {
+      try {
+        lockScroll()
+        console.log('CreditSidebar - 스크롤 락 적용됨')
+      } catch (error) {
+        console.error('CreditSidebar - 스크롤 락 적용 실패:', error)
+      }
+    } else {
+      try {
+        unlockScroll()
+        console.log('CreditSidebar - 스크롤 락 해제됨')
+      } catch (error) {
+        console.error('CreditSidebar - 스크롤 락 해제 실패:', error)
+      }
+    }
+
+    return () => {
+      console.log('CreditSidebar - 컴포넌트 언마운트')
+      try {
+        resetScrollLock()
+        console.log('CreditSidebar - 스크롤 락 초기화됨')
+      } catch (error) {
+        console.error('CreditSidebar - 스크롤 락 초기화 실패:', error)
+      }
+    }
+  }, [isOpen, modalType])
 
   if (!isOpen || modalType !== 'credit') {
     return null
@@ -273,13 +310,13 @@ export default function CreditSidebar({}: CreditSidebarProps) {
               <div className="space-y-3">
                 {/* coinList 데이터를 사용하여 패키지 렌더링 */}
                 {coinList && coinList.length > 0 ? (
-                  coinList.map((coin) => {
+                  coinList.map(coin => {
                     // content를 JSON으로 파싱하여 web_price 가져오기
                     const contentData = JSON.parse(coin.content || '{}')
                     const price = contentData.web_price || 0
-                    
+
                     return (
-                      <div 
+                      <div
                         key={coin.coin_key}
                         className="border border-secondary-200 dark:border-dark-secondary-700 rounded-lg p-4 hover:border-primary-300 dark:hover:border-dark-primary-600 transition-colors cursor-pointer"
                         onClick={() => handlePackageClick(coin)}
@@ -296,7 +333,10 @@ export default function CreditSidebar({}: CreditSidebarProps) {
                         </div>
                         <div className="flex justify-between items-center">
                           <div className="flex items-center">
-                            <FontAwesomeIcon icon={faPen} className="text-primary-600 dark:text-dark-primary-400 mr-1.5" />
+                            <FontAwesomeIcon
+                              icon={faPen}
+                              className="text-primary-600 dark:text-dark-primary-400 mr-1.5"
+                            />
                             <span className="text-secondary-800 dark:text-dark-secondary-300">{coin.cnt} 펜</span>
                           </div>
                           <span className="text-secondary-900 dark:text-dark-secondary-200 font-bold">
@@ -304,9 +344,7 @@ export default function CreditSidebar({}: CreditSidebarProps) {
                           </span>
                         </div>
                         {coin.content && (
-                          <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mt-2">
-                            {coin.content}
-                          </p>
+                          <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mt-2">{coin.content}</p>
                         )}
                       </div>
                     )

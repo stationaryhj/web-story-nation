@@ -107,7 +107,7 @@ export default function BaseModal({
     md: 'max-w-md',
     lg: 'max-w-lg',
     xl: 'max-w-xl',
-    full: 'max-w-full mx-4',
+    full: 'max-w-[1300px] mx-4',
   }
 
   // 모달 위치에 따른 클래스 설정
@@ -169,7 +169,7 @@ export default function BaseModal({
           {/* 모달 */}
           <motion.div
             {...getAnimationProps()}
-            className={`relative z-10 max-h-[90vh] w-full overflow-auto rounded-xl bg-white shadow-lg dark:bg-dark-background-light ${sizeClasses[size]} ${className}`}
+            className={`relative z-10 max-h-[90vh] overflow-auto rounded-xl bg-white shadow-lg dark:bg-dark-background-light ${sizeClasses[size]} ${className}`}
             onClick={handleModalClick}
             style={style}
           >

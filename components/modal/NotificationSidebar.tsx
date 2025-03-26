@@ -3,8 +3,9 @@
 import { faCheckCircle, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useModalStore } from '@/store/useStoreModal'
+import { lockScroll, unlockScroll, resetScrollLock } from '@/lib/utils/scrollLock'
 
 // 알림 타입 정의
 type NotificationType = 'info' | 'success' | 'warning' | 'error'
@@ -58,6 +59,39 @@ const sampleNotifications: NotificationItem[] = [
 export default function NotificationSidebar() {
   const { isOpen, modalType, closeModal } = useModalStore()
   const [notifications, setNotifications] = useState<NotificationItem[]>(sampleNotifications)
+
+  // 모달이 열릴 때 배경 스크롤 방지
+  useEffect(() => {
+    // 이전 사이드바의 스크롤 락 상태 확인
+    console.log('NotificationSidebar - isOpen 변경됨:', isOpen)
+    console.log('NotificationSidebar - modalType:', modalType)
+
+    if (isOpen && modalType === 'notification') {
+      try {
+        lockScroll()
+        console.log('NotificationSidebar - 스크롤 락 적용됨')
+      } catch (error) {
+        console.error('NotificationSidebar - 스크롤 락 적용 실패:', error)
+      }
+    } else {
+      try {
+        unlockScroll()
+        console.log('NotificationSidebar - 스크롤 락 해제됨')
+      } catch (error) {
+        console.error('NotificationSidebar - 스크롤 락 해제 실패:', error)
+      }
+    }
+
+    return () => {
+      console.log('NotificationSidebar - 컴포넌트 언마운트')
+      try {
+        resetScrollLock()
+        console.log('NotificationSidebar - 스크롤 락 초기화됨')
+      } catch (error) {
+        console.error('NotificationSidebar - 스크롤 락 초기화 실패:', error)
+      }
+    }
+  }, [isOpen, modalType])
 
   // 모달이 열려있고, 타입이 notification인 경우에만 렌더링
   if (!isOpen || modalType !== 'notification') {
