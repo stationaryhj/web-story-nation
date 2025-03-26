@@ -155,3 +155,159 @@ body {
     border-color 0.5s ease,
     box-shadow 0.5s ease;
 }
+
+/* 스와이퍼 공통 스타일 */
+.swiper-container-wrapper {
+  position: relative;
+  margin: 0;
+  margin-bottom: 20px;
+}
+
+.swiper-container-wrapper .swiper-button-disabled {
+  opacity: 0.35 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+.swiper-pagination {
+  bottom: 0 !important;
+}
+
+/* 다크 모드 대응 */
+.dark .swiper-button-next,
+.dark .swiper-button-prev {
+  color: #e5e7eb;
+}
+
+.dark .swiper-pagination-bullet {
+  background: #e5e7eb;
+}
+
+/* 네비게이션 버튼 공통 스타일 */
+.navigation-button {
+  color: #6b7280 !important;
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10000 !important;
+  margin-top: -18px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  transition:
+    background-color 0.3s ease,
+    transform 0.2s ease,
+    box-shadow 0.3s ease !important;
+  pointer-events: auto !important;
+  isolation: isolate !important;
+  border: none !important;
+  outline: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.navigation-button:hover {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  transform: translateY(-50%) scale(1.05) !important;
+}
+
+.navigation-button:active {
+  transform: translateY(-50%) scale(0.95) !important;
+}
+
+.navigation-button:after {
+  font-size: 16px !important;
+  font-weight: bold !important;
+  font-family: 'swiper-icons';
+  text-transform: none !important;
+  letter-spacing: 0;
+  font-variant: initial;
+  line-height: 1;
+}
+
+.navigation-next-button:after {
+  content: 'next';
+}
+
+.navigation-prev-button:after {
+  content: 'prev';
+}
+
+.navigation-next-button {
+  right: -25px !important;
+}
+
+.navigation-prev-button {
+  left: -25px !important;
+}
+
+.dark .navigation-button {
+  background-color: rgba(31, 41, 55, 0.8) !important;
+  color: #e5e7eb !important;
+}
+
+.dark .navigation-button:hover {
+  background-color: rgba(31, 41, 55, 0.95) !important;
+}
+
+/* 스와이퍼 스타일 */
+.custom-swiper {
+  padding-bottom: 40px;
+  position: relative !important;
+  isolation: isolate !important;
+}
+
+@media (max-width: 768px) {
+  .navigation-button {
+    width: 30px !important;
+    height: 30px !important;
+    margin-top: -15px !important;
+  }
+  .navigation-button:after {
+    font-size: 14px !important;
+  }
+  .navigation-next-button {
+    right: -20px !important;
+  }
+  .navigation-prev-button {
+    left: -20px !important;
+  }
+}
+
+/* 카드 그리드 스와이퍼 스타일 */
+.card-grid-swiper .swiper-wrapper {
+  padding-bottom: 30px;
+}
+
+/* 작가 그리드 스와이퍼 스타일 */
+.author-grid-swiper .swiper-wrapper {
+  padding-bottom: 30px;
+}
+
+/* 카드 그리드 네비게이션 버튼 스타일 */
+.card-grid-prev-button:after,
+.card-grid-next-button:after {
+  color: #4f46e5;
+}
+
+.dark .card-grid-prev-button:after,
+.dark .card-grid-next-button:after {
+  color: #6366f1;
+}
+
+/* 작가 그리드 네비게이션 버튼 스타일 */
+.author-grid-prev-button:after,
+.author-grid-next-button:after {
+  color: #4f46e5;
+}
+
+.dark .author-grid-prev-button:after,
+.dark .author-grid-next-button:after {
+  color: #6366f1;
+}

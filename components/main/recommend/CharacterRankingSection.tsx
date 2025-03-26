@@ -45,7 +45,7 @@ const CharacterRankingSection = memo(() => {
   const getCharacterRankingData = () => {
     // 실제로는 탭에 따라 다른 데이터를 반환하는 로직이 필요함
     // 현재는 목업으로 characters 데이터 사용
-    return characters.slice(0, 5)
+    return characters
   }
 
   return (
@@ -77,7 +77,9 @@ const CharacterRankingSection = memo(() => {
 
         {/* 캐릭터 랭킹 그리드 */}
         <SectionTransition>
-          <CardGrid customData={getCharacterRankingData()} cardsPerRow={5} hasRanking={true} />
+          <div className="w-full">
+            <CardGrid customData={getCharacterRankingData()} cardsPerRow={5} hasRanking={true} useSwiper={true} />
+          </div>
         </SectionTransition>
       </div>
 

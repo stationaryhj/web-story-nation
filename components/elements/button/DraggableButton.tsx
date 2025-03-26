@@ -414,7 +414,7 @@ export default function DraggableButton({
         text-white
         rounded-full
         shadow-lg
-        cursor-move
+        cursor-pointer
         select-none
         flex
         items-center

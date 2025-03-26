@@ -6,6 +6,7 @@ export default function Page() {
   return (
     <PageTransition>
       <MainPage />
+      <DraggableButtonGrid />
     </PageTransition>
   )
 }

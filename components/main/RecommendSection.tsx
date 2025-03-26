@@ -59,9 +59,13 @@ export default function RecommendSection({ onSearchTrigger }: RecommendSectionPr
 
   return (
     <div>
-      {/* 각 섹션을 별도의 컴포넌트로 분리 */}
-      <CharacterRankingSection />
-      <AuthorRankingSection />
+      {/* 각 섹션을 별도의 컴포넌트로 분리하고 고유 ID 추가 */}
+      <div id="character-ranking-section">
+        <CharacterRankingSection />
+      </div>
+      <div id="author-ranking-section">
+        <AuthorRankingSection />
+      </div>
       <LatestCharactersSection />
       <CreateCharacterSection />
     </div>
