@@ -14,13 +14,12 @@ import { useRouter } from 'next/navigation'
 interface CardProps {
   character: Character
   index?: number
-  variant?: 'default' | 'my-character'
+  variant?: 'default' | 'my-character' | 'horizontal'
   onEdit?: () => void
   onDelete?: () => void
   onCardClick?: (character: Character) => void
   rank?: number
   hasRank?: boolean
-
 }
 
 export default function Card({
@@ -77,6 +76,86 @@ export default function Card({
     return 'bg-primary-500' // 그 외
   }
 
+  // 가로형 카드 렌더링
+  if (variant === 'horizontal') {
+    return (
+      <CardTransition index={index}>
+        <div
+          className="group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-dark-background-light dark:border dark:border-dark-secondary-200/10 cursor-pointer flex mb-2"
+          onClick={handleCardClick}
+        >
+          {/* 이미지 영역 */}
+          <div className="relative w-32 h-32 overflow-hidden">
+            {/* 랭킹 표시 */}
+            {hasRank && rank !== undefined && (
+              <div
+                className={`absolute top-0 left-0 z-[40] w-6 h-6 ${getRankBgColor(rank)} text-white flex items-center justify-center font-bold shadow-md text-sm`}
+              >
+                {rank}
+              </div>
+            )}
+
+            <Image
+              src={imageUrl}
+              alt={name}
+              fill
+              sizes="(max-width: 640px) 25vw, 128px"
+              className="object-cover"
+              onError={handleImageError}
+            />
+
+            {/* 댓글 수 표시 - 이미지 우측 하단으로 이동 */}
+            <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded-full flex items-center backdrop-blur-sm">
+              <FontAwesomeIcon icon={faComment} className="mr-0.5 text-xs" />
+              <span>{commentCount}</span>
+            </div>
+          </div>
+
+          {/* 콘텐츠 영역 */}
+          <div className="flex-1 px-3 pt-2">
+            <h3 className="font-bold text-secondary-900 dark:text-dark-secondary-700 text-base truncate">{name}</h3>
+
+            {/* 캐릭터 설명 - 최대 2줄 */}
+            <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 my-1.5">{description}</p>
+
+            <div className="flex flex-wrap gap-1 my-1.5">
+              {hashtags.slice(0, 2).map((tag, index) => (
+                <span
+                  key={`${character.id}-tag-${tag}-${index}`}
+                  className="text-xs text-primary-500 dark:text-dark-primary-600 bg-primary-50 dark:bg-dark-primary-100/10 px-1.5 py-0.5 rounded-full"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            <div className="flex items-center mt-1.5">
+              <div className="w-5 h-5 rounded-full bg-secondary-200 dark:bg-dark-secondary-300 flex items-center justify-center overflow-hidden">
+                {creator?.profileImageUrl ? (
+                  <Image
+                    src={creator.profileImageUrl}
+                    alt={creator.nickname}
+                    width={20}
+                    height={20}
+                    className="object-cover"
+                  />
+                ) : (
+                  <span className="text-[8px] text-secondary-500 dark:text-dark-secondary-400">
+                    {creator?.nickname?.charAt(0) || '?'}
+                  </span>
+                )}
+              </div>
+              <span className="ml-1.5 text-xs text-secondary-500 dark:text-dark-secondary-500 truncate max-w-[100px]">
+                {creator?.nickname || '익명'}
+              </span>
+            </div>
+          </div>
+        </div>
+      </CardTransition>
+    )
+  }
+
+  // 기존 카드 렌더링 (세로형)
   return (
     <CardTransition index={index}>
       <div
@@ -88,7 +167,7 @@ export default function Card({
             {/* 랭킹 표시 */}
             {hasRank && rank !== undefined && (
               <div
-                className={`absolute top-0 left-0 z-10 w-8 h-8 ${getRankBgColor(rank)} text-white flex items-center justify-center font-bold shadow-md`}
+                className={`absolute top-0 left-0 z-[40] w-8 h-8 ${getRankBgColor(rank)} text-white flex items-center justify-center font-bold shadow-md`}
               >
                 {rank}
               </div>

@@ -10,6 +10,7 @@ import { faSearch, faSort, faThumbtack, faTrash } from '@fortawesome/free-solid-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { FormEvent } from 'react'
 import { useState } from 'react'
@@ -179,7 +180,17 @@ export default function ChatListPage() {
 
                 {chatList.length === 0 && (
                   <div className="py-20 text-center">
-                    <p className="text-secondary-500 dark:text-dark-secondary-500">아직 대화 내역이 없습니다.</p>
+                    <p className="text-secondary-500 dark:text-dark-secondary-500 mb-4">
+                      {searchQuery ? '검색 결과가 없습니다.' : '아직 대화를 시작한 캐릭터가 없습니다.'}
+                    </p>
+                    {!searchQuery && (
+                      <Link
+                        href="/my-characters/create"
+                        className="inline-flex items-center px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
+                      >
+                        <span className="mr-1">+</span> 첫캐릭터 만들기
+                      </Link>
+                    )}
                   </div>
                 )}
               </motion.div>

@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faXmark, faCheckCircle, faUser } from '@fortawesome/free-solid-svg-icons'
 import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
-import AuthorGrid from '@/components/elements/card/AuthorGrid'
 import { lockScroll, unlockScroll, resetScrollLock } from '@/lib/utils/scrollLock'
+import Image from 'next/image'
 
 // 작가 랭킹 탭 정의
 const rankingTabs: TabItem[] = [
@@ -135,6 +135,81 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
     visible: { x: 0 },
   }
 
+  // 랭킹 배경색 결정
+  const getRankBgColor = (rank: number) => {
+    if (rank === 1) return 'bg-yellow-500' // 1위: 금색
+    if (rank === 2) return 'bg-gray-400' // 2위: 은색
+    if (rank === 3) return 'bg-amber-600' // 3위: 동색
+    return 'bg-primary-500' // 그 외
+  }
+
+  // 스켈레톤 로더 렌더링
+  const renderSkeletons = () => {
+    return Array(5)
+      .fill(0)
+      .map((_, index) => (
+        <div key={`skeleton-${index}`} className="border dark:border-dark-secondary-200/10 rounded-lg mb-4 p-4">
+          <div className="flex items-center space-x-4">
+            <div className="w-8 h-8 rounded-md bg-secondary-100 dark:bg-dark-secondary-800 animate-pulse"></div>
+            <div className="w-16 h-16 rounded-full bg-secondary-100 dark:bg-dark-secondary-800 animate-pulse"></div>
+            <div className="flex-1">
+              <div className="h-4 w-24 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse mb-2"></div>
+              <div className="h-3 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse w-full"></div>
+            </div>
+          </div>
+        </div>
+      ))
+  }
+
+  // 작가 카드 렌더링
+  const renderAuthorCards = () => {
+    return rankingData.map((author, index) => (
+      <div
+        key={author.id}
+        className="border dark:border-dark-secondary-200/10 rounded-lg mb-4 p-4 cursor-pointer hover:bg-secondary-50 dark:hover:bg-dark-secondary-900/30 transition-colors"
+        onClick={() => handleAuthorClick(author)}
+      >
+        <div className="flex items-center">
+          {/* 프로필 이미지와 랭킹 표시 */}
+          <div className="relative flex-shrink-0">
+            {/* 프로필 이미지 */}
+            <div className="relative w-16 h-16 rounded-full overflow-hidden bg-secondary-100 dark:bg-dark-secondary-800">
+              {author.profileImageUrl ? (
+                <Image
+                  src="/images/placeholders/author_default_img.jpg"
+                  alt={author.nickname || author.name}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-secondary-400 dark:text-dark-secondary-500">
+                  <FontAwesomeIcon icon={faUser} className="text-xl" />
+                </div>
+              )}
+            </div>
+
+            {/* 랭킹 표시 - 이미지 좌측 상단에 겹쳐서 표시 */}
+            <div
+              className={`absolute -top-2 -left-2 w-7 h-7 ${getRankBgColor(index + 1)} text-white flex items-center justify-center font-bold rounded-full shadow-md z-10`}
+            >
+              {index + 1}
+            </div>
+          </div>
+
+          {/* 작가 정보 */}
+          <div className="ml-4 flex-1 overflow-hidden">
+            <h3 className="font-bold text-secondary-900 dark:text-dark-secondary-200 text-sm">
+              {author.nickname || author.name}
+            </h3>
+            <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 mt-1 line-clamp-2">
+              {author.description}
+            </p>
+          </div>
+        </div>
+      </div>
+    ))
+  }
+
   return (
     <>
       {isOpen && (
@@ -147,7 +222,7 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
           onClick={onClose}
         >
           <motion.div
-            className="fixed top-0 right-0 h-full min-w-[600px] bg-white dark:bg-dark-background-DEFAULT overflow-y-auto z-50"
+            className="fixed top-0 right-0 h-full w-[600px] bg-white dark:bg-dark-background-DEFAULT overflow-y-auto z-50"
             initial="hidden"
             animate="visible"
             exit="hidden"
@@ -175,18 +250,7 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
             </div>
 
             {/* 컨텐츠 영역 */}
-            <div className="px-4 py-6">
-              <AuthorGrid
-                customData={rankingData}
-                cardsPerRow={1}
-                hasRanking={true}
-                isLoading={isLoading}
-                subtitle={`${rankingTabs.find(tab => tab.id === activeTab)?.label || ''} 작가 랭킹`}
-                onAuthorClick={handleAuthorClick}
-                isSidebar={isSidebar}
-                useSwiper={false}
-              />
-            </div>
+            <div className="px-6 py-4">{isLoading ? renderSkeletons() : renderAuthorCards()}</div>
           </motion.div>
         </motion.div>
       )}

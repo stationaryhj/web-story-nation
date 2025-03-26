@@ -137,7 +137,7 @@ export default function NewCharacterSidebar({ isOpen, onClose }: NewCharacterSid
           onClick={onClose}
         >
           <motion.div
-            className="fixed top-0 right-0 h-full w-full max-w-[600px] bg-white dark:bg-dark-background-DEFAULT overflow-y-auto z-50"
+            className="fixed top-0 right-0 h-full w-[600px] bg-white dark:bg-dark-background-DEFAULT overflow-y-auto z-50"
             initial="hidden"
             animate="visible"
             exit="hidden"
@@ -172,7 +172,13 @@ export default function NewCharacterSidebar({ isOpen, onClose }: NewCharacterSid
 
             {/* 컨텐츠 영역 */}
             <div ref={contentRef} className="h-[calc(100%-74px)] overflow-y-auto px-4 py-6">
-              <CardGrid customData={newCharacters} cardsPerRow={2} subtitle="최신 등록순" useSwiper={false} />
+              <CardGrid
+                customData={newCharacters}
+                cardsPerRow={1}
+                subtitle="최신 등록순"
+                useSwiper={false}
+                variant="horizontal"
+              />
             </div>
 
             {/* 맨 위로 스크롤 버튼 */}

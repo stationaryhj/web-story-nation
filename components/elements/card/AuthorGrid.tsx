@@ -38,7 +38,8 @@ interface AuthorGridProps {
   error?: string | null
   isSidebar?: boolean
   onAuthorClick?: (author: Author) => void
-  useSwiper?: boolean // Swiper 사용 여부 (기본값: true)
+  useSwiper?: boolean
+  variant?: 'default' | 'horizontal'
 }
 
 export default function AuthorGrid({
@@ -55,6 +56,7 @@ export default function AuthorGrid({
   isSidebar = false,
   onAuthorClick,
   useSwiper = true, // 기본적으로 Swiper 사용
+  variant = 'default',
 }: AuthorGridProps) {
   const [authors, setAuthors] = useState<Array<Author>>(customData)
   const [localLoading, setLocalLoading] = useState(isLoading)
