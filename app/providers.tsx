@@ -14,14 +14,17 @@ import { API_URL, CHAT_URL } from '@/services/api/storyNationApi'
 import { useAccountStore } from '@/store/useStoreData'
 
 export default function Providers({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        refetchOnWindowFocus: false,
-        retry: 1,
-      },
-    },
-  }))
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchOnWindowFocus: false,
+            retry: 1,
+          },
+        },
+      })
+  )
   const { isDarkMode } = useThemeStore()
   const [mounted, setMounted] = useState(false)
   const { isLogin, data } = useAccountStore()
@@ -89,14 +92,22 @@ export default function Providers({ children }: { children: ReactNode }) {
           <br />
           release : bslive1, bslive2, bslive1
           <br />
+<<<<<<< HEAD
+          dev : BS1, BS2, BS3
+        </pre>
+        <br />
+=======
           dev : BS1, BS2, BS3, 천마신군
         </pre><br />
+>>>>>>> 0828c8be915eae3c263d0703c7cf338333acf4b2
 
         <pre>
-          IS LOGIN : {isLogin ? 'true' : 'false'}<br />
+          IS LOGIN : {isLogin ? 'true' : 'false'}
+          <br />
           {isLogin && (
             <>
-              NICKNAME : {data?.nick_nm}<br />
+              NICKNAME : {data?.nick_nm}
+              <br />
             </>
           )}
         </pre>

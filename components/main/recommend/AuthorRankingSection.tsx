@@ -121,6 +121,52 @@ const mockAuthors = [
     characterCount: 14,
     isVerified: true,
   },
+  // 추가 작가 데이터
+  {
+    id: '11',
+    name: '우주탐험가',
+    nickname: '우주탐험가',
+    description: '우주를 배경으로 한 서사적 캐릭터와 이야기를 만듭니다.',
+    profileImageUrl: '/images/profile/author11.jpg',
+    characterCount: 18,
+    isVerified: true,
+  },
+  {
+    id: '12',
+    name: '판타지마법사',
+    nickname: '판타지마법사',
+    description: '마법의 세계를 탐험하는 독특한 캐릭터를 창작하는 전문가입니다.',
+    profileImageUrl: '/images/profile/author12.jpg',
+    characterCount: 13,
+    isVerified: true,
+  },
+  {
+    id: '13',
+    name: '모험가이야기',
+    nickname: '모험가이야기',
+    description: '모험심 넘치는 캐릭터들의 여정을 그립니다.',
+    profileImageUrl: '/images/profile/author13.jpg',
+    characterCount: 9,
+    isVerified: false,
+  },
+  {
+    id: '14',
+    name: '사이버펑크',
+    nickname: '사이버펑크',
+    description: '미래의 디스토피아 세계관에서 살아가는 캐릭터를 창작합니다.',
+    profileImageUrl: '/images/profile/author14.jpg',
+    characterCount: 11,
+    isVerified: true,
+  },
+  {
+    id: '15',
+    name: '판타지드래곤',
+    nickname: '판타지드래곤',
+    description: '드래곤과 마법이 공존하는 세계의 이야기를 만듭니다.',
+    profileImageUrl: '/images/profile/author15.jpg',
+    characterCount: 16,
+    isVerified: true,
+  },
 ]
 
 // 작가 랭킹 섹션 컴포넌트
@@ -168,24 +214,17 @@ const AuthorRankingSection = memo(() => {
 
         {/* 작가 랭킹 그리드 */}
         <SectionTransition>
-          <div className="overflow-x-auto">
-            <div className="min-w-full pb-4">
-              <AuthorGrid
-                customData={getAuthorRankingData()}
-                cardsPerRow={10}
-                hasRanking={true}
-                onAuthorClick={handleAuthorClick}
-              />
-            </div>
+          <div className="w-full">
+            <AuthorGrid
+              customData={getAuthorRankingData()}
+              cardsPerRow={10}
+              hasRanking={true}
+              onAuthorClick={handleAuthorClick}
+              useSwiper={true}
+            />
           </div>
         </SectionTransition>
       </div>
-
-      <AuthorRankingSidebar
-        isOpen={isAuthorRankingSidebarOpen}
-        onClose={() => setIsAuthorRankingSidebarOpen(false)}
-        isSidebar={true}
-      />
     </section>
   )
 })
