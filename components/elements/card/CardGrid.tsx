@@ -5,6 +5,7 @@ import type { Character } from '@/store/useStoreData'
 import { useStoreData } from '@/store/useStoreData'
 import { useEffect, useState, useRef } from 'react'
 import { useModalStore } from '@/store/useStoreModal'
+import { useSettingsStore } from '@/store/useStoreSettings'
 import { useRouter } from 'next/navigation'
 import CardSkeleton from '../skeleton/CardSkeleton'
 import Card from './Card'
@@ -55,6 +56,7 @@ export default function CardGrid({
 }: CardGridProps) {
   const { isLoading: storeLoading, error: storeError, fetchCategoryCharacters } = useStoreData()
   const { openModal, setSelectedCharacter } = useModalStore()
+  const { isAdultModeEnabled } = useSettingsStore()
   const [characters, setCharacters] = useState<Array<Character>>([])
   const [localLoading, setLocalLoading] = useState(true)
   const [reachedEnd, setReachedEnd] = useState(false)
@@ -69,7 +71,14 @@ export default function CardGrid({
   useEffect(() => {
     // customData가 제공되면 해당 데이터를 사용
     if (customData) {
-      setCharacters(customData)
+      console.log('CardGrid - 원본 데이터 수:', customData.length)
+      console.log('CardGrid - 성인 모드 상태:', isAdultModeEnabled)
+
+      // 성인 모드 비활성화 시 성인 컨텐츠 필터링
+      const filteredData = isAdultModeEnabled ? customData : customData.filter(character => !character.isAdult)
+
+      console.log('CardGrid - 필터링 후 데이터 수:', filteredData.length)
+      setCharacters(filteredData)
       setLocalLoading(false)
       return
     }
@@ -88,7 +97,7 @@ export default function CardGrid({
     }
 
     loadCharacters()
-  }, [fetchCategoryCharacters, categoryId, customData])
+  }, [fetchCategoryCharacters, categoryId, customData, isAdultModeEnabled])
 
   // 카드 클릭 핸들러
   const handleCardClick = (character: Character) => {

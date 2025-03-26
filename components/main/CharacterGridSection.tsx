@@ -45,6 +45,20 @@ export default function CharacterGridSection({
   // 짜릿모드 상태 가져오기
   const { isAdultModeEnabled } = useSettingsStore()
 
+  // 상태 변경 디버깅 로그
+  useEffect(() => {
+    console.log('CharacterGridSection - isAdultModeEnabled 변경됨:', isAdultModeEnabled)
+
+    // 성인 모드 상태가 변경되면 강제로 페이지 새로고침
+    // 주의: 개발 환경에서는 두 번 실행될 수 있으므로 실제 사용 시 조건을 추가하는 것이 좋습니다
+    /* 
+    이 코드는 테스트 후 제거하세요!
+    if (typeof window !== 'undefined') {
+      window.location.reload()
+    }
+    */
+  }, [isAdultModeEnabled])
+
   // 필터링 상태 관리
   const [order, setOrder] = useState<number>(1) // 1: 인기순(기본값), 2: 최신순
   const [nsfw, setNsfw] = useState<number>(2) // 2: 전체 이용가(기본값), 1: 짜릿모드 가능, 3: 이용등급 전체
@@ -73,22 +87,33 @@ export default function CharacterGridSection({
     selectedTags.join(',') // tag 검색어 - 쉼표로 구분된 합집합 형태로 전달
   )
 
-  // 카테고리나 필터 값이 변경될 때 상태 리셋 및 데이터 다시 로드
-  useEffect(() => {
-    setCharacters([])
-    refetch()
-  }, [categoryId, order, nsfw, selectedTags, refetch])
-
   // 데이터 로드 시 characters 업데이트
   useEffect(() => {
     if (!isLoading && categoryData?.chrbotList?.data) {
+      console.log('데이터 로드 완료 - 성인 모드 상태:', isAdultModeEnabled)
+
       const moduleData = mapToModuleCharacter(categoryData.chrbotList.data)
       const newCharacters = bridgeCharacterDataToCharacter(moduleData)
 
-      // 짜릿모드 필터링
-      const filteredCharacters = isAdultModeEnabled
-        ? newCharacters
-        : newCharacters.filter(character => !character.isAdult)
+      console.log('필터링 전 캐릭터 수:', newCharacters.length)
+      console.log('성인 컨텐츠 캐릭터 수:', newCharacters.filter(character => character.isAdult).length)
+
+      // 성인 컨텐츠 필터링을 위한 현재 설정 상태 직접 확인
+      const currentAdultMode = useSettingsStore.getState().isAdultModeEnabled
+      console.log('스토어에서 직접 확인한 성인 모드 상태:', currentAdultMode)
+
+      // 짜릿모드 필터링 - 성인 모드가 활성화되어 있지 않으면 성인 컨텐츠 필터링
+      let filteredCharacters = [...newCharacters] // 배열 복사
+
+      // 성인 모드가 비활성화된 경우 성인 컨텐츠 제거
+      if (!currentAdultMode) {
+        filteredCharacters = filteredCharacters.filter(character => !character.isAdult)
+        console.log('성인 컨텐츠 필터링 적용됨')
+      } else {
+        console.log('모든 컨텐츠 표시')
+      }
+
+      console.log('필터링 후 캐릭터 수:', filteredCharacters.length)
 
       // category 속성 추가
       const charactersWithCategory = filteredCharacters.map(character => ({
@@ -99,6 +124,13 @@ export default function CharacterGridSection({
       setCharacters(charactersWithCategory as Character[])
     }
   }, [categoryData, isLoading, isAdultModeEnabled])
+
+  // 성인 모드 상태나 필터 변경 시 데이터 다시 로드
+  useEffect(() => {
+    console.log('필터 변경으로 데이터 다시 로드 - 성인 모드 상태:', isAdultModeEnabled)
+    setCharacters([])
+    refetch()
+  }, [categoryId, order, nsfw, selectedTags, isAdultModeEnabled, refetch])
 
   if (categoryId === 'all') {
     return null // all 카테고리는 RecommendSection에서 처리
