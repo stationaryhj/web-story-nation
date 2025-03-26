@@ -217,7 +217,7 @@ const AuthorRankingSection = memo(() => {
           <div className="w-full">
             <AuthorGrid
               customData={getAuthorRankingData()}
-              cardsPerRow={10}
+              cardsPerRow={8}
               hasRanking={true}
               onAuthorClick={handleAuthorClick}
               useSwiper={true}
@@ -225,6 +225,7 @@ const AuthorRankingSection = memo(() => {
           </div>
         </SectionTransition>
       </div>
+      <AuthorRankingSidebar isOpen={isAuthorRankingSidebarOpen} onClose={() => setIsAuthorRankingSidebarOpen(false)} />
     </section>
   )
 })

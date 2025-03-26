@@ -180,13 +180,6 @@ export default function MyEarningsView() {
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">지급 계좌 정보</h2>
-              <button
-                onClick={handleEditBankAccount}
-                className="text-violet-600 hover:text-violet-700 flex items-center"
-              >
-                <FontAwesomeIcon icon={faPencilAlt} className="mr-1" />
-                <span>수정</span>
-              </button>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center mb-2">

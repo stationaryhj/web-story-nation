@@ -6,7 +6,7 @@ import LoginModal from './LoginModal'
 import SignupModal from './SignupModal'
 import ConfirmActionModal from './ConfirmActionModal'
 import NotificationSidebar from './NotificationSidebar'
-import CreditSidebar from './CreditSidebar'
+
 import AdultVerificationModal from './AdultVerificationModal'
 import ChatModeModal from './ChatModeModal'
 
@@ -44,10 +44,6 @@ export default function ModalManager() {
 
   if (modalType === 'notification') {
     return <NotificationSidebar />
-  }
-
-  if (modalType === 'credit') {
-    return <CreditSidebar />
   }
 
   if (modalType === 'adultVerification') {

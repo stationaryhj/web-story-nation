@@ -5,6 +5,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 
 export type CharacterGender = 'male' | 'female' | 'unspecified'
 export type CharacterVisibility = 'public' | 'private'
+export type CharacterRating = 'all' | 'adult'
 
 // 이미지 타입 정의
 export type ImageType = 'normal' | 'adult'
@@ -30,6 +31,7 @@ export interface CharacterFormData {
   name: string
   gender: CharacterGender
   visibility: CharacterVisibility
+  rating: CharacterRating
   bio: string
   firstMessage: string
   hashtags: Array<string>
@@ -86,6 +88,7 @@ const defaultFormData: CharacterFormData = {
   name: '',
   gender: 'unspecified',
   visibility: 'private',
+  rating: 'all',
   bio: '',
   firstMessage: '',
   hashtags: [],

@@ -12,6 +12,7 @@ interface ConfirmActionModalProps {
   confirmText?: string
   cancelText?: string
   onConfirm: () => void
+  onCancel?: () => void
   className?: string
   showCloseButton?: boolean
   preventBackdropClose?: boolean
@@ -25,6 +26,7 @@ export default function ConfirmActionModal({
   confirmText = '확인',
   cancelText = '취소',
   onConfirm,
+  onCancel,
   className = '',
   showCloseButton = true,
   preventBackdropClose = false,
@@ -32,7 +34,7 @@ export default function ConfirmActionModal({
   const footerContent = (
     <div className="flex justify-end space-x-3">
       <button
-        onClick={onClose}
+        onClick={onCancel || onClose}
         className="rounded-full bg-secondary-100 px-5 py-2 text-secondary-700 transition-colors hover:bg-secondary-200 dark:bg-dark-secondary-800 dark:text-dark-secondary-200 dark:hover:bg-dark-secondary-700"
       >
         {cancelText}

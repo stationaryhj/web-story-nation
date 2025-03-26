@@ -9,11 +9,15 @@ import Dropdown from '@/components/elements/dropdown/Dropdown'
 import Pagination from '@/components/elements/pagination/Pagination'
 import { Character } from '@/store/useStoreData'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useAccountStore } from '@/store/useAccountStore'
+import { useModalStore } from '@/store/useStoreModal'
 
 type Props = {}
 
 export default function searchPage({}: Props) {
   const router = useRouter()
+  const { isLogin } = useAccountStore()
+  const { openModal } = useModalStore()
   const searchParams = useSearchParams()
 
   // URL 쿼리 파라미터 가져오기
@@ -197,6 +201,15 @@ export default function searchPage({}: Props) {
   // 총 페이지 수 계산
   const totalPages = Math.ceil(totalItems / itemsPerPage)
 
+  // 캐릭터 생성 페이지로 이동하는 핸들러
+  const handleCreateCharacter = () => {
+    if (!isLogin) {
+      openModal('login')
+      return
+    }
+    router.push('/character/create')
+  }
+
   return (
     <PageTransition>
       <Header />
@@ -223,15 +236,30 @@ export default function searchPage({}: Props) {
           </div>
         </div>
         <div>
-          <CardGrid useSwiper={false} customData={displayItems} isLoading={isLoading} cardsPerRow={6} />
+          {totalItems === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-dark-gray-200 mb-4">검색된 캐릭터가 없어요</h2>
+              <p className="text-gray-600 dark:text-dark-gray-400 mb-8">내가 원하는 캐릭터를 직접 만들어 보세요!</p>
+              <button
+                onClick={handleCreateCharacter}
+                className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+              >
+                캐릭터 만들기
+              </button>
+            </div>
+          ) : (
+            <>
+              <CardGrid useSwiper={false} customData={displayItems} isLoading={isLoading} cardsPerRow={6} />
 
-          {!isLoading && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              className="mb-6"
-            />
+              {!isLoading && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  className="mb-6"
+                />
+              )}
+            </>
           )}
         </div>
       </div>

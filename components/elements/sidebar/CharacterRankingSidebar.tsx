@@ -8,6 +8,7 @@ import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
 import { BaseSelectBox } from '@/components/elements/selectbox/BaseSelectBox'
 import { useStoreData } from '@/store/useStoreData'
 import CardGrid from '@/components/elements/card/CardGrid'
+import { lockScroll, unlockScroll, resetScrollLock } from '@/lib/utils/scrollLock'
 
 // 캐릭터 랭킹 탭 정의
 const rankingTabs: TabItem[] = [
@@ -97,23 +98,33 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
 
   // 모달이 열릴 때 배경 스크롤 방지
   useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+    // 이전 사이드바의 스크롤 락 상태 확인
+    console.log('CharacterRankingSidebar - isOpen 변경됨:', isOpen)
 
     if (isOpen) {
-      // 스크롤바 너비만큼 패딩을 추가하여 레이아웃 이동 방지
-      document.body.style.overflow = 'hidden'
-      document.body.style.paddingRight = `${scrollbarWidth}px`
+      try {
+        lockScroll()
+        console.log('CharacterRankingSidebar - 스크롤 락 적용됨')
+      } catch (error) {
+        console.error('CharacterRankingSidebar - 스크롤 락 적용 실패:', error)
+      }
     } else {
-      // 사이드바가 닫힐 때 스크롤 상태 복원
-      document.body.style.overflow = originalStyle
-      document.body.style.paddingRight = '0px'
+      try {
+        unlockScroll()
+        console.log('CharacterRankingSidebar - 스크롤 락 해제됨')
+      } catch (error) {
+        console.error('CharacterRankingSidebar - 스크롤 락 해제 실패:', error)
+      }
     }
 
     return () => {
-      // 컴포넌트 언마운트 시에만 원래 스타일로 복원
-      document.body.style.overflow = originalStyle
-      document.body.style.paddingRight = '0px'
+      console.log('CharacterRankingSidebar - 컴포넌트 언마운트')
+      try {
+        resetScrollLock()
+        console.log('CharacterRankingSidebar - 스크롤 락 초기화됨')
+      } catch (error) {
+        console.error('CharacterRankingSidebar - 스크롤 락 초기화 실패:', error)
+      }
     }
   }, [isOpen])
 
@@ -129,7 +140,7 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
           onClick={onClose}
         >
           <motion.div
-            className="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-dark-background-DEFAULT overflow-y-auto z-50"
+            className="fixed top-0 right-0 h-full w-full max-w-[600px] bg-white dark:bg-dark-background-DEFAULT overflow-y-auto z-50"
             initial="hidden"
             animate="visible"
             exit="hidden"
@@ -177,6 +188,7 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
                 hasRanking={true}
                 isLoading={isLoading}
                 subtitle={`${selectedGender.label} · ${rankingTabs.find(tab => tab.id === activeTab)?.label || ''} 랭킹`}
+                useSwiper={false}
               />
             </div>
           </motion.div>
