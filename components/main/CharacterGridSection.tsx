@@ -128,8 +128,16 @@ export default function CharacterGridSection({
   // 성인 모드 상태나 필터 변경 시 데이터 다시 로드
   useEffect(() => {
     console.log('필터 변경으로 데이터 다시 로드 - 성인 모드 상태:', isAdultModeEnabled)
-    setCharacters([])
-    refetch()
+    console.log('현재 선택된 태그:', selectedTags)
+
+    // selectedTags가 변경되었을 때만 characters를 초기화하고 refetch
+    if (selectedTags.length > 0 || categoryId === 'all') {
+      setCharacters([])
+      refetch()
+    } else {
+      // 태그가 없는 경우에는 초기 로드 이후에는 categoryId가 변경되었을 때만 refetch
+      refetch()
+    }
   }, [categoryId, order, nsfw, selectedTags, isAdultModeEnabled, refetch])
 
   if (categoryId === 'all') {
@@ -182,7 +190,17 @@ export default function CharacterGridSection({
     <SectionTransition className="py-12 bg-white dark:bg-dark-background-light">
       <div className="container mx-auto px-4">
         {/* 공통 필터 컴포넌트 적용 */}
-        <FilterControls categoryId={categoryIdNumber} order={order} setOrder={setOrder} nsfw={nsfw} setNsfw={setNsfw} />
+        <FilterControls
+          categoryId={categoryIdNumber}
+          order={order}
+          setOrder={setOrder}
+          nsfw={nsfw}
+          setNsfw={setNsfw}
+          onTagsChange={tags => {
+            console.log('CharacterGridSection - 태그 변경:', tags)
+            // 이미 selectedTags를 상위 컴포넌트에서 받아 오므로 여기서는 로그만 출력
+          }}
+        />
 
         {/* 카드 그리드 */}
         <CardGrid categoryId={categoryId} customData={characters} useSwiper={false} />

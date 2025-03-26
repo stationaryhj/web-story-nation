@@ -45,6 +45,12 @@ export default function RecommendSection({ onSearchTrigger }: RecommendSectionPr
     fetchCharacters()
   }, [fetchCharacters])
 
+  // 짜릿모드 변경 시 데이터 다시 로드
+  useEffect(() => {
+    console.log('RecommendSection - 성인 모드 상태 변경됨:', isAdultModeEnabled)
+    refetch()
+  }, [isAdultModeEnabled, refetch])
+
   if (isLoading) {
     return <div>Loading...</div>
   }

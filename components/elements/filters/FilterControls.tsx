@@ -10,6 +10,7 @@ export interface FilterControlsProps {
   setOrder: (order: number) => void
   nsfw: number
   setNsfw: (nsfw: number) => void
+  onTagsChange?: (tags: string[]) => void
 }
 
 /**
@@ -17,7 +18,14 @@ export interface FilterControlsProps {
  * - 정렬 옵션 (인기순/최신순)
  * - 이용등급 필터 (전체 이용가/짜릿모드/이용등급 전체)
  */
-export default function FilterControls({ categoryId, order, setOrder, nsfw, setNsfw }: FilterControlsProps) {
+export default function FilterControls({
+  categoryId,
+  order,
+  setOrder,
+  nsfw,
+  setNsfw,
+  onTagsChange,
+}: FilterControlsProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -42,9 +50,16 @@ export default function FilterControls({ categoryId, order, setOrder, nsfw, setN
     [setNsfw]
   )
 
-  const handleTagSelect = useCallback((tagIds: string[]) => {
-    console.log('tagIds', tagIds)
-  }, [])
+  const handleTagSelect = useCallback(
+    (tagIds: string[]) => {
+      console.log('선택된 태그:', tagIds)
+      // 상위 컴포넌트로 선택된 태그 전달
+      if (onTagsChange) {
+        onTagsChange(tagIds)
+      }
+    },
+    [onTagsChange]
+  )
 
   return (
     <>

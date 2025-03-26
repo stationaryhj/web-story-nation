@@ -30,17 +30,56 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
   const [scrollLeft, setScrollLeft] = useState(0)
-  const [recentlyClicked, setRecentlyClicked] = useState(false)
+  const [mouseMoved, setMouseMoved] = useState(false)
+  const [moveDistance, setMoveDistance] = useState(0)
+  const currentTab = searchParams.get('tab')
+  const prevTabRef = useRef<string | null>(currentTab)
 
   // URL 파라미터가 변경될 때 태그 선택 상태 업데이트
   useEffect(() => {
     const currentTagsParam = searchParams.get('tags')
-    if (currentTagsParam) {
-      setSelectedTags(currentTagsParam.split('&'))
-    } else {
+
+    // 탭이 변경되었는지 확인
+    if (currentTab !== prevTabRef.current) {
+      // 탭이 변경되었으면 태그 리스트 초기화
       setSelectedTags([])
+
+      // 부모 컴포넌트에 빈 태그 배열 전달하여 카드 리스트 리셋 방지
+      if (onTagSelect) {
+        onTagSelect([])
+      }
+
+      // 태그 파라미터 제거
+      if (currentTagsParam) {
+        // URL에서 태그 파라미터 제거
+        startTransition(() => {
+          const params = new URLSearchParams(searchParams.toString())
+          params.delete('tags')
+          const newUrl = `${pathname}?${params.toString()}`
+          router.push(newUrl, { scroll: false })
+        })
+      }
+      // 현재 탭 저장
+      prevTabRef.current = currentTab
+    } else if (currentTagsParam) {
+      // 탭이 변경되지 않았고 태그 파라미터가 있으면 선택된 태그 업데이트
+      const newSelectedTags = currentTagsParam.split('&')
+      setSelectedTags(newSelectedTags)
+
+      // 부모 컴포넌트에 선택된 태그 전달
+      if (onTagSelect) {
+        onTagSelect(newSelectedTags)
+      }
+    } else {
+      // 태그 파라미터가 없으면 선택된 태그 초기화
+      setSelectedTags([])
+
+      // 부모 컴포넌트에 빈 태그 배열 전달
+      if (onTagSelect) {
+        onTagSelect([])
+      }
     }
-  }, [searchParams])
+  }, [searchParams, currentTab, pathname, router, onTagSelect])
 
   // URL 파라미터 업데이트
   const updateUrlParams = useCallback(
@@ -73,6 +112,8 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
     if (expanded || !scrollContainerRef.current) return
 
     setIsDragging(true)
+    setMouseMoved(false)
+    setMoveDistance(0)
     setStartX(e.pageX)
     setScrollLeft(scrollContainerRef.current.scrollLeft)
     document.body.style.userSelect = 'none' // 드래그 중 텍스트 선택 방지
@@ -83,20 +124,20 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
     if (!isDragging || !scrollContainerRef.current) return
 
     const x = e.pageX
-    const distance = x - startX
-    scrollContainerRef.current.scrollLeft = scrollLeft - distance
+    const distance = Math.abs(x - startX)
+
+    if (distance > 5) {
+      setMouseMoved(true)
+      setMoveDistance(distance)
+    }
+
+    scrollContainerRef.current.scrollLeft = scrollLeft - (x - startX)
   }
 
   // 마우스 업 이벤트 핸들러
   const handleMouseUp = () => {
     setIsDragging(false)
     document.body.style.userSelect = '' // 텍스트 선택 다시 활성화
-
-    // 클릭과 드래그를 구분하기 위한 타이머 설정
-    setRecentlyClicked(true)
-    setTimeout(() => {
-      setRecentlyClicked(false)
-    }, 300) // 300ms 이내에 클릭 이벤트가 발생하면 클릭으로 간주
   }
 
   // 가로 스크롤 휠 이벤트 핸들러
@@ -126,8 +167,14 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
     const handleGlobalMouseMove = (e: MouseEvent) => {
       if (isDragging && scrollContainerRef.current) {
         const x = e.pageX
-        const distance = x - startX
-        scrollContainerRef.current.scrollLeft = scrollLeft - distance
+        const distance = Math.abs(x - startX)
+
+        if (distance > 5) {
+          setMouseMoved(true)
+          setMoveDistance(distance)
+        }
+
+        scrollContainerRef.current.scrollLeft = scrollLeft - (x - startX)
       }
     }
 
@@ -143,8 +190,8 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
   // 태그 클릭 핸들러
   const handleTagClick = useCallback(
     (tagId: string) => {
-      // 드래그 직후 클릭 이벤트가 발생하면 무시
-      if (isDragging || recentlyClicked) return
+      // 드래그 중이거나 일정 거리 이상 움직였을 때는 클릭으로 처리하지 않음
+      if (isDragging || mouseMoved || moveDistance > 5) return
 
       let newSelectedTags: string[]
 
@@ -164,7 +211,7 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
         onTagSelect(newSelectedTags)
       }
     },
-    [selectedTags, updateUrlParams, onTagSelect, isDragging, recentlyClicked]
+    [selectedTags, updateUrlParams, onTagSelect, isDragging, mouseMoved, moveDistance]
   )
 
   // 모든 태그 필터 초기화
