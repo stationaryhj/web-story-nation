@@ -18,14 +18,13 @@ export default function RecommendSection({ onSearchTrigger }: RecommendSectionPr
   // 짜릿모드 상태 가져오기
   const { isAdultModeEnabled } = useSettingsStore()
   const { initialize, isLoading, error } = useRecommendSectionStoreData()
-  
+
   useEffect(() => {
-    initialize();
-  }, []);
+    initialize()
+  }, [])
 
   // 짜릿모드 변경 시 데이터 다시 로드
-  useEffect(() => {
-  }, [isAdultModeEnabled])
+  useEffect(() => {}, [isAdultModeEnabled])
 
   if (isLoading) {
     return <div>Loading...</div>
@@ -34,7 +33,7 @@ export default function RecommendSection({ onSearchTrigger }: RecommendSectionPr
   if (error) {
     return <div>Error: {error.message}</div>
   }
-  
+
   return (
     <div>
       {/* 각 섹션을 별도의 컴포넌트로 분리하고 고유 ID 추가 */}

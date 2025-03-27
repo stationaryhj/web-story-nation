@@ -36,9 +36,9 @@ export default function FilterControls({
   // 컴포넌트 마운트 시 태그 데이터 로드
   useEffect(() => {
     if (categoryId > 0) {
-      loadTags(categoryId);
+      loadTags(categoryId)
     }
-  }, [categoryId, loadTags]);
+  }, [categoryId, loadTags])
 
   const handleOrderChange = useCallback(
     (newOrder: number) => {
@@ -139,7 +139,7 @@ export default function FilterControls({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </button>
-            
+
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-background-light rounded-lg shadow-lg z-10 border overflow-hidden">
                 <button

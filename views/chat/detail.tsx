@@ -783,13 +783,13 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
               <button
                 type="button"
                 onClick={toggleActionMode}
-                className={`mr-3 p-3 rounded-full transition-colors ${
+                className={`mr-2 p-2.5 rounded-full transition-colors ${
                   isActionMode ? 'bg-violet-100 text-violet-600' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                 }`}
                 title={isActionMode ? '일반 대화 모드로 전환' : '상황 설명 모드로 전환'}
                 disabled={isWaitingForAI}
               >
-                <FontAwesomeIcon icon={faAsterisk} className="text-lg" />
+                <FontAwesomeIcon icon={faAsterisk} className="text-base" />
               </button>
 
               <div className="flex-1 relative">
@@ -804,9 +804,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                         ? '상황 설명을 입력하세요. (예: 캐릭터가 웃으며)'
                         : '대화를 입력하세요. (예: 안녕! 뭐해?)'
                   }
-                  className={`w-full py-4 px-5 text-base bg-gray-100 text-gray-800 rounded-l-xl border-0 focus:outline-none focus:ring-2 ${
-                    isWaitingForAI ? 'bg-gray-200 text-gray-500' : 'focus:ring-violet-200'
-                  } transition-all`}
+                  className={`w-full py-3 px-4 text-sm sm:text-base bg-gray-100 text-gray-800 rounded-l-xl border-0 focus:outline-none focus:ring-0 ${
+                    isWaitingForAI ? 'bg-gray-200 text-gray-500' : 'hover:bg-gray-200/80'
+                  } transition-all placeholder:text-sm placeholder:text-gray-500`}
                   disabled={isWaitingForAI}
                 />
                 {isActionMode && !isWaitingForAI && (
@@ -842,23 +842,25 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                 type="submit"
                 color={message.trim() && !isWaitingForAI ? 'gradient' : 'secondary'}
                 disabled={!message.trim() || isWaitingForAI}
-                className="rounded-l-none rounded-r-xl py-4 px-5"
+                className="rounded-l-none rounded-r-xl py-3 px-4"
               >
-                <FontAwesomeIcon icon={faPaperPlane} className="text-lg" />
+                <FontAwesomeIcon icon={faPaperPlane} className="text-base" />
               </BaseButton>
             </form>
 
             {/* 사용중인 모드와 펜 소모량 안내 */}
-            <div className="mt-3 text-center text-sm text-gray-500">
-              <span className="mr-2">현재 모드: {getChatModeName(currentModeId)}</span>
+            <div className="mt-2 text-center text-xs text-gray-500">
+              <span className="mr-1.5">현재 모드: {getChatModeName(currentModeId)}</span>
               <span className="text-primary-600 flex items-center justify-center">
-                (<FontAwesomeIcon icon={getModeIcon(currentModeId)} className="mr-1" size="xs" />
+                (<FontAwesomeIcon icon={getModeIcon(currentModeId)} className="mx-0.5" size="xs" />
                 {getPenCostByMode(currentModeId)}
                 /메시지
                 {getDiscountByMode(currentModeId) > 0 && (
-                  <span className="ml-1 text-green-500">
+                  <span className="ml-1 text-green-500 text-xs">
                     {getDiscountByMode(currentModeId)}% 할인
-                    <span className="line-through text-gray-400 ml-1">{getOriginalCoinByMode(currentModeId)}</span>
+                    <span className="line-through text-gray-400 ml-0.5 text-xs">
+                      {getOriginalCoinByMode(currentModeId)}
+                    </span>
                   </span>
                 )}
                 )
