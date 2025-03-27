@@ -50,7 +50,7 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
         // 실제 구현에서는 API를 호출해야 합니다.
         // 현재는 목업으로 characters 데이터를 사용합니다.
         setTimeout(() => {
-          const characters = bridgeTop10DataToModuleCharacter(rankingCharacters) as Character[]
+          const characters = rankingCharacters
 
           // 성별에 따라 필터링
           const filtered =

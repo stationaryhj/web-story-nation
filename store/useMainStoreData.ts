@@ -4,7 +4,7 @@ import { contentApi } from '@/services/api'
 import { QueryClient } from '@tanstack/react-query'
 import { Character } from '@/store/useStoreData'
 import { CATEGORIES } from '@/services/hooks/DataListManager'
-import { bridgeCharacterDataToCharacter } from '@/lib/utils/storyNationUtil'
+import { bridgeCharacterDataToCharacter, bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil'
 
 // 싱글톤 queryClient 생성 (최초 한 번만 생성)
 const queryClient = new QueryClient({
@@ -22,11 +22,11 @@ const queryClient = new QueryClient({
 // 추천 캐릭터 데이터 스토어
 interface MainStoreData {
     characters: CharbotTop10NewResponse | null
-    rankingCharacters: Array<ModuleCharacter> | [];
-    rankingCreaters: Array<ModuleCharacter> | [];
-    modules_1: Array<ModuleCharacter> | [];
-    modules_2: Array<ModuleCharacter> | [];
-    modules_3: Array<ModuleCharacter> | [];
+    rankingCharacters: Array<Character> | [];
+    rankingCreaters: Array<Character> | [];
+    modules_1: Array<Character> | [];
+    modules_2: Array<Character> | [];
+    modules_3: Array<Character> | [];
   
     isLoading: boolean;
     error: Error | null;
@@ -66,11 +66,11 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
         // Zustand 스토어 업데이트
         set({ 
           characters: data,
-          rankingCharacters: data?.modules?.module_9 || [],
-          rankingCreaters: data?.modules?.module_10 || [],
-          modules_1: data?.modules?.module_1 || [],
-          modules_2: data?.modules?.module_2 || [],
-          modules_3: data?.modules?.module_3 || [],
+          rankingCharacters: bridgeTop10DataToModuleCharacter(data?.modules?.module_9) as Character[]  || [],
+          rankingCreaters: bridgeTop10DataToModuleCharacter(data?.modules?.module_10) as Character[] || [],
+          modules_1: bridgeTop10DataToModuleCharacter(data?.modules?.module_1) as Character[] || [],
+          modules_2: bridgeTop10DataToModuleCharacter(data?.modules?.module_2) as Character[] || [],
+          modules_3: bridgeTop10DataToModuleCharacter(data?.modules?.module_3) as Character[] || [],
           isLoading: false
         });
       } else {

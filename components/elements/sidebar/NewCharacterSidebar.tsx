@@ -41,10 +41,7 @@ export default function NewCharacterSidebar({ isOpen, onClose }: NewCharacterSid
         // 최신순 정렬 (실제로는 백엔드에서 정렬된 데이터가 올 것입니다)
         // 여기서는 임의로 가정하여 전체 캐릭터를 최대 50개까지 표시
         const combinedModules = [...modules_1, ...modules_2, ...modules_3];
-        const sortedModules = combinedModules.sort((a, b) => 
-          new Date(b.create_dt).getTime() - new Date(a.create_dt).getTime()
-        );
-        const characters = bridgeTop10DataToModuleCharacter(sortedModules) as Character[];
+        const characters = combinedModules
 
         const sorted = [...characters]
           .sort((a, b) => {
