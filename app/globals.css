@@ -86,6 +86,24 @@
   display: none; /* Chrome, Safari, Opera */
 }
 
+/* 스크롤바 숨기기 (새로운 클래스) */
+.no-scrollbar {
+  -ms-overflow-style: none !important; /* IE and Edge */
+  scrollbar-width: none !important; /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
+  width: 0 !important;
+  background: transparent !important;
+}
+
+/* 스크롤바가 숨겨진 상태에서 body 스타일 */
+body.no-scrollbar {
+  overflow: hidden !important;
+  padding-right: 0 !important;
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;

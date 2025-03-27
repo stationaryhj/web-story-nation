@@ -35,6 +35,8 @@ interface CardGridProps {
   isLoading?: boolean
   error?: string | null
   useSwiper?: boolean // Swiper 사용 여부 (기본값: true)
+  className?: string // 추가 스타일링을 위한 클래스명
+  sectionId?: string // 각 섹션을 구분하기 위한 고유 ID
 }
 
 export default function CardGrid({
@@ -53,6 +55,8 @@ export default function CardGrid({
   isLoading: externalLoading,
   error: externalError,
   useSwiper = true, // 기본적으로 Swiper 사용
+  className = '',
+  sectionId = '',
 }: CardGridProps) {
   const { isLoading: storeLoading, error: storeError, fetchCategoryCharacters } = useStoreData()
   const { openModal, setSelectedCharacter } = useModalStore()
@@ -215,7 +219,7 @@ export default function CardGrid({
   }
 
   return (
-    <div>
+    <div className={className}>
       {title && (
         <FadeIn direction="up" delay={0.1}>
           <div className="flex justify-between items-center mb-4">
@@ -253,7 +257,7 @@ export default function CardGrid({
       )}
 
       {useSwiper ? (
-        <div className="relative swiper-container-wrapper">
+        <div className="relative swiper-container-wrapper" id={sectionId}>
           <button
             type="button"
             className={`swiper-button-prev navigation-button navigation-prev-button card-grid-prev-button absolute left-[-20px] z-[9999] flex items-center justify-center ${
@@ -290,8 +294,8 @@ export default function CardGrid({
             loop={false}
             slidesPerGroup={1}
             navigation={{
-              nextEl: '.card-grid-next-button',
-              prevEl: '.card-grid-prev-button',
+              nextEl: `#${sectionId} .card-grid-next-button`,
+              prevEl: `#${sectionId} .card-grid-prev-button`,
               enabled: true,
             }}
             breakpoints={breakpoints}

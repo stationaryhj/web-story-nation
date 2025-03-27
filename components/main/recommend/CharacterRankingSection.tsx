@@ -78,7 +78,13 @@ const CharacterRankingSection = memo(() => {
         {/* 캐릭터 랭킹 그리드 */}
         <SectionTransition>
           <div className="w-full">
-            <CardGrid customData={getCharacterRankingData()} cardsPerRow={5} hasRanking={true} useSwiper={true} />
+            <CardGrid
+              customData={getCharacterRankingData()}
+              cardsPerRow={5}
+              hasRanking={true}
+              useSwiper={true}
+              sectionId="character-ranking-section"
+            />
           </div>
         </SectionTransition>
       </div>
