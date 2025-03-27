@@ -1,40 +1,17 @@
 'use client'
 
-import { bridgeCharacterDataToCharacter } from '@/lib/utils/storyNationUtil'
-import { ReqGetCharacterList, CATEGORIES } from '@/services/hooks/DataListManager'
 import { SectionTransition } from '@/components/motion/PageTransition'
 import CardGrid from '@/components/elements/card/CardGrid'
 import FilterControls from '@/components/elements/filters/FilterControls'
-import { CategoryId } from '@/services/hooks/DataListManager'
-import { Character } from '@/store/useStoreData'
-import { CharbotData, ModuleCharacter } from '@/types/api'
-import { useState, useEffect } from 'react'
+import { CategoryId, CATEGORIES } from '@/services/hooks/DataListManager'
+import { useEffect } from 'react'
 import { useSettingsStore } from '@/store/useStoreSettings'
+import { useCharacterGridStoreData } from '@/store/useCharacterGridStoreData'
 
 interface CharacterGridSectionProps {
   categoryId: CategoryId
   selectedTags?: string[] // 선택된 태그 ID 목록 추가
   onSearchTrigger?: (query: string) => void
-}
-
-// CharbotData를 ModuleCharacter 형식으로 변환하는 함수
-const mapToModuleCharacter = (data: CharbotData[]): ModuleCharacter[] => {
-  return data.map(item => ({
-    world_list_detail_chrbot_key: item.world_list_detail_chrbot_key,
-    title: item.title,
-    intro: item.intro,
-    img_url: item.img_url,
-    lv: item.lv,
-    tags: item.tags,
-    chat_cnt: item.chat_cnt,
-    msg_cnt: item.msg_cnt,
-    like_cnt: item.like_cnt,
-    create_dt: item.create_dt,
-    nick_nm: item.nick_nm,
-    nsfw: item.nsfw,
-    module_id: 0, // 기본값 설정
-    sort: 0, // 기본값 설정
-  }))
 }
 
 export default function CharacterGridSection({
@@ -44,107 +21,66 @@ export default function CharacterGridSection({
 }: CharacterGridSectionProps) {
   // 짜릿모드 상태 가져오기
   const { isAdultModeEnabled } = useSettingsStore()
-
-  // 상태 변경 디버깅 로그
-  useEffect(() => {
-    console.log('CharacterGridSection - isAdultModeEnabled 변경됨:', isAdultModeEnabled)
-
-    // 성인 모드 상태가 변경되면 강제로 페이지 새로고침
-    // 주의: 개발 환경에서는 두 번 실행될 수 있으므로 실제 사용 시 조건을 추가하는 것이 좋습니다
-    /* 
-    이 코드는 테스트 후 제거하세요!
-    if (typeof window !== 'undefined') {
-      window.location.reload()
-    }
-    */
-  }, [isAdultModeEnabled])
-
-  // 필터링 상태 관리
-  const [order, setOrder] = useState<number>(1) // 1: 인기순(기본값), 2: 최신순
-  const [nsfw, setNsfw] = useState<number>(2) // 2: 전체 이용가(기본값), 1: 짜릿모드 가능, 3: 이용등급 전체
-
-  // 캐릭터 데이터 관리
-  const [characters, setCharacters] = useState<Character[]>([])
+  
+  // 캐릭터 그리드 스토어 가져오기
+  const { 
+    characters, 
+    filter, 
+    isLoading, 
+    error, 
+    initialize, 
+    updateFilter, 
+    loadMore,
+    invalidateData 
+  } = useCharacterGridStoreData()
 
   // 카테고리 정보 가져오기
   const categoryInfo = CATEGORIES.find(cat => cat.id === categoryId)
   const categoryName = categoryInfo?.name || '캐릭터'
-  const categoryType = categoryInfo?.type || ''
   const categoryIdNumber = Number(categoryInfo?.type || 0)
 
-  // 컴포넌트 내부에서 직접 데이터 로드
-  const {
-    data: categoryData,
-    isLoading,
-    error,
-    refetch,
-  } = ReqGetCharacterList(
-    categoryId,
-    nsfw, // nsfw
-    1, // page (항상 1)
-    10, // paginate - 한 번에 50개 로드
-    order, // order
-    selectedTags.join(',') // tag 검색어 - 쉼표로 구분된 합집합 형태로 전달
-  )
-
-  // 데이터 로드 시 characters 업데이트
+  // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
-    if (!isLoading && categoryData?.chrbotList?.data) {
-      console.log('데이터 로드 완료 - 성인 모드 상태:', isAdultModeEnabled)
+    if (categoryId === 'all') return; // all 카테고리는 처리하지 않음
+    
+    console.log('CharacterGridSection - 초기 데이터 로드:', categoryId, selectedTags);
+    initialize(categoryId, selectedTags);
+  }, [categoryId, selectedTags, initialize]);
 
-      const moduleData = mapToModuleCharacter(categoryData.chrbotList.data)
-      const newCharacters = bridgeCharacterDataToCharacter(moduleData)
-
-      console.log('필터링 전 캐릭터 수:', newCharacters.length)
-      console.log('성인 컨텐츠 캐릭터 수:', newCharacters.filter(character => character.isAdult).length)
-
-      // 성인 컨텐츠 필터링을 위한 현재 설정 상태 직접 확인
-      const currentAdultMode = useSettingsStore.getState().isAdultModeEnabled
-      console.log('스토어에서 직접 확인한 성인 모드 상태:', currentAdultMode)
-
-      // 짜릿모드 필터링 - 성인 모드가 활성화되어 있지 않으면 성인 컨텐츠 필터링
-      let filteredCharacters = [...newCharacters] // 배열 복사
-
-      // 성인 모드가 비활성화된 경우 성인 컨텐츠 제거
-      if (!currentAdultMode) {
-        filteredCharacters = filteredCharacters.filter(character => !character.isAdult)
-        console.log('성인 컨텐츠 필터링 적용됨')
-      } else {
-        console.log('모든 컨텐츠 표시')
-      }
-
-      console.log('필터링 후 캐릭터 수:', filteredCharacters.length)
-
-      // category 속성 추가
-      const charactersWithCategory = filteredCharacters.map(character => ({
-        ...character,
-        category: 'unspecified' as 'male' | 'female' | 'unspecified',
-      }))
-
-      setCharacters(charactersWithCategory as Character[])
-    }
-  }, [categoryData, isLoading, isAdultModeEnabled])
-
-  // 성인 모드 상태나 필터 변경 시 데이터 다시 로드
+  // 성인 모드 상태 변경 시 데이터 다시 로드
   useEffect(() => {
-    console.log('필터 변경으로 데이터 다시 로드 - 성인 모드 상태:', isAdultModeEnabled)
-    console.log('현재 선택된 태그:', selectedTags)
-
-    // selectedTags가 변경되었을 때만 characters를 초기화하고 refetch
-    if (selectedTags.length > 0 || categoryId === 'all') {
-      setCharacters([])
-      refetch()
-    } else {
-      // 태그가 없는 경우에는 초기 로드 이후에는 categoryId가 변경되었을 때만 refetch
-      refetch()
+    if (categoryId === 'all') return;
+    
+    console.log('CharacterGridSection - 성인 모드 상태 변경됨:', isAdultModeEnabled);
+    
+    // 성인 모드 상태에 따라 nsfw 필터 설정 변경
+    // 짜릿모드 켜짐: nsfw=1 (짜릿모드 가능), 꺼짐: nsfw=2 (전체 이용가)
+    updateFilter({ nsfw: isAdultModeEnabled ? 1 : 2 });
+  }, [isAdultModeEnabled, updateFilter, categoryId]);
+  
+  // 필터 변경 핸들러
+  const handleOrderChange = (newOrder: number) => {
+    updateFilter({ order: newOrder });
+  };
+  
+  const handleNsfwChange = (newNsfw: number) => {
+    updateFilter({ nsfw: newNsfw });
+  };
+  
+  // 태그 변경 핸들러
+  const handleTagsChange = (tags: string[]) => {
+    console.log('CharacterGridSection - 태그 변경:', tags);
+    // 태그 변경 시 기존 선택된 태그와 비교하여 변경된 경우에만 초기화
+    if (JSON.stringify(tags) !== JSON.stringify(selectedTags)) {
+      initialize(categoryId, tags);
     }
-  }, [categoryId, order, nsfw, selectedTags, isAdultModeEnabled, refetch])
+  };
 
   if (categoryId === 'all') {
     return null // all 카테고리는 RecommendSection에서 처리
   }
 
-  if (isLoading) {
+  if (isLoading && characters.length === 0) {
     return (
       <SectionTransition className="py-12 bg-white dark:bg-dark-background-light">
         <div className="container mx-auto px-4">
@@ -154,7 +90,7 @@ export default function CharacterGridSection({
     )
   }
 
-  if (error) {
+  if (error && characters.length === 0) {
     return (
       <SectionTransition className="py-12 bg-white dark:bg-dark-background-light">
         <div className="container mx-auto px-4 text-red-500">
@@ -173,10 +109,10 @@ export default function CharacterGridSection({
           <h2 className="text-2xl font-bold mb-6">{categoryName}</h2>
           <FilterControls
             categoryId={categoryIdNumber}
-            order={order}
-            setOrder={setOrder}
-            nsfw={nsfw}
-            setNsfw={setNsfw}
+            order={filter.order}
+            setOrder={handleOrderChange}
+            nsfw={filter.nsfw}
+            setNsfw={handleNsfwChange}
           />
           <p className="mt-8 text-center text-gray-500 dark:text-dark-secondary-400">
             {selectedTags.length > 0 ? '선택한 태그에 해당하는 캐릭터가 없습니다.' : '데이터가 없습니다.'}
@@ -192,18 +128,30 @@ export default function CharacterGridSection({
         {/* 공통 필터 컴포넌트 적용 */}
         <FilterControls
           categoryId={categoryIdNumber}
-          order={order}
-          setOrder={setOrder}
-          nsfw={nsfw}
-          setNsfw={setNsfw}
-          onTagsChange={tags => {
-            console.log('CharacterGridSection - 태그 변경:', tags)
-            // 이미 selectedTags를 상위 컴포넌트에서 받아 오므로 여기서는 로그만 출력
-          }}
+          order={filter.order}
+          setOrder={handleOrderChange}
+          nsfw={filter.nsfw}
+          setNsfw={handleNsfwChange}
+          onTagsChange={handleTagsChange}
         />
 
         {/* 카드 그리드 */}
         <CardGrid categoryId={categoryId} customData={characters} useSwiper={false} />
+        
+        {/* 더 보기 버튼 */}
+        {characters.length > 0 && (
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={loadMore}
+              disabled={isLoading}
+              className={`px-6 py-2 rounded-full text-white bg-primary-500 hover:bg-primary-600 ${
+                isLoading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {isLoading ? '로딩 중...' : '더 보기'}
+            </button>
+          </div>
+        )}
       </div>
     </SectionTransition>
   )

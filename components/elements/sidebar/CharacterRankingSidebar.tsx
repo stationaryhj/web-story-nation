@@ -4,9 +4,11 @@ import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
 import { BaseSelectBox } from '@/components/elements/selectbox/BaseSelectBox'
-import { useStoreData } from '@/store/useStoreData'
+import { Character, useStoreData } from '@/store/useStoreData'
 import CardGrid from '@/components/elements/card/CardGrid'
 import BaseSidebar from './BaseSidebar'
+import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
+import { bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil'
 
 // 캐릭터 랭킹 탭 정의
 const rankingTabs: TabItem[] = [
@@ -32,9 +34,11 @@ interface CharacterRankingSidebarProps {
 export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRankingSidebarProps) {
   const [activeTab, setActiveTab] = useState('realtime')
   const [selectedGender, setSelectedGender] = useState(genderOptions[0])
-  const { characters } = useStoreData()
+  // const { characters } = useStoreData()
   const [rankingData, setRankingData] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+
+  const { rankingCharacters } = useRecommendSectionStoreData()
 
   // 랭킹 데이터 가져오기
   useEffect(() => {
@@ -44,6 +48,8 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
         // 실제 구현에서는 API를 호출해야 합니다.
         // 현재는 목업으로 characters 데이터를 사용합니다.
         setTimeout(() => {
+          const characters = rankingCharacters
+
           // 성별에 따라 필터링
           const filtered =
             selectedGender.value === 'all'
@@ -71,7 +77,7 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
     if (isOpen) {
       fetchRankingData()
     }
-  }, [isOpen, activeTab, selectedGender, characters])
+  }, [isOpen, activeTab, selectedGender, rankingCharacters])
 
   // 탭 변경 핸들러
   const handleTabChange = (tabId: string) => {

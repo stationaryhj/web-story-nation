@@ -6,10 +6,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { getImageUri } from '@/lib/utils/storyNationUtil'
-import { motion, AnimatePresence } from 'framer-motion'
+import { bridgeCharbotDataToCharacter } from '@/lib/utils/storyNationUtil'
 import BaseModal from './BaseModal'
-
+import { ReqGetChatBot } from '@/services/hooks/DataListManager'
+import { Character } from '@/store/useStoreData'
 // 목업 데이터
 const mockFirstMessage = {
   situation: '어두운 밤, 비가 내리는 거리에서',
@@ -17,24 +17,6 @@ const mockFirstMessage = {
     '안녕하세요. 저는 도시의 수호자입니다. 이 도시에서 일어나는 모든 사건을 조사하고 있죠. 당신과 함께 이 도시의 비밀을 파헤치고 싶습니다.',
 }
 
-// 대화 예시 목업 데이터
-const mockConversationExamples = [
-  {
-    user: '당신은 누구인가요?',
-    character:
-      '저는 도시의 그림자 속에서 활동하는 수호자입니다. 제 본명은 알려드릴 수 없지만, 많은 사람들은 저를 "나이트워커"라고 부릅니다.',
-  },
-  {
-    user: '왜 이 일을 하고 있나요?',
-    character:
-      '5년 전, 이 도시에서 제 가족을 잃었습니다. 그 이후로 다른 사람들이 같은 고통을 겪지 않도록 범죄와 부패에 맞서고 있습니다. 이것은 복수가 아닌, 정의를 위한 일입니다.',
-  },
-  {
-    user: '도와드릴 수 있을까요?',
-    character:
-      '위험한 일입니다만... 당신이 정말 도울 의향이 있다면, 몇 가지 정보가 필요합니다. 하지만 경고하겠습니다. 이 일에 발을 들이면, 돌이킬 수 없는 길이 될 수도 있습니다.',
-  },
-]
 
 interface CharactorModalProps {
   isOpen: boolean
@@ -46,11 +28,19 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   const { selectedCharacter, setSelectedCharacter } = useModalStore()
   const [isImageLoaded, setIsImageLoaded] = useState(false)
 
+  const { data: chatBotData, isLoading: chatBotLoading, error: chatBotError } = ReqGetChatBot(Number(selectedCharacter?.id))
+
+  useEffect(() => {
+    if(chatBotData) {
+      setSelectedCharacter(bridgeCharbotDataToCharacter(chatBotData?.chrbot) as Character)
+    }
+  }, [chatBotData])
+
   // 모달 열릴 때 이미지 미리 로딩
   useEffect(() => {
-    if (selectedCharacter?.imageUrl) {
+    if (selectedCharacter && selectedCharacter?.imageUrl) {
       const img = new window.Image()
-      img.src = getImageUri(selectedCharacter.imageUrl)
+      img.src = selectedCharacter?.imageUrl
       img.onload = () => setIsImageLoaded(true)
     }
   }, [selectedCharacter])
@@ -112,7 +102,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   <div className="w-8 h-8 rounded-full border-2 border-primary-500 border-t-transparent animate-spin"></div>
                 </div>
                 <Image
-                  src={getImageUri(selectedCharacter.imageUrl)}
+                  src={selectedCharacter.imageUrl}
                   alt={selectedCharacter.name || '캐릭터'}
                   fill
                   priority
@@ -187,7 +177,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                 <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mb-2">
                   {mockFirstMessage.situation}
                 </p>
-                <p className="text-secondary-700 dark:text-dark-secondary-300">{mockFirstMessage.message}</p>
+                <p className="text-secondary-700 dark:text-dark-secondary-300">{selectedCharacter?.first_talk}</p>
               </div>
             </div>
             <button

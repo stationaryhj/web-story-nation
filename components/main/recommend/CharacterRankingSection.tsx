@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, memo } from 'react'
-import { useStoreData } from '@/store/useStoreData'
+import { Character } from '@/store/useStoreData'
 import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
 import CardGrid from '@/components/elements/card/CardGrid'
 import { SectionTransition } from '@/components/motion/PageTransition'
 import CharacterRankingSidebar from '@/components/elements/sidebar/CharacterRankingSidebar'
+import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
+import { bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil'
 
 // 캐릭터 랭킹 탭 정의
 const characterRankingTabs: TabItem[] = [
@@ -33,9 +35,10 @@ const getRankingUpdateMessage = (tabId: string) => {
 
 // 캐릭터 랭킹 섹션 컴포넌트
 const CharacterRankingSection = memo(() => {
-  const { characters } = useStoreData()
   const [characterActiveTab, setCharacterActiveTab] = useState('realtime')
   const [isCharacterRankingSidebarOpen, setIsCharacterRankingSidebarOpen] = useState(false)
+
+  const { rankingCharacters: mainStoreRankingCharacters } = useRecommendSectionStoreData()
 
   const handleCharacterRankingTabChange = (tabId: string) => {
     setCharacterActiveTab(tabId)
@@ -45,7 +48,7 @@ const CharacterRankingSection = memo(() => {
   const getCharacterRankingData = () => {
     // 실제로는 탭에 따라 다른 데이터를 반환하는 로직이 필요함
     // 현재는 목업으로 characters 데이터 사용
-    return characters
+    return mainStoreRankingCharacters
   }
 
   return (

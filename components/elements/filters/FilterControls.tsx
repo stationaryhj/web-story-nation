@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useTransition, useCallback } from 'react'
+import { useState, useTransition, useCallback, useEffect } from 'react'
 import TagList from '@/components/elements/tags/TagList'
-import { ReqGetTags } from '@/services/hooks/DataListManager'
+import { useCharacterGridStoreData } from '@/store/useCharacterGridStoreData'
+
 // 필터 컨트롤 컴포넌트 타입 정의
 export interface FilterControlsProps {
   categoryId: number
@@ -29,7 +30,15 @@ export default function FilterControls({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  const { data: tagList, isLoading, error } = ReqGetTags(categoryId)
+  // useCharacterGridStoreData에서 태그 데이터 가져오기
+  const { tags, isTagsLoading, tagsError, loadTags } = useCharacterGridStoreData()
+
+  // 컴포넌트 마운트 시 태그 데이터 로드
+  useEffect(() => {
+    if (categoryId > 0) {
+      loadTags(categoryId);
+    }
+  }, [categoryId, loadTags]);
 
   const handleOrderChange = useCallback(
     (newOrder: number) => {
@@ -68,9 +77,9 @@ export default function FilterControls({
         {/* 상단: 태그 리스트 */}
         <div className="w-full mb-10">
           <TagList
-            tags={tagList?.charbot_tag || []}
+            tags={tags || []}
             categoryId={categoryId.toString()}
-            isLoading={isLoading}
+            isLoading={isTagsLoading}
             onTagSelect={handleTagSelect}
           />
         </div>
@@ -103,6 +112,34 @@ export default function FilterControls({
 
           {/* 오른쪽: 등급 드롭다운 */}
           <div className="relative">
+            <button
+              className="px-4 py-2 text-sm font-medium border rounded-lg bg-white dark:bg-dark-background-lighter text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-background-lighter/80 flex items-center gap-2"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              disabled={isPending}
+            >
+              {nsfw === 1 ? (
+                <>
+                  <span className="inline-flex items-center">
+                    짜릿모드 가능
+                    <span className="ml-1 w-2 h-2 rounded-full bg-red-500"></span>
+                  </span>
+                </>
+              ) : nsfw === 2 ? (
+                '전체 이용가'
+              ) : (
+                '이용등급 전체'
+              )}
+              <svg
+                className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-background-light rounded-lg shadow-lg z-10 border overflow-hidden">
                 <button

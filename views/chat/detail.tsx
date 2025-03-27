@@ -100,6 +100,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   // 연결 상태 표시 관련 상태
   const [showConnectedStatus, setShowConnectedStatus] = useState(false)
 
+  // 먼저 새로운 모바일 이미지 보기 모달을 위한 상태를 추가합니다
+  const [showImageModal, setShowImageModal] = useState(false)
+
   // 메시지 디버깅을 위한 로깅 추가
   useEffect(() => {
     console.log('🗨️ chatMessages 변경 감지:', chatMessages.length)
@@ -188,21 +191,20 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         }
 
         // 초기 메시지 설정 (Provider의 메서드 사용)
-        clearChatHistory(); // 기존 메시지 초기화
-        
-        // 현재 모드 설정 업데이트
-        setCurrentModeId(selectedModeId);
-        
-      } catch (error) {
-        console.error('채팅방 초기화 실패:', error);
-        setError('채팅방을 초기화하는 중 오류가 발생했습니다. 다시 시도해주세요.');
-        hasInitialized.current = false;
-      } finally {
-        setIsLoading(false);
-      }
-    };
+        clearChatHistory() // 기존 메시지 초기화
 
-    initializeChatRoom();
+        // 현재 모드 설정 업데이트
+        setCurrentModeId(selectedModeId)
+      } catch (error) {
+        console.error('채팅방 초기화 실패:', error)
+        setError('채팅방을 초기화하는 중 오류가 발생했습니다. 다시 시도해주세요.')
+        hasInitialized.current = false
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    initializeChatRoom()
 
     // 컴포넌트 언마운트 시 정리
     return () => {
@@ -423,7 +425,17 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     document.body.removeChild(link)
   }
 
-  // 채팅 메시지 항목 렌더링 함수
+  // 모바일에서 프로필 이미지 클릭 시 모달 표시 함수
+  const handleProfileImageClick = () => {
+    setShowImageModal(true)
+  }
+
+  // 모달 닫기 함수
+  const handleCloseImageModal = () => {
+    setShowImageModal(false)
+  }
+
+  // 채팅 메시지 항목 렌더링 함수를 수정합니다
   const renderChatMessage = (chat: ChatMessage, index: number) => {
     const isLastAiMessage =
       chat.sender === 'character' &&
@@ -439,7 +451,10 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         className={`flex ${chat.sender === 'user' ? 'justify-end' : 'justify-start'}`}
       >
         {chat.sender === 'character' && (
-          <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0 shadow-sm border border-gray-200">
+          <div
+            className="relative w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0 shadow-sm border border-gray-200 cursor-pointer md:cursor-default"
+            onClick={() => handleProfileImageClick()}
+          >
             <Image
               src={character.imageUrl || '/images/character1.jpg'}
               alt={character.name}
@@ -452,14 +467,14 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         <motion.div
           initial={{ scale: 0.95 }}
           animate={{ scale: 1 }}
-          className={`max-w-[35%] md:max-w-[35%] rounded-2xl px-5 py-4 shadow-sm ${
+          className={`max-w-[75%] sm:max-w-[65%] md:max-w-[55%] lg:max-w-[45%] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 shadow-sm ${
             chat.sender === 'user'
               ? 'bg-primary-500 text-white rounded-tr-none'
               : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none'
           }`}
           style={{ wordBreak: 'break-word', overflow: 'hidden' }}
         >
-          <p className="text-base whitespace-pre-wrap leading-relaxed break-words">
+          <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed break-words">
             {formatMessageWithSituations(chat.message)}
           </p>
           <p className={`text-xs mt-2 text-right ${chat.sender === 'user' ? 'text-violet-200' : 'text-gray-500'}`}>
@@ -473,19 +488,19 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             {/* 새로고침 버튼 */}
             <button
               onClick={handleRefreshLastAIMessage}
-              className="w-10 h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-500 hover:text-violet-600 hover:bg-violet-100 transition-colors mr-1.5 shadow-sm"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-500 hover:text-violet-600 hover:bg-violet-100 transition-colors mr-1.5 shadow-sm"
               title="응답 새로고침"
             >
-              <FontAwesomeIcon icon={faSync} className="text-base" />
+              <FontAwesomeIcon icon={faSync} className="text-sm sm:text-base" />
             </button>
 
             {/* 삭제 버튼 */}
             <button
               onClick={handleDeleteLastAIMessage}
-              className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-100 transition-colors shadow-sm"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-100 transition-colors shadow-sm"
               title="응답 삭제"
             >
-              <FontAwesomeIcon icon={faTrashAlt} className="text-base" />
+              <FontAwesomeIcon icon={faTrashAlt} className="text-sm sm:text-base" />
             </button>
           </div>
         )}
@@ -541,8 +556,17 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           {/* 캐릭터 프로필 */}
           <div className="flex items-center min-w-0 overflow-hidden">
             {/* 캐릭터 프로필 이미지 */}
-            <Link href={`/chat/character/${characterId}`}>
-              <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 border border-gray-200 flex-shrink-0 hover:opacity-90 transition-opacity shadow-sm">
+            <Link href={`/chat/character/${characterId}`} className="md:pointer-events-auto pointer-events-none">
+              <div
+                className="relative w-10 h-10 rounded-full overflow-hidden mr-3 border border-gray-200 flex-shrink-0 hover:opacity-90 transition-opacity shadow-sm"
+                onClick={e => {
+                  // 모바일에서만 이벤트 처리
+                  if (window.innerWidth < 768) {
+                    e.preventDefault()
+                    handleProfileImageClick()
+                  }
+                }}
+              >
                 <Image
                   src={character.imageUrl || '/images/character1.jpg'}
                   alt={character.name}
@@ -843,6 +867,56 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           </div>
         </div>
       </main>
+
+      {/* 모바일용 이미지 모달을 추가합니다 (return 문 끝에 추가) */}
+      {showImageModal && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex flex-col items-center justify-center p-4">
+          <div className="relative w-full max-w-md mx-auto">
+            {/* 닫기 버튼 */}
+            <button
+              className="absolute top-0 right-0 z-10 bg-black/50 rounded-full p-2 text-white transform translate-x-3 -translate-y-3"
+              onClick={handleCloseImageModal}
+            >
+              <FontAwesomeIcon icon={faArrowLeft} className="text-lg" />
+            </button>
+
+            {/* 이미지 */}
+            <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden">
+              <Image
+                src={character.imageUrl || '/images/character1.jpg'}
+                alt={character.name}
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+
+            {/* 이미지 정보 및 다운로드 버튼 */}
+            <div className="bg-black/50 backdrop-blur-sm text-white p-4 rounded-b-lg">
+              <h3 className="font-bold text-lg mb-1">{character.name}</h3>
+              <div className="flex items-center justify-between">
+                <div className="flex flex-wrap gap-1">
+                  {character.hashtags?.slice(0, 2).map((tag: string, index: number) => (
+                    <span key={index} className="text-xs text-gray-300">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+                <button
+                  className="bg-violet-600 hover:bg-violet-700 text-white py-2 px-4 rounded-full flex items-center text-sm"
+                  onClick={() => {
+                    handleSaveImage()
+                    handleCloseImageModal()
+                  }}
+                >
+                  <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                  저장하기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
