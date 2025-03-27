@@ -632,16 +632,16 @@ const safeStorage = {
 export const useThemeStore = create<ThemeStore>()(
   persist(
     set => ({
-      isDarkMode: true,
+      isDarkMode: false,
       toggleDarkMode: () => set(state => ({ isDarkMode: !state.isDarkMode })),
       enableDarkMode: () => set({ isDarkMode: true }),
       disableDarkMode: () => set({ isDarkMode: false }),
       initializeTheme: () => {
-        const savedTheme = localStorage.getItem('theme-storage');
+        const savedTheme = localStorage.getItem('theme-storage')
         if (!savedTheme) {
-          set({ isDarkMode: true });
+          set({ isDarkMode: false })
         }
-      }
+      },
     }),
     {
       name: 'theme-storage',

@@ -87,7 +87,7 @@ export default function ChatModeModal({ isOpen, onClose, currentModeId, onSelect
       bodyClassName="p-0"
     >
       <div className="py-4">
-        <p className="px-6 pb-4 text-secondary-600 text-sm dark:text-dark-secondary-400 border-b border-secondary-100 dark:border-dark-secondary-800">
+        <p className="px-4 sm:px-6 pb-4 text-secondary-600 text-sm dark:text-dark-secondary-400 border-b border-secondary-100 dark:border-dark-secondary-800">
           원하는 채팅 모드를 선택하세요. 각 모드는 대화 품질과 특성이 다르며, 소모되는 펜 개수가 다릅니다.
         </p>
         <ul className="mt-2">
@@ -96,16 +96,16 @@ export default function ChatModeModal({ isOpen, onClose, currentModeId, onSelect
             .map(mode => (
               <li
                 key={mode.id}
-                className={`px-6 py-4 cursor-pointer border-b border-secondary-100 dark:border-dark-secondary-800 last:border-0 hover:bg-secondary-50 dark:hover:bg-dark-secondary-800/30 ${
+                className={`px-4 sm:px-6 py-3 sm:py-4 cursor-pointer border-b border-secondary-100 dark:border-dark-secondary-800 last:border-0 hover:bg-secondary-50 dark:hover:bg-dark-secondary-800/30 ${
                   currentModeId === mode.id ? 'bg-primary-50 dark:bg-dark-primary-900/30' : ''
                 }`}
                 onClick={() => onSelectMode(mode)}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                   <div className="flex-1">
                     <div className="flex items-center">
                       <span
-                        className={`flex items-center text-base font-medium ${
+                        className={`flex items-center text-sm sm:text-base font-medium ${
                           currentModeId === mode.id
                             ? 'text-primary-700 dark:text-dark-primary-400'
                             : 'text-secondary-900 dark:text-dark-secondary-200'
@@ -113,7 +113,7 @@ export default function ChatModeModal({ isOpen, onClose, currentModeId, onSelect
                       >
                         <FontAwesomeIcon
                           icon={mode.icon}
-                          className="mr-2 text-sm"
+                          className="mr-2 text-xs sm:text-sm"
                           style={{
                             color:
                               currentModeId === mode.id ? 'var(--color-primary-600)' : 'var(--color-secondary-500)',
@@ -129,22 +129,31 @@ export default function ChatModeModal({ isOpen, onClose, currentModeId, onSelect
                         />
                       )}
                     </div>
-                    <p className="text-sm text-secondary-600 dark:text-dark-secondary-400 mt-1">{mode.description}</p>
-                    <div className="mt-2 text-xs text-secondary-500 dark:text-dark-secondary-500">
+                    <p className="text-xs sm:text-sm text-secondary-600 dark:text-dark-secondary-400 mt-1">
+                      {mode.description}
+                    </p>
+                    <div className="mt-1 sm:mt-2 text-[10px] sm:text-xs text-secondary-500 dark:text-dark-secondary-500">
                       <span className="mr-2">{mode.ai}</span>
                     </div>
                   </div>
-                  <div className="flex-shrink-0 ml-4">
-                    <div className="flex items-center bg-primary-100 dark:bg-dark-primary-900/60 px-3 py-1 rounded-full">
-                      <span className="text-primary-700 dark:text-dark-primary-400 font-medium flex items-center">
+                  <div className="flex-shrink-0 sm:ml-4">
+                    <div className="flex items-center bg-primary-100 dark:bg-dark-primary-900/60 px-2 sm:px-3 py-1 rounded-full">
+                      <span className="text-primary-700 dark:text-dark-primary-400 font-medium flex items-center text-xs sm:text-sm">
                         <FontAwesomeIcon icon={faPen} size="xs" className="mr-1" />
                         {mode.penCost}
                       </span>
-                      <span className="ml-1 text-xs text-primary-600 dark:text-dark-primary-500"> / 메시지</span>
+                      <span className="ml-1 text-[10px] sm:text-xs text-primary-600 dark:text-dark-primary-500">
+                        {' '}
+                        / 메시지
+                      </span>
                       {mode.discount > 0 && (
                         <div className="ml-1.5 flex items-center">
-                          <span className="text-xs text-green-500 font-medium">{mode.discount}% 할인</span>
-                          <span className="ml-1 text-xs text-gray-400 line-through">{mode.original_coin}</span>
+                          <span className="text-[10px] sm:text-xs text-green-500 font-medium">
+                            {mode.discount}% 할인
+                          </span>
+                          <span className="ml-1 text-[10px] sm:text-xs text-gray-400 line-through">
+                            {mode.original_coin}
+                          </span>
                         </div>
                       )}
                     </div>

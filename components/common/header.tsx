@@ -75,7 +75,7 @@ export default function Header() {
   const navLinks = [
     { href: '/', label: '홈', requireLogin: false, icon: faHome },
     { href: '/chat-list', label: '대화', requireLogin: true, icon: faComment },
-    { href: '/my-characters', label: '나의 캐릭터', requireLogin: true, icon: faUser },
+    { href: '/my-characters', label: '캐릭터 만들기', requireLogin: true, icon: faUser },
     { href: '/live', label: 'Live', requireLogin: true, icon: faVideo },
     { href: '/my-account', label: '수익 관리', requireLogin: true, icon: faChartLine },
     { href: '/shop-recharge', label: '상점', requireLogin: true, icon: faStore },
@@ -134,7 +134,7 @@ export default function Header() {
   return (
     <>
       <motion.header
-        className="sticky top-0 z-[50] bg-white dark:bg-dark-background-light shadow-sm dark:shadow-dark-primary-300/20"
+        className="sticky top-0 left-0 right-0 z-[1000] bg-white dark:bg-dark-background-light shadow-sm dark:shadow-dark-primary-300/20"
         initial={{ y: 0 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -166,7 +166,7 @@ export default function Header() {
             </nav>
           </div>
 
-          <div className="flex items-center space-x-2 md:space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4 gap-1">
             {/* 짜릿모드 토글 - 모바일에서도 표시 */}
             {mounted && (
               <div>
@@ -325,37 +325,6 @@ export default function Header() {
           </>
         )}
       </AnimatePresence>
-
-      {/* 모바일 하단 GNB - 태블릿 이하에서만 표시 */}
-      {mounted && (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-background-light border-t border-secondary-100 dark:border-dark-secondary-200/10 z-[100]">
-          <div className="grid grid-cols-5 h-16">
-            {navLinks
-              .filter(link => link.href !== '/') // 홈 링크 제외
-              .map(link => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={e => handleNavLinkClick(e, link)}
-                  className={`flex flex-col items-center justify-center ${
-                    activeLink === link.href
-                      ? 'text-primary-500 dark:text-dark-primary-500'
-                      : 'text-secondary-600 dark:text-dark-secondary-400'
-                  }`}
-                >
-                  <FontAwesomeIcon
-                    icon={link.icon}
-                    className={`text-2xl ${
-                      activeLink === link.href
-                        ? 'text-primary-500 dark:text-dark-primary-500'
-                        : 'text-secondary-600 dark:text-dark-secondary-400'
-                    }`}
-                  />
-                </Link>
-              ))}
-          </div>
-        </div>
-      )}
     </>
   )
 }

@@ -1,8 +1,8 @@
 'use client'
 
-import React, { ReactNode, useState } from 'react'
+import React, { ReactNode, useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCommentDots, faPen } from '@fortawesome/free-solid-svg-icons'
+import { faCommentDots, faPen, faComment } from '@fortawesome/free-solid-svg-icons'
 import DraggableButton from '../elements/button/DraggableButton'
 import IdeaShareModal from '../modal/IdeaShareModal'
 import RewardModal from '../modal/RewardModal'
@@ -31,6 +31,18 @@ export default function DraggableButtonGrid({
   // 모달 상태 관리
   const [ideaModalOpen, setIdeaModalOpen] = useState(false)
   const [rewardModalOpen, setRewardModalOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // 모바일 감지
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkIfMobile()
+    window.addEventListener('resize', checkIfMobile)
+    return () => window.removeEventListener('resize', checkIfMobile)
+  }, [])
 
   // 아이디어 공유 모달 열기
   const onPrimaryClick = () => {
@@ -51,26 +63,35 @@ export default function DraggableButtonGrid({
   // 기본 아이콘 컨텐츠
   const defaultPrimaryContent = (
     <div className="flex flex-col items-center justify-center">
-      <FontAwesomeIcon
-        icon={faCommentDots}
-        className="text-[25px] lg:text-[25px] sm:text-[15px] text-[#f200b9] sm:text-[15px]"
-      />
+      <FontAwesomeIcon icon={faComment} className="text-[20px] lg:text-[25px] sm:text-[20px] text-white" />
     </div>
   )
 
   const defaultSecondaryContent = (
     <div className="flex flex-col items-center justify-center">
-      <FontAwesomeIcon icon={faPen} className="text-[25px] lg:text-[25px] sm:text-[15px] text-[#7c3aed]" />
+      <FontAwesomeIcon icon={faPen} className="text-[20px] lg:text-[25px] sm:text-[20px] text-white" />
     </div>
   )
 
   return (
     <>
-      <DraggableButton buttonIndex={0} buttonsCount={buttonsCount} color={primaryColor} onClick={onPrimaryClick}>
+      <DraggableButton
+        buttonIndex={0}
+        buttonsCount={buttonsCount}
+        color={primaryColor}
+        onClick={onPrimaryClick}
+        size={isMobile ? 60 : 70}
+      >
         {primaryContent || defaultPrimaryContent}
       </DraggableButton>
 
-      <DraggableButton buttonIndex={1} buttonsCount={buttonsCount} color={secondaryColor} onClick={onSecondaryClick}>
+      <DraggableButton
+        buttonIndex={1}
+        buttonsCount={buttonsCount}
+        color={secondaryColor}
+        onClick={onSecondaryClick}
+        size={isMobile ? 60 : 70}
+      >
         {secondaryContent || defaultSecondaryContent}
       </DraggableButton>
 

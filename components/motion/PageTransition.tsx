@@ -16,7 +16,7 @@ export default function PageTransition({ children, className = '' }: PageTransit
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      className={className}
+      className={`${className}`}
     >
       {children}
     </motion.div>

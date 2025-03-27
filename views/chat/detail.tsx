@@ -448,7 +448,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
-        className={`flex ${chat.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+        className={`flex flex-col`}
       >
         {chat.sender === 'character' && (
           <div
@@ -467,7 +467,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         <motion.div
           initial={{ scale: 0.95 }}
           animate={{ scale: 1 }}
-          className={`max-w-[75%] sm:max-w-[65%] md:max-w-[55%] lg:max-w-[45%] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 shadow-sm ${
+          className={`inline-block max-w-[85%] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 shadow-sm ${
             chat.sender === 'user'
               ? 'bg-primary-500 text-white rounded-tr-none'
               : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none'
@@ -484,7 +484,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
         {/* 마지막 AI 메시지인 경우 새로고침/삭제 버튼 표시 */}
         {isLastAiMessage && (
-          <div className="flex ml-2 items-center">
+          <div className="flex ml-2 items-center justify-start max-w-[85%] mt-2">
             {/* 새로고침 버튼 */}
             <button
               onClick={handleRefreshLastAIMessage}
@@ -847,25 +847,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                 <FontAwesomeIcon icon={faPaperPlane} className="text-base" />
               </BaseButton>
             </form>
-
-            {/* 사용중인 모드와 펜 소모량 안내 */}
-            <div className="mt-2 text-center text-xs text-gray-500">
-              <span className="mr-1.5">현재 모드: {getChatModeName(currentModeId)}</span>
-              <span className="text-primary-600 flex items-center justify-center">
-                (<FontAwesomeIcon icon={getModeIcon(currentModeId)} className="mx-0.5" size="xs" />
-                {getPenCostByMode(currentModeId)}
-                /메시지
-                {getDiscountByMode(currentModeId) > 0 && (
-                  <span className="ml-1 text-green-500 text-xs">
-                    {getDiscountByMode(currentModeId)}% 할인
-                    <span className="line-through text-gray-400 ml-0.5 text-xs">
-                      {getOriginalCoinByMode(currentModeId)}
-                    </span>
-                  </span>
-                )}
-                )
-              </span>
-            </div>
           </div>
         </div>
       </main>

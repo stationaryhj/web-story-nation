@@ -74,13 +74,13 @@ export default function AuthorCard({
               </div>
             )}
 
-            <div className="relative w-full h-full flex items-center justify-center">
+            <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
               {profileImageUrl ? (
                 <Image
                   src="/images/placeholders/author_default_img.jpg"
                   alt={nickname || name}
                   fill
-                  className="object-cover"
+                  className="object-cover object-center"
                   onError={handleImageError}
                 />
               ) : (
@@ -157,13 +157,13 @@ export default function AuthorCard({
               className={`flex items-center justify-center ${isSidebar ? '' : 'border-b border-secondary-200 dark:border-dark-secondary-200 mb-3'}`}
             >
               {/* 프로필 이미지 */}
-              <div className="relative w-12 h-12 rounded-full overflow-hidden bg-secondary-100 dark:bg-dark-secondary-800 mr-3 flex-shrink-0 mb-3">
+              <div className="relative w-[60px] h-[60px] rounded-full overflow-hidden flex-shrink-0 mb-3">
                 {profileImageUrl ? (
                   <Image
                     src="/images/placeholders/author_default_img.jpg"
                     alt={nickname || name}
                     fill
-                    className="object-cover"
+                    className="object-cover object-center"
                     onError={handleImageError}
                   />
                 ) : (

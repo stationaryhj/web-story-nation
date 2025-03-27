@@ -74,7 +74,7 @@ export default function Home() {
 
   return (
     <PageTransition>
-      <main className="min-h-screen pb-20 bg-white dark:bg-dark-background-light">
+      <main className="min-h-screen pb-24 md:pb-20 bg-white dark:bg-dark-background-light">
         <Header />
 
         {/* 검색바 */}

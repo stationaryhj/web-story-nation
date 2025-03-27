@@ -54,13 +54,14 @@ export type CharbotTop10NewResponse = {
     module_2: Array<ModuleCharacter>;
     module_3: Array<ModuleCharacter>;
     module_9: Array<ModuleCharacter>;
-    module_10: Array<ModuleCharacter>;
+    module_10: Array<ModuleCreater>;
   }
   
   order: Array<number>;
   result: ApiResult;
 };
 
+// Module Character
 export interface ModuleCharacter {
   world_list_detail_chrbot_key: number;
   title: string;
@@ -76,6 +77,17 @@ export interface ModuleCharacter {
   nsfw: number;
   module_id: number;
   sort: number;
+}
+
+// Module Creater
+export interface ModuleCreater {
+  intro: string;
+  module_id: number;
+  module_type: number;
+  nick_nm: string;
+  profile_url: string;
+  user_key: number;
+  withdraw_pen: string;
 }
 
 export interface TagListResponse {

@@ -104,9 +104,12 @@ export default function Card({
               onError={handleImageError}
             />
 
+            {/* 그라데이션 오버레이 */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent"></div>
+
             {/* 댓글 수 표시 - 이미지 우측 하단으로 이동 */}
-            <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded-full flex items-center backdrop-blur-sm">
-              <FontAwesomeIcon icon={faComment} className="mr-0.5 text-xs" />
+            <div className="absolute bottom-1 right-1 flex items-center gap-1 text-white text-xs z-10">
+              <Image src="/images/icons/comment_white.svg" alt="댓글" width={14} height={14} />
               <span>{commentCount}</span>
             </div>
           </div>
@@ -182,13 +185,8 @@ export default function Card({
               onError={handleImageError}
             />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-            {/* {variant === 'default' && (
-              <div className="absolute top-3 left-3 bg-primary-500/90 dark:bg-dark-primary-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-                스토리네이션
-              </div>
-            )} */}
+            {/* 그라데이션 오버레이 */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent"></div>
 
             {isAdult && (
               <div className="absolute top-3 right-3 bg-red-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
@@ -196,19 +194,11 @@ export default function Card({
               </div>
             )}
 
-            {variant === 'default' && commentCount > 100 && (
-              <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center backdrop-blur-sm">
-                <FontAwesomeIcon icon={faFire} className="mr-1 text-red-400" />
-                인기
-              </div>
-            )}
-
-            {variant !== 'default' && (
-              <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center backdrop-blur-sm">
-                <FontAwesomeIcon icon={faComment} className="mr-1" />
-                {commentCount}
-              </div>
-            )}
+            {/* 댓글 수 표시 - 이미지 우측 하단으로 이동 */}
+            <div className="absolute bottom-4 right-4 flex items-center gap-[5px] text-white text-xs z-10">
+              <Image src="/images/comment_black.svg" alt="댓글" width={22} height={22} />
+              <span className="text-[20px]">{commentCount}</span>
+            </div>
           </div>
 
           <div className="p-4">
@@ -227,41 +217,32 @@ export default function Card({
               ))}
             </div>
 
-            <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 mb-3 line-clamp-2 h-8 group-hover:text-secondary-800 dark:group-hover:text-dark-secondary-400 transition-colors">
+            <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 mb-1 line-clamp-2 h-8 group-hover:text-secondary-800 dark:group-hover:text-dark-secondary-400 transition-colors">
               {description}
             </p>
+            <div className="flex items-center">
+              <div className="w-5 h-5 rounded-full bg-secondary-200 dark:bg-dark-secondary-300 flex items-center justify-center overflow-hidden">
+                {creator?.profileImageUrl ? (
+                  <Image
+                    src={creator.profileImageUrl}
+                    alt={creator.nickname}
+                    width={20}
+                    height={20}
+                    className="object-cover"
+                  />
+                ) : (
+                  <span className="text-[8px] text-secondary-500 dark:text-dark-secondary-400">
+                    {creator?.nickname?.charAt(0) || '?'}
+                  </span>
+                )}
+              </div>
+              <span className="ml-1 text-xs text-secondary-500 dark:text-dark-secondary-500 truncate max-w-[80px]">
+                {creator?.nickname || '익명'}
+              </span>
+            </div>
 
             {/* variant에 따라 다른 하단 영역 렌더링 */}
-            {variant === 'default' ? (
-              // 기본 카드 - 작성자 정보와 댓글 수
-              <div className="flex items-center justify-between pt-2 border-t border-secondary-100 dark:border-dark-secondary-200/10">
-                <div className="flex items-center">
-                  <div className="w-5 h-5 rounded-full bg-secondary-200 dark:bg-dark-secondary-300 flex items-center justify-center overflow-hidden">
-                    {creator?.profileImageUrl ? (
-                      <Image
-                        src={creator.profileImageUrl}
-                        alt={creator.nickname}
-                        width={20}
-                        height={20}
-                        className="object-cover"
-                      />
-                    ) : (
-                      <span className="text-[8px] text-secondary-500 dark:text-dark-secondary-400">
-                        {creator?.nickname?.charAt(0) || '?'}
-                      </span>
-                    )}
-                  </div>
-                  <span className="ml-1 text-xs text-secondary-500 dark:text-dark-secondary-500 truncate max-w-[80px]">
-                    {creator?.nickname || '익명'}
-                  </span>
-                </div>
-
-                <div className="flex items-center text-secondary-500 dark:text-dark-secondary-500">
-                  <FontAwesomeIcon icon={faComment} className="text-xs" />
-                  <span className="ml-1 text-xs">{commentCount}</span>
-                </div>
-              </div>
-            ) : (
+            {variant === 'default' ? null : ( // 기본 카드 - 작성자 정보와 댓글 수
               // 내 캐릭터 카드 - 수정/삭제 버튼
               <div className="grid grid-cols-2 gap-2 mt-2">
                 <button
