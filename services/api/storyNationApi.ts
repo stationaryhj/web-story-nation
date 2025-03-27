@@ -26,6 +26,7 @@ import type {
   ChangePersonaNameResponse,
   ViewTermsResponse,
   CharbotTop10NewResponse,
+  CharbotTop10RankingResponse,
 } from '../../types/api'
 
 // API 기본 설정
@@ -177,19 +178,26 @@ export const contentApi = {
     return api.post('/api/charbot/rcmnd/top10')
   },
 
-  // List
-  GetListRcmnd: async (
-    module_id: number,
-    page: number,
-    paginate: number
-  ): Promise<ApiResponse<Array<ModuleCharacter>>> => {
+
+  GetTop10Ranking: async (countryCode: string, module_type: number, ranking_type: number): Promise<ApiResponse<CharbotTop10RankingResponse>> => {
+    return api.post('/api/charbot/rcmnd/ranking/top10', {
+      countryCode,
+      module_type,
+      ranking_type,
+    })
+  },
+
+
+  GetListRcmnd: async (module_id: number, ranking_type: number, page: number, paginate: number): Promise<ApiResponse<Array<CharbotTop10RankingResponse>>> => {
     return api.post('/api/charbot/rcmnd/getlist', {
       module_id,
+      ranking_type,
       page,
       paginate,
     })
   },
 
+  
   GetList: async (
     type: string,
     chrbot_tag_keys: string,

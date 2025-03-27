@@ -7,6 +7,8 @@ import { faXmark, faCheckCircle, faUser } from '@fortawesome/free-solid-svg-icon
 import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
 import { lockScroll, unlockScroll, resetScrollLock } from '@/lib/utils/scrollLock'
 import Image from 'next/image'
+import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
+
 
 // 작가 랭킹 탭 정의
 const rankingTabs: TabItem[] = [
@@ -38,7 +40,8 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
   const [activeTab, setActiveTab] = useState('weekly')
   const [rankingData, setRankingData] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
-
+  const { rankingCreaters } = useRecommendSectionStoreData()
+  
   // 랭킹 데이터 가져오기
   useEffect(() => {
     const fetchRankingData = async () => {
@@ -48,7 +51,17 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
         // 현재는 목업 데이터를 사용합니다.
         setTimeout(() => {
           // 목업 작가 데이터 생성
-          const mockAuthors = generateMockAuthors(200)
+          // const mockAuthors = generateMockAuthors(200)
+
+          const mockAuthors = rankingCreaters.map(character => ({
+            id: character.id,
+            name: character.name,
+            nickname: character.creator?.nickname || character.name,
+            description: character.description || '',
+            profileImageUrl: character.imageUrl,
+            characterCount: 0, // 기본값 설정
+            isVerified: true,  // 기본값 설정
+          }));
 
           // 탭에 따라 다른 정렬 적용
           let sortedAuthors = [...mockAuthors]

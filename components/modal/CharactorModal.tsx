@@ -175,7 +175,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
               <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-4">첫 메시지</h3>
               <div className="p-4">
                 <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mb-2">
-                  {mockFirstMessage.situation}
+                  {mockFirstMessage .situation}
                 </p>
                 <p className="text-secondary-700 dark:text-dark-secondary-300">{selectedCharacter?.first_talk}</p>
               </div>
