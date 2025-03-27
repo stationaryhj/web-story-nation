@@ -160,10 +160,6 @@ export default function Header() {
                 >
                   {/* 화면 크기가 1300px 이상일 때는 텍스트 표시, 그 이하일 때는 아이콘만 표시 */}
                   <span className="hidden xl:inline">{link.label}</span>
-                  <FontAwesomeIcon
-                    icon={link.icon}
-                    className={`text-lg ${activeLink === link.href ? 'text-primary-500 dark:text-dark-primary-500' : ''} ${link.label !== '홈' ? 'md:inline xl:hidden' : 'md:inline'}`}
-                  />
                   <span className="inline xl:hidden md:hidden">{link.label}</span>
                 </Link>
               ))}
