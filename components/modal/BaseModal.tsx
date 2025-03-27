@@ -176,7 +176,7 @@ export default function BaseModal({
             <div className={`flex flex-col ${contentClassName}`}>
               {/* 모달 헤더 - 닫기 버튼만 포함 */}
               {!hideHeader && showCloseButton && (
-                <div className={`relative mb-4 flex justify-end p-5 pb-0 ${headerClassName}`}>
+                <div className={`relative flex justify-end p-3 pb-0 ${headerClassName}`}>
                   <button
                     onClick={onClose}
                     className="text-secondary-500 transition-colors hover:text-secondary-700 dark:text-dark-secondary-400 dark:hover:text-dark-secondary-300"
