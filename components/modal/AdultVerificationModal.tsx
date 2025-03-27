@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import BaseModal from './BaseModal'
 import { useSettingsStore } from '@/store/useStoreSettings'
+import { toast } from 'react-toastify'
 
 interface AdultVerificationModalProps {
   isOpen: boolean
@@ -64,7 +65,7 @@ export default function AdultVerificationModal({ isOpen, onClose, onVerify }: Ad
       onClose()
     } catch (error) {
       console.error('본인인증 중 오류 발생:', error)
-      alert('본인인증 중 오류가 발생했습니다. 다시 시도해주세요.')
+      toast.error('본인인증 중 오류가 발생했습니다. 다시 시도해주세요.')
     } finally {
       setIsVerifying(false)
     }

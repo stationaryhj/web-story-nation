@@ -152,7 +152,7 @@ export default function SearchBar({
                     onSearch(query, selectedOption.value)
                   }
                 }}
-                className="rounded-l-xl rounded-r-0 sm:rounded-l-none sm:rounded-r-none sm:border-l border-gray-200"
+                className="rounded-l-xl rounded-r-0 sm:rounded-l-none sm:rounded-r-none sm:border-l border-gray-200 outline-none"
                 // onFocus={() => setIsFocused(true)}
                 // onBlur={() => setIsFocused(false)}
               />

@@ -9,7 +9,7 @@ import CharacterForm from '@/components/form/CharacterForm'
 
 import { ReqGetCreateChatBotInProgress, ReqSaveCreateChatBotInProgress } from '@/services/hooks/DataListManager'
 import { bridgeCharacterInProgressToCharacter } from '@/lib/utils/storyNationUtil'
-
+import { toast } from 'react-toastify'
 
 // 임시 데이터 (실제로는 API에서 가져옴)
 const MOCK_CHARACTER = {
@@ -50,10 +50,10 @@ export default function EditCharacterPage() {
   const {
     data: inProgressData,
     isLoading: inProgressLoading,
-    error: inProgressError, 
-    refetch: inProgressRefetch
-  } = ReqGetCreateChatBotInProgress(Number(characterId));
-  
+    error: inProgressError,
+    refetch: inProgressRefetch,
+  } = ReqGetCreateChatBotInProgress(Number(characterId))
+
   // 유효성 검사 상태
   const [isFormValid, setIsFormValid] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -65,13 +65,13 @@ export default function EditCharacterPage() {
     const loadCharacter = async () => {
       try {
         setIsLoading(true)
-        
+
         if (inProgressData) {
           resetForm() // 이전 데이터 초기화
-          
+
           // API 데이터 브릿지 함수를 사용하여 변환
           const characterData = bridgeCharacterInProgressToCharacter(inProgressData?.chrbot)
-          
+
           // 캐릭터 데이터를 스토어에 설정
           Object.entries(characterData).forEach(([key, value]) => {
             if (key !== 'id') {
@@ -117,14 +117,14 @@ export default function EditCharacterPage() {
   // API 호출하여 현재 진행 상태 저장
   const saveProgress = async (finishYn = 0) => {
     try {
-      setIsSaving(true);
-      
+      setIsSaving(true)
+
       // 폼 데이터에서 API 요청에 필요한 데이터 추출
       const payload = {
         world_list_detail_chrbot_key: characterId,
         img_url: inProgressData?.chrbot?.img_url || '',
         title: formData.name || '',
-        gender: formData.gender === 'male' ? 1 : (formData.gender === 'female' ? 2 : 0),
+        gender: formData.gender === 'male' ? 1 : formData.gender === 'female' ? 2 : 0,
         intro: formData.bio || '',
         first_talk: formData.firstMessage || '',
         content: formData.bioDetail || '',
@@ -135,55 +135,55 @@ export default function EditCharacterPage() {
         content_show_yn: inProgressData?.chrbot?.content_show_yn || 0,
         example_show_yn: inProgressData?.chrbot?.example_show_yn || 0,
         finish_yn: finishYn,
-      };
-      
-      // API 호출
-      const response = await ReqSaveCreateChatBotInProgress(payload);
-      
-      if (response.error) {
-        throw new Error(response.error.toString());
       }
-      
-      return true;
+
+      // API 호출
+      const response = await ReqSaveCreateChatBotInProgress(payload)
+
+      if (response.error) {
+        throw new Error(response.error.toString())
+      }
+
+      return true
     } catch (error) {
-      console.error('저장 실패:', error);
-      alert('저장에 실패했습니다. 다시 시도해주세요.');
-      return false;
+      console.error('저장 실패:', error)
+      toast.error('저장에 실패했습니다. 다시 시도해주세요.')
+      return false
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
   // 다음 버튼 클릭 핸들러
   const handleNext = async () => {
     // 현재 단계 저장
-    const saveResult = await saveProgress();
-    if (!saveResult) return;
-    
+    const saveResult = await saveProgress()
+    if (!saveResult) return
+
     if (activeTab === 'basic') {
-      setActiveTab('detail');
+      setActiveTab('detail')
     } else if (activeTab === 'detail') {
-      setActiveTab('image');
+      setActiveTab('image')
     } else if (activeTab === 'image') {
       // 최종 완료 처리
-      handleSubmit();
+      handleSubmit()
     }
-  };
+  }
 
   // 폼 제출 핸들러
   const handleSubmit = async () => {
     try {
       // 완료 상태로 저장
-      const saveResult = await saveProgress(1);
-      if (!saveResult) return;
-      
-      alert('캐릭터가 성공적으로 수정되었습니다!');
-      router.push('/my-characters');
+      const saveResult = await saveProgress(1)
+      if (!saveResult) return
+
+      toast.success('캐릭터가 성공적으로 수정되었습니다!')
+      router.push('/my-characters')
     } catch (error) {
-      console.error('캐릭터 수정 실패:', error);
-      alert('캐릭터 수정에 실패했습니다. 다시 시도해주세요.');
+      console.error('캐릭터 수정 실패:', error)
+      toast.error('캐릭터 수정에 실패했습니다. 다시 시도해주세요.')
     }
-  };
+  }
 
   if (inProgressLoading || isLoading) {
     return (

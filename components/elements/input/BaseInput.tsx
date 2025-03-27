@@ -26,10 +26,7 @@ export const BaseInput = forwardRef<HTMLInputElement, BaseInputProps>(
         value={value}
         onChange={onChange}
         onKeyDown={handleKeyDown}
-        className={cn(
-          'w-full py-3 px-4 bg-gray-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all',
-          className
-        )}
+        className={cn('w-full py-3 px-4 bg-gray-100 text-gray-800 focus:outline-none transition-all', className)}
         {...props}
       />
     )

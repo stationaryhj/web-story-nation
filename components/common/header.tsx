@@ -54,7 +54,6 @@ export default function Header() {
   const { isDarkMode, toggleDarkMode } = useThemeStore()
   const [mounted, setMounted] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
   const pathname = usePathname()
   const [activeLink, setActiveLink] = useState('/')
   const { openModal } = useModalStore()
@@ -100,25 +99,6 @@ export default function Header() {
     }
   }, [pathname])
 
-  // 모바일 감지 기능
-  useEffect(() => {
-    if (!mounted) return
-
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth < 768) // md 브레이크포인트(768px) 미만일 때 모바일로 간주
-    }
-
-    // 초기 확인
-    checkIfMobile()
-
-    // 리사이즈 이벤트에 대응
-    window.addEventListener('resize', checkIfMobile)
-
-    return () => {
-      window.removeEventListener('resize', checkIfMobile)
-    }
-  }, [mounted])
-
   // 다크모드 변경 시 HTML에 클래스 추가/제거
   useEffect(() => {
     // 클라이언트 사이드에서만 실행
@@ -130,27 +110,6 @@ export default function Header() {
       document.documentElement.classList.remove('dark')
     }
   }, [isDarkMode, mounted])
-
-  // 모바일일 때 스크롤바 숨기기
-  useEffect(() => {
-    if (!mounted) return
-
-    if (isMobile) {
-      // 모바일일 때 스크롤바 숨기기 클래스 추가
-      document.body.classList.add('hide-scrollbar')
-      document.documentElement.classList.add('hide-scrollbar')
-    } else {
-      // 모바일이 아닐 때 클래스 제거
-      document.body.classList.remove('hide-scrollbar')
-      document.documentElement.classList.remove('hide-scrollbar')
-    }
-
-    return () => {
-      // 클린업 시 클래스 제거
-      document.body.classList.remove('hide-scrollbar')
-      document.documentElement.classList.remove('hide-scrollbar')
-    }
-  }, [isMobile, mounted])
 
   // 사이드바가 열렸을 때 스크롤 방지
   useEffect(() => {
@@ -174,20 +133,6 @@ export default function Header() {
 
   return (
     <>
-      <style jsx global>{`
-        /* 스크롤바 숨기기 */
-        .hide-scrollbar {
-          scrollbar-width: none; /* Firefox */
-          -ms-overflow-style: none; /* IE and Edge */
-        }
-
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none; /* Chrome, Safari, Opera */
-          width: 0;
-          background: transparent;
-        }
-      `}</style>
-
       <motion.header
         className="sticky top-0 z-[50] bg-white dark:bg-dark-background-light shadow-sm dark:shadow-dark-primary-300/20"
         initial={{ y: 0 }}

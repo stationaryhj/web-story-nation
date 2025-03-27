@@ -128,6 +128,22 @@ body.no-scrollbar {
   scrollbar-width: none; /* Firefox */
 }
 
+/* 모바일 환경에서 스크롤바 숨기기 */
+@media (max-width: 767px) {
+  html,
+  body {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+    width: 0;
+    background: transparent;
+  }
+}
+
 /* 페이지 전환 애니메이션 */
 .page-transition-enter {
   opacity: 0;
