@@ -19,6 +19,7 @@ import type {
   TagListResponse,
   InquiryListResponse,
   BankListResponse,
+  CharbotTop10NewResponse,
 } from '@/types/api'
 
 import { contentApi, settlementApi, createApi, chatApi } from '../api/storyNationApi'
@@ -44,6 +45,20 @@ export const ReqTop10Characters = () => {
       const response = await contentApi.GetTop10()
 
       return response?.data as CharbotTop10Response
+    },
+  })
+
+  return { data, isLoading, error, refetch }
+}
+
+
+export const ReqTop10CharactersNew = () => {
+  const { data, isLoading, error, refetch } = useQuery<CharbotTop10NewResponse>({
+    queryKey: ['RequestTop10New'],
+    queryFn: async () => {
+      const response = await contentApi.GetTop10New()
+
+      return response?.data as CharbotTop10NewResponse
     },
   })
 

@@ -69,12 +69,20 @@ export function bridgeTop10DataToModuleCharacter(dataList: Array<ModuleCharacter
       id: item.world_list_detail_chrbot_key.toString(),
       name: item.title,
       description: item.intro,
-      imageUrl: item.img_url,
+      imageUrl: getImageUri(item.img_url),
       commentCount: item.msg_cnt,
+      likeCount: item.like_cnt,
       hashtags: uniqueTags,
       isAdult: item.nsfw === 1,
+      category: 'unspecified',
+      gender: 'unknown',
+      createdAt: item.create_dt,
       creator: {
         id: item.world_list_detail_chrbot_key.toString(),
+        nickname: item.nick_nm || '',
+        username: item.nick_nm || '',
+        profileImageUrl: null,
+        isActive: true,
       },
     }
   })
