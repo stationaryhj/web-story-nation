@@ -8,6 +8,8 @@ export interface Character {
   name: string
   description: string
   detailDescription?: string
+  example?: string
+  first_talk?: string
   imageUrl: string
   commentCount: number
   likeCount?: number

@@ -14,7 +14,7 @@ export function getImageUri(url: string | undefined | null): string {
     if (url.indexOf('kr/') > -1) {
       return url.replace('kr/', 'https://universestationery.s3.amazonaws.com/')
     } else if (url.indexOf('image/') > -1) {
-      return 'https://s3.amazonaws.com/en.universestationery.imgs/' + url
+      return 'https://universestationery-en.s3.us-east-1.amazonaws.com/' + url
     }
 
     return url
@@ -156,6 +156,8 @@ export function bridgeCharbotDataToCharacter(data: ChrbotData) {
     id: data.world_list_detail_chrbot_key.toString(),
     name: data.title,
     description: data.intro,
+    example: data.example,
+    first_talk: data.first_talk,
     imageUrl: getImageUri(data.img_url),
     commentCount: data.msg_cnt,
     hashtags: data.tags ? data.tags.split(',') : [],

@@ -17,15 +17,15 @@ const LatestCharactersSection = memo(() => {
     const combinedModules = [...modules_1, ...modules_2, ...modules_3];
     
     // 최신순으로 정렬 (생성일 기준)
-    const sortedModules = combinedModules.sort((a, b) => 
-      new Date(b.create_dt).getTime() - new Date(a.create_dt).getTime()
-    );
+    // const sortedModules = combinedModules.sort((a, b) => 
+    //   new Date(b.create_dt).getTime() - new Date(a.create_dt).getTime()
+    // );
     
     // 상위 5개만 추출
-    const latestModules = sortedModules.slice(0, 5);
+    const latestModules = combinedModules.slice(0, 5);
     
     // Character 타입으로 변환하여 반환
-    return bridgeTop10DataToModuleCharacter(latestModules) as Character[];
+    return latestModules
   }
 
   return (

@@ -2,6 +2,9 @@ import { ModuleCharacter, CharbotTop10NewResponse } from '@/types/api'
 import { create } from 'zustand'
 import { contentApi } from '@/services/api'
 import { QueryClient } from '@tanstack/react-query'
+import { Character } from '@/store/useStoreData'
+import { CATEGORIES } from '@/services/hooks/DataListManager'
+import { bridgeCharacterDataToCharacter, bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil'
 
 // 싱글톤 queryClient 생성 (최초 한 번만 생성)
 const queryClient = new QueryClient({
@@ -19,74 +22,69 @@ const queryClient = new QueryClient({
 // 추천 캐릭터 데이터 스토어
 interface MainStoreData {
     characters: CharbotTop10NewResponse | null
-    rankingCharacters: Array<ModuleCharacter> | [];
-    rankingCreaters: Array<ModuleCharacter> | [];
-    modules_1: Array<ModuleCharacter> | [];
-    modules_2: Array<ModuleCharacter> | [];
-    modules_3: Array<ModuleCharacter> | [];
+    rankingCharacters: Array<Character> | [];
+    rankingCreaters: Array<Character> | [];
+    modules_1: Array<Character> | [];
+    modules_2: Array<Character> | [];
+    modules_3: Array<Character> | [];
   
     isLoading: boolean;
     error: Error | null;
   
     initialize: () => Promise<void>;
     invalidateData: () => Promise<void>;
-  }
-  
-  export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => ({
-    characters: null,
-    rankingCharacters: [],
-    rankingCreaters: [],
-    modules_1: [],
-    modules_2: [],
-    modules_3: [],
-
-    isLoading: false,
-    error: null,
-
-    initialize: async () => {
-      // 로딩 상태 설정
-      set({ isLoading: true, error: null });
-      
-      try {
-        // React Query를 통해 데이터 요청
-        const data = await queryClient.fetchQuery({
-          queryKey: ['mainData'],
-          queryFn: async () => {
-            const response = await contentApi.GetTop10New();
-            return response?.data;
-          },
-          staleTime: 1000 * 60 * 5 // 5분
-        });
-        
-        if (data) {
-          // Zustand 스토어 업데이트
-          set({ 
-            characters: data,
-            rankingCharacters: data?.modules?.module_9 || [],
-            rankingCreaters: data?.modules?.module_10 || [],
-            modules_1: data?.modules?.module_1 || [],
-            modules_2: data?.modules?.module_2 || [],
-            modules_3: data?.modules?.module_3 || [],
-            isLoading: false
-          });
-        } else {
-          set({ isLoading: false, error: new Error('데이터가 없습니다') });
-        }
-      } catch (error) {
-        console.error("데이터 로딩 중 오류 발생:", error);
-        set({ isLoading: false, error: error as Error });
-      }
-    },
-    
-    // 데이터를 무효화하고 다시 가져오는 함수
-    invalidateData: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['mainData'] });
-      get().initialize();
-    }
-  }))
-
-
-//   그 외 남자, 여자, 성별모름
-interface MainStoreFilterStoreData {
-
 }
+  
+export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => ({
+  characters: null,
+  rankingCharacters: [],
+  rankingCreaters: [],
+  modules_1: [],
+  modules_2: [],
+  modules_3: [],
+
+  isLoading: false,
+  error: null,
+
+  // 초기 데이터 불러오기
+  initialize: async () => {
+    // 로딩 상태 설정
+    set({ isLoading: true, error: null });
+    
+    try {
+      // React Query를 통해 데이터 요청
+      const data = await queryClient.fetchQuery({
+        queryKey: ['mainData'],
+        queryFn: async () => {
+          const response = await contentApi.GetTop10New();
+          return response?.data;
+        },
+        staleTime: 1000 * 60 * 5 // 5분
+      });
+      
+      if (data) {
+        // Zustand 스토어 업데이트
+        set({ 
+          characters: data,
+          rankingCharacters: bridgeTop10DataToModuleCharacter(data?.modules?.module_9) as Character[]  || [],
+          rankingCreaters: bridgeTop10DataToModuleCharacter(data?.modules?.module_10) as Character[] || [],
+          modules_1: bridgeTop10DataToModuleCharacter(data?.modules?.module_1) as Character[] || [],
+          modules_2: bridgeTop10DataToModuleCharacter(data?.modules?.module_2) as Character[] || [],
+          modules_3: bridgeTop10DataToModuleCharacter(data?.modules?.module_3) as Character[] || [],
+          isLoading: false
+        });
+      } else {
+        set({ isLoading: false, error: new Error('데이터가 없습니다') });
+      }
+    } catch (error) {
+      console.error("데이터 로딩 중 오류 발생:", error);
+      set({ isLoading: false, error: error as Error });
+    }
+  },
+  
+  // 데이터를 무효화하고 다시 가져오는 함수
+  invalidateData: async () => {
+    await queryClient.invalidateQueries({ queryKey: ['mainData'] });
+    get().initialize();
+  }
+}))
