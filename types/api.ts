@@ -48,6 +48,19 @@ export type CharbotTop10Response = {
   result: ApiResult;
 };
 
+export type CharbotTop10NewResponse = {
+  modules: {
+    module_1: Array<ModuleCharacter>;
+    module_2: Array<ModuleCharacter>;
+    module_3: Array<ModuleCharacter>;
+    module_9: Array<ModuleCharacter>;
+    module_10: Array<ModuleCharacter>;
+  }
+  
+  order: Array<number>;
+  result: ApiResult;
+};
+
 export interface ModuleCharacter {
   world_list_detail_chrbot_key: number;
   title: string;
