@@ -79,7 +79,7 @@ export default function Card({
   // 가로형 카드 렌더링
   if (variant === 'horizontal') {
     return (
-      <CardTransition index={index}>
+      <CardTransition index={Math.min(index, 5)}>
         <div
           className="group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-dark-background-light dark:border dark:border-dark-secondary-200/10 cursor-pointer flex mb-2"
           onClick={handleCardClick}
@@ -157,7 +157,7 @@ export default function Card({
 
   // 기존 카드 렌더링 (세로형)
   return (
-    <CardTransition index={index}>
+    <CardTransition index={Math.min(index, 5)}>
       <div
         className="group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-dark-background-light dark:border dark:border-dark-secondary-200/10 cursor-pointer"
         onClick={handleCardClick}
