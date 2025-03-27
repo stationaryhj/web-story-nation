@@ -5,6 +5,7 @@ import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
 import AuthorGrid from '@/components/elements/card/AuthorGrid'
 import { SectionTransition } from '@/components/motion/PageTransition'
 import AuthorRankingSidebar from '@/components/elements/sidebar/AuthorRankingSidebar'
+import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
 
 // 작가 랭킹 탭 정의
 const authorRankingTabs: TabItem[] = [
@@ -173,6 +174,7 @@ const mockAuthors = [
 const AuthorRankingSection = memo(() => {
   const [authorActiveTab, setAuthorActiveTab] = useState('weekly')
   const [isAuthorRankingSidebarOpen, setIsAuthorRankingSidebarOpen] = useState(false)
+  const { rankingCreaters } = useRecommendSectionStoreData()
 
   const handleAuthorRankingTabChange = (tabId: string) => {
     setAuthorActiveTab(tabId)
@@ -181,7 +183,7 @@ const AuthorRankingSection = memo(() => {
 
   const getAuthorRankingData = () => {
     // 실제로는 탭에 따라 다른 데이터를 반환하는 로직이 필요함
-    return mockAuthors
+    return rankingCreaters
   }
 
   const handleAuthorClick = (author: any) => {

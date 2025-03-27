@@ -4,7 +4,7 @@ import { contentApi } from '@/services/api'
 import { QueryClient } from '@tanstack/react-query'
 import { Character } from '@/store/useStoreData'
 import { CATEGORIES } from '@/services/hooks/DataListManager'
-import { bridgeCharacterDataToCharacter, bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil'
+import { bridgeModuleCreaterToCharacter, bridgeCharacterDataToCharacter, bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil'
 
 // 싱글톤 queryClient 생성 (최초 한 번만 생성)
 const queryClient = new QueryClient({
@@ -67,7 +67,7 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
         set({ 
           characters: data,
           rankingCharacters: bridgeTop10DataToModuleCharacter(data?.modules?.module_9) as Character[]  || [],
-          rankingCreaters: bridgeTop10DataToModuleCharacter(data?.modules?.module_10) as Character[] || [],
+          rankingCreaters: bridgeModuleCreaterToCharacter(data?.modules?.module_10) as unknown as Character[] || [],
           modules_1: bridgeTop10DataToModuleCharacter(data?.modules?.module_1) as Character[] || [],
           modules_2: bridgeTop10DataToModuleCharacter(data?.modules?.module_2) as Character[] || [],
           modules_3: bridgeTop10DataToModuleCharacter(data?.modules?.module_3) as Character[] || [],

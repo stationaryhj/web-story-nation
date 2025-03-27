@@ -1,4 +1,4 @@
-import { CharbotChatData, CharbotChatListData, CharbotMineData, ChatModeData, ChrbotData, InquiryData, LoginResponse, ModuleCharacter } from '@/types/api';
+import { CharbotChatData, ModuleCreater, CharbotChatListData, CharbotMineData, ChatModeData, ChrbotData, InquiryData, LoginResponse, ModuleCharacter } from '@/types/api';
 import { ChatMode } from '@/components/modal/ChatModeModal';
 
 /**
@@ -89,6 +89,24 @@ export function bridgeTop10DataToModuleCharacter(dataList: Array<ModuleCharacter
 
   return characters
 }
+
+export function bridgeModuleCreaterToCharacter(dataList: Array<ModuleCreater>) {
+  const creaters = dataList?.map(item => {
+    return {
+      id: item.user_key.toString(),
+      name: item.nick_nm || '',
+      nickname: item.nick_nm || '',
+      description: item.intro || '',
+      profileImageUrl: getImageUri(item.profile_url),
+      characterCount: 0,
+      moduleType: item.module_type,
+      isVerified: true,
+    }
+  })
+
+  return creaters
+}
+
 
 export function bridgeCharbotGetListMineDataToCharacter(dataList: Array<CharbotMineData>) {
   const characters = dataList?.map(item => ({
