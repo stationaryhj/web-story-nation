@@ -54,7 +54,7 @@ export const BaseSelectBox = ({
   return (
     <div ref={selectRef} className={cn('relative inline-block w-full text-left', className)}>
       <div
-        className="cursor-pointer flex items-center justify-between rounded-l-xl bg-gray-100 py-3 px-4 text-base text-gray-800 hover:bg-gray-200 focus:outline-none"
+        className="cursor-pointer flex items-center justify-between rounded-xl sm:rounded-r-none sm:rounded-l-xl bg-gray-100 py-3 px-4 text-base text-gray-800 hover:bg-gray-200 focus:outline-none"
         onClick={toggleDropdown}
       >
         <span className="mr-2 truncate">{selectedOption.label || placeholder}</span>

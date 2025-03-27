@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, ReactNode } from 'react'
+import React, { useEffect, ReactNode, useState } from 'react'
 import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
@@ -26,6 +26,25 @@ export default function BaseSidebar({
   headerExtra,
   width = '600px',
 }: BaseSidebarProps) {
+  const [isMobile, setIsMobile] = useState(false)
+
+  // 화면 크기 감지
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 640)
+    }
+
+    // 초기 체크
+    checkIsMobile()
+
+    // 리사이즈 이벤트 리스너
+    window.addEventListener('resize', checkIsMobile)
+
+    return () => {
+      window.removeEventListener('resize', checkIsMobile)
+    }
+  }, [])
+
   // 모달이 열릴 때 배경 스크롤 방지
   useEffect(() => {
     if (isOpen) {
@@ -59,8 +78,8 @@ export default function BaseSidebar({
         animate={{ x: 0 }}
         exit={{ x: '100%' }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="fixed top-0 right-0 h-full bg-white dark:bg-dark-background-DEFAULT no-scrollbar z-[101]"
-        style={{ width }}
+        className="fixed top-0 right-0 h-full w-full sm:w-auto bg-white dark:bg-dark-background-DEFAULT no-scrollbar z-[101]"
+        style={{ width: isMobile ? '100%' : width }}
       >
         {/* 헤더 */}
         <div className="sticky top-0 bg-white dark:bg-dark-background-DEFAULT z-20 px-6 py-4 border-b dark:border-dark-secondary-200/10 flex justify-between items-center">
