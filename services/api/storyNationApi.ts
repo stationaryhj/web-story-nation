@@ -25,6 +25,7 @@ import type {
   WriteRemailEditResponse,
   ChangePersonaNameResponse,
   ViewTermsResponse,
+  CharbotTop10NewResponse,
 } from '../../types/api'
 
 // API 기본 설정
@@ -168,6 +169,11 @@ export const contentApi = {
 
   // Top10
   GetTop10: async (): Promise<ApiResponse<CharbotTop10Response>> => {
+    return api.post('/api/charbot/rcmnd/top10')
+  },
+
+  // Top10 New
+  GetTop10New: async (): Promise<ApiResponse<CharbotTop10NewResponse>> => {
     return api.post('/api/charbot/rcmnd/top10')
   },
 
