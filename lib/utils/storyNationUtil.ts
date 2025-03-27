@@ -156,6 +156,8 @@ export function bridgeCharbotDataToCharacter(data: ChrbotData) {
     id: data.world_list_detail_chrbot_key.toString(),
     name: data.title,
     description: data.intro,
+    example: data.example,
+    first_talk: data.first_talk,
     imageUrl: getImageUri(data.img_url),
     commentCount: data.msg_cnt,
     hashtags: data.tags ? data.tags.split(',') : [],

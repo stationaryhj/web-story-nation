@@ -40,7 +40,7 @@ interface MainStoreCharacterGridStoreData {
   };
   filter: {
     order: number; // 1: 인기순(기본값), 2: 최신순
-    nsfw: number; // 2: 전체 이용가(기본값), 1: 짜릿모드 가능, 3: 이용등급 전체
+    nsfw: number; // 1: 짜릿모드 가능, 2: 전체 이용가(기본값), 3: 이용등급 전체
   };
   
   // 태그 데이터 관련
