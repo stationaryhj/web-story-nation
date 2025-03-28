@@ -19,6 +19,8 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import { useSettingsStore, BANK_LIST } from '@/store/useStoreSettings'
+import { contentApi } from '@/services/api/storyNationApi'
+
 
 const getPlatform = (sns_type: number) => {
   switch (sns_type) {
@@ -251,6 +253,16 @@ export default function SettingsForm() {
   const handleLogout = () => {
     // 여기에 실제 로그아웃 로직이 들어갈 수 있음
     router.push('/login')
+  }
+
+  // 회원탈퇴
+  const handleExit = async () => {
+    try {
+      await contentApi.Signout()
+      router.push('/')
+    } catch (error) {
+      console.error('회원탈퇴 중 오류 발생:', error)
+    }
   }
 
   // 뒤로가기 핸들러
@@ -574,6 +586,14 @@ export default function SettingsForm() {
           className="w-full py-3 text-accent-dark font-medium border border-accent-light rounded-lg bg-white hover:bg-red-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
         >
           로그아웃
+        </button>
+
+        {/* 회원탈퇴 버튼 */}
+        <button
+          onClick={handleExit}
+          className="w-full py-3 text-accent-dark font-medium border border-accent-light rounded-lg bg-white hover:bg-red-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
+        >
+          회원탈퇴
         </button>
       </div>
 

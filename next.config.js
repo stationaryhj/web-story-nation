@@ -14,6 +14,10 @@ const nextConfig = {
       {
         source: '/nakama/:path*',
         destination: 'http://qauschat.storynation.io:443/:path*'
+      },
+      {
+        source: '/callback',
+        destination: '/oauth-callback.html'
       }
     ]
   }

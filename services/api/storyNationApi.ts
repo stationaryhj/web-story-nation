@@ -101,6 +101,10 @@ if (typeof window !== 'undefined') {
   }
 }
 
+export const GetApiUrl = () => {
+  return API_URL
+}
+
 // 콘텐츠 API
 export const contentApi = {
   // 로그인
@@ -148,6 +152,14 @@ export const contentApi = {
       token,
     })
   },
+
+  Signout: async (): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/signout')
+  },
+
+  
 
   getToken: async (snsauth: number, token_key: string): Promise<ApiResponse> => {
     return api.post('/api/snsgettoken', {
@@ -197,7 +209,7 @@ export const contentApi = {
     })
   },
 
-  
+
   GetList: async (
     type: string,
     chrbot_tag_keys: string,
@@ -331,11 +343,12 @@ export const contentApi = {
   },
 
   // 운영 정책 Url 가져오기
-  ViewTerms: async (service_type: number, countrycode = 'KR', os_type = 1): Promise<ApiResponse<ViewTermsResponse>> => {
+  ViewTerms: async (service_type = 0, countrycode = 'KR', os_type = 1, terms_type: number): Promise<ApiResponse<ViewTermsResponse>> => {
     return api.post('/api/viewterms', {
       service_type,
       countrycode,
       os_type,
+      terms_type,
     })
   },
 }

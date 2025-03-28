@@ -579,6 +579,7 @@ export interface ChangePersonaNameResponse {
 // ViewTerms Response
 export interface ViewTermsResponse {
   result: ApiResult;
+  URL: string;
 }
 
 

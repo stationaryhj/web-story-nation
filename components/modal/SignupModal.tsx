@@ -9,19 +9,25 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faCheckSquare, faSquare, faPen } from '@fortawesome/free-solid-svg-icons'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useAccountStore } from '@/store/useAccountStore'
 
 interface SignupModalProps {
   isOpen: boolean
   onClose: () => void
+  onSuccess?: () => void
 }
 
-export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
+export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalProps) {
   const router = useRouter()
   const [nickname, setNickname] = useState('')
   const [birthdate, setBirthdate] = useState('')
   const [isNicknameValid, setIsNicknameValid] = useState(false)
   const [isNicknameChecked, setIsNicknameChecked] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // 계정 스토어에서 회원가입 함수와 로딩 상태 가져오기
+  const { registerWithSocialData, loading, error } = useAccountStore()
 
   // 약관 동의 상태
   const [allAgreed, setAllAgreed] = useState(false)
@@ -98,11 +104,11 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   // 완료 화면에서 확인 버튼 클릭 시 로그인 페이지로 이동
   const handleCompleteConfirm = () => {
     onClose()
-    router.push('/login')
+    router.push('/')
   }
 
   // 회원가입 제출
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // 닉네임 유효성 검사
     if (!nickname) {
       toast.error('닉네임을 입력해주세요.')
@@ -131,9 +137,32 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
       return
     }
 
-    // 회원가입 처리 로직 구현 후 바로 완료 화면으로 전환
-    setIsCompleted(true)
+    try {
+      setIsSubmitting(true)
+      // 회원가입 처리 호출 (성공 콜백 전달)
+      const success = await registerWithSocialData(nickname, birthdate, marketingAgreed, onSuccess)
+      
+      if (success) {
+        // 회원가입 성공 시 완료 화면으로 전환
+        setIsCompleted(true)
+      } else {
+        // 실패 메시지 표시
+        toast.error(error || '회원가입에 실패했습니다. 다시 시도해주세요.')
+      }
+    } catch (err) {
+      console.error('회원가입 오류:', err)
+      toast.error('회원가입 처리 중 오류가 발생했습니다.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
+
+  // 에러 메시지 표시
+  useEffect(() => {
+    if (error) {
+      toast.error(error)
+    }
+  }, [error])
 
   // 모달이 닫힐 때 상태 초기화
   useEffect(() => {
@@ -173,10 +202,12 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
               setIsNicknameChecked(false)
             }}
             maxLength={20}
+            disabled={loading || isSubmitting}
           />
           <button
             className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-primary-500 px-2 py-1 text-xs text-white hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-700"
             onClick={checkNickname}
+            disabled={loading || isSubmitting}
           >
             중복확인
           </button>
@@ -196,6 +227,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
           value={birthdate}
           onChange={e => setBirthdate(e.target.value.replace(/[^0-9]/g, '').slice(0, 8))}
           maxLength={8}
+          disabled={loading || isSubmitting}
         />
       </div>
 
@@ -208,6 +240,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
           <button
             className="mr-2 text-gray-600 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400"
             onClick={toggleAllAgreements}
+            disabled={loading || isSubmitting}
           >
             <FontAwesomeIcon
               icon={allAgreed ? faCheckSquare : faSquare}
@@ -223,6 +256,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             <button
               className="mr-2 text-gray-600 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400"
               onClick={() => setServiceAgreed(!serviceAgreed)}
+              disabled={loading || isSubmitting}
             >
               <FontAwesomeIcon
                 icon={serviceAgreed ? faCheckSquare : faSquare}
@@ -246,6 +280,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             <button
               className="mr-2 text-gray-600 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400"
               onClick={() => setPrivacyAgreed(!privacyAgreed)}
+              disabled={loading || isSubmitting}
             >
               <FontAwesomeIcon
                 icon={privacyAgreed ? faCheckSquare : faSquare}
@@ -269,6 +304,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             <button
               className="mr-2 text-gray-600 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400"
               onClick={() => setPaidServiceAgreed(!paidServiceAgreed)}
+              disabled={loading || isSubmitting}
             >
               <FontAwesomeIcon
                 icon={paidServiceAgreed ? faCheckSquare : faSquare}
@@ -292,6 +328,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
             <button
               className="mr-2 text-gray-600 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400"
               onClick={() => setMarketingAgreed(!marketingAgreed)}
+              disabled={loading || isSubmitting}
             >
               <FontAwesomeIcon
                 icon={marketingAgreed ? faCheckSquare : faSquare}
@@ -346,15 +383,16 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
         animation="none"
         backdropColor="bg-black/70 backdrop-blur-sm"
         showCloseButton={!isCompleted}
-        preventBackdropClose={isCompleted}
+        preventBackdropClose={isCompleted || loading || isSubmitting}
         footerContent={
           <div className="flex justify-center w-full">
             <BaseButton
               color="gradient"
               className="w-full"
               onClick={isCompleted ? handleCompleteConfirm : handleSubmit}
+              disabled={loading || isSubmitting}
             >
-              확인
+              {loading || isSubmitting ? '처리 중...' : '확인'}
             </BaseButton>
           </div>
         }

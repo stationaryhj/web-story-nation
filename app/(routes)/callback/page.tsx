@@ -1,14 +1,12 @@
 'use client'
 
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
-import { useAccountStore } from '@/store/useAccountStore'
 
 export default function Page() {
   const searchParams = useSearchParams()
-  const router = useRouter()
-  const { handleCallback, error, loading } = useAccountStore()
   const processedRef = useRef(false)
+  const [error, setError] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
 
   useEffect(() => {
@@ -24,23 +22,38 @@ export default function Page() {
 
         const code = searchParams.get('code')
         const state = searchParams.get('state')
+        const errorParam = searchParams.get('error')
+
+        if (errorParam) {
+          // 오류 메시지를 부모 창에 전달
+          window.opener?.postMessage({ error: errorParam }, window.location.origin)
+          window.close()
+          return
+        }
 
         if (!code || !state) {
           throw new Error('필수 파라미터가 누락되었습니다.')
         }
 
-        // 직접 콜백 처리
-        await handleCallback(code, state)
+        // 인증 정보를 부모 창에 전달
+        window.opener?.postMessage({ code, state }, window.location.origin)
         
-        // 컴포넌트가 마운트된 상태일 때만 리다이렉트
-        if (isMounted) {
-          router.replace('/')
+        // 팝업 창 닫기
+        if (isMounted && window.opener) {
+          window.close()
         }
       } catch (err) {
         console.error('OAuth 콜백 처리 오류:', err)
-        // 컴포넌트가 마운트된 상태일 때만 리다이렉트
-        if (isMounted) {
-          router.replace('/')
+        
+        // 오류 정보를 부모 창에 전달
+        if (window.opener) {
+          window.opener.postMessage(
+            { error: err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.' }, 
+            window.location.origin
+          )
+          window.close()
+        } else {
+          setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.')
         }
       } finally {
         if (isMounted) {
@@ -49,33 +62,37 @@ export default function Page() {
       }
     }
 
-    processCallback()
+    // 약간의 지연을 줘서 창이 완전히 로드된 후 처리하도록 함
+    const timeoutId = setTimeout(() => {
+      processCallback()
+    }, 500)
 
     // cleanup 함수
     return () => {
+      clearTimeout(timeoutId)
       isMounted = false
       processedRef.current = false
       setIsProcessing(false)
     }
-  }, []) // 의존성 배열을 비워서 마운트 시에만 실행
+  }, [searchParams]) // searchParams가 변경될 경우 재실행
 
-  // 로딩 상태 표시
+  // window.opener가 없는 경우 (직접 URL 접근) 메시지 표시
   return (
     <div className="min-h-screen flex items-center justify-center">
       {error ? (
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
           <div className="text-red-700 mb-4">{error}</div>
-          <button
-            onClick={() => router.replace('/')}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-          >
-            로그인 페이지로 돌아가기
-          </button>
+          <div className="text-gray-600 mt-4">
+            이 페이지는 소셜 로그인 콜백을 처리하기 위한 페이지입니다.
+            <br />
+            로그인 페이지로 이동해주세요.
+          </div>
         </div>
       ) : (
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
           <div className="text-gray-600">로그인 처리 중...</div>
+          <div className="text-gray-400 text-sm mt-2">잠시만 기다려주세요. 곧 창이 닫힙니다.</div>
         </div>
       )}
     </div>
