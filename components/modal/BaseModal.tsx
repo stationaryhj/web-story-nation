@@ -157,7 +157,7 @@ export default function BaseModal({
     <AnimatePresence onExitComplete={onAnimationComplete}>
       {isOpen && (
         <Portal>
-          <div className={`fixed inset-0 z-[100] flex ${positionClasses[position]}`}>
+          <div className={`fixed inset-0 z-[100] flex ${positionClasses[position]}`} style={{ pointerEvents: 'auto' }}>
             {/* 백드롭 */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -173,7 +173,10 @@ export default function BaseModal({
               {...getAnimationProps()}
               className={`relative z-[101] max-h-[95vh] overflow-auto rounded-xl bg-white shadow-lg dark:bg-dark-background-light ${sizeClasses[size]} ${className}`}
               onClick={handleModalClick}
-              style={style}
+              style={{
+                ...style,
+                pointerEvents: 'auto',
+              }}
             >
               {/* 모달 헤더 - 닫기 버튼만 포함 */}
               {!hideHeader && showCloseButton && (

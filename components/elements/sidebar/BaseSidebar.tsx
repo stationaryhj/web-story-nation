@@ -74,6 +74,7 @@ export default function BaseSidebar({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
+        style={{ pointerEvents: 'auto' }}
       />
 
       {/* 사이드바 컨테이너 */}
@@ -85,6 +86,7 @@ export default function BaseSidebar({
         animate={{ x: 0 }}
         exit={{ x: side === 'right' ? '100%' : '-100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        style={{ pointerEvents: 'auto' }}
       >
         {/* 헤더 */}
         <div className="sticky top-0 bg-white dark:bg-dark-background-DEFAULT z-20 px-6 py-4 border-b dark:border-dark-secondary-200/10 flex justify-between items-center">

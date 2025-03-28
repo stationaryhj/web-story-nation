@@ -27,19 +27,6 @@ export default function Modal({
   showCloseButton = true,
   preventBackdropClose = false,
 }: ModalProps) {
-  // 모달이 열릴 때 배경 스크롤 방지
-  useEffect(() => {
-    if (isOpen) {
-      lockScroll()
-    } else {
-      unlockScroll()
-    }
-
-    return () => {
-      resetScrollLock()
-    }
-  }, [isOpen])
-
   // ESC 키로 모달 닫기
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -51,6 +38,20 @@ export default function Modal({
     window.addEventListener('keydown', handleEsc)
     return () => window.removeEventListener('keydown', handleEsc)
   }, [isOpen, onClose, preventBackdropClose])
+
+  // 모달이 열릴 때 스크롤 락 적용
+  useEffect(() => {
+    if (isOpen) {
+      lockScroll()
+    } else {
+      unlockScroll()
+    }
+
+    return () => {
+      // 컴포넌트 언마운트 시 스크롤 락 초기화
+      resetScrollLock()
+    }
+  }, [isOpen])
 
   // 백드롭 클릭으로 모달 닫기
   const handleBackdropClick = () => {
@@ -68,7 +69,7 @@ export default function Modal({
     <AnimatePresence>
       {isOpen && (
         <Portal>
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ pointerEvents: 'auto' }}>
             {/* 배경 */}
             <motion.div
               className="fixed inset-0 bg-black/50"
@@ -86,6 +87,7 @@ export default function Modal({
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ type: 'spring', damping: 20, stiffness: 300 }}
               onClick={handleModalClick}
+              style={{ pointerEvents: 'auto' }}
             >
               {/* 헤더 */}
               <div className="mb-4 flex items-center justify-between">
