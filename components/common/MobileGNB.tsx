@@ -46,16 +46,14 @@ export default function MobileGNB() {
 
   return (
     <div
-      className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-background-light border-t border-secondary-100 dark:border-dark-secondary-200/10 z-[9999]"
+      className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-background-light border-t border-secondary-100 dark:border-dark-secondary-200/10"
       style={{
         position: 'fixed',
         bottom: 0,
         left: 0,
         right: 0,
         width: '100%',
-        zIndex: 9999,
-        transform: 'translateZ(0)',
-        willChange: 'transform',
+        zIndex: 50,
         boxShadow: '0 -2px 4px rgba(0,0,0,0.05)',
       }}
     >

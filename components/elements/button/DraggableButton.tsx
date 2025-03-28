@@ -401,7 +401,7 @@ export default function DraggableButton({
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
-        zIndex: 9999,
+        zIndex: 50,
         width: `${actualSize}px`,
         height: `${actualSize}px`,
         fontSize: isMobile ? '0.875rem' : '1rem',

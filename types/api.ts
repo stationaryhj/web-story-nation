@@ -61,6 +61,15 @@ export type CharbotTop10NewResponse = {
   result: ApiResult;
 };
 
+
+// Charbot Top 10 Ranking ( Creater )
+export type CharbotTop10RankingResponse = {
+  result: ApiResult;
+  charbot_top10: Array<ModuleCreater>;
+}
+
+
+
 // Module Character
 export interface ModuleCharacter {
   world_list_detail_chrbot_key: number;

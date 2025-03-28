@@ -161,13 +161,15 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
           </div>
 
           {/* 첫 메시지 미리보기 */}
-          <div className="bg-secondary-50 dark:bg-dark-secondary-800 rounded-lg p-4 mb-4">
-            <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-2">첫 메시지</h3>
-            <div className="p-3 bg-white dark:bg-dark-secondary-700 rounded-lg">
-              <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mb-2">
-                {mockFirstMessage.situation}
-              </p>
-              <p className="text-secondary-700 dark:text-dark-secondary-300">{selectedCharacter?.first_talk}</p>
+          <div className="flex flex-col justify-between md:min-h-[600px] sm:min-h-[300px] mb-8 bg-secondary-50 dark:bg-dark-secondary-800 rounded-lg p-4">
+            <div>
+              <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-4">첫 메시지</h3>
+              <div className="p-4">
+                <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mb-2">
+                  {mockFirstMessage.situation}
+                </p>
+                <p className="text-secondary-700 dark:text-dark-secondary-300">{selectedCharacter?.first_talk}</p>
+              </div>
             </div>
           </div>
 

@@ -27,6 +27,7 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { useSettingsStore } from '../../store/useStoreSettings'
 import Image from 'next/image'
+import Portal from '@/components/portal/Portal'
 
 // 토글 스위치 컴포넌트 추가 (불꽃 아이콘 추가)
 const SimpleToggle = ({ isOn, onToggle }: { isOn: boolean; onToggle: () => void }) => {
@@ -134,7 +135,7 @@ export default function Header() {
   return (
     <>
       <motion.header
-        className="sticky top-0 left-0 right-0 z-[1000] bg-white dark:bg-dark-background-light shadow-sm dark:shadow-dark-primary-300/20"
+        className="sticky top-0 left-0 right-0 z-[50] bg-white dark:bg-dark-background-light shadow-sm dark:shadow-dark-primary-300/20"
         initial={{ y: 0 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -257,72 +258,74 @@ export default function Header() {
       {/* 모바일 사이드바 */}
       <AnimatePresence>
         {isSidebarOpen && mounted && (
-          <>
-            {/* 배경 오버레이 */}
-            <motion.div
-              className="fixed inset-0 bg-black/50 z-[200]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsSidebarOpen(false)}
-            />
+          <Portal>
+            <>
+              {/* 배경 오버레이 */}
+              <motion.div
+                className="fixed inset-0 bg-black/50 z-[999]"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsSidebarOpen(false)}
+              />
 
-            {/* 사이드바 */}
-            <motion.div
-              className="fixed top-0 right-0 h-full w-72 bg-white dark:bg-dark-background-light shadow-xl z-[201] overflow-y-auto"
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            >
-              <div className="p-5 flex justify-between items-center border-b border-secondary-100 dark:border-dark-secondary-200/20">
-                <h2 className="text-xl font-bold text-primary-600 dark:text-dark-primary-600">메뉴</h2>
-                <button
-                  onClick={() => setIsSidebarOpen(false)}
-                  className="p-2 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
-                >
-                  <FontAwesomeIcon icon={faTimes} className="text-xl" />
-                </button>
-              </div>
-
-              <nav className="p-5">
-                {/* 모바일 사이드바 설정 섹션 */}
-                <div className="border-b border-secondary-100 dark:border-dark-secondary-200/20 pb-4 mb-4">
-                  <h3 className="text-sm font-semibold text-secondary-500 dark:text-dark-secondary-500 mb-4">설정</h3>
-                  <ul className="space-y-4">
-                    <li>
-                      <button
-                        onClick={toggleDarkMode}
-                        className="flex items-center w-full py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors"
-                      >
-                        <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} className="text-lg mr-3" />
-                        {isDarkMode ? '라이트 모드' : '다크 모드'}
-                      </button>
-                    </li>
-                    <li>
-                      <Link
-                        href="/settings"
-                        className="flex items-center py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors"
-                        onClick={() => setIsSidebarOpen(false)}
-                      >
-                        <FontAwesomeIcon icon={faCog} className="text-lg mr-3" />
-                        설정
-                      </Link>
-                    </li>
-                    <li>
-                      <button
-                        onClick={isLogin ? logout : () => openModal('login')}
-                        className="flex items-center w-full py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors"
-                      >
-                        <FontAwesomeIcon icon={faSignOutAlt} className="text-lg mr-3" />
-                        {isLogin ? '로그아웃' : '로그인'}
-                      </button>
-                    </li>
-                  </ul>
+              {/* 사이드바 */}
+              <motion.div
+                className="fixed top-0 right-0 h-full w-72 bg-white dark:bg-dark-background-light shadow-xl z-[999] overflow-y-auto"
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              >
+                <div className="p-5 flex justify-between items-center border-b border-secondary-100 dark:border-dark-secondary-200/20">
+                  <h2 className="text-xl font-bold text-primary-600 dark:text-dark-primary-600">메뉴</h2>
+                  <button
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="p-2 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
+                  >
+                    <FontAwesomeIcon icon={faTimes} className="text-xl" />
+                  </button>
                 </div>
-              </nav>
-            </motion.div>
-          </>
+
+                <nav className="p-5">
+                  {/* 모바일 사이드바 설정 섹션 */}
+                  <div className="border-b border-secondary-100 dark:border-dark-secondary-200/20 pb-4 mb-4">
+                    <h3 className="text-sm font-semibold text-secondary-500 dark:text-dark-secondary-500 mb-4">설정</h3>
+                    <ul className="space-y-4">
+                      <li>
+                        <button
+                          onClick={toggleDarkMode}
+                          className="flex items-center w-full py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors"
+                        >
+                          <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} className="text-lg mr-3" />
+                          {isDarkMode ? '라이트 모드' : '다크 모드'}
+                        </button>
+                      </li>
+                      <li>
+                        <Link
+                          href="/settings"
+                          className="flex items-center py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors"
+                          onClick={() => setIsSidebarOpen(false)}
+                        >
+                          <FontAwesomeIcon icon={faCog} className="text-lg mr-3" />
+                          설정
+                        </Link>
+                      </li>
+                      <li>
+                        <button
+                          onClick={isLogin ? logout : () => openModal('login')}
+                          className="flex items-center w-full py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors"
+                        >
+                          <FontAwesomeIcon icon={faSignOutAlt} className="text-lg mr-3" />
+                          {isLogin ? '로그아웃' : '로그인'}
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </nav>
+              </motion.div>
+            </>
+          </Portal>
         )}
       </AnimatePresence>
     </>

@@ -1,10 +1,9 @@
-import { ModuleCharacter, CharbotTop10NewResponse } from '@/types/api'
+import { CharbotTop10NewResponse } from '@/types/api'
 import { create } from 'zustand'
 import { contentApi } from '@/services/api'
 import { QueryClient } from '@tanstack/react-query'
 import { Character } from '@/store/useStoreData'
-import { CATEGORIES } from '@/services/hooks/DataListManager'
-import { bridgeModuleCreaterToCharacter, bridgeCharacterDataToCharacter, bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil'
+import { bridgeModuleCreaterToCharacter, bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil'
 
 // 싱글톤 queryClient 생성 (최초 한 번만 생성)
 const queryClient = new QueryClient({

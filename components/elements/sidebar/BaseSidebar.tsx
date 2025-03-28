@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { lockScroll, unlockScroll, resetScrollLock } from '@/lib/utils/scrollLock'
+import Portal from '@/components/portal/Portal'
 
 interface BaseSidebarProps {
   isOpen: boolean
@@ -13,6 +14,8 @@ interface BaseSidebarProps {
   children: ReactNode
   headerExtra?: ReactNode
   width?: string
+  side?: 'right' | 'left'
+  className?: string
 }
 
 /**
@@ -25,6 +28,8 @@ export default function BaseSidebar({
   children,
   headerExtra,
   width = '600px',
+  side = 'right',
+  className,
 }: BaseSidebarProps) {
   const [isMobile, setIsMobile] = useState(false)
 
@@ -60,26 +65,26 @@ export default function BaseSidebar({
 
   if (!isOpen) return null
 
-  return (
+  const sidebarContent = (
     <>
       {/* 배경 오버레이 */}
       <motion.div
+        className="fixed inset-0 bg-black/50 z-[999]"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 0.5 }}
+        animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-        className="fixed inset-0 bg-black/50 dark:bg-black/80 no-scrollbar z-[100]"
         onClick={onClose}
       />
 
       {/* 사이드바 컨테이너 */}
       <motion.div
-        initial={{ x: '100%' }}
+        className={`fixed top-0 ${side === 'right' ? 'right-0' : 'left-0'} h-full ${
+          width ? width : 'w-72'
+        } bg-white dark:bg-dark-background-light shadow-xl z-[1000] overflow-y-auto ${className}`}
+        initial={{ x: side === 'right' ? '100%' : '-100%' }}
         animate={{ x: 0 }}
-        exit={{ x: '100%' }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="fixed top-0 right-0 h-full w-full sm:w-auto bg-white dark:bg-dark-background-DEFAULT no-scrollbar z-[101]"
-        style={{ width: isMobile ? '100%' : width }}
+        exit={{ x: side === 'right' ? '100%' : '-100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
       >
         {/* 헤더 */}
         <div className="sticky top-0 bg-white dark:bg-dark-background-DEFAULT z-20 px-6 py-4 border-b dark:border-dark-secondary-200/10 flex justify-between items-center">
@@ -101,4 +106,7 @@ export default function BaseSidebar({
       </motion.div>
     </>
   )
+
+  // Portal을 사용하여 DOM의 최상단에 렌더링
+  return <Portal>{sidebarContent}</Portal>
 }
