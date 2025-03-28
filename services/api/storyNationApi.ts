@@ -6,7 +6,6 @@ import type {
   LoginResponse,
   ModuleCharacter,
   CharbotTop10Response,
-  CharbotListResponse,
   TagRankingListResponse,
   CharbotSearchResponse,
   CharbotChatListResponse,
@@ -19,6 +18,18 @@ import type {
   ChatUseResponse,
   CoinChargeUseHistoryResponse,
   ConfirmTossPaymentResponse,
+  OpenChatResponse,
+  InquiryListResponse,
+  BankListResponse,
+  BankAccountEditResponse,
+  WriteRemailEditResponse,
+  ChangePersonaNameResponse,
+  ViewTermsResponse,
+  CharbotTop10NewResponse,
+  CharbotTop10RankingResponse,
+  SendFeedbackResponse,
+  CharbotLikeResponse,
+  WriterInfoResponse,
 } from '../../types/api'
 
 // API 기본 설정
@@ -93,6 +104,10 @@ if (typeof window !== 'undefined') {
   }
 }
 
+export const GetApiUrl = () => {
+  return API_URL
+}
+
 // 콘텐츠 API
 export const contentApi = {
   // 로그인
@@ -141,6 +156,14 @@ export const contentApi = {
     })
   },
 
+  Signout: async (): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/signout')
+  },
+
+  
+
   getToken: async (snsauth: number, token_key: string): Promise<ApiResponse> => {
     return api.post('/api/snsgettoken', {
       snsauth,
@@ -165,18 +188,30 @@ export const contentApi = {
     return api.post('/api/charbot/rcmnd/top10')
   },
 
-  // List
-  GetListRcmnd: async (
-    module_id: number,
-    page: number,
-    paginate: number
-  ): Promise<ApiResponse<Array<ModuleCharacter>>> => {
+  // Top10 New
+  GetTop10New: async (): Promise<ApiResponse<CharbotTop10NewResponse>> => {
+    return api.post('/api/charbot/rcmnd/top10')
+  },
+
+
+  GetTop10Ranking: async (countryCode: string, module_type: number, ranking_type: number): Promise<ApiResponse<CharbotTop10RankingResponse>> => {
+    return api.post('/api/charbot/rcmnd/ranking/top10', {
+      countryCode,
+      module_type,
+      ranking_type,
+    })
+  },
+
+
+  GetListRcmnd: async (module_id: number, ranking_type: number, page: number, paginate: number): Promise<ApiResponse<Array<CharbotTop10RankingResponse>>> => {
     return api.post('/api/charbot/rcmnd/getlist', {
       module_id,
+      ranking_type,
       page,
       paginate,
     })
   },
+
 
   GetList: async (
     type: string,
@@ -206,7 +241,9 @@ export const contentApi = {
     return api.post('/api/charbot/tag/get')
   },
 
-  SendFeedback: async (content: string): Promise<ApiResponse> => {
+  SendFeedback: async (content: string): Promise<ApiResponse<SendFeedbackResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/charbot/feedback', {
       content,
     })
@@ -239,7 +276,9 @@ export const contentApi = {
   },
 
   // 캐봇 좋아요
-  CharBotLike: async (world_list_detail_chrbot_key: number): Promise<ApiResponse> => {
+  CharBotLike: async (world_list_detail_chrbot_key: number): Promise<ApiResponse<CharbotLikeResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/charbot/like', {
       world_list_detail_chrbot_key,
     })
@@ -263,7 +302,9 @@ export const contentApi = {
   },
 
   // 페르소나 이름변경
-  ChangePersonaName: async (persona: string, persona_gender: number): Promise<ApiResponse> => {
+  ChangePersonaName: async (persona: string, persona_gender: number): Promise<ApiResponse<ChangePersonaNameResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/personachange', {
       persona,
       persona_gender,
@@ -273,6 +314,49 @@ export const contentApi = {
   // 캐봇 챗 모드 가져오기
   GetChatMode: async (): Promise<ApiResponse<CharbotChatModeResponse>> => {
     return api.post('/api/charbot/chatmode')
+  },
+
+  // notification
+  GetInquiryList: async (page: number, paginate: number): Promise<ApiResponse<InquiryListResponse>> => {
+    return api.post('/api/cs/inquiryList', {
+      page,
+      paginate,
+    })
+  },
+
+  // 은행 리스트
+  GetBankList: async (): Promise<ApiResponse<BankListResponse>> => {
+    return api.post('/api/banklist')
+  },
+
+  // 이메일 수정
+  WriteRemailEdit: async (email: string): Promise<ApiResponse<WriteRemailEditResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/writeremailedit', {
+      email,
+    })
+  },  
+
+  // 은행 계좌 수정
+  WriteRebankAccountEdit: async (bank_key: number, account_no: string, user_nm: string): Promise<ApiResponse<BankAccountEditResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/writerebankaccountedit', {
+      bank_key,
+      account_no,
+      user_nm,
+    })
+  },
+
+  // 운영 정책 Url 가져오기
+  ViewTerms: async (service_type = 0, countrycode = 'KR', os_type = 1, terms_type: number): Promise<ApiResponse<ViewTermsResponse>> => {
+    return api.post('/api/viewterms', {
+      service_type,
+      countrycode,
+      os_type,
+      terms_type,
+    })
   },
 }
 
@@ -288,7 +372,7 @@ export const chatApi = {
     })
   },
 
-  OpenChat: async (chrbot_chat_key: number, chat_mode: number, nsfw: number): Promise<ApiResponse> => {
+  OpenChat: async (chrbot_chat_key: number, chat_mode: number, nsfw: number): Promise<ApiResponse<OpenChatResponse>> => {
     const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
     chatApiInstance.defaults.headers.common['Authorization'] = account_token
     return chatApiInstance.post('/api/charbot/chat/open', {
@@ -313,8 +397,6 @@ export const chatApi = {
     prompt_key: string,
     chrbot_chat_key: number,
     stream: boolean,
-    ai_message: string = '',
-    user_message: string = ''
   ): Promise<ApiResponse> => {
     return chatApiInstance.post('/api/charbot/chat/send', {
       chat_mode,
@@ -323,8 +405,6 @@ export const chatApi = {
       chrbot_chat_key,
       stream: stream ? 1 : 0,
       countryCode: 'KR',
-      ai_message,
-      user_message,
     })
   },
 
@@ -518,6 +598,34 @@ export const createApi = {
 
   GetChatBotAuth: async (): Promise<ApiResponse> => {
     return api.post('/api/charbot/get/auth')
+  },
+
+
+  // 작가 정보
+  GetWriterInfo: async (): Promise<ApiResponse<WriterInfoResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/writerinfo')
+  },
+
+  // 작가 출금 현황
+  GetWriterWithdrawStatus: async (): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/sales/writerwithdraw')
+  },
+
+  // 작가 출금 신청
+  WithdrawRequest: async (price: number, locale = 0, user_nm: string, resno1:string, resno2:string): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/sales/withdrawrequest', {
+      price,
+      locale,
+      user_nm,
+      resno1,
+      resno2,
+    })
   },
 }
 

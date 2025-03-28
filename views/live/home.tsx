@@ -72,6 +72,25 @@ export default function LiveChatPage() {
   const [submitted, setSubmitted] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { openModal } = useModalStore()
+  const [isMobile, setIsMobile] = useState(false)
+
+  // 화면 크기 감지하여 모바일/PC 모드 설정
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    // 초기 실행
+    handleResize()
+
+    // 리사이즈 이벤트 리스너 추가
+    window.addEventListener('resize', handleResize)
+
+    // 클린업
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [])
 
   // 메시지 스크롤을 항상 맨 아래로
   const scrollToBottom = () => {
@@ -159,8 +178,8 @@ export default function LiveChatPage() {
         </div>
 
         {/* 2. 채팅 콘텐츠 영역: 스크롤 가능, 헤더와 입력창 사이의 공간 */}
-        <div className="flex-1 overflow-y-auto pt-16 pb-20">
-          <div className="px-4">
+        <div className={`flex-1 overflow-y-auto ${isMobile ? 'pb-36 pt-6' : 'pb-28 pt-16'}`}>
+          <div className="px-4 pb-4">
             <div className="bg-white dark:bg-dark-background-light rounded-lg border-2 border-gray-300 dark:border-gray-700 shadow-lg p-4 mb-4">
               <p className="text-center text-sm text-gray-500 dark:text-gray-400">
                 라이브 채팅방에 오신 것을 환영합니다. 예의를 지켜주세요.
@@ -175,7 +194,7 @@ export default function LiveChatPage() {
             )}
 
             {/* 채팅 메시지 목록 */}
-            <div className="space-y-4">
+            <div className="space-y-4 mb-6">
               {messages.map(msg => {
                 const isCurrentUser = msg.userId === currentUser.id
 
@@ -234,7 +253,9 @@ export default function LiveChatPage() {
         </div>
 
         {/* 3. 메시지 입력 영역: 하단 고정 */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-background-light shadow-lg border-t border-gray-200 dark:border-gray-700 z-20">
+        <div
+          className={`fixed ${isMobile ? 'bottom-16' : 'bottom-0'} left-0 right-0 bg-white dark:bg-dark-background-light shadow-lg border-t border-gray-200 dark:border-gray-700 z-20`}
+        >
           <div className="mx-auto max-w-[1300px] px-4 py-3">
             <div className="flex items-center bg-gray-100 dark:bg-dark-background rounded-lg px-4 py-2 border border-gray-300 dark:border-gray-600">
               <div className="flex-1">
@@ -253,7 +274,7 @@ export default function LiveChatPage() {
                     }
                   }}
                   placeholder="메시지를 입력하세요 (최대 400자)"
-                  className="w-full border-0 bg-transparent focus:ring-0 text-gray-800 dark:text-gray-200 resize-none py-1 h-[40px] max-h-[40px] overflow-y-auto"
+                  className="w-full border-0 bg-transparent outline-none text-gray-800 dark:text-gray-200 resize-none py-1 h-[40px] max-h-[40px] overflow-y-auto"
                   rows={1}
                 />
                 <div className="text-xs text-right text-gray-500 dark:text-gray-400">{newMessage.length}/400</div>

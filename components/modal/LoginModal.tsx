@@ -31,7 +31,15 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const handleSocialLogin = async (provider: OAuthProvider) => {
     try {
       setLoading(true)
-      await socialLogin(provider)
+      await socialLogin(
+        provider,
+        () => {
+          setShowSignup(true)
+        },
+        () => {
+          onClose()
+        }
+      )
     } catch (error) {
       console.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', error)
       // toast.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
@@ -44,7 +52,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     try {
       setLoading(true)
       let isSuccess = await guestLogin(nickname)
-      if(isSuccess) {
+      if (isSuccess) {
         onClose()
         router.push('/')
       }
@@ -53,6 +61,12 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     } finally {
       setLoading(false)
     }
+  }
+
+  // 회원가입 성공 시 모달 닫기
+  const handleSignupSuccess = () => {
+    setShowSignup(false)
+    onClose()
   }
 
   return (
@@ -123,7 +137,13 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         </div>
       </BaseModal>
 
-      {showSignup && <SignupModal isOpen={isOpen && showSignup} onClose={handleSignupClose} />}
+      {showSignup && (
+        <SignupModal 
+          isOpen={isOpen && showSignup} 
+          onClose={handleSignupClose} 
+          onSuccess={handleSignupSuccess}
+        />
+      )}
     </>
   )
 }

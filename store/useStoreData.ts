@@ -1,4 +1,4 @@
-import { ChatModeData, CoinData, LoginResponse } from '@/types/api'
+import { ChatModeData, CoinData, InquiryData } from '@/types/api'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
@@ -8,6 +8,8 @@ export interface Character {
   name: string
   description: string
   detailDescription?: string
+  example?: string
+  first_talk?: string
   imageUrl: string
   commentCount: number
   likeCount?: number
@@ -605,6 +607,7 @@ interface ThemeStore {
   toggleDarkMode: () => void
   enableDarkMode: () => void
   disableDarkMode: () => void
+  initializeTheme: () => void
 }
 
 // 안전한 localStorage 접근을 위한 커스텀 스토리지 객체
@@ -633,11 +636,17 @@ export const useThemeStore = create<ThemeStore>()(
       toggleDarkMode: () => set(state => ({ isDarkMode: !state.isDarkMode })),
       enableDarkMode: () => set({ isDarkMode: true }),
       disableDarkMode: () => set({ isDarkMode: false }),
+      initializeTheme: () => {
+        const savedTheme = localStorage.getItem('theme-storage')
+        if (!savedTheme) {
+          set({ isDarkMode: false })
+        }
+      },
     }),
     {
-      name: 'theme-storage', // 로컬 스토리지 키 이름
+      name: 'theme-storage',
       storage: createJSONStorage(() => safeStorage),
-      skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
+      skipHydration: true,
     }
   )
 )
@@ -678,6 +687,25 @@ export const useChatModeStore = create<ChatModeStore>()(
     }),
     {
       name: 'chatMode-storage',
+      storage: createJSONStorage(() => safeStorage),
+      // skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
+    }
+  )
+)
+
+interface InquiryStore {
+  inquiryList: Array<InquiryData>
+  setInquiryList: (inquiryList: Array<InquiryData>) => void
+}
+
+export const useInquiryStore = create<InquiryStore>()(
+  persist(
+    set => ({
+      inquiryList: [],
+      setInquiryList: (inquiryList: Array<InquiryData>) => set({ inquiryList }),
+    }),
+    {
+      name: 'inquiry-storage',
       storage: createJSONStorage(() => safeStorage),
       // skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
     }

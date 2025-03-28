@@ -1,11 +1,12 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faUser, faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
-import AuthorGrid from '@/components/elements/card/AuthorGrid'
+import Image from 'next/image'
+import BaseSidebar from './BaseSidebar'
+import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
 
 // 작가 랭킹 탭 정의
 const rankingTabs: TabItem[] = [
@@ -37,6 +38,7 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
   const [activeTab, setActiveTab] = useState('weekly')
   const [rankingData, setRankingData] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const { rankingCreaters } = useRecommendSectionStoreData()
 
   // 랭킹 데이터 가져오기
   useEffect(() => {
@@ -47,7 +49,17 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
         // 현재는 목업 데이터를 사용합니다.
         setTimeout(() => {
           // 목업 작가 데이터 생성
-          const mockAuthors = generateMockAuthors(200)
+          // const mockAuthors = generateMockAuthors(200)
+
+          const mockAuthors = rankingCreaters.map(character => ({
+            id: character.id,
+            name: character.name,
+            nickname: character.creator?.nickname || character.name,
+            description: character.description || '',
+            profileImageUrl: character.imageUrl,
+            characterCount: 0, // 기본값 설정
+            isVerified: true, // 기본값 설정
+          }))
 
           // 탭에 따라 다른 정렬 적용
           let sortedAuthors = [...mockAuthors]
@@ -91,93 +103,93 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
     // 작가 프로필 페이지 이동 또는 추가 정보 표시 로직
   }
 
-  // 모달이 열릴 때 배경 스크롤 방지
-  useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
-
-    if (isOpen) {
-      // 스크롤바 너비만큼 패딩을 추가하여 레이아웃 이동 방지
-      document.body.style.overflow = 'hidden'
-      document.body.style.paddingRight = `${scrollbarWidth}px`
-    } else {
-      // 사이드바가 닫힐 때 스크롤 상태 복원
-      document.body.style.overflow = originalStyle
-      document.body.style.paddingRight = '0px'
-    }
-
-    return () => {
-      // 컴포넌트 언마운트 시에만 원래 스타일로 복원
-      document.body.style.overflow = originalStyle
-      document.body.style.paddingRight = '0px'
-    }
-  }, [isOpen])
-
-  // Framer Motion 변수
-  const overlayVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
+  // 랭킹 배경색 결정
+  const getRankBgColor = (rank: number) => {
+    if (rank === 1) return 'bg-yellow-500' // 1위: 금색
+    if (rank === 2) return 'bg-gray-400' // 2위: 은색
+    if (rank === 3) return 'bg-amber-600' // 3위: 동색
+    return 'bg-primary-500' // 그 외
   }
 
-  const sidebarVariants = {
-    hidden: { x: '100%' },
-    visible: { x: 0 },
+  // 스켈레톤 로더 렌더링
+  const renderSkeletons = () => {
+    return Array(5)
+      .fill(0)
+      .map((_, index) => (
+        <div key={`skeleton-${index}`} className="border dark:border-dark-secondary-200/10 rounded-lg mb-4 p-4">
+          <div className="flex items-center space-x-4">
+            <div className="w-8 h-8 rounded-md bg-secondary-100 dark:bg-dark-secondary-800 animate-pulse"></div>
+            <div className="w-16 h-16 rounded-full bg-secondary-100 dark:bg-dark-secondary-800 animate-pulse"></div>
+            <div className="flex-1">
+              <div className="h-4 w-24 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse mb-2"></div>
+              <div className="h-3 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse w-full"></div>
+            </div>
+          </div>
+        </div>
+      ))
+  }
+
+  // 작가 카드 렌더링
+  const renderAuthorCards = () => {
+    return rankingData.map((author, index) => (
+      <div
+        key={author.id}
+        className="border dark:border-dark-secondary-200/10 rounded-lg mb-4 p-4 cursor-pointer hover:bg-secondary-50 dark:hover:bg-dark-secondary-900/30 transition-colors"
+        onClick={() => handleAuthorClick(author)}
+      >
+        <div className="flex items-center">
+          {/* 프로필 이미지와 랭킹 표시 */}
+          <div className="relative flex-shrink-0">
+            {/* 프로필 이미지 */}
+            <div className="relative w-16 h-16 rounded-full overflow-hidden bg-secondary-100 dark:bg-dark-secondary-800">
+              {author.profileImageUrl ? (
+                <Image
+                  src="/images/placeholders/author_default_img.jpg"
+                  alt={author.nickname || author.name}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-secondary-400 dark:text-dark-secondary-500">
+                  <FontAwesomeIcon icon={faUser} className="text-xl" />
+                </div>
+              )}
+            </div>
+
+            {/* 랭킹 표시 - 이미지 좌측 상단에 겹쳐서 표시 */}
+            <div
+              className={`absolute -top-2 -left-2 w-7 h-7 ${getRankBgColor(index + 1)} text-white flex items-center justify-center font-bold rounded-full shadow-md z-10`}
+            >
+              {index + 1}
+            </div>
+          </div>
+
+          {/* 작가 정보 */}
+          <div className="ml-4 flex-1 overflow-hidden">
+            <h3 className="font-bold text-secondary-900 dark:text-dark-secondary-200 text-sm">
+              {author.nickname || author.name}
+            </h3>
+            <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 mt-1 line-clamp-2">
+              {author.description}
+            </p>
+          </div>
+        </div>
+      </div>
+    ))
   }
 
   return (
-    <>
-      {isOpen && (
-        <motion.div
-          className="fixed inset-0 bg-black/50 z-50"
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-          variants={overlayVariants}
-          onClick={onClose}
-        >
-          <motion.div
-            className="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-dark-background-DEFAULT overflow-y-auto z-50"
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            variants={sidebarVariants}
-            transition={{ type: 'tween', duration: 0.3 }}
-            onClick={e => e.stopPropagation()}
-          >
-            {/* 헤더 */}
-            <div className="sticky top-0 bg-white dark:bg-dark-background-DEFAULT z-20 px-6 py-4 border-b dark:border-dark-secondary-200/10 flex justify-between items-center">
-              <h2 className="text-xl font-bold text-secondary-900 dark:text-dark-secondary-200">작가 랭킹</h2>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-secondary-500 hover:bg-secondary-100 dark:text-dark-secondary-400 dark:hover:bg-dark-secondary-800"
-              >
-                <FontAwesomeIcon icon={faXmark} />
-              </button>
-            </div>
+    <BaseSidebar isOpen={isOpen} onClose={onClose} title="작가 랭킹">
+      {/* 필터 영역 */}
+      <div className="px-6 py-4 border-b dark:border-dark-secondary-200/10 space-y-4">
+        {/* 탭 */}
+        <div>
+          <ButtonTabs tabs={rankingTabs} defaultTabId={activeTab} onTabChange={handleTabChange} />
+        </div>
+      </div>
 
-            {/* 필터 영역 */}
-            <div className="px-6 py-4 border-b dark:border-dark-secondary-200/10 space-y-4">
-              {/* 탭 */}
-              <div>
-                <ButtonTabs tabs={rankingTabs} defaultTabId={activeTab} onTabChange={handleTabChange} />
-              </div>
-            </div>
-
-            {/* 컨텐츠 영역 */}
-            <div className="px-4 py-6">
-              <AuthorGrid
-                customData={rankingData}
-                cardsPerRow={1}
-                hasRanking={true}
-                isLoading={isLoading}
-                subtitle={`${rankingTabs.find(tab => tab.id === activeTab)?.label || ''} 작가 랭킹`}
-                onAuthorClick={handleAuthorClick}
-                isSidebar={isSidebar}
-              />
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </>
+      {/* 컨텐츠 영역 */}
+      <div className="px-6 py-4">{isLoading ? renderSkeletons() : renderAuthorCards()}</div>
+    </BaseSidebar>
   )
 }

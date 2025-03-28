@@ -106,6 +106,7 @@ export default function MyCharacterPage() {
             variant="my-character"
             onEdit={handleEditClick}
             onDelete={handleDeleteClick}
+            useSwiper={false}
           />
         )}
 

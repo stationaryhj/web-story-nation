@@ -4,6 +4,7 @@ import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ReactNode, useEffect } from 'react'
+import { lockScroll, unlockScroll, resetScrollLock } from '@/lib/utils/scrollLock'
 
 export type ModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full'
 export type ModalPosition = 'center' | 'top' | 'bottom' | 'left' | 'right'
@@ -48,14 +49,13 @@ export default function Modal({
   // 모달 열릴 때 스크롤 방지
   useEffect(() => {
     if (isOpen && preventScroll) {
-      document.body.style.overflow = 'hidden'
+      lockScroll()
     } else {
-      document.body.style.overflow = ''
+      unlockScroll()
     }
 
     return () => {
-      // 컴포넌트 언마운트 시에만 스크롤 상태 복원
-      document.body.style.overflow = ''
+      resetScrollLock()
     }
   }, [isOpen, preventScroll])
 

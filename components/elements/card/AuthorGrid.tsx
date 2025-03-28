@@ -38,7 +38,10 @@ interface AuthorGridProps {
   error?: string | null
   isSidebar?: boolean
   onAuthorClick?: (author: Author) => void
-  useSwiper?: boolean // Swiper 사용 여부 (기본값: true)
+  useSwiper?: boolean
+  variant?: 'default' | 'horizontal'
+  className?: string
+  sectionId?: string
 }
 
 export default function AuthorGrid({
@@ -55,6 +58,9 @@ export default function AuthorGrid({
   isSidebar = false,
   onAuthorClick,
   useSwiper = true, // 기본적으로 Swiper 사용
+  variant = 'default',
+  className = '',
+  sectionId = '',
 }: AuthorGridProps) {
   const [authors, setAuthors] = useState<Array<Author>>(customData)
   const [localLoading, setLocalLoading] = useState(isLoading)
@@ -142,7 +148,7 @@ export default function AuthorGrid({
   }
 
   return (
-    <div>
+    <div className={className}>
       {title && (
         <FadeIn direction="up" delay={0.1}>
           <div className="flex justify-between items-center mb-4">
@@ -180,7 +186,7 @@ export default function AuthorGrid({
       )}
 
       {shouldUseSwiper ? (
-        <div className="relative swiper-container-wrapper">
+        <div className="relative swiper-container-wrapper" id={sectionId}>
           <button
             type="button"
             className={`swiper-button-prev navigation-button navigation-prev-button author-grid-prev-button absolute left-[-20px] z-[9999] flex items-center justify-center ${
@@ -214,11 +220,11 @@ export default function AuthorGrid({
           <Swiper
             modules={[Navigation]}
             spaceBetween={16}
+            loop={false}
             slidesPerGroup={1}
-            slidesPerView="auto"
             navigation={{
-              nextEl: '.author-grid-next-button',
-              prevEl: '.author-grid-prev-button',
+              nextEl: `#${sectionId} .author-grid-next-button`,
+              prevEl: `#${sectionId} .author-grid-prev-button`,
               enabled: true,
             }}
             breakpoints={{

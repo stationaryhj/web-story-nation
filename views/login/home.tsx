@@ -1,14 +1,17 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import SocialLoginButton from '@/components/form/SocialLoginButton'
 import GuestLoginForm from '@/components/form/GuestLoginForm'
 import PageTransition from '@/components/motion/PageTransition'
 import { useAccountStore } from '@/store/useAccountStore'
 import { OAuthProvider } from '@/types/login'
+import SignupModal from '@/components/modal/SignupModal'
 
 export default function LoginPage() {
   const router = useRouter()
+  const [showSignup, setShowSignup] = useState(false)
   const { 
     loading, 
     error, 
@@ -20,7 +23,17 @@ export default function LoginPage() {
   // 소셜 로그인 핸들러
   const handleSocialLogin = async (type: OAuthProvider) => {
     try {
-      await socialLogin(type)
+      await socialLogin(
+        type,
+        // 회원가입이 필요한 경우
+        () => {
+          setShowSignup(true)
+        },
+        // 로그인 성공 시
+        () => {
+          router.push('/')
+        }
+      )
     } catch (err) {
       console.error('소셜 로그인 오류:', err)
     }
@@ -41,6 +54,17 @@ export default function LoginPage() {
   // 회원가입 페이지 이동
   const handleSignupClick = () => {
     router.push('/login/signup')
+  }
+
+  // 회원가입 모달 닫기
+  const handleSignupClose = () => {
+    setShowSignup(false)
+  }
+
+  // 회원가입 성공 시 처리
+  const handleSignupSuccess = () => {
+    setShowSignup(false)
+    router.push('/')
   }
 
   return (
@@ -110,6 +134,14 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {showSignup && (
+        <SignupModal 
+          isOpen={showSignup} 
+          onClose={handleSignupClose} 
+          onSuccess={handleSignupSuccess}
+        />
+      )}
     </PageTransition>
   )
-} 
+}

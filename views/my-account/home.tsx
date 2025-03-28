@@ -22,9 +22,12 @@ import { BaseButton } from '@/components/elements/button/BaseButton'
 import BaseModal from '@/components/modal/BaseModal'
 import ConfirmActionModal from '@/components/modal/ConfirmActionModal'
 import WithdrawModal from '@/components/modal/WithdrawModal'
+import { useAccountStore } from '@/store/useAccountStore'
 
 export default function MyEarningsView() {
   const router = useRouter()
+
+  const { data: userInfo, writerInfo, fetchWriterInfo } = useAccountStore()
 
   // 정산 관련 상태
   const [totalEarnings, setTotalEarnings] = useState(125000) // 총 수익 (펜 단위)
@@ -35,9 +38,9 @@ export default function MyEarningsView() {
 
   // 계좌 정보
   const [bankAccount, setBankAccount] = useState({
-    bank: '신한은행',
-    accountNumber: '110-123-456789',
-    accountHolder: '홍길동',
+    bank: writerInfo?.bank_nm || '',
+    accountNumber: writerInfo?.account_no || '',
+    accountHolder: writerInfo?.user_nm || '',
   })
 
   // 정산 요청 내역
@@ -180,13 +183,6 @@ export default function MyEarningsView() {
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">지급 계좌 정보</h2>
-              <button
-                onClick={handleEditBankAccount}
-                className="text-violet-600 hover:text-violet-700 flex items-center"
-              >
-                <FontAwesomeIcon icon={faPencilAlt} className="mr-1" />
-                <span>수정</span>
-              </button>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center mb-2">

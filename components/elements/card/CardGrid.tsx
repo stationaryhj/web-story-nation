@@ -5,6 +5,7 @@ import type { Character } from '@/store/useStoreData'
 import { useStoreData } from '@/store/useStoreData'
 import { useEffect, useState, useRef } from 'react'
 import { useModalStore } from '@/store/useStoreModal'
+import { useSettingsStore } from '@/store/useStoreSettings'
 import { useRouter } from 'next/navigation'
 import CardSkeleton from '../skeleton/CardSkeleton'
 import Card from './Card'
@@ -23,7 +24,7 @@ interface CardGridProps {
   subtitle?: string | null
   categoryId?: string
   customData?: Array<Character>
-  variant?: 'default' | 'my-character'
+  variant?: 'default' | 'my-character' | 'horizontal'
   onEdit?: (character: Character) => void
   onDelete?: (character: Character) => void
   cardsPerRow?: number // 한 줄에 표시할 카드 수
@@ -34,6 +35,8 @@ interface CardGridProps {
   isLoading?: boolean
   error?: string | null
   useSwiper?: boolean // Swiper 사용 여부 (기본값: true)
+  className?: string // 추가 스타일링을 위한 클래스명
+  sectionId?: string // 각 섹션을 구분하기 위한 고유 ID
 }
 
 export default function CardGrid({
@@ -52,9 +55,12 @@ export default function CardGrid({
   isLoading: externalLoading,
   error: externalError,
   useSwiper = true, // 기본적으로 Swiper 사용
+  className = '',
+  sectionId = '',
 }: CardGridProps) {
   const { isLoading: storeLoading, error: storeError, fetchCategoryCharacters } = useStoreData()
   const { openModal, setSelectedCharacter } = useModalStore()
+  const { isAdultModeEnabled } = useSettingsStore()
   const [characters, setCharacters] = useState<Array<Character>>([])
   const [localLoading, setLocalLoading] = useState(true)
   const [reachedEnd, setReachedEnd] = useState(false)
@@ -69,7 +75,14 @@ export default function CardGrid({
   useEffect(() => {
     // customData가 제공되면 해당 데이터를 사용
     if (customData) {
-      setCharacters(customData)
+      console.log('CardGrid - 원본 데이터 수:', customData.length)
+      console.log('CardGrid - 성인 모드 상태:', isAdultModeEnabled)
+
+      // 성인 모드 비활성화 시 성인 컨텐츠 필터링
+      const filteredData = isAdultModeEnabled ? customData : customData.filter(character => !character.isAdult)
+
+      console.log('CardGrid - 필터링 후 데이터 수:', filteredData.length)
+      setCharacters(filteredData)
       setLocalLoading(false)
       return
     }
@@ -88,7 +101,7 @@ export default function CardGrid({
     }
 
     loadCharacters()
-  }, [fetchCategoryCharacters, categoryId, customData])
+  }, [fetchCategoryCharacters, categoryId, customData, isAdultModeEnabled])
 
   // 카드 클릭 핸들러
   const handleCardClick = (character: Character) => {
@@ -206,7 +219,7 @@ export default function CardGrid({
   }
 
   return (
-    <div>
+    <div className={className}>
       {title && (
         <FadeIn direction="up" delay={0.1}>
           <div className="flex justify-between items-center mb-4">
@@ -244,7 +257,7 @@ export default function CardGrid({
       )}
 
       {useSwiper ? (
-        <div className="relative swiper-container-wrapper">
+        <div className="relative swiper-container-wrapper" id={sectionId}>
           <button
             type="button"
             className={`swiper-button-prev navigation-button navigation-prev-button card-grid-prev-button absolute left-[-20px] z-[9999] flex items-center justify-center ${
@@ -281,8 +294,8 @@ export default function CardGrid({
             loop={false}
             slidesPerGroup={1}
             navigation={{
-              nextEl: '.card-grid-next-button',
-              prevEl: '.card-grid-prev-button',
+              nextEl: `#${sectionId} .card-grid-next-button`,
+              prevEl: `#${sectionId} .card-grid-prev-button`,
               enabled: true,
             }}
             breakpoints={breakpoints}
@@ -307,7 +320,7 @@ export default function CardGrid({
           </Swiper>
         </div>
       ) : (
-        <div className={`grid ${getGridColumns()} gap-4 md:gap-6`}>
+        <div className={`grid ${getGridColumns()} ${variant === 'horizontal' ? 'gap-2' : 'gap-4 md:gap-6'}`}>
           {isDataLoading
             ? Array(cardsPerRow)
                 .fill(0)

@@ -134,9 +134,14 @@ export default function SearchBar({
         <div className="bg-white dark:bg-dark-background-DEFAULT p-3 rounded-xl shadow-sm">
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
             <div className="w-full sm:w-1/5 sm:min-w-[120px] z-49">
-              <BaseSelectBox options={searchOptions} selectedOption={selectedOption} onChange={handleOptionChange} />
+              <BaseSelectBox
+                options={searchOptions}
+                selectedOption={selectedOption}
+                onChange={handleOptionChange}
+                className="rounded-xl sm:rounded-r-none sm:rounded-l-xl"
+              />
             </div>
-            <div className="flex flex-1 rounded-r-xl overflow-hidden">
+            <div className="flex flex-1 sm:rounded-r-xl overflow-hidden">
               <BaseInput
                 ref={inputRef}
                 placeholder={`${selectedOption.label}으로 검색하세요`}
@@ -147,14 +152,14 @@ export default function SearchBar({
                     onSearch(query, selectedOption.value)
                   }
                 }}
-                className="rounded-l-none rounded-r-none border-l border-gray-200"
+                className="rounded-l-xl rounded-r-0 sm:rounded-l-none sm:rounded-r-none sm:border-l border-gray-200 outline-none"
                 // onFocus={() => setIsFocused(true)}
                 // onBlur={() => setIsFocused(false)}
               />
               <BaseButton
                 color="primary"
                 type="submit"
-                className="rounded-l-none rounded-r-xl bg-gray-50 hover:bg-violet-500 hover:text-white text-gray-700 transition-colors"
+                className="sm:rounded-l-none sm:rounded-r-xl rounded-l-none rounded-r-xl bg-gray-50 hover:bg-violet-500 hover:text-white text-gray-700 transition-colors"
                 disabled={!query.trim()}
               >
                 <FontAwesomeIcon icon={faSearch} className="mr-2" />

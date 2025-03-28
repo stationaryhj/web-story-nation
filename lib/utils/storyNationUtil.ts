@@ -1,4 +1,4 @@
-import { CharbotChatData, CharbotChatListData, CharbotMineData, ChatModeData, ChrbotData, LoginResponse, ModuleCharacter } from '@/types/api';
+import { CharbotChatData, ModuleCreater, CharbotChatListData, CharbotMineData, ChatModeData, ChrbotData, InquiryData, LoginResponse, ModuleCharacter } from '@/types/api';
 import { ChatMode } from '@/components/modal/ChatModeModal';
 
 /**
@@ -14,7 +14,7 @@ export function getImageUri(url: string | undefined | null): string {
     if (url.indexOf('kr/') > -1) {
       return url.replace('kr/', 'https://universestationery.s3.amazonaws.com/')
     } else if (url.indexOf('image/') > -1) {
-      return 'https://s3.amazonaws.com/en.universestationery.imgs/' + url
+      return 'https://universestationery-en.s3.us-east-1.amazonaws.com/' + url
     }
 
     return url
@@ -69,18 +69,44 @@ export function bridgeTop10DataToModuleCharacter(dataList: Array<ModuleCharacter
       id: item.world_list_detail_chrbot_key.toString(),
       name: item.title,
       description: item.intro,
-      imageUrl: item.img_url,
+      imageUrl: getImageUri(item.img_url),
       commentCount: item.msg_cnt,
+      likeCount: item.like_cnt,
       hashtags: uniqueTags,
       isAdult: item.nsfw === 1,
+      category: 'unspecified',
+      gender: 'unknown',
+      createdAt: item.create_dt,
       creator: {
         id: item.world_list_detail_chrbot_key.toString(),
+        nickname: item.nick_nm || '',
+        username: item.nick_nm || '',
+        profileImageUrl: null,
+        isActive: true,
       },
     }
   })
 
   return characters
 }
+
+export function bridgeModuleCreaterToCharacter(dataList: Array<ModuleCreater>) {
+  const creaters = dataList?.map(item => {
+    return {
+      id: item.user_key.toString(),
+      name: item.nick_nm || '',
+      nickname: item.nick_nm || '',
+      description: item.intro || '',
+      profileImageUrl: getImageUri(item.profile_url),
+      characterCount: 0,
+      moduleType: item.module_type,
+      isVerified: true,
+    }
+  })
+
+  return creaters
+}
+
 
 export function bridgeCharbotGetListMineDataToCharacter(dataList: Array<CharbotMineData>) {
   const characters = dataList?.map(item => ({
@@ -148,6 +174,8 @@ export function bridgeCharbotDataToCharacter(data: ChrbotData) {
     id: data.world_list_detail_chrbot_key.toString(),
     name: data.title,
     description: data.intro,
+    example: data.example,
+    first_talk: data.first_talk,
     imageUrl: getImageUri(data.img_url),
     commentCount: data.msg_cnt,
     hashtags: data.tags ? data.tags.split(',') : [],
@@ -159,6 +187,7 @@ export function bridgeCharbotDataToCharacter(data: ChrbotData) {
       profileImageUrl: null,
       isActive: true,
     },
+    likeCount: data.like_cnt,
     category: getCategory(Number(data.gender)),
   }
 }
@@ -261,6 +290,19 @@ export function bridgeChatModeDataToChatMode(data: ChatModeData, customData: Cha
     penCost: data.coin,
     discount: data.discount,
     original_coin: data.original_coin
+  }
+}
+
+
+export function bridgeInquiryDataToNotification(data: InquiryData) {
+  return {
+    id: data.notice_key.toString(),
+    title: data.title,
+    message: data.content,
+    type: 'info',
+    isRead: true,
+    date: new Date(data.create_dt),
+    sort: data.sort,
   }
 }
 

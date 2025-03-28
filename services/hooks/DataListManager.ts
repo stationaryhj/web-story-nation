@@ -17,6 +17,9 @@ import type {
   SaleMonthlyIncomeListResponse,
   ChatUseResponse,
   TagListResponse,
+  InquiryListResponse,
+  BankListResponse,
+  CharbotTop10NewResponse,
 } from '@/types/api'
 
 import { contentApi, settlementApi, createApi, chatApi } from '../api/storyNationApi'
@@ -42,6 +45,20 @@ export const ReqTop10Characters = () => {
       const response = await contentApi.GetTop10()
 
       return response?.data as CharbotTop10Response
+    },
+  })
+
+  return { data, isLoading, error, refetch }
+}
+
+
+export const ReqTop10CharactersNew = () => {
+  const { data, isLoading, error, refetch } = useQuery<CharbotTop10NewResponse>({
+    queryKey: ['RequestTop10New'],
+    queryFn: async () => {
+      const response = await contentApi.GetTop10New()
+
+      return response?.data as CharbotTop10NewResponse
     },
   })
 
@@ -271,6 +288,18 @@ export const ReqGetCreateChatBotInProgress = (world_list_detail_chrbot_key: numb
   return { data, isLoading, error, refetch }
 }
 
+export const ReqGetInquiryList = (page: number, paginate: number) => {
+  const { data, isLoading, error, refetch } = useQuery<InquiryListResponse>({
+    queryKey: ['inquiryList', page, paginate],
+    queryFn: async () => {
+      const response = await contentApi.GetInquiryList(page, paginate)
+      return response.data as InquiryListResponse
+    },
+  })
+
+  return { data, isLoading, error, refetch }
+}
+
 // SaveInProgress API 호출을 위한 함수 추가
 export const ReqSaveCreateChatBotInProgress = async (payload: {
   world_list_detail_chrbot_key: string
@@ -319,6 +348,18 @@ export const GetTagList = () => {
     queryFn: async () => {
       const response = await contentApi.GetTagList()
       return response.data as TagListResponse
+    },
+  })
+
+  return { data, isLoading, error, refetch }
+}
+
+export const GetBankList = () => {
+  const { data, isLoading, error, refetch } = useQuery<BankListResponse>({
+    queryKey: ['bankList'],
+    queryFn: async () => {
+      const response = await contentApi.GetBankList()
+      return response.data as BankListResponse
     },
   })
 

@@ -1,29 +1,38 @@
-'use client'
-
 import { useState, memo } from 'react'
-import { useStoreData } from '@/store/useStoreData'
+import { Character } from '@/store/useStoreData'
 import CardGrid from '@/components/elements/card/CardGrid'
 import { SectionTransition } from '@/components/motion/PageTransition'
 import NewCharacterSidebar from '@/components/elements/sidebar/NewCharacterSidebar'
-
-// 목업 업데이트 시간
-const getUpdateTime = () => {
-  const now = new Date()
-  const minutes = Math.floor(Math.random() * 60)
-  return `${minutes}분 전`
-}
+import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
+import { bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil'
 
 // 최신 캐릭터 섹션 컴포넌트
 const LatestCharactersSection = memo(() => {
-  const { characters } = useStoreData()
   const [isNewCharacterSidebarOpen, setIsNewCharacterSidebarOpen] = useState(false)
-  const [updateTime, setUpdateTime] = useState(getUpdateTime())
+  const { modules_1, modules_2, modules_3 } = useRecommendSectionStoreData()
 
   const getLatestCharactersData = () => {
-    // 실제로는 최신 캐릭터 데이터를 반환하는 로직이 필요함
-    // 현재는 목업으로 characters 데이터 사용
-    return characters.slice(0, 5)
+    // modules_1, modules_2, modules_3을 하나의 배열로 합침
+    const combinedModules = [...modules_1, ...modules_2, ...modules_3]
+
+    // 최신순으로 정렬 (생성일 기준)
+    // const sortedModules = combinedModules.sort((a, b) =>
+    //   new Date(b.create_dt).getTime() - new Date(a.create_dt).getTime()
+    // );
+
+    // 상위 5개만 추출
+    const latestModules = combinedModules.slice(0, 5)
+
+    // Character 타입으로 변환하여 반환
+    return latestModules
   }
+
+  // 최신 캐릭터 데이터
+  const latestCharacters = getLatestCharactersData()
+  // 카드 수가 캐럿셀 사용이 필요한지 확인 (카드가 5개 이하면 스와이퍼 사용 안함)
+  const shouldUseSwiper = latestCharacters.length > 5
+
+  console.log('최신 캐릭터 수:', latestCharacters.length, '스와이퍼 사용:', shouldUseSwiper)
 
   return (
     <section className="py-20">
@@ -43,7 +52,13 @@ const LatestCharactersSection = memo(() => {
 
         {/* 최신 캐릭터 그리드 */}
         <SectionTransition>
-          <CardGrid customData={getLatestCharactersData()} cardsPerRow={5} hasRanking={false} />
+          <CardGrid
+            customData={latestCharacters}
+            cardsPerRow={5}
+            hasRanking={false}
+            useSwiper={shouldUseSwiper} // 5개 이하면 스와이퍼 사용 안함
+            sectionId="latest-characters-section" // 고유 ID 추가
+          />
         </SectionTransition>
       </div>
 
