@@ -108,9 +108,9 @@ export default function Card({
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent"></div>
 
             {/* 댓글 수 표시 - 이미지 우측 하단으로 이동 */}
-            <div className="absolute bottom-1 right-1 flex items-center gap-1 text-white text-xs z-10">
-              <Image src="/images/icons/comment_white.svg" alt="댓글" width={14} height={14} />
-              <span>{commentCount}</span>
+            <div className="absolute bottom-2 right-2 flex items-center gap-[5px] text-white text-xs z-10">
+              <Image src="/images/comment_white.svg" alt="댓글" width={17} height={17} />
+              <span className="text-[15px]">{commentCount}</span>
             </div>
           </div>
 
