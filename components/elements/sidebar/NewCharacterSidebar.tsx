@@ -1,12 +1,11 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faXmark, faArrowUp, faRotate } from '@fortawesome/free-solid-svg-icons'
-import { Character, useStoreData } from '@/store/useStoreData'
+import { faArrowUp, faRotate } from '@fortawesome/free-solid-svg-icons'
+import { useStoreData } from '@/store/useStoreData'
 import CardGrid from '@/components/elements/card/CardGrid'
-import { lockScroll, unlockScroll, resetScrollLock } from '@/lib/utils/scrollLock'
+import BaseSidebar from './BaseSidebar'
 import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
 import { bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil'
 
@@ -40,7 +39,7 @@ export default function NewCharacterSidebar({ isOpen, onClose }: NewCharacterSid
       setTimeout(() => {
         // 최신순 정렬 (실제로는 백엔드에서 정렬된 데이터가 올 것입니다)
         // 여기서는 임의로 가정하여 전체 캐릭터를 최대 50개까지 표시
-        const combinedModules = [...modules_1, ...modules_2, ...modules_3];
+        const combinedModules = [...modules_1, ...modules_2, ...modules_3]
         const characters = combinedModules
 
         const sorted = [...characters]
@@ -88,115 +87,46 @@ export default function NewCharacterSidebar({ isOpen, onClose }: NewCharacterSid
     loadNewCharacters()
   }
 
-  // 모달이 열릴 때 배경 스크롤 방지
-  useEffect(() => {
-    // 이전 사이드바의 스크롤 락 상태 확인
-    console.log('NewCharacterSidebar - isOpen 변경됨:', isOpen)
-
-    if (isOpen) {
-      try {
-        lockScroll()
-        console.log('NewCharacterSidebar - 스크롤 락 적용됨')
-      } catch (error) {
-        console.error('NewCharacterSidebar - 스크롤 락 적용 실패:', error)
-      }
-    } else {
-      try {
-        unlockScroll()
-        console.log('NewCharacterSidebar - 스크롤 락 해제됨')
-      } catch (error) {
-        console.error('NewCharacterSidebar - 스크롤 락 해제 실패:', error)
-      }
-    }
-
-    return () => {
-      console.log('NewCharacterSidebar - 컴포넌트 언마운트')
-      try {
-        resetScrollLock()
-        console.log('NewCharacterSidebar - 스크롤 락 초기화됨')
-      } catch (error) {
-        console.error('NewCharacterSidebar - 스크롤 락 초기화 실패:', error)
-      }
-    }
-  }, [isOpen])
-
-  // Framer Motion 변수
-  const overlayVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-  }
-
-  const sidebarVariants = {
-    hidden: { x: '100%' },
-    visible: { x: 0 },
-  }
+  // 헤더에 표시할 추가 요소
+  const headerExtra = lastUpdate ? (
+    <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">{lastUpdate} 업데이트</p>
+  ) : null
 
   return (
-    <>
-      {isOpen && (
-        <motion.div
-          className="fixed inset-0 bg-black/50 z-50"
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-          variants={overlayVariants}
-          onClick={onClose}
-        >
-          <motion.div
-            className="fixed top-0 right-0 h-full w-[600px] bg-white dark:bg-dark-background-DEFAULT overflow-y-auto z-50"
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            variants={sidebarVariants}
-            transition={{ type: 'tween', duration: 0.3 }}
-            onClick={e => e.stopPropagation()}
+    <BaseSidebar
+      isOpen={isOpen}
+      onClose={onClose}
+      title="최신 캐릭터"
+      headerExtra={
+        <div className="flex items-center space-x-4">
+          {headerExtra}
+          <button
+            onClick={handleRefresh}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-secondary-500 hover:bg-secondary-100 dark:text-dark-secondary-400 dark:hover:bg-dark-secondary-800"
+            title="새로고침"
           >
-            {/* 헤더 */}
-            <div className="sticky top-0 bg-white dark:bg-dark-background-DEFAULT z-10 px-6 py-4 border-b dark:border-dark-secondary-200/10 flex justify-between items-center">
-              <div>
-                <h2 className="text-xl font-bold text-secondary-900 dark:text-dark-secondary-200">최신 캐릭터</h2>
-                {lastUpdate && (
-                  <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">{lastUpdate} 업데이트</p>
-                )}
-              </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={handleRefresh}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-secondary-500 hover:bg-secondary-100 dark:text-dark-secondary-400 dark:hover:bg-dark-secondary-800"
-                  title="새로고침"
-                >
-                  <FontAwesomeIcon icon={faRotate} />
-                </button>
-                <button
-                  onClick={onClose}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-secondary-500 hover:bg-secondary-100 dark:text-dark-secondary-400 dark:hover:bg-dark-secondary-800"
-                >
-                  <FontAwesomeIcon icon={faXmark} />
-                </button>
-              </div>
-            </div>
+            <FontAwesomeIcon icon={faRotate} />
+          </button>
+        </div>
+      }
+    >
+      <div ref={contentRef} className="h-full overflow-y-auto px-4 py-6">
+        <CardGrid
+          customData={newCharacters}
+          cardsPerRow={1}
+          subtitle="최신 등록순"
+          useSwiper={false}
+          variant="horizontal"
+        />
+      </div>
 
-            {/* 컨텐츠 영역 */}
-            <div ref={contentRef} className="h-[calc(100%-74px)] overflow-y-auto px-4 py-6">
-              <CardGrid
-                customData={newCharacters}
-                cardsPerRow={1}
-                subtitle="최신 등록순"
-                useSwiper={false}
-                variant="horizontal"
-              />
-            </div>
-
-            {/* 맨 위로 스크롤 버튼 */}
-            <button
-              className="fixed bottom-6 right-6 w-10 h-10 rounded-full bg-primary-500 dark:bg-dark-primary-600 text-white flex items-center justify-center shadow-md hover:bg-primary-600 dark:hover:bg-dark-primary-700 transition-colors"
-              onClick={scrollToTop}
-            >
-              <FontAwesomeIcon icon={faArrowUp} />
-            </button>
-          </motion.div>
-        </motion.div>
-      )}
-    </>
+      {/* 맨 위로 스크롤 버튼 */}
+      <button
+        className="fixed bottom-6 right-6 w-10 h-10 rounded-full bg-primary-500 dark:bg-dark-primary-600 text-white flex items-center justify-center shadow-md hover:bg-primary-600 dark:hover:bg-dark-primary-700 transition-colors"
+        onClick={scrollToTop}
+      >
+        <FontAwesomeIcon icon={faArrowUp} />
+      </button>
+    </BaseSidebar>
   )
 }

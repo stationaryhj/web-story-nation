@@ -21,18 +21,10 @@ export default function CharacterGridSection({
 }: CharacterGridSectionProps) {
   // 짜릿모드 상태 가져오기
   const { isAdultModeEnabled } = useSettingsStore()
-  
+
   // 캐릭터 그리드 스토어 가져오기
-  const { 
-    characters, 
-    filter, 
-    isLoading, 
-    error, 
-    initialize, 
-    updateFilter, 
-    loadMore,
-    invalidateData 
-  } = useCharacterGridStoreData()
+  const { characters, filter, isLoading, error, initialize, updateFilter, loadMore, invalidateData } =
+    useCharacterGridStoreData()
 
   // 카테고리 정보 가져오기
   const categoryInfo = CATEGORIES.find(cat => cat.id === categoryId)
@@ -41,40 +33,40 @@ export default function CharacterGridSection({
 
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
-    if (categoryId === 'all') return; // all 카테고리는 처리하지 않음
-    
-    console.log('CharacterGridSection - 초기 데이터 로드:', categoryId, selectedTags);
-    initialize(categoryId, selectedTags);
-  }, [categoryId, selectedTags, initialize]);
+    if (categoryId === 'all') return // all 카테고리는 처리하지 않음
+
+    console.log('CharacterGridSection - 초기 데이터 로드:', categoryId, selectedTags)
+    initialize(categoryId, selectedTags)
+  }, [categoryId, selectedTags, initialize])
 
   // 성인 모드 상태 변경 시 데이터 다시 로드
   useEffect(() => {
-    if (categoryId === 'all') return;
-    
-    console.log('CharacterGridSection - 성인 모드 상태 변경됨:', isAdultModeEnabled);
-    
+    if (categoryId === 'all') return
+
+    console.log('CharacterGridSection - 성인 모드 상태 변경됨:', isAdultModeEnabled)
+
     // 성인 모드 상태에 따라 nsfw 필터 설정 변경
     // 짜릿모드 켜짐: nsfw=1 (짜릿모드 가능), 꺼짐: nsfw=2 (전체 이용가)
-    updateFilter({ nsfw: isAdultModeEnabled ? 1 : 2 });
-  }, [isAdultModeEnabled, updateFilter, categoryId]);
-  
+    updateFilter({ nsfw: isAdultModeEnabled ? 1 : 2 })
+  }, [isAdultModeEnabled, updateFilter, categoryId])
+
   // 필터 변경 핸들러
   const handleOrderChange = (newOrder: number) => {
-    updateFilter({ order: newOrder });
-  };
-  
+    updateFilter({ order: newOrder })
+  }
+
   const handleNsfwChange = (newNsfw: number) => {
-    updateFilter({ nsfw: newNsfw });
-  };
-  
+    updateFilter({ nsfw: newNsfw })
+  }
+
   // 태그 변경 핸들러
   const handleTagsChange = (tags: string[]) => {
-    console.log('CharacterGridSection - 태그 변경:', tags);
+    console.log('CharacterGridSection - 태그 변경:', tags)
     // 태그 변경 시 기존 선택된 태그와 비교하여 변경된 경우에만 초기화
     if (JSON.stringify(tags) !== JSON.stringify(selectedTags)) {
-      initialize(categoryId, tags);
+      initialize(categoryId, tags)
     }
-  };
+  }
 
   if (categoryId === 'all') {
     return null // all 카테고리는 RecommendSection에서 처리
@@ -137,7 +129,7 @@ export default function CharacterGridSection({
 
         {/* 카드 그리드 */}
         <CardGrid categoryId={categoryId} customData={characters} useSwiper={false} />
-        
+
         {/* 더 보기 버튼 */}
         {characters.length > 0 && (
           <div className="mt-8 flex justify-center">

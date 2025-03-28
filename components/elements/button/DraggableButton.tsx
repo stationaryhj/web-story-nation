@@ -48,14 +48,14 @@ export default function DraggableButton({
   // 모바일 기준 화면 너비 (이 값보다 작으면 모바일로 간주)
   const MOBILE_BREAKPOINT = 768
   // 모바일에서 버튼 크기 축소 비율
-  const MOBILE_SIZE_RATIO = 0.5
+  const MOBILE_SIZE_RATIO = 0.7
   // 모바일에서 추가 상단 여백 (픽셀)
-  const MOBILE_EXTRA_MARGIN_TOP = 100
+  const MOBILE_EXTRA_MARGIN_TOP = 80
   // 버튼 간 간격 (픽셀)
-  const BUTTON_SPACING_DESKTOP = 10
-  const BUTTON_SPACING_MOBILE = 10
+  const BUTTON_SPACING_DESKTOP = 20
+  const BUTTON_SPACING_MOBILE = 15
   // 버튼 투명도 값
-  const BUTTON_OPACITY_NORMAL = 0.5
+  const BUTTON_OPACITY_NORMAL = 0.8
 
   // 모바일 환경 감지 함수
   const checkIfMobile = useCallback(() => {
@@ -68,56 +68,33 @@ export default function DraggableButton({
     if (typeof window === 'undefined') return { x: 0, y: 0 }
 
     const buttonSize = isMobile ? Math.round(size * MOBILE_SIZE_RATIO) : size
+    const margin = isMobile ? 15 : 20
+    const spacing = isMobile ? BUTTON_SPACING_MOBILE : BUTTON_SPACING_DESKTOP
 
-    // 사용자 지정 위치가 있는 경우 사용
-    if (initialPosition) {
-      return { x: initialPosition.x, y: initialPosition.y }
-    }
-
-    // 여백 설정 (모바일에서는 다른 여백 적용)
-    const margin = 20 // 기본 여백
-    const spacing = isMobile ? BUTTON_SPACING_MOBILE : BUTTON_SPACING_DESKTOP // 버튼 사이 간격
-
-    // 화면 너비와 높이
     const screenWidth = window.innerWidth
     const screenHeight = window.innerHeight
-
-    // 버튼 너비 계산 (전체 버튼 + 간격)
     const totalButtonsWidth = buttonsCount * buttonSize + (buttonsCount - 1) * spacing
 
-    // 왼쪽 시작 위치 계산 (화면 오른쪽에서 전체 버튼 너비를 뺀 값)
-    const leftStart = screenWidth - margin - totalButtonsWidth
-
-    // 모바일 환경에서 화면이 너무 작으면 버튼 위치 재조정 (겹치지 않도록)
+    let leftStart = screenWidth - margin - totalButtonsWidth
     let initialX
 
     if (isMobile && totalButtonsWidth > screenWidth - 2 * margin) {
-      // 화면이 좁을 때: 균등 분배
       const availableWidth = screenWidth - 2 * margin
       const buttonSectionWidth = availableWidth / buttonsCount
-
-      // 각 버튼의 중앙 위치 계산
       const centerPoint = margin + buttonIndex * buttonSectionWidth + buttonSectionWidth / 2
-
-      // 버튼 크기의 절반을 뺌 (버튼의 중앙이 centerPoint에 위치하도록)
       initialX = centerPoint - buttonSize / 2
     } else {
-      // 일반적인 환경: 설정된 간격으로 배치
       initialX = leftStart + buttonIndex * (buttonSize + spacing)
     }
 
-    // 모바일 환경에서는 버튼을 더 위로 배치
     const bottomMargin = isMobile ? margin + MOBILE_EXTRA_MARGIN_TOP : margin
     let initialY = screenHeight - bottomMargin - buttonSize
 
-    // 화면 오른쪽 경계를 넘어가지 않도록 제한
     initialX = Math.min(initialX, screenWidth - margin - buttonSize)
-
-    // 화면 왼쪽 경계를 넘어가지 않도록 제한
     initialX = Math.max(margin, initialX)
 
     return { x: initialX, y: initialY }
-  }, [isMobile, size, buttonIndex, buttonsCount, initialPosition])
+  }, [isMobile, size, buttonIndex, buttonsCount])
 
   // 버튼 위치 계산 함수
   const calculatePosition = useCallback(() => {
@@ -143,40 +120,25 @@ export default function DraggableButton({
 
   // 위치 및 크기 업데이트
   const updatePositionAndSize = useCallback(() => {
-    // 현재 모바일 상태 확인
     const newIsMobile = checkIfMobile()
 
-    // 모바일 상태가 변경된 경우 (모바일 <-> 데스크톱 전환)
     if (newIsMobile !== prevIsMobile.current) {
-      // 모바일 상태 업데이트
       setIsMobile(newIsMobile)
       prevIsMobile.current = newIsMobile
 
-      // 모바일 상태에 따른 크기 설정
       const newSize = newIsMobile ? Math.round(size * MOBILE_SIZE_RATIO) : size
       setActualSize(newSize)
 
-      // 모드 전환 시에는 항상 기본 위치로 리셋 (드래그 무시)
       const defaultPosition = calculateDefaultPosition()
       positionRef.current = defaultPosition
       setPosition(defaultPosition)
 
-      // 사용자 위치 변경 플래그 리셋
       hasUserRepositioned.current = false
-    }
-    // 이미 초기화 되었고 모바일 상태는 변경 없는 경우 (단순 리사이즈)
-    else if (isInitialized.current) {
-      // 단순 리사이즈시에는 사용자 드래그 위치 존중 (화면 안으로만 조정)
+    } else if (isInitialized.current) {
       const newPosition = calculatePosition()
       positionRef.current = newPosition
       setPosition(newPosition)
-    }
-    // 초기 설정 (처음 한 번만 실행)
-    else {
-      const newIsMobile = checkIfMobile()
-      setIsMobile(newIsMobile)
-      prevIsMobile.current = newIsMobile
-
+    } else {
       const newSize = newIsMobile ? Math.round(size * MOBILE_SIZE_RATIO) : size
       setActualSize(newSize)
 
@@ -311,11 +273,12 @@ export default function DraggableButton({
     }
   }
 
-  // 모바일 터치 이벤트 처리
   const handleTouchStart = (e: React.TouchEvent<HTMLButtonElement>) => {
     if (e.touches.length !== 1) return
 
-    // 주의: preventDefault는 제거 (스크롤 등 기본 터치 동작을 막지 않기 위함)
+    // 터치 시작 시 기본 동작 방지 (스크롤 방지)
+    e.preventDefault()
+    e.stopPropagation()
 
     const touch = e.touches[0]
     mouseDownPosition.current = { x: touch.clientX, y: touch.clientY }
@@ -330,6 +293,10 @@ export default function DraggableButton({
 
   const handleTouchMove = (e: TouchEvent) => {
     if (!isDragging || e.touches.length !== 1) return
+
+    // 항상 기본 스크롤 동작 방지
+    e.preventDefault()
+    e.stopPropagation()
 
     const touch = e.touches[0]
 
@@ -373,8 +340,13 @@ export default function DraggableButton({
     if (isDragging) {
       window.addEventListener('mousemove', handleMouseMove)
       window.addEventListener('mouseup', handleMouseUp)
-      window.addEventListener('touchmove', handleTouchMove)
+      window.addEventListener('touchmove', handleTouchMove, { passive: false })
       window.addEventListener('touchend', handleTouchEnd)
+
+      // 드래그 중에는 body의 스크롤을 방지
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
     }
 
     return () => {
@@ -382,6 +354,7 @@ export default function DraggableButton({
       window.removeEventListener('mouseup', handleMouseUp)
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('touchend', handleTouchEnd)
+      document.body.style.overflow = ''
     }
   }, [isDragging, dragStart, actualSize])
 
@@ -409,7 +382,7 @@ export default function DraggableButton({
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
       className={`
-        absolute
+        fixed
         ${color}
         text-white
         rounded-full
@@ -419,19 +392,24 @@ export default function DraggableButton({
         flex
         items-center
         justify-center
+        transition-transform
+        duration-200
+        hover:scale-110
+        active:scale-95
+        touch-none
       `}
       style={{
-        position: 'fixed',
         left: `${position.x}px`,
         top: `${position.y}px`,
-        zIndex: 9000,
+        zIndex: 50,
         width: `${actualSize}px`,
         height: `${actualSize}px`,
-        fontSize: isMobile ? '0.75rem' : '1rem',
-        transform: 'translate3d(0,0,0)', // 하드웨어 가속 활성화
-        opacity: BUTTON_OPACITY_NORMAL, // 투명도 설정
-        userSelect: 'none', // 텍스트 선택 방지
-        WebkitTapHighlightColor: 'transparent', // 모바일 탭 하이라이트 제거
+        fontSize: isMobile ? '0.875rem' : '1rem',
+        transform: 'translate3d(0,0,0)',
+        opacity: BUTTON_OPACITY_NORMAL,
+        userSelect: 'none',
+        WebkitTapHighlightColor: 'transparent',
+        touchAction: 'none',
       }}
     >
       <div className="transform scale-125 flex items-center justify-center w-full h-full">{children}</div>

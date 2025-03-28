@@ -36,9 +36,9 @@ export default function FilterControls({
   // 컴포넌트 마운트 시 태그 데이터 로드
   useEffect(() => {
     if (categoryId > 0) {
-      loadTags(categoryId);
+      loadTags(categoryId)
     }
-  }, [categoryId, loadTags]);
+  }, [categoryId, loadTags])
 
   const handleOrderChange = useCallback(
     (newOrder: number) => {
@@ -101,7 +101,7 @@ export default function FilterControls({
               className={`px-4 py-2 text-sm font-medium transition-colors ${
                 order === 2
                   ? 'bg-indigo-600 text-white'
-                  : 'bg-white dark:bg-dark-background-lighter text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-background-lighter/80'
+                  : 'bg-white dark:bg-dark-background-lighter text-gray-800 dark:text-black hover:bg-gray-100 dark:hover:bg-dark-background-lighter/80'
               }`}
               onClick={() => handleOrderChange(2)}
               disabled={isPending}
@@ -113,7 +113,7 @@ export default function FilterControls({
           {/* 오른쪽: 등급 드롭다운 */}
           <div className="relative">
             <button
-              className="px-4 py-2 text-sm font-medium border rounded-lg bg-white dark:bg-dark-background-lighter text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-background-lighter/80 flex items-center gap-2"
+              className="px-4 py-2 text-sm font-medium border rounded-lg dark-background-lighter dark:bg-dark-background-lighter text-black dark:text-white dark:hover:bg-dark-background-lighter/80 flex items-center gap-2"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               disabled={isPending}
             >
@@ -139,7 +139,7 @@ export default function FilterControls({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
               </svg>
             </button>
-            
+
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-dark-background-light rounded-lg shadow-lg z-10 border overflow-hidden">
                 <button

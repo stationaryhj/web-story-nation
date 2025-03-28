@@ -386,17 +386,17 @@ export default function SettingsForm() {
                 닉네임
                 {isNicknameChanged && <span className="text-red-500 ml-2 text-xs">중복 확인이 필요합니다</span>}
               </label>
-              <div className="flex space-x-2">
+              <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
                 <input
                   type="text"
                   value={profile.nickname}
                   onChange={e => handleInputChange(e, 'nickname')}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
                   placeholder="닉네임을 입력하세요"
                 />
                 <button
                   onClick={handleDuplicateCheck}
-                  className="px-4 py-2 bg-primary-500 text-white rounded-lg whitespace-nowrap hover:bg-primary-700"
+                  className="sm:flex-shrink-0 px-4 py-3 bg-primary-500 text-white rounded-lg whitespace-nowrap hover:bg-primary-700"
                 >
                   중복 확인
                 </button>
@@ -497,25 +497,25 @@ export default function SettingsForm() {
             {/* 페르소나 성별 - BaseButton 사용 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">성별</label>
-              <div className="flex space-x-3">
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                 <BaseButton
                   onClick={() => handleGenderChange('남성')}
                   color="primary"
-                  className={persona.gender === '남성' ? '!bg-primary-500 !text-white !border-primary-500' : ''}
+                  className={`w-full sm:w-auto ${persona.gender === '남성' ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
                 >
                   남성
                 </BaseButton>
                 <BaseButton
                   onClick={() => handleGenderChange('여성')}
                   color="primary"
-                  className={persona.gender === '여성' ? '!bg-primary-500 !text-white !border-primary-500' : ''}
+                  className={`w-full sm:w-auto ${persona.gender === '여성' ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
                 >
                   여성
                 </BaseButton>
                 <BaseButton
                   onClick={() => handleGenderChange('알 수 없음')}
                   color="primary"
-                  className={persona.gender === '알 수 없음' ? '!bg-primary-500 !text-white !border-primary-500' : ''}
+                  className={`w-full sm:w-auto ${persona.gender === '알 수 없음' ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
                 >
                   알 수 없음
                 </BaseButton>

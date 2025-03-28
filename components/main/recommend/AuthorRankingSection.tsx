@@ -91,6 +91,7 @@ const AuthorRankingSection = memo(() => {
               hasRanking={true}
               onAuthorClick={handleAuthorClick}
               useSwiper={true}
+              sectionId="author-ranking-section"
             />
           </div>
         </SectionTransition>

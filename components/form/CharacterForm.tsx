@@ -12,6 +12,7 @@ import { useSettingsStore } from '../../store/useStoreSettings'
 import { useModalStore } from '@/store/useStoreModal'
 
 import ConfirmActionModal from '../modal/ConfirmActionModal'
+import { toast } from 'react-toastify'
 
 // 필수 입력값 표시 컴포넌트
 const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
@@ -102,6 +103,15 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
     }
   }, [mode, formData.conversationExamples.length, addConversationExample])
 
+  // 이미지가 있는데 selectedImage가 없으면 첫 번째 이미지를 기본 이미지로 설정
+  useEffect(() => {
+    if (mode === 'image') {
+      if (images && images.length > 0 && !selectedImage) {
+        setSelectedImage(images[0].id)
+      }
+    }
+  }, [mode, images, selectedImage])
+
   // 입력 필드 변경 핸들러
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -143,7 +153,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
       if (formData.hashtags.length < 7) {
         addHashtag(tag)
       } else {
-        alert('최대 7개의 태그만 선택할 수 있습니다.')
+        toast.error('최대 7개의 태그만 선택할 수 있습니다.')
       }
     }
   }
@@ -198,7 +208,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
     if (!files || files.length === 0) return
 
     if ((images?.length || 0) + files.length > 30) {
-      alert('최대 30개의 이미지만 업로드할 수 있습니다.')
+      toast.error('최대 30개의 이미지만 업로드할 수 있습니다.')
       return
     }
 
@@ -207,7 +217,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
     for (const file of Array.from(files)) {
       // 파일 크기 확인 (10MB 제한)
       if (file.size > 10 * 1024 * 1024) {
-        alert(`파일 크기가 너무 큽니다: ${file.name} (최대 10MB)`)
+        toast.error(`파일 크기가 너무 큽니다: ${file.name} (최대 10MB)`)
         continue
       }
 
@@ -224,10 +234,10 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         const compressedImage = await compressImage(dataUrl)
 
         // 압축된 이미지 저장
-        addImage(compressedImage, activeImageTab)
+        addImage(compressedImage, 'normal')
       } catch (error) {
         console.error('이미지 처리 오류:', error)
-        alert(`이미지 처리 중 오류가 발생했습니다: ${file.name}`)
+        toast.error(`이미지 처리 중 오류가 발생했습니다: ${file.name}`)
       }
     }
 
@@ -358,6 +368,143 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
     }
   }
 
+  // 이미지 업로드 폼 렌더링
+  if (mode === 'image') {
+    // 기본 이미지 설정 메시지
+    const renderValidationMessage = () => {
+      if (images?.length === 0) {
+        return <p className="text-red-500 dark:text-red-400 text-sm mt-2">이미지를 하나 이상 업로드해주세요.</p>
+      } else if (!selectedImage) {
+        return <p className="text-red-500 dark:text-red-400 text-sm mt-2">기본 이미지를 설정해주세요.</p>
+      }
+      return null
+    }
+
+    return (
+      <div className="space-y-6">
+        {/* 이용등급 */}
+        <div>
+          <RequiredLabel>
+            <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
+              이용등급
+            </label>
+          </RequiredLabel>
+          <div className="mt-2 grid grid-cols-2 gap-4">
+            <button
+              type="button"
+              onClick={() => handleRatingSelect('all')}
+              className={`rounded-lg px-4 py-3 text-center transition-colors ${
+                formData.rating === 'all'
+                  ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                  : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+              }`}
+            >
+              전체 이용가
+            </button>
+            <button
+              type="button"
+              onClick={() => handleRatingSelect('adult')}
+              disabled={!isAdultModeEnabled}
+              className={`rounded-lg px-4 py-3 text-center transition-colors ${
+                formData.rating === 'adult'
+                  ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                  : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+              } ${!isAdultModeEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              성인 전용
+            </button>
+          </div>
+          {!isAdultModeEnabled && formData.rating === 'adult' && (
+            <p className="mt-2 text-sm text-red-500">성인 인증이 필요합니다.</p>
+          )}
+        </div>
+
+        {/* 이미지 그리드 */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
+          {/* 이미지 목록 (먼저 렌더링) */}
+          {images?.map(img => (
+            <div
+              key={img.id}
+              className={`relative aspect-square rounded-lg overflow-hidden border-2 cursor-pointer ${
+                selectedImage === img.id
+                  ? 'border-primary-500 dark:border-dark-primary-500'
+                  : 'border-secondary-200 dark:border-dark-secondary-200/10'
+              }`}
+              onClick={() => setSelectedImage(img.id)}
+            >
+              <Image src={img.url} alt={`캐릭터 이미지 ${img.id}`} fill className="object-cover" />
+              <button
+                onClick={e => handleImageDelete(img.id, e)}
+                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center"
+                aria-label="이미지 삭제"
+              >
+                <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />
+              </button>
+              {selectedImage === img.id && (
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
+                  기본 이미지
+                </div>
+              )}
+            </div>
+          ))}
+
+          {/* 이미지 업로드 버튼 (항상 마지막에 위치) */}
+          <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
+            <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
+            <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
+              <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
+              <span className="text-xs sm:text-sm">이미지 업로드</span>
+              <span className="text-xs mt-1 hidden sm:inline">(최대 30개)</span>
+            </div>
+          </label>
+        </div>
+
+        {/* 이미지가 없을 때 안내 메시지 */}
+        {images?.length === 0 && (
+          <div className="text-center p-4 bg-secondary-50 dark:bg-dark-secondary-100/5 rounded-lg">
+            <p className="text-sm text-secondary-500 dark:text-dark-secondary-500">
+              이미지가 없습니다. 이미지를 업로드해주세요.
+            </p>
+          </div>
+        )}
+
+        {/* 유효성 검사 메시지 */}
+        {renderValidationMessage()}
+
+        {/* 이미지 가이드라인 경고 메시지 */}
+        <div className="mt-4 p-4 bg-secondary-50 dark:bg-dark-secondary-100/5 rounded-lg">
+          <p className="text-sm text-secondary-800 dark:text-dark-secondary-400 leading-relaxed">
+            성기 노출, 잔인한 장면, 그외 사회 통념상 허용할 수 없는 이미지는 통보 없이 삭제될 수 있습니다.
+            <br />
+            초상권, 저작권 침해 이미지는 통보 없이 삭제될 수 있습니다.
+          </p>
+        </div>
+
+        {/* 이용등급별 경고문구 */}
+        <div className="rounded-lg bg-secondary-50 p-4 dark:bg-dark-secondary-100/5">
+          <h3 className="mb-2 text-sm font-medium text-secondary-800 dark:text-dark-secondary-300">
+            {formData.rating === 'all'
+              ? '전체 이용가 캐릭터 이미지 업로드 시 주의사항'
+              : '성인 캐릭터 이미지 업로드 시 주의사항'}
+          </h3>
+          <div className="space-y-2 text-sm text-secondary-600 dark:text-dark-secondary-500">
+            {formData.rating === 'all' ? (
+              <>
+                <p>• 성인용 이미지 업로드 시 별도의 경고 없이 차단될 수 있습니다.</p>
+                <p>• 초상권, 저작권 침해 이미지는 통보 없이 삭제될 수 있습니다.</p>
+              </>
+            ) : (
+              <>
+                <p>• 성기 노출, 잔인한 장면, 그외 사회 통념상 허용할 수 없는 이미지는 통보 없이 삭제될 수 있습니다.</p>
+                <p>• 초상권, 저작권 침해 이미지는 통보 없이 삭제될 수 있습니다.</p>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // 기본 설정 탭을 렌더링합니다
   if (mode === 'detail') {
     return (
@@ -377,11 +524,11 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
           </div>
 
           {/* 공개/비공개 선택 버튼 */}
-          <div className="grid grid-cols-2 gap-4 w-2/3 sm:w-1/3 mb-4">
+          <div className="grid grid-cols-2 gap-4 w-full sm:w-1/2 md:w-1/3 mb-4">
             <button
               type="button"
               onClick={() => handleVisibilitySelect('private')}
-              className={`w-full px-4 py-3 rounded-lg text-center transition-colors ${
+              className={`w-full px-3 py-2 text-base rounded-lg text-center transition-colors ${
                 formData.visibility === 'private'
                   ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                   : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -392,7 +539,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
             <button
               type="button"
               onClick={() => handleVisibilitySelect('public')}
-              className={`w-full px-4 py-3 rounded-lg text-center transition-colors ${
+              className={`w-full px-3 py-2 text-base rounded-lg text-center transition-colors ${
                 formData.visibility === 'public'
                   ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                   : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -443,7 +590,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
                 </div>
 
                 {/* 공개/비공개 선택 버튼 */}
-                <div className="grid grid-cols-2 gap-4 w-1/2 sm:w-1/3 mb-3">
+                <div className="grid grid-cols-2 gap-4 w-full sm:w-1/2 md:w-1/3 mb-4">
                   <button
                     type="button"
                     onClick={() => handleExampleVisibilityChange(example.id, 'private')}
@@ -815,143 +962,6 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
           </div>
         </div>
       </>
-    )
-  }
-
-  // 이미지 업로드 폼 렌더링
-  if (mode === 'image') {
-    // 이미지 필터링
-    const filteredImages = images?.filter(img => img.type === activeImageTab) || []
-
-    // 기본 이미지 설정 메시지
-    const renderValidationMessage = () => {
-      if (images?.length === 0) {
-        return <p className="text-red-500 dark:text-red-400 text-sm mt-2">이미지를 하나 이상 업로드해주세요.</p>
-      } else if (!selectedImage) {
-        return <p className="text-red-500 dark:text-red-400 text-sm mt-2">기본 이미지를 설정해주세요.</p>
-      }
-      return null
-    }
-
-    return (
-      <div className="space-y-6">
-        {/* 이미지 탭 */}
-        <div className="flex justify-between items-center mb-4">
-          {/* 이용등급 */}
-          <div>
-            <RequiredLabel>
-              <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-                이용등급
-              </label>
-            </RequiredLabel>
-            <div className="mt-2 grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                onClick={() => handleRatingSelect('all')}
-                className={`rounded-lg px-4 py-3 text-center transition-colors ${
-                  formData.rating === 'all'
-                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-                }`}
-              >
-                전체 이용가
-              </button>
-              <button
-                type="button"
-                onClick={() => handleRatingSelect('adult')}
-                disabled={!isAdultModeEnabled}
-                className={`rounded-lg px-4 py-3 text-center transition-colors ${
-                  formData.rating === 'adult'
-                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-                } ${!isAdultModeEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                성인 전용
-              </button>
-            </div>
-            {!isAdultModeEnabled && formData.rating === 'adult' && (
-              <p className="mt-2 text-sm text-red-500">성인 인증이 필요합니다.</p>
-            )}
-          </div>
-        </div>
-
-        {/* 이미지 그리드 */}
-        <div className="grid grid-cols-5 gap-4">
-          {/* 이미지 목록 (먼저 렌더링) */}
-          {filteredImages.map(img => (
-            <div
-              key={img.id}
-              className={`relative aspect-square rounded-lg overflow-hidden border-2 ${
-                selectedImage === img.id
-                  ? 'border-primary-500 dark:border-dark-primary-500'
-                  : 'border-secondary-200 dark:border-dark-secondary-200/10'
-              }`}
-              onClick={() => setSelectedImage(img.id)}
-            >
-              <Image src={img.url} alt={`캐릭터 이미지 ${img.id}`} fill className="object-cover" />
-              <button
-                onClick={e => handleImageDelete(img.id, e)}
-                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center"
-              >
-                <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />
-              </button>
-              {selectedImage === img.id && (
-                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
-                  기본 이미지
-                </div>
-              )}
-            </div>
-          ))}
-
-          {/* 이미지 업로드 버튼 (항상 마지막에 위치) */}
-          <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
-            <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
-            <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500">
-              <FontAwesomeIcon icon={faUpload} className="w-6 h-6 mb-2" />
-              <span className="text-sm">이미지 업로드</span>
-              <span className="text-xs mt-1">(최대 30개)</span>
-            </div>
-          </label>
-        </div>
-
-        {/* 유효성 검사 메시지 */}
-        {renderValidationMessage()}
-
-        {/* 이미지 가이드라인 경고 메시지 */}
-        <div className="mt-4 p-4 bg-secondary-50 dark:bg-dark-secondary-100/5 rounded-lg">
-          <p className="text-sm text-secondary-800 dark:text-dark-secondary-400 leading-relaxed">
-            {activeImageTab === 'adult' && (
-              <span className="text-red-500 dark:text-red-400">부적절한 콘텐츠는 업로드가 제한될 수 있습니다.</span>
-            )}
-            {activeImageTab === 'adult' && <br />}
-            성기 노출, 잔인한 장면, 그외 사회 통념상 허용할 수 없는 이미지는 통보 없이 삭제될 수 있습니다.
-            <br />
-            초상권, 저작권 침해 이미지는 통보 없이 삭제될 수 있습니다.
-          </p>
-        </div>
-
-        {/* 이용등급별 경고문구 */}
-        <div className="rounded-lg bg-secondary-50 p-4 dark:bg-dark-secondary-100/5">
-          <h3 className="mb-2 text-sm font-medium text-secondary-800 dark:text-dark-secondary-300">
-            {formData.rating === 'all'
-              ? '전체 이용가 캐릭터 이미지 업로드 시 주의사항'
-              : '성인 캐릭터 이미지 업로드 시 주의사항'}
-          </h3>
-          <div className="space-y-2 text-sm text-secondary-600 dark:text-dark-secondary-500">
-            {formData.rating === 'all' ? (
-              <>
-                <p>• 성인용 이미지 업로드 시 별도의 경고 없이 차단될 수 있습니다.</p>
-                <p>• 초상권, 저작권 침해 이미지는 통보 없이 삭제될 수 있습니다.</p>
-              </>
-            ) : (
-              <>
-                <p>• 성기 노출, 잔인한 장면, 그외 사회 통념상 허용할 수 없는 이미지는 통보 없이 삭제될 수 있습니다.</p>
-                <p>• 초상권, 저작권 침해 이미지는 통보 없이 삭제될 수 있습니다.</p>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
     )
   }
 }

@@ -258,7 +258,7 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
           return (
             <button
               key={tag.c_chrbot_tag_key}
-              className="px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors bg-primary-100 text-primary-700 dark:bg-dark-primary-900/50 dark:text-dark-primary-300"
+              className="h-7 px-3 sm:h-8 sm:px-3.5 md:h-9 md:px-4 rounded-full text-xs sm:text-sm whitespace-nowrap transition-colors bg-primary-100 text-primary-700 dark:bg-dark-primary-900/50 dark:text-dark-primary-300"
               onClick={() => handleTagClick(tag.c_chrbot_tag_key.toString())}
               disabled={isPending}
             >
@@ -275,7 +275,7 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
       {/* 컨트롤 버튼 영역 */}
       <div className="flex justify-end space-x-2 px-2 mb-2">
         <button
-          className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:hover:bg-dark-secondary-700"
+          className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:hover:bg-dark-secondary-700 flex items-center justify-center"
           onClick={handleRefresh}
           aria-label="태그 필터 초기화"
           disabled={isPending}
@@ -284,7 +284,7 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
         </button>
 
         <button
-          className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:hover:bg-dark-secondary-700"
+          className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:hover:bg-dark-secondary-700 flex items-center justify-center"
           onClick={toggleExpand}
           aria-label={expanded ? '태그 목록 접기' : '태그 목록 펼치기'}
           disabled={isPending}
@@ -313,7 +313,7 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
           {tags.map(tag => (
             <button
               key={tag.c_chrbot_tag_key}
-              className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors flex-shrink-0 ${
+              className={`h-7 px-3 sm:h-8 sm:px-3.5 md:h-9 md:px-4 rounded-full text-xs sm:text-sm whitespace-nowrap transition-colors flex-shrink-0 ${
                 selectedTags.includes(tag.c_chrbot_tag_key.toString())
                   ? 'bg-primary-100 text-primary-700 dark:bg-dark-primary-900/50 dark:text-dark-primary-300'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:text-dark-secondary-300 dark:hover:bg-dark-secondary-700'
