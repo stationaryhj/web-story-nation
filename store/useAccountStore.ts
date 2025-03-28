@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { LoginResponse } from '@/types/api'
+import { LoginResponse, WriterInfoData } from '@/types/api'
 import { OAuthProvider, OAuthState, OAuthResponse, OAuthUserInfo } from '@/types/login'
 import { OAUTH_PROVIDERS } from '@/types/login'
-import { contentApi } from '@/services/api'
+import { contentApi, createApi } from '@/services/api'
 import axios from 'axios'
 
 // 환경 변수에서 리다이렉트 URI 가져오기
@@ -16,6 +16,7 @@ if (!REDIRECT_URI) {
 interface AccountState {
   isLogin: boolean
   data: LoginResponse | null
+  writerInfo: WriterInfoData | null
   loading: boolean
   error: string | null
   isInitialized: boolean
@@ -31,6 +32,9 @@ interface AccountState {
   initialize: () => Promise<void>
   updateAccountData: (coin_free: number, coin_free_dt: number | string, coin_register: number, coin_user: number) => void
   setPersona: (persona: string, persona_gender: number) => void
+  setWriterInfo: (writerInfo: WriterInfoData | null) => void
+  fetchWriterInfo: () => Promise<void>
+  updateBankAccount: (bank: string, accountNumber: string, accountHolder: string) => Promise<{success: boolean, message: string}>
 }
 
 // 네트워크 에러 타입 정의
@@ -214,9 +218,33 @@ export const useAccountStore = create<AccountState>()(
     (set, get) => ({
       isLogin: false,
       data: null,
+      writerInfo: null,
       loading: false,
       error: null,
       isInitialized: false,
+
+      setWriterInfo: (writerInfo) => {
+        set({ writerInfo })
+      },
+
+      fetchWriterInfo: async () => {
+        const { data } = get()
+        if (!data || !data.writerchk || data.writerchk !== 1) {
+          set({ writerInfo: null })
+          return
+        }
+
+        try {
+          const response = await createApi.GetWriterInfo()
+          if (response.data && response.data.result && response.data.result.err === 0) {
+            set({ writerInfo: response.data.book_writer })
+          } else {
+            console.error('작가 정보 가져오기 실패:', response.data?.result?.msg)
+          }
+        } catch (error) {
+          console.error('작가 정보 요청 중 오류 발생:', error)
+        }
+      },
 
       setPersona: (persona: string, persona_gender: number) => {
         set((state) => {
@@ -252,7 +280,8 @@ export const useAccountStore = create<AccountState>()(
       ) => {
         set((state) => {
           if (!state.data) return state
-          return {
+          
+          const newState = {
             ...state,
             data: {
               ...state.data,
@@ -262,6 +291,11 @@ export const useAccountStore = create<AccountState>()(
               coin_user,
             }
           }
+          
+          // 작가 정보 업데이트
+          get().fetchWriterInfo()
+          
+          return newState
         })
       },
 
@@ -273,6 +307,12 @@ export const useAccountStore = create<AccountState>()(
         try {
           // 여기에 초기화 로직 추가
           // 예: 세션 체크, 토큰 검증 등
+          
+          // 로그인 상태이고 작가면 작가 정보 가져오기
+          if (get().isLogin) {
+            await get().fetchWriterInfo()
+          }
+          
           set({ isInitialized: true, loading: false })
         } catch (error) {
           const errorMessage = handleNetworkError(error)
@@ -295,6 +335,8 @@ export const useAccountStore = create<AccountState>()(
               data: response.data,
               loading: false,
             })
+
+            await get().fetchWriterInfo()
             return true
           }
           else {
@@ -465,6 +507,12 @@ export const useAccountStore = create<AccountState>()(
             const loginResponse = await contentApi.login2(snsauth, Number(snstype), snsid, String(kr_gb))
             set({ isLogin: true, data: loginResponse.data, loading: false })
             
+            // 작가 정보 가져오기
+            // if (loginResponse.data.writerchk === 1) {
+            //   await get().fetchWriterInfo()
+            // }
+            await get().fetchWriterInfo()
+            
             // 로그인 성공 콜백 호출
             if (onLoginSuccess) {
               onLoginSuccess();
@@ -552,6 +600,12 @@ export const useAccountStore = create<AccountState>()(
               loading: false 
             })
             
+            // 작가 정보 가져오기 (필요한 경우)
+            // if (loginResponse.data.writerchk === 1) {
+            //   await get().fetchWriterInfo()
+            // }
+            await get().fetchWriterInfo()
+            
             // 임시 데이터 삭제
             localStorage.removeItem('signup_data')
             
@@ -577,8 +631,67 @@ export const useAccountStore = create<AccountState>()(
       },
 
       logout: () => {
-        set({ isLogin: false, data: null, isInitialized: false })
-      }
+        set({ isLogin: false, data: null, writerInfo: null, isInitialized: false })
+      },
+
+      updateBankAccount: async (bank: string, accountNumber: string, accountHolder: string) => {
+        set({ loading: true, error: null })
+        try {
+          // 은행 리스트에서 은행명으로 bank_key 찾기
+          const { useBankStore } = await import('@/store/useGlobalStore')
+          const bankList = useBankStore.getState().bankList
+          
+          const selectedBank = bankList.find(b => b.bank_nm === bank)
+          if (!selectedBank) {
+            set({ loading: false })
+            return { 
+              success: false, 
+              message: '유효한 은행을 선택해주세요' 
+            }
+          }
+          
+          // 계좌 정보 API 저장
+          const response = await contentApi.WriteRebankAccountEdit(
+            selectedBank.bank_key,
+            accountNumber,
+            accountHolder
+          )
+          
+          if (response.data && response.data.result && response.data.result.err === 0) {
+            // 성공 시 writerInfo 업데이트
+            if (get().writerInfo) {
+              set((state) => ({
+                ...state,
+                writerInfo: state.writerInfo ? {
+                  ...state.writerInfo,
+                  bank_nm: bank,
+                  account_no: accountNumber,
+                  user_nm: accountHolder
+                } : null,
+                loading: false
+              }))
+            }
+            
+            return { 
+              success: true, 
+              message: '계좌 정보가 성공적으로 저장되었습니다.' 
+            }
+          } else {
+            set({ loading: false })
+            return { 
+              success: false, 
+              message: response.data?.result?.msg || '계좌 정보 저장에 실패했습니다.' 
+            }
+          }
+        } catch (error) {
+          console.error('계좌 정보 저장 중 오류 발생:', error)
+          set({ loading: false, error: '계좌 정보 저장 중 오류가 발생했습니다.' })
+          return { 
+            success: false, 
+            message: '계좌 정보 저장 중 오류가 발생했습니다.' 
+          }
+        }
+      },
     }),
     {
       name: 'account-storage',

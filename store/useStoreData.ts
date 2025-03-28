@@ -1,4 +1,4 @@
-import { ChatModeData, CoinData, LoginResponse, InquiryData } from '@/types/api'
+import { ChatModeData, CoinData, InquiryData } from '@/types/api'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 

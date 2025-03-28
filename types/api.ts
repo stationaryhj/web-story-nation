@@ -583,6 +583,25 @@ export interface ViewTermsResponse {
 }
 
 
+// SendFeedback Response
+export interface SendFeedbackResponse {
+  result: ApiResult;
+}
+
+// WriterInfo Response
+export interface WriterInfoResponse {
+  result: ApiResult;
+  book_writer: WriterInfoData;
+}
+
+export interface WriterInfoData {
+  account_no: string;
+  bank_nm: string;
+  cellphone: string;
+  email: string;
+  user_key: number;
+  user_nm: string;
+}
 
 
 // API Result

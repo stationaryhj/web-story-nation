@@ -10,6 +10,9 @@ import { bridgeCharbotDataToCharacter } from '@/lib/utils/storyNationUtil'
 import BaseModal from './BaseModal'
 import { ReqGetChatBot } from '@/services/hooks/DataListManager'
 import { Character } from '@/store/useStoreData'
+import { contentApi } from '@/services/api/storyNationApi'
+import { CharbotLikeResponse } from '@/types/api'
+
 // 목업 데이터
 const mockFirstMessage = {
   situation: '어두운 밤, 비가 내리는 거리에서',
@@ -31,6 +34,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
     data: chatBotData,
     isLoading: chatBotLoading,
     error: chatBotError,
+    refetch
   } = ReqGetChatBot(Number(selectedCharacter?.id))
 
   useEffect(() => {
@@ -65,6 +69,14 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
       if (chatId) {
         router.push(`/chat/${chatId}`)
       }
+    }
+  }
+
+  const handleLike = async () => {
+    const response = await contentApi.CharBotLike(Number(selectedCharacter?.id))
+    const responseData = response.data as CharbotLikeResponse
+    if (responseData.result.err === 0) {
+      refetch()
     }
   }
 
@@ -126,7 +138,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
 
           {/* 좋아요 & 댓글 수 */}
           <div className="flex items-center space-x-4 mb-4">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2" onClick={handleLike}>
               <FontAwesomeIcon icon={faHeart} className="h-5 w-5 text-red-500" />
               <span className="text-secondary-700 dark:text-dark-secondary-300">
                 {selectedCharacter.likeCount || 0}

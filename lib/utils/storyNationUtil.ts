@@ -187,6 +187,7 @@ export function bridgeCharbotDataToCharacter(data: ChrbotData) {
       profileImageUrl: null,
       isActive: true,
     },
+    likeCount: data.like_cnt,
     category: getCategory(Number(data.gender)),
   }
 }

@@ -9,6 +9,7 @@ import NotificationSidebar from './NotificationSidebar'
 
 import AdultVerificationModal from './AdultVerificationModal'
 import ChatModeModal from './ChatModeModal'
+import BankInfoModal from './BankInfoModal'
 
 export default function ModalManager() {
   const { isOpen, modalType, closeModal, modalProps } = useModalStore()
@@ -57,6 +58,17 @@ export default function ModalManager() {
         onClose={closeModal}
         currentModeId={modalProps?.currentModeId || 1}
         onSelectMode={modalProps?.onSelectMode || (() => {})}
+      />
+    )
+  }
+
+  if (modalType === 'bankInfo') {
+    return (
+      <BankInfoModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        bankInfo={modalProps?.bankInfo || { bank: '', accountNumber: '', accountHolder: '' }}
+        onBankInfoChange={modalProps?.onBankInfoChange || (() => {})}
       />
     )
   }

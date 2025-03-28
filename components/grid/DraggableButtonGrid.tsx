@@ -6,6 +6,7 @@ import { faCommentDots, faPen, faComment } from '@fortawesome/free-solid-svg-ico
 import DraggableButton from '../elements/button/DraggableButton'
 import IdeaShareModal from '../modal/IdeaShareModal'
 import RewardModal from '../modal/RewardModal'
+import { contentApi } from '@/services/api/storyNationApi'
 
 type DraggableButtonGridProps = {
   buttonsCount?: number
@@ -50,9 +51,13 @@ export default function DraggableButtonGrid({
   }
 
   // 아이디어 제출 처리
-  const handleIdeaSubmit = (idea: string) => {
+  const handleIdeaSubmit = async (idea: string) => {
     console.log('제출된 아이디어:', idea)
     // TODO: 여기에 API 호출 추가
+    const response = await contentApi.SendFeedback(idea)
+    if (response.data.result.err === 0) {
+      setIdeaModalOpen(false)
+    }
   }
 
   // 보상 모달 열기

@@ -27,6 +27,9 @@ import type {
   ViewTermsResponse,
   CharbotTop10NewResponse,
   CharbotTop10RankingResponse,
+  SendFeedbackResponse,
+  CharbotLikeResponse,
+  WriterInfoResponse,
 } from '../../types/api'
 
 // API 기본 설정
@@ -238,7 +241,9 @@ export const contentApi = {
     return api.post('/api/charbot/tag/get')
   },
 
-  SendFeedback: async (content: string): Promise<ApiResponse> => {
+  SendFeedback: async (content: string): Promise<ApiResponse<SendFeedbackResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/charbot/feedback', {
       content,
     })
@@ -271,7 +276,9 @@ export const contentApi = {
   },
 
   // 캐봇 좋아요
-  CharBotLike: async (world_list_detail_chrbot_key: number): Promise<ApiResponse> => {
+  CharBotLike: async (world_list_detail_chrbot_key: number): Promise<ApiResponse<CharbotLikeResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/charbot/like', {
       world_list_detail_chrbot_key,
     })
@@ -595,7 +602,7 @@ export const createApi = {
 
 
   // 작가 정보
-  GetWriterInfo: async (): Promise<ApiResponse> => {
+  GetWriterInfo: async (): Promise<ApiResponse<WriterInfoResponse>> => {
     const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
     api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/writerinfo')

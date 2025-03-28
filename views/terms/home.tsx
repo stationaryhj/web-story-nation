@@ -15,8 +15,9 @@ const tabs = [
 export default function TermsPage() {
   const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState<'terms' | 'privacy' | 'paid' | 'policy'>('terms')
-  const { termsUrls, getTermsUrl, isLoading, error } = useTermsStore()
+  const { getTermsUrl, isLoading, error } = useTermsStore()
   const [isLoadingUrl, setIsLoadingUrl] = useState(false)
+  const [termsUrl, setTermsUrl] = useState<string | null>(null)
 
   // URL 쿼리에서 탭 파라미터 읽기
   useEffect(() => {
@@ -34,8 +35,12 @@ export default function TermsPage() {
         try {
           setIsLoadingUrl(true)
           await getTermsUrl(tabIndex)
+          // URL 설정
+          const url = await getCurrentTermsUrl()
+          setTermsUrl(url)
         } catch (error) {
           console.error(`약관 URL을 가져오는 중 에러 발생: ${error}`)
+          setTermsUrl(null)
         } finally {
           setIsLoadingUrl(false)
         }
@@ -53,15 +58,13 @@ export default function TermsPage() {
   }
 
   // 현재 선택된 약관의 URL 가져오기
-  const getCurrentTermsUrl = () => {
+  const getCurrentTermsUrl = async (): Promise<string | null> => {
     const tabIndex = tabs.find(tab => tab.id === activeTab)?.index
-    if (tabIndex !== undefined && termsUrls[tabIndex]) {
-      return `${GetApiUrl()}/${termsUrls[tabIndex]}`
+    if (tabIndex !== undefined && await getTermsUrl(tabIndex)) {
+      return `${GetApiUrl()}/${await getTermsUrl(tabIndex)}`
     }
     return null
   }
-
-  const termsUrl = getCurrentTermsUrl()
 
   return (
     <div className="mx-auto max-w-4xl py-8 px-4 sm:px-6 lg:px-8">

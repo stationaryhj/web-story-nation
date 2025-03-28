@@ -1,4 +1,4 @@
-import { ChatModeData, CoinData, LoginResponse, InquiryData } from '@/types/api'
+import { ChatModeData, CoinData, LoginResponse, InquiryData, BankData } from '@/types/api'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { contentApi } from '@/services/api'
@@ -145,6 +145,101 @@ export const useTermsStore = create<TermsStore>()(
       name: 'terms-storage',
       // 필요한 상태만 저장
       partialize: (state) => ({ termsUrls: state.termsUrls }),
+    }
+  )
+)
+
+// 은행 리스트 Store
+interface BankStore {
+  bankList: BankData[];
+  isLoading: boolean;
+  error: Error | null;
+  
+  // 은행 리스트 가져오기 (캐시된 것이 있으면 재사용)
+  getBankList: () => Promise<BankData[]>;
+  
+  // 은행 리스트 강제로 다시 가져오기
+  refreshBankList: () => Promise<BankData[]>;
+}
+
+export const useBankStore = create<BankStore>()(
+  persist(
+    (set, get) => ({
+      bankList: [],
+      isLoading: false,
+      error: null,
+      
+      // 은행 리스트 가져오기
+      getBankList: async () => {
+        // 이미 저장된 은행 리스트가 있으면 바로 반환
+        const existingBankList = get().bankList;
+        if (existingBankList && existingBankList.length > 0) {
+          return existingBankList;
+        }
+        
+        // 저장된 은행 리스트가 없으면 API 호출
+        set({ isLoading: true, error: null });
+        
+        try {
+          const data = await queryClient.fetchQuery({
+            queryKey: ['bankList'],
+            queryFn: async () => {
+              const response = await contentApi.GetBankList();
+              return response?.data;
+            },
+            staleTime: Infinity // 한번 가져온 후에는 무효화 안됨
+          });
+          
+          if (data && data.bank_list) {
+            // 성공적으로 은행 리스트를 가져왔을 때
+            set({ bankList: data.bank_list, isLoading: false });
+            return data.bank_list;
+          } else {
+            // 응답이 올바르지 않을 때
+            const error = new Error('은행 리스트를 가져오지 못했습니다');
+            set({ isLoading: false, error });
+            throw error;
+          }
+        } catch (error) {
+          console.error("은행 리스트 로딩 중 오류 발생:", error);
+          set({ isLoading: false, error: error as Error });
+          throw error;
+        }
+      },
+      
+      // 은행 리스트 강제로 다시 가져오기
+      refreshBankList: async () => {
+        set({ isLoading: true, error: null });
+        
+        try {
+          // 캐시 무효화
+          await queryClient.invalidateQueries({ queryKey: ['bankList'] });
+          
+          // 새로 요청
+          const response = await contentApi.GetBankList();
+          const data = response?.data;
+          
+          if (data && data.bank_list) {
+            // 성공적으로 은행 리스트를 가져왔을 때
+            set({ bankList: data.bank_list, isLoading: false });
+            return data.bank_list;
+          } else {
+            // 응답이 올바르지 않을 때
+            const error = new Error('은행 리스트를 새로 가져오지 못했습니다');
+            set({ isLoading: false, error });
+            throw error;
+          }
+        } catch (error) {
+          console.error("은행 리스트 새로고침 중 오류 발생:", error);
+          set({ isLoading: false, error: error as Error });
+          throw error;
+        }
+      }
+    }),
+    {
+      name: 'bank-storage',
+      // 필요한 상태만 저장
+      partialize: (state) => ({ bankList: state.bankList }),
     }
   )
 )

@@ -9,12 +9,12 @@ import { useTermsStore } from '@/store/useGlobalStore'
 import { useEffect } from 'react'
 
 export default function SettingsPage() {
-  useEffect(() => {
-    const initializeTerms = async () => {
-      await useTermsStore.getState().initializeAllTerms();
-    }
-    initializeTerms();
-  }, [])
+  // useEffect(() => {
+  //   const initializeTerms = async () => {
+  //     await useTermsStore.getState().initializeAllTerms();
+  //   }
+  //   initializeTerms();
+  // }, [])
 
   return (
     <PageTransition>

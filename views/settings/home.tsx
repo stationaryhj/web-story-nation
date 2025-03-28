@@ -18,8 +18,10 @@ import { bridgeLoginDataToUserInfo } from '@/lib/utils/storyNationUtil'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { BaseButton } from '@/components/elements/button/BaseButton'
-import { useSettingsStore, BANK_LIST } from '@/store/useStoreSettings'
-import { contentApi } from '@/services/api/storyNationApi'
+import { useSettingsStore } from '@/store/useStoreSettings'
+import { contentApi, createApi } from '@/services/api/storyNationApi'
+import { useModalStore } from '@/store/useStoreModal'
+import { useBankStore } from '@/store/useGlobalStore'
 
 
 const getPlatform = (sns_type: number) => {
@@ -52,7 +54,9 @@ export default function SettingsForm() {
   const [activeTab, setActiveTab] = useState<'support' | 'terms' | 'privacy' | 'paid' | 'policy'>('support')
 
   const { settings, updateProfile, updateBankAccount, setLanguage, uploadProfileImage } = useSettingsStore()
-  const { data: userInfo } = useAccountStore()
+  const { data: userInfo, writerInfo, fetchWriterInfo } = useAccountStore()
+  const { openModal } = useModalStore()
+  const { bankList, getBankList } = useBankStore()
 
   // 사용자 정보 상태
   const [profile, setProfile] = useState({
@@ -68,8 +72,8 @@ export default function SettingsForm() {
 
   // 페르소나 설정
   const [persona, setPersona] = useState({
-    name: '',
-    gender: '남성' as '남성' | '여성' | '알 수 없음',
+    name: userInfo?.persona || '',
+    gender: userInfo?.persona_gender || 1,
   })
 
   // 이미지 업로드를 위한 참조
@@ -79,6 +83,13 @@ export default function SettingsForm() {
   const [showBankList, setShowBankList] = useState(false)
   const bankDropdownRef = useRef<HTMLDivElement>(null)
 
+  // 은행 리스트 가져오기
+  useEffect(() => {
+    getBankList().catch(error => {
+      console.error('은행 리스트를 가져오는 중 오류 발생:', error)
+    })
+  }, [getBankList])
+
   // 닉네임이 원래 닉네임과 같은지 확인
   useEffect(() => {
     if (userInfo?.nick_nm) {
@@ -86,6 +97,19 @@ export default function SettingsForm() {
       setProfile(prev => ({ ...prev, nickname: userInfo.nick_nm }))
     }
   }, [userInfo])
+
+  // 작가 정보 불러오기
+  useEffect(() => {
+    if (writerInfo) {
+      setProfile(prev => ({
+        ...prev,
+        bank: writerInfo.bank_nm || prev.bank,
+        accountNumber: writerInfo.account_no || prev.accountNumber,
+        accountHolder: writerInfo.user_nm || prev.accountHolder,
+        email: writerInfo.email || prev.email
+      }))
+    }
+  }, [userInfo?.writerchk, writerInfo, fetchWriterInfo])
 
   useEffect(() => {
     if (profile.nickname === originalNickname) {
@@ -123,6 +147,26 @@ export default function SettingsForm() {
       toast.error('사용할 수 없는 닉네임입니다.')
       setIsNicknameVerified(false)
     }
+  }
+
+  // 은행정보 모달
+  const handleOpenBankInfoModal = () => {
+    openModal('bankInfo', {
+      bankInfo: {
+        bank: profile.bank,
+        accountNumber: profile.accountNumber,
+        accountHolder: profile.accountHolder,
+      },
+      onBankInfoChange: (bankInfo: { bank: string; accountNumber: string; accountHolder: string }) => {
+        setProfile(prev => ({
+          ...prev,
+          bank: bankInfo.bank,
+          accountNumber: bankInfo.accountNumber,
+          accountHolder: bankInfo.accountHolder
+        }))
+        setIsEdited(true)
+      }
+    })
   }
 
   // 저장 핸들러
@@ -184,47 +228,64 @@ export default function SettingsForm() {
 
   // 페르소나 입력 핸들러
   const handlePersonaChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>, field: keyof typeof persona) => {
-    if (field === 'name' && e.target.value.length > 25) {
-      return
-    }
+    // if (field === 'name' && e.target.value.length > 25) {
+    //   return
+    // }
 
     setPersona(prev => ({ ...prev, [field]: e.target.value }))
     setIsEdited(true)
   }
 
   // 성별 변경 핸들러
-  const handleGenderChange = (gender: '남성' | '여성' | '알 수 없음') => {
+  const handleGenderChange = (gender: 1 | 2 | 3) => {
     setPersona(prev => ({ ...prev, gender }))
     setIsEdited(true)
   }
 
   // 페르소나 저장 핸들러
-  const handleSavePersona = () => {
+  const handleSavePersona = async () => {
     // 현재 페르소나 상태와 userInfo의 페르소나 데이터 출력
     console.log('===== 페르소나 데이터 =====')
     console.log('현재 페르소나 상태:', {
       name: persona.name,
       gender: persona.gender,
-      koreanGender: persona.gender === '남성' ? 'male' : persona.gender === '여성' ? 'female' : 'unknown',
+      koreanGender: persona.gender === 1 ? 'male' : persona.gender === 2 ? 'female' : 'unknown',
       inputValue: userInfo?.persona || '페르소나 없음',
     })
 
     // 성별 데이터 영문 변환
-    const genderMap = {
-      남성: 'male',
-      여성: 'female',
-      '알 수 없음': 'unknown',
+    const genderMap: Record<number, string> = {
+      1: 'male',
+      2: 'female',
+      3: 'unknown',
     }
 
     // 최종 저장될 페르소나 데이터 출력
     console.log('저장될 데이터:', {
-      name: userInfo?.persona || persona.name,
+      name: persona.name,
       gender: genderMap[persona.gender],
       updatedAt: new Date().toISOString(),
     })
 
-    // 토스트 메시지 표시
-    toast.success('페르소나 데이터를 저장했습니다.')
+    try {
+      // API 호출 - persona(문자열)와 persona_gender(숫자)를 전달
+      const response = await contentApi.ChangePersonaName(persona.name, persona.gender)
+      console.log('API 응답:', response)
+
+      // 서버 응답이 성공적이면 useAccountStore의 setPersona 호출하여 상태 업데이트
+      if (response.data && response.data.result && response.data.result.err === 0) {
+        // useAccountStore의 setPersona 함수를 호출하여 상태 업데이트
+        useAccountStore.getState().setPersona(persona.name, persona.gender)
+        
+        // 토스트 메시지 표시
+        toast.success('페르소나 데이터를 저장했습니다.')
+      } else {
+        toast.error('페르소나 저장에 실패했습니다.')
+      }
+    } catch (error) {
+      console.error('페르소나 저장 중 오류 발생:', error)
+      toast.error('페르소나 저장 중 오류가 발생했습니다.')
+    }
   }
 
   // 이미지 업로드 핸들러
@@ -308,15 +369,6 @@ export default function SettingsForm() {
     setIsEdited(true)
   }
 
-  // 가상의 펜 사용 내역
-  const penUsageHistory = [
-    { date: '2023.05.15', type: '캐릭터 생성', amount: 100 },
-    { date: '2023.05.12', type: '채팅 사용', amount: 50 },
-    { date: '2023.05.10', type: '이미지 생성', amount: 200 },
-    { date: '2023.05.05', type: '캐릭터 수정', amount: 30 },
-    { date: '2023.05.01', type: '채팅 사용', amount: 45 },
-  ]
-
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
       {/* 헤더 */}
@@ -331,13 +383,21 @@ export default function SettingsForm() {
             </button>
             <h1 className="text-xl font-semibold">내 정보</h1>
           </div>
-          <button
-            onClick={handleSave}
-            disabled={!isEdited}
-            className={`px-4 py-2 rounded-lg ${isEdited ? 'bg-primary-500 text-white' : 'bg-secondary-200 text-secondary-400'}`}
-          >
-            저장
-          </button>
+          <div>
+            <button
+              onClick={handleOpenBankInfoModal}
+              className="px-4 py-2 mr-2 rounded-lg bg-primary-500 text-white hover:bg-primary-600"
+            >
+              은행정보
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={!isEdited}
+              className={`px-4 py-2 rounded-lg ${isEdited ? 'bg-primary-500 text-white' : 'bg-secondary-200 text-secondary-400'}`}
+            >
+              저장
+            </button>
+          </div>
         </div>
       </div>
 
@@ -439,13 +499,13 @@ export default function SettingsForm() {
               </button>
               {showBankList && (
                 <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
-                  {BANK_LIST.map(bank => (
+                  {bankList.map(bank => (
                     <div
-                      key={bank}
+                      key={bank.bank_key}
                       className="px-4 py-2 hover:bg-primary-100 cursor-pointer"
-                      onClick={() => handleBankSelect(bank)}
+                      onClick={() => handleBankSelect(bank.bank_nm)}
                     >
-                      {bank}
+                      {bank.bank_nm}
                     </div>
                   ))}
                 </div>
@@ -498,7 +558,7 @@ export default function SettingsForm() {
               <label className="block text-sm font-medium text-gray-700 mb-2">이름 (최대 25자)</label>
               <input
                 type="text"
-                value={userInfo?.persona}
+                value={persona.name}
                 onChange={e => handlePersonaChange(e, 'name')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
                 placeholder="페르소나 이름"
@@ -511,23 +571,23 @@ export default function SettingsForm() {
               <label className="block text-sm font-medium text-gray-700 mb-2">성별</label>
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
                 <BaseButton
-                  onClick={() => handleGenderChange('남성')}
+                  onClick={() => handleGenderChange(1)}
                   color="primary"
-                  className={`w-full sm:w-auto ${persona.gender === '남성' ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
+                  className={`w-full sm:w-auto ${persona.gender === 1 ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
                 >
                   남성
                 </BaseButton>
                 <BaseButton
-                  onClick={() => handleGenderChange('여성')}
+                  onClick={() => handleGenderChange(2)}
                   color="primary"
-                  className={`w-full sm:w-auto ${persona.gender === '여성' ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
+                  className={`w-full sm:w-auto ${persona.gender === 2 ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
                 >
                   여성
                 </BaseButton>
                 <BaseButton
-                  onClick={() => handleGenderChange('알 수 없음')}
+                  onClick={() => handleGenderChange(3)}
                   color="primary"
-                  className={`w-full sm:w-auto ${persona.gender === '알 수 없음' ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
+                  className={`w-full sm:w-auto ${persona.gender === 3 ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
                 >
                   알 수 없음
                 </BaseButton>
