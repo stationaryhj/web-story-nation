@@ -69,7 +69,7 @@ export default function Modal({
     <AnimatePresence>
       {isOpen && (
         <Portal>
-          <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ pointerEvents: 'auto' }}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
             {/* 배경 */}
             <motion.div
               className="fixed inset-0 bg-black/50"
@@ -87,7 +87,6 @@ export default function Modal({
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ type: 'spring', damping: 20, stiffness: 300 }}
               onClick={handleModalClick}
-              style={{ pointerEvents: 'auto' }}
             >
               {/* 헤더 */}
               <div className="mb-4 flex items-center justify-between">
