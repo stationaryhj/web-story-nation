@@ -5,6 +5,14 @@ export interface ApiResponse<T = any> {
   code?: string;
 }
 
+
+export interface GetUuidResponse {
+  clientId: string;
+  snsauth: string;
+  uuid: string;
+  result: ApiResult;
+}
+
 // Response Data
 // Login
 export interface LoginResponse {
@@ -601,6 +609,14 @@ export interface WriterInfoData {
   email: string;
   user_key: number;
   user_nm: string;
+}
+
+// WriterWithdraw Response
+export interface WriterWithdrawResponse {
+  result: ApiResult;
+  withdraw: number;
+  withdraw_pen: number;
+  allow: number;
 }
 
 

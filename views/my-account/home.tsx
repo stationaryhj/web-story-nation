@@ -23,6 +23,8 @@ import BaseModal from '@/components/modal/BaseModal'
 import ConfirmActionModal from '@/components/modal/ConfirmActionModal'
 import WithdrawModal from '@/components/modal/WithdrawModal'
 import { useAccountStore } from '@/store/useAccountStore'
+import { GetWriterWithdrawStatus } from '@/services/hooks/DataListManager'
+import { settlementApi } from '@/services/api/storyNationApi'
 
 export default function MyEarningsView() {
   const router = useRouter()
@@ -30,11 +32,13 @@ export default function MyEarningsView() {
   const { data: userInfo, writerInfo, fetchWriterInfo } = useAccountStore()
 
   // 정산 관련 상태
-  const [totalEarnings, setTotalEarnings] = useState(125000) // 총 수익 (펜 단위)
+  const [totalEarnings, setTotalEarnings] = useState(userInfo?.coin_user || 0) // 총 수익 (펜 단위)
   const [lastMonthEarnings, setLastMonthEarnings] = useState(35000) // 지난달 수익 (펜 단위)
   const [totalPayouts, setTotalPayouts] = useState(50000) // 총 정산액 (펜 단위)
   const [availableAmount, setAvailableAmount] = useState(75000) // 정산 가능 금액 (펜 단위)
   const [requestAmount, setRequestAmount] = useState(1500) // 요청 금액 (펜 단위, 최소 1500펜)
+
+  const { data: writerWithdrawStatus } = GetWriterWithdrawStatus()
 
   // 계좌 정보
   const [bankAccount, setBankAccount] = useState({
@@ -81,7 +85,7 @@ export default function MyEarningsView() {
   }
 
   // 출금 요청 확인 핸들러
-  const handleConfirmWithdraw = () => {
+  const handleConfirmWithdraw = async () => {
     if (requestAmount < 1500) {
       toast.error('최소 1500펜 이상부터 출금 가능합니다.')
       return
@@ -92,21 +96,29 @@ export default function MyEarningsView() {
       return
     }
 
-    // 실제 API 호출 코드 추가 필요
-    const newPayoutRequest = {
-      id: payoutRequests.length + 1,
-      date: new Date()
-        .toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
-        .replace(/\. /g, '.')
-        .replace('.', ''),
-      amount: requestAmount,
-      status: '처리중',
+    const response = await settlementApi.WithdrawRequest(requestAmount, 0, userInfo?.nick_nm || '', '', '')
+
+    if (response.data.result.err === 0) {
+      toast.success('출금 요청이 접수되었습니다.')
+    } else {
+      toast.error('출금 요청에 실패했습니다.')
     }
 
-    setPayoutRequests([newPayoutRequest, ...payoutRequests])
-    setAvailableAmount(prev => prev - requestAmount)
+    // 실제 API 호출 코드 추가 필요
+    // const newPayoutRequest = {
+    //   id: payoutRequests.length + 1,
+    //   date: new Date()
+    //     .toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
+    //     .replace(/\. /g, '.')
+    //     .replace('.', ''),
+    //   amount: requestAmount,
+    //   status: '처리중',
+    // }
+
+    // setPayoutRequests([newPayoutRequest, ...payoutRequests])
+    // setAvailableAmount(prev => prev - requestAmount)
+    // toast.success('출금 요청이 접수되었습니다.')
     setIsWithdrawModalOpen(false)
-    toast.success('출금 요청이 접수되었습니다.')
   }
 
   // 요청 금액 변경 핸들러

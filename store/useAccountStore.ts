@@ -35,6 +35,7 @@ interface AccountState {
   setWriterInfo: (writerInfo: WriterInfoData | null) => void
   fetchWriterInfo: () => Promise<void>
   updateBankAccount: (bank: string, accountNumber: string, accountHolder: string) => Promise<{success: boolean, message: string}>
+  updateWriterEmail: (email: string) => Promise<{success: boolean, message: string}>
 }
 
 // 네트워크 에러 타입 정의
@@ -336,6 +337,8 @@ export const useAccountStore = create<AccountState>()(
               loading: false,
             })
 
+            contentApi.userinfo(response.data.access_token)
+
             await get().fetchWriterInfo()
             return true
           }
@@ -600,10 +603,6 @@ export const useAccountStore = create<AccountState>()(
               loading: false 
             })
             
-            // 작가 정보 가져오기 (필요한 경우)
-            // if (loginResponse.data.writerchk === 1) {
-            //   await get().fetchWriterInfo()
-            // }
             await get().fetchWriterInfo()
             
             // 임시 데이터 삭제
@@ -689,6 +688,54 @@ export const useAccountStore = create<AccountState>()(
           return { 
             success: false, 
             message: '계좌 정보 저장 중 오류가 발생했습니다.' 
+          }
+        }
+      },
+
+      updateWriterEmail: async (email: string) => {
+        set({ loading: true, error: null })
+        try {
+          // 현재 writerInfo가 있는지 확인
+          const writerInfo = get().writerInfo
+          if (!writerInfo) {
+            set({ loading: false })
+            return { 
+              success: false, 
+              message: '작가 정보를 찾을 수 없습니다.' 
+            }
+          }
+          
+          // 이메일 저장 API 호출
+          const response = await contentApi.WriteRemailEdit(email)
+          
+          if (response.data && response.data.result && response.data.result.err === 0) {
+            // 성공 시 writerInfo 업데이트
+            set((state) => ({
+              ...state,
+              writerInfo: state.writerInfo ? {
+                ...state.writerInfo,
+                email
+              } : null,
+              loading: false
+            }))
+            
+            return { 
+              success: true, 
+              message: '이메일이 성공적으로 저장되었습니다.' 
+            }
+          } else {
+            set({ loading: false })
+            return { 
+              success: false, 
+              message: response.data?.result?.msg || '이메일 저장에 실패했습니다.' 
+            }
+          }
+        } catch (error) {
+          console.error('이메일 저장 중 오류 발생:', error)
+          set({ loading: false, error: '이메일 저장 중 오류가 발생했습니다.' })
+          return { 
+            success: false, 
+            message: '이메일 저장 중 오류가 발생했습니다.' 
           }
         }
       },
