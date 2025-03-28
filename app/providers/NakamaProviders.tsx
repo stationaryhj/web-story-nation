@@ -451,6 +451,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
                 chrBotChatKey,
                 false // stream 설정
               );
+              console.log('🤖 AI 응답 수신:', response);
               
               // 응답 상태 확인
               if (response && response.data && response.data.result && response.data.result.err === 0) {
@@ -477,10 +478,10 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
                 }
 
                 if (socketRef.current) {
-                  console.log('@@@@ socketRef.current :: ', socketRef.current)
                   try {
                     // 응답 JSON 파싱 및 content 추출
                     const responseObj = JSON.parse(chatMessageResponse.response);
+
                     let messageContent = '';
                     
                     // Gemini AI 모델 응답인지 확인 (candidates 속성 존재)
@@ -760,7 +761,17 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
   // 메시지 직접 추가
   const addChatMessage = (message: ChatMessage): void => {
-    setChatMessages(prev => [...prev, message]);
+    setChatMessages(prev => {
+      // 이미 같은 ID의 메시지가 있는지 확인
+      const isDuplicate = prev.some(msg => msg.id === message.id);
+      if (isDuplicate) {
+        console.log('⚠️ 중복 메시지 무시 (addChatMessage):', message.id);
+        return prev;
+      }
+      
+      // 고유 ID 메시지만 추가
+      return [...prev, message];
+    });
   };
 
   /**
@@ -774,7 +785,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     channelId?: string;
     roomName?: string;
   }> => {
-    // try {
+    try {
       console.log('채팅방 초기화 시작:', { userKey, chatBotId, chatMode });
       
       // 초기화 상태 리셋
@@ -797,21 +808,9 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
       // 2. 디바이스 ID 생성 및 인증
       const deviceId = `chatbot_jackpot_${userKey}`;
-      console.log('디바이스 인증 시작@@@@@@@@@@@@@@@@@@@@@@@:', deviceId);
-
-      // const newSession = await _client.authenticateDevice(deviceId, true, userKey?.toString());
-
-      let newSession = null;
-      const accountExists = await checkAccountExists(_client, deviceId, userKey?.toString());
-      console.log('accountExists :: ', accountExists);
-      if(accountExists.exists) {
-        newSession = await _client.authenticateDevice(deviceId, false, userKey?.toString());
-      }
-      else {
-        newSession = await _client.authenticateDevice(deviceId, true, userKey?.toString());
-      }
+      console.log('디바이스 인증 시작:', deviceId);
       
-      
+      const newSession = await _client.authenticateDevice(deviceId, false, userKey?.toString());
       console.log('인증 성공, 세션 생성됨');
       setSession(newSession);
 
@@ -961,13 +960,13 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         roomName: newRoomName
       };
       
-    // } catch (error) {
-    //   console.error('채팅방 초기화 중 오류 발생:', error);
-    //   setIsConnecting(false);
-    //   setIsConnected(false);
-    //   setIsInitRoom(false);
-    //   throw error;
-    // }
+    } catch (error) {
+      console.error('채팅방 초기화 중 오류 발생:', error);
+      setIsConnecting(false);
+      setIsConnected(false);
+      setIsInitRoom(false);
+      throw error;
+    }
   };
 
   // 소켓 연결 함수
