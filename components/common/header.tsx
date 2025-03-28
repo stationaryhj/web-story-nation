@@ -4,7 +4,16 @@
 import { FadeIn } from '@/components/motion/PageTransition'
 import { useThemeStore, useAccountStore } from '@/store/useStoreData'
 import { useModalStore } from '@/store/useStoreModal'
-import { faBell, faShoppingBag, faCog, faMoon, faSun, faBars, faTimes, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
+import {
+  faBell,
+  faShoppingBag,
+  faCog,
+  faMoon,
+  faSun,
+  faBars,
+  faTimes,
+  faSignOutAlt,
+} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion, AnimatePresence } from 'framer-motion'
 import NotificationButton from '@/components/elements/sidebar/NotificationButton'
@@ -68,10 +77,10 @@ export default function Header() {
   ]
 
   // 로그인 필요한 링크 체크 핸들러
-  const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, link: typeof navLinks[0]) => {
+  const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, link: (typeof navLinks)[0]) => {
     if (link.requireLogin && !isLogin) {
-      e.preventDefault();
-      openModal('login');
+      e.preventDefault()
+      openModal('login')
     }
   }
 
@@ -135,7 +144,7 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={(e) => handleNavLinkClick(e, link)}
+                onClick={e => handleNavLinkClick(e, link)}
                 className={`text-sm font-medium transition-colors hover:text-primary-500 dark:hover:text-dark-primary-500 ${
                   activeLink === link.href
                     ? 'text-primary-500 dark:text-dark-primary-500'
@@ -270,14 +279,14 @@ export default function Header() {
                             ? 'text-primary-600 dark:text-dark-primary-600'
                             : 'text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600'
                         }`}
-                        onClick={(e) => {
+                        onClick={e => {
                           if (link.requireLogin && !isLogin) {
-                            e.preventDefault();
-                            setIsSidebarOpen(false);
-                            openModal('login');
+                            e.preventDefault()
+                            setIsSidebarOpen(false)
+                            openModal('login')
                           } else {
-                            setActiveLink(link.href);
-                            setIsSidebarOpen(false);
+                            setActiveLink(link.href)
+                            setIsSidebarOpen(false)
                           }
                         }}
                       >
