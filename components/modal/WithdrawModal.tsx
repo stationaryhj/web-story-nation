@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import BaseModal from './BaseModal'
 import { BaseButton } from '../elements/button/BaseButton'
 
+
 interface BankAccount {
   bank: string
   accountNumber: string

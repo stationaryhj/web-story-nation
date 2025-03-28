@@ -369,6 +369,25 @@ export default function SettingsForm() {
     setIsEdited(true)
   }
 
+  // 이메일 저장 핸들러
+  const handleSaveEmail = async () => {
+    try {
+      // useAccountStore의 updateWriterEmail 함수 사용
+      const { updateWriterEmail } = useAccountStore.getState()
+      
+      const result = await updateWriterEmail(profile.email)
+      
+      if (result.success) {
+        toast.success(result.message)
+      } else {
+        toast.error(result.message)
+      }
+    } catch (error) {
+      console.error('이메일 저장 중 오류 발생:', error)
+      toast.error('이메일 저장 중 오류가 발생했습니다.')
+    }
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
       {/* 헤더 */}
@@ -478,7 +497,21 @@ export default function SettingsForm() {
             {/* 이메일 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">이메일</label>
-              <div className="px-4 py-3 bg-gray-100 rounded-lg text-gray-700">{profile.email}</div>
+              <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
+                <input
+                  type="email"
+                  value={profile.email}
+                  onChange={e => handleInputChange(e, 'email')}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                  placeholder="이메일을 입력하세요"
+                />
+                <button
+                  onClick={handleSaveEmail}
+                  className="sm:flex-shrink-0 px-4 py-3 bg-primary-500 text-white rounded-lg whitespace-nowrap hover:bg-primary-700"
+                >
+                  저장
+                </button>
+              </div>
             </div>
           </div>
         </div>
