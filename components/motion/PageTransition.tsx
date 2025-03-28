@@ -16,7 +16,7 @@ export default function PageTransition({ children, className = '' }: PageTransit
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      className={className}
+      className={`${className}`}
     >
       {children}
     </motion.div>
@@ -46,10 +46,13 @@ export function SectionTransition({ children, className = '', delay = 0 }: PageT
 export function CardTransition({ children, className = '', index = 0 }: PageTransitionProps & { index?: number }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 50 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      exit={{ opacity: 0, y: 30 }}
+      transition={{
+        duration: 0.3,
+        delay: Math.min(index, 5) * 0.05, // 인덱스 값에 상관없이 최대 0.25초(5*0.05)의 지연 시간만 적용
+      }}
       className={className}
     >
       {children}

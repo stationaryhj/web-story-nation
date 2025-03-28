@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 
 import { useCharacterFormStore } from '@/store/useCharacterFormStore'
 import CharacterForm from '@/components/form/CharacterForm'
+import { toast } from 'react-toastify'
 
 export default function CreateCharacterPage() {
   const router = useRouter()
@@ -65,11 +66,11 @@ export default function CreateCharacterPage() {
       // })
 
       // 임시 처리 (성공으로 가정)
-      alert('캐릭터가 성공적으로 생성되었습니다!')
+      toast.success('캐릭터가 성공적으로 생성되었습니다!')
       router.push('/my-characters')
     } catch (error) {
       console.error('캐릭터 생성 실패:', error)
-      alert('캐릭터 생성에 실패했습니다. 다시 시도해주세요.')
+      toast.error('캐릭터 생성에 실패했습니다. 다시 시도해주세요.')
     }
   }
 

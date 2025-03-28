@@ -2,18 +2,14 @@
 
 import Footer from '@/components/common/footer'
 import Header from '@/components/common/header'
-import PageTransition, { SectionTransition } from '@/components/motion/PageTransition'
+import PageTransition from '@/components/motion/PageTransition'
 import { useStoreData } from '@/store/useStoreData'
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import CardGrid from '@/components/elements/card/CardGrid'
-import SearchBar from '@/components/elements/search/SearchBar'
+import SearchBar from '@/components/elements/searchBar/SearchBar'
 import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
 import { useModalStore } from '@/store/useStoreModal'
 import ModalManager from '@/components/modal/ModalManager'
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Link from 'next/link'
 import CharacterRankingSidebar from '@/components/elements/sidebar/CharacterRankingSidebar'
 import AuthorRankingSidebar from '@/components/elements/sidebar/AuthorRankingSidebar'
 import NewCharacterSidebar from '@/components/elements/sidebar/NewCharacterSidebar'
@@ -78,7 +74,7 @@ export default function Home() {
 
   return (
     <PageTransition>
-      <main className="min-h-screen pb-20 bg-white dark:bg-dark-background-light">
+      <main className="min-h-screen pb-24 md:pb-20 bg-white dark:bg-dark-background-light">
         <Header />
 
         {/* 검색바 */}
@@ -87,7 +83,7 @@ export default function Home() {
         </div>
 
         {/* 네비게이션 탭 */}
-        <div className="container px-4 mt-8 flex justify-center">
+        <div className="container px-4 mt-8 mx-auto flex justify-center w-full">
           <ButtonTabs tabs={navigationTabs} defaultTabId={tabParam} onTabChange={handleCategoryChange} />
         </div>
 

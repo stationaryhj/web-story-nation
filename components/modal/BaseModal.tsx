@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { CSSProperties, ReactNode, MouseEvent as ReactMouseEvent } from 'react'
 import { useEffect } from 'react'
+import { lockScroll, unlockScroll, resetScrollLock } from '@/lib/utils/scrollLock'
+import Portal from '@/components/portal/Portal'
 
 interface BaseModalProps {
   isOpen: boolean
@@ -29,6 +31,8 @@ interface BaseModalProps {
   zIndex?: number
   onBackdropClick?: () => void
   onAnimationComplete?: () => void
+  icon?: ReactNode
+  isIcon?: boolean
 }
 
 export default function BaseModal({
@@ -54,24 +58,19 @@ export default function BaseModal({
   zIndex = 50,
   onBackdropClick,
   onAnimationComplete,
+  icon,
+  isIcon = false,
 }: BaseModalProps) {
   // 모달이 열릴 때 배경 스크롤 방지
   useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
-
     if (isOpen) {
-      // 스크롤바 너비만큼 패딩을 추가하여 레이아웃 이동 방지
-      document.body.style.overflow = 'hidden'
-      document.body.style.paddingRight = `${scrollbarWidth}px`
+      lockScroll()
+    } else {
+      unlockScroll()
     }
 
     return () => {
-      // 컴포넌트 언마운트 또는 isOpen 상태 변경 시 원래 스타일로 복원
-      if (isOpen) {
-        document.body.style.overflow = originalStyle
-        document.body.style.paddingRight = '0px'
-      }
+      resetScrollLock()
     }
   }, [isOpen])
 
@@ -109,14 +108,14 @@ export default function BaseModal({
     md: 'max-w-md',
     lg: 'max-w-lg',
     xl: 'max-w-xl',
-    full: 'max-w-full mx-4',
+    full: 'max-w-[1300px] mx-4',
   }
 
   // 모달 위치에 따른 클래스 설정
   const positionClasses = {
-    center: 'items-center justify-center',
-    top: 'items-start justify-center pt-16',
-    bottom: 'items-end justify-center pb-16',
+    center: 'items-center justify-center min-h-screen',
+    top: 'items-start justify-center pt-4 sm:pt-16',
+    bottom: 'items-end justify-center pb-4 sm:pb-16',
   }
 
   // 애니메이션 설정
@@ -157,51 +156,73 @@ export default function BaseModal({
   return (
     <AnimatePresence onExitComplete={onAnimationComplete}>
       {isOpen && (
-        <div className={`fixed inset-0 z-${zIndex} flex ${positionClasses[position]}`}>
-          {/* 백드롭 */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: animationDuration }}
-            className={`fixed inset-0 ${backdropColor}`}
-            onClick={handleBackdropClick}
-          />
+        <Portal>
+          <div className={`fixed inset-0 z-[100] flex ${positionClasses[position]}`}>
+            {/* 백드롭 */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: animationDuration }}
+              className={`fixed inset-0 ${backdropColor} z-[99]`}
+              onClick={handleBackdropClick}
+            />
 
-          {/* 모달 */}
-          <motion.div
-            {...getAnimationProps()}
-            className={`relative z-10 max-h-[90vh] w-full overflow-auto rounded-xl bg-white shadow-lg dark:bg-dark-background-light ${sizeClasses[size]} ${className}`}
-            onClick={handleModalClick}
-            style={style}
-          >
-            <div className={`flex flex-col ${contentClassName}`}>
-              {/* 모달 헤더 */}
-              {!hideHeader && (
-                <div className={`mb-4 flex items-center justify-between p-5 pb-0 ${headerClassName}`}>
-                  {title && (
-                    <h2 className="text-xl font-bold text-secondary-900 dark:text-dark-secondary-100">{title}</h2>
-                  )}
-                  {showCloseButton && (
-                    <button
-                      onClick={onClose}
-                      className="text-secondary-500 transition-colors hover:text-secondary-700 dark:text-dark-secondary-400 dark:hover:text-dark-secondary-300"
-                      aria-label="닫기"
-                    >
-                      <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
-                    </button>
-                  )}
+            {/* 모달 */}
+            <motion.div
+              {...getAnimationProps()}
+              className={`relative z-[101] max-h-[95vh] overflow-auto rounded-xl bg-white shadow-lg dark:bg-dark-background-light ${sizeClasses[size]} ${className}`}
+              onClick={handleModalClick}
+              style={style}
+            >
+              {/* 모달 헤더 - 닫기 버튼만 포함 */}
+              {!hideHeader && showCloseButton && (
+                <div className={`relative flex justify-end p-3 pb-0 ${headerClassName}`}>
+                  <button
+                    onClick={onClose}
+                    className="text-secondary-500 transition-colors hover:text-secondary-700 dark:text-dark-secondary-400 dark:hover:text-dark-secondary-300"
+                    aria-label="닫기"
+                  >
+                    <FontAwesomeIcon icon={faTimes} className="h-6 w-6" />
+                  </button>
+                </div>
+              )}
+
+              {/* 닫기 버튼이 필요하지만 헤더가 숨겨진 경우 */}
+              {hideHeader && showCloseButton && (
+                <div className="absolute right-4 top-4 z-10">
+                  <button
+                    onClick={onClose}
+                    className="text-secondary-500 transition-colors hover:text-secondary-700 dark:text-dark-secondary-400 dark:hover:text-dark-secondary-300"
+                    aria-label="닫기"
+                  >
+                    <FontAwesomeIcon icon={faTimes} className="h-6 w-6" />
+                  </button>
                 </div>
               )}
 
               {/* 모달 내용 */}
-              <div className={`p-5 ${bodyClassName}`}>{children}</div>
+              <div className={`p-5 ${bodyClassName}`}>
+                {/* 아이콘이 있는 경우 타이틀 위에 표시 */}
+                {isIcon && icon && <div className="mb-3 flex justify-center">{icon}</div>}
+                {/* 타이틀을 바디에 포함 (가운데 정렬) */}
+                {title && (
+                  <h2 className="mb-4 text-center text-xl font-bold text-secondary-900 dark:text-dark-secondary-100">
+                    {title}
+                  </h2>
+                )}
+                {children}
+              </div>
 
               {/* 모달 푸터 */}
-              {footerContent && <div className={`mt-2 p-5 pt-0 ${footerClassName}`}>{footerContent}</div>}
-            </div>
-          </motion.div>
-        </div>
+              {footerContent && (
+                <div className={`border-t border-secondary-100 dark:border-dark-secondary-800 p-4 ${footerClassName}`}>
+                  {footerContent}
+                </div>
+              )}
+            </motion.div>
+          </div>
+        </Portal>
       )}
     </AnimatePresence>
   )

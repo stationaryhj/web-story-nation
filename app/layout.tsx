@@ -1,35 +1,37 @@
 // app/layout.tsx
-import type { Metadata } from 'next';
-import { Poppins } from 'next/font/google';
+import type { Metadata } from 'next'
+import { Poppins } from 'next/font/google'
 
-import './globals.css';
-import Script from 'next/script';
-import type { ReactNode } from 'react';
+import './globals.css'
+import Script from 'next/script'
+import type { ReactNode } from 'react'
 
-import Providers from './providers';
+import Providers from './providers'
+import DraggableButtonGrid from '@/components/grid/DraggableButtonGrid'
+import MobileGNB from '@/components/common/MobileGNB'
 
 // Poppins 폰트 설정
 const poppins = Poppins({
-  subsets: [ 'latin' ],
-  weight: [ '400', '500', '600', '700' ],
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
   variable: '--font-poppins',
   display: 'swap',
-});
+})
 
 export const metadata: Metadata = {
   title: '스토리네이션',
   description: '스토리네이션 - 캐릭터 기반 서비스',
-};
+}
 
-export default function RootLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ko" className={ `${ poppins.variable }` } suppressHydrationWarning>
+    <html lang="ko" className={`${poppins.variable}`} suppressHydrationWarning>
       <head>
-        { /* 다크모드 초기화를 위한 인라인 스크립트 */ }
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+        />
+        {/* 다크모드 초기화를 위한 인라인 스크립트 */}
         <Script
           id="theme-init"
           strategy="beforeInteractive"
@@ -63,10 +65,39 @@ export default function RootLayout({
             `,
           }}
         />
+        {/* 뷰포트 높이 계산을 위한 스크립트 */}
+        <Script
+          id="viewport-height"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                // 실제 뷰포트 높이 계산 및 CSS 변수 설정
+                const setViewportHeight = () => {
+                  const vh = window.innerHeight * 0.01;
+                  document.documentElement.style.setProperty('--vh', \`\${vh}px\`);
+                };
+                
+                // 초기화 시 실행
+                setViewportHeight();
+                
+                // 리사이즈 이벤트에서 실행
+                window.addEventListener('resize', setViewportHeight);
+                
+                // 방향 전환(orientation) 이벤트에서 실행
+                window.addEventListener('orientationchange', () => {
+                  setTimeout(setViewportHeight, 100);
+                });
+              })();
+            `,
+          }}
+        />
       </head>
-      <body className="font-sans bg-background dark:bg-gradient-dark transition-colors duration-300" suppressHydrationWarning>
-        <Providers>{ children }</Providers>
+      <body className="font-sans bg-white dark:bg-gray-900 transition-colors duration-300" suppressHydrationWarning>
+        <Providers>{children}</Providers>
+        <DraggableButtonGrid />
+        <MobileGNB />
       </body>
     </html>
-  );
+  )
 }

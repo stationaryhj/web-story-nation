@@ -5,6 +5,7 @@ import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
 import AuthorGrid from '@/components/elements/card/AuthorGrid'
 import { SectionTransition } from '@/components/motion/PageTransition'
 import AuthorRankingSidebar from '@/components/elements/sidebar/AuthorRankingSidebar'
+import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
 
 // 작가 랭킹 탭 정의
 const authorRankingTabs: TabItem[] = [
@@ -29,104 +30,11 @@ const getRankingUpdateMessage = (tabId: string) => {
   }
 }
 
-// 작가 목업 데이터
-const mockAuthors = [
-  {
-    id: '1',
-    name: '스토리텔러',
-    nickname: '스토리텔러',
-    description: '다양한 장르의 캐릭터를 만드는 창작자입니다. 판타지부터 현대물까지 다양한 스토리를 다룹니다.',
-    profileImageUrl: '/images/profile/author1.jpg',
-    characterCount: 15,
-    isVerified: true,
-  },
-  {
-    id: '2',
-    name: '판타지작가',
-    nickname: '판타지작가',
-    description: '판타지 세계관에 특화된 작가입니다. 마법과 모험이 가득한 캐릭터를 주로 창작합니다.',
-    profileImageUrl: '/images/profile/author2.jpg',
-    characterCount: 8,
-    isVerified: false,
-  },
-  {
-    id: '3',
-    name: '로맨스퀸',
-    nickname: '로맨스퀸',
-    description: '로맨스 전문 작가입니다. 달콤하고 설레는 캐릭터를 만듭니다.',
-    profileImageUrl: '/images/profile/author3.jpg',
-    characterCount: 12,
-    isVerified: true,
-  },
-  {
-    id: '4',
-    name: '미스터리마스터',
-    nickname: '미스터리마스터',
-    description: '추리와 미스터리를 좋아하는 작가입니다. 복잡한 사건과 캐릭터를 다룹니다.',
-    profileImageUrl: null,
-    characterCount: 5,
-    isVerified: false,
-  },
-  {
-    id: '5',
-    name: 'SF작가',
-    nickname: 'SF작가',
-    description: '미래 세계와 과학적 상상력을 기반으로 한 캐릭터를 만듭니다.',
-    profileImageUrl: '/images/profile/author5.jpg',
-    characterCount: 7,
-    isVerified: true,
-  },
-  {
-    id: '6',
-    name: '역사전문가',
-    nickname: '역사전문가',
-    description: '역사적 배경을 가진 캐릭터와 스토리를 만듭니다.',
-    profileImageUrl: '/images/profile/author6.jpg',
-    characterCount: 9,
-    isVerified: true,
-  },
-  {
-    id: '7',
-    name: '호러작가',
-    nickname: '호러작가',
-    description: '공포와 스릴을 주는 캐릭터 전문 작가입니다.',
-    profileImageUrl: null,
-    characterCount: 4,
-    isVerified: false,
-  },
-  {
-    id: '8',
-    name: '판타지히어로',
-    nickname: '판타지히어로',
-    description: '영웅적 요소를 가진 캐릭터를 전문적으로 만듭니다.',
-    profileImageUrl: '/images/profile/author8.jpg',
-    characterCount: 11,
-    isVerified: true,
-  },
-  {
-    id: '9',
-    name: '일상작가',
-    nickname: '일상작가',
-    description: '일상의 소소한 이야기를 가진 캐릭터를 만듭니다.',
-    profileImageUrl: '/images/profile/author9.jpg',
-    characterCount: 6,
-    isVerified: false,
-  },
-  {
-    id: '10',
-    name: '판타지메이커',
-    nickname: '판타지메이커',
-    description: '독특한 판타지 세계관의 캐릭터를 창작합니다.',
-    profileImageUrl: '/images/profile/author10.jpg',
-    characterCount: 14,
-    isVerified: true,
-  },
-]
-
 // 작가 랭킹 섹션 컴포넌트
 const AuthorRankingSection = memo(() => {
   const [authorActiveTab, setAuthorActiveTab] = useState('weekly')
   const [isAuthorRankingSidebarOpen, setIsAuthorRankingSidebarOpen] = useState(false)
+  const { rankingCreaters } = useRecommendSectionStoreData()
 
   const handleAuthorRankingTabChange = (tabId: string) => {
     setAuthorActiveTab(tabId)
@@ -134,8 +42,16 @@ const AuthorRankingSection = memo(() => {
   }
 
   const getAuthorRankingData = () => {
-    // 실제로는 탭에 따라 다른 데이터를 반환하는 로직이 필요함
-    return mockAuthors
+    // Character 타입을 Author 타입으로 변환
+    return rankingCreaters.map(character => ({
+      id: character.id,
+      name: character.name,
+      nickname: character.creator?.nickname || character.name,
+      description: character.description || '',
+      profileImageUrl: character.imageUrl,
+      characterCount: 0, // 기본값 설정
+      isVerified: true,  // 기본값 설정
+    }));
   }
 
   const handleAuthorClick = (author: any) => {
@@ -168,24 +84,19 @@ const AuthorRankingSection = memo(() => {
 
         {/* 작가 랭킹 그리드 */}
         <SectionTransition>
-          <div className="overflow-x-auto">
-            <div className="min-w-full pb-4">
-              <AuthorGrid
-                customData={getAuthorRankingData()}
-                cardsPerRow={10}
-                hasRanking={true}
-                onAuthorClick={handleAuthorClick}
-              />
-            </div>
+          <div className="w-full">
+            <AuthorGrid
+              customData={getAuthorRankingData()}
+              cardsPerRow={8}
+              hasRanking={true}
+              onAuthorClick={handleAuthorClick}
+              useSwiper={true}
+              sectionId="author-ranking-section"
+            />
           </div>
         </SectionTransition>
       </div>
-
-      <AuthorRankingSidebar
-        isOpen={isAuthorRankingSidebarOpen}
-        onClose={() => setIsAuthorRankingSidebarOpen(false)}
-        isSidebar={true}
-      />
+      <AuthorRankingSidebar isOpen={isAuthorRankingSidebarOpen} onClose={() => setIsAuthorRankingSidebarOpen(false)} />
     </section>
   )
 })

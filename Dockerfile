@@ -12,5 +12,5 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/yarn.lock ./
 RUN yarn install --production
-EXPOSE 3000
+EXPOSE 3100
 CMD ["yarn", "start"]

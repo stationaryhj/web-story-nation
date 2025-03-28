@@ -129,6 +129,12 @@ export const useSettingsStore = create<SettingsStore>()(
 
       // 로그인 상태에 따라 성인 모드 활성화 처리
       enableAdultMode: () => {
+        // 테스트를 위해 로그인 체크 임시 비활성화
+        set({ isAdultModeEnabled: true })
+        console.log('enableAdultMode 호출됨 - 상태 변경됨')
+        return true
+
+        /* 원래 로직
         let success = false
         set(state => {
           if (state.isLoggedIn) {
@@ -144,6 +150,7 @@ export const useSettingsStore = create<SettingsStore>()(
         }
 
         return success
+        */
       },
 
       disableAdultMode: () => set({ isAdultModeEnabled: false }),

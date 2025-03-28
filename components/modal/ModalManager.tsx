@@ -6,9 +6,10 @@ import LoginModal from './LoginModal'
 import SignupModal from './SignupModal'
 import ConfirmActionModal from './ConfirmActionModal'
 import NotificationSidebar from './NotificationSidebar'
-import CreditSidebar from './CreditSidebar'
+
 import AdultVerificationModal from './AdultVerificationModal'
 import ChatModeModal from './ChatModeModal'
+import BankInfoModal from './BankInfoModal'
 
 export default function ModalManager() {
   const { isOpen, modalType, closeModal, modalProps } = useModalStore()
@@ -46,10 +47,6 @@ export default function ModalManager() {
     return <NotificationSidebar />
   }
 
-  if (modalType === 'credit') {
-    return <CreditSidebar />
-  }
-
   if (modalType === 'adultVerification') {
     return <AdultVerificationModal isOpen={isOpen} onClose={closeModal} />
   }
@@ -61,6 +58,17 @@ export default function ModalManager() {
         onClose={closeModal}
         currentModeId={modalProps?.currentModeId || 1}
         onSelectMode={modalProps?.onSelectMode || (() => {})}
+      />
+    )
+  }
+
+  if (modalType === 'bankInfo') {
+    return (
+      <BankInfoModal
+        isOpen={isOpen}
+        onClose={closeModal}
+        bankInfo={modalProps?.bankInfo || { bank: '', accountNumber: '', accountHolder: '' }}
+        onBankInfoChange={modalProps?.onBankInfoChange || (() => {})}
       />
     )
   }

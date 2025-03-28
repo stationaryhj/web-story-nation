@@ -3,13 +3,12 @@
 import { Suspense, use } from 'react'
 import ChatDetailClient from '@/views/chat/detail'
 import { ReqGetChatBot } from '@/services/hooks/DataListManager';
-import type { ChrbotData } from '@/types/api';
-import { NakamaProvider, useNakama } from '@/app/providers/NakamaProviders'
+import { NakamaProvider } from '@/app/providers/NakamaProviders'
 
 const serverConfig = {
   serverUrl: 'qauschat.storynation.io',
   // serverUrl: 'chat.storynation.io',
-  serverPort: 443,
+  serverPort: '443',
   useSSL: true,
   autoConnect: false,
   serverKey: 'defaultkey'

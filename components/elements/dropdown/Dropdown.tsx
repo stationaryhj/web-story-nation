@@ -95,14 +95,14 @@ export default function Dropdown({
 
       {isOpen && (
         <div
-          className={`absolute z-10 mt-1 w-full overflow-hidden rounded-md border border-secondary-200 bg-white shadow-lg dark:border-dark-secondary-700 dark:bg-dark-background-light ${menuClassName}`}
+          className={`absolute z-10 mt-1 w-full overflow-hidden rounded-md border border-secondary-200 bg-white shadow-lg dark:border-dark-secondary-700 dark:bg-dark-background-light dark:shadow-dark-secondary-900/30 ${menuClassName}`}
           role="listbox"
         >
           {options.map(option => (
             <div
               key={option.value}
               onClick={() => handleSelect(option)}
-              className={`flex cursor-pointer items-center px-3 py-2 text-secondary-800 hover:bg-secondary-50 dark:text-dark-secondary-200 dark:hover:bg-dark-background ${
+              className={`flex cursor-pointer items-center px-3 py-2 text-secondary-800 hover:bg-secondary-50 dark:text-dark-secondary-200 dark:hover:bg-dark-background-DEFAULT ${
                 option.value === value ? 'bg-primary-50 dark:bg-dark-primary-900/30' : ''
               }`}
               role="option"

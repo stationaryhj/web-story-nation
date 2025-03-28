@@ -48,6 +48,29 @@ export type CharbotTop10Response = {
   result: ApiResult;
 };
 
+export type CharbotTop10NewResponse = {
+  modules: {
+    module_1: Array<ModuleCharacter>;
+    module_2: Array<ModuleCharacter>;
+    module_3: Array<ModuleCharacter>;
+    module_9: Array<ModuleCharacter>;
+    module_10: Array<ModuleCreater>;
+  }
+  
+  order: Array<number>;
+  result: ApiResult;
+};
+
+
+// Charbot Top 10 Ranking ( Creater )
+export type CharbotTop10RankingResponse = {
+  result: ApiResult;
+  charbot_top10: Array<ModuleCreater>;
+}
+
+
+
+// Module Character
 export interface ModuleCharacter {
   world_list_detail_chrbot_key: number;
   title: string;
@@ -63,6 +86,17 @@ export interface ModuleCharacter {
   nsfw: number;
   module_id: number;
   sort: number;
+}
+
+// Module Creater
+export interface ModuleCreater {
+  intro: string;
+  module_id: number;
+  module_type: number;
+  nick_nm: string;
+  profile_url: string;
+  user_key: number;
+  withdraw_pen: string;
 }
 
 export interface TagListResponse {
@@ -428,8 +462,11 @@ export interface UseHistoryData {
 
 // Use Coin Response
 export interface ChatUseResponse {
-  coin: number;
-  charge_use_key: number;
+  coin: number,
+  coin_free: number,
+  coin_free_dt: string,
+  coin_register: number,
+  charge_use_key: number,
   result: ApiResult;
 }
 
@@ -452,6 +489,119 @@ export interface ChatMessageResponse {
 }
 
 
+export interface OpenChatResponse {
+  arrangePrompt: number
+  prompt_key: string
+  world_list_detail_chrbot: WorldListDetailChrbot;
+  result: ApiResult
+}
+
+
+export interface WorldListDetailChrbot {
+  block_type: number
+  chat_cnt: number
+  comment_cnt: number
+  delete_yn: number
+  first_talk: string
+  gender: string
+  img_url: string
+  img_url_nsfw: string
+  like_cnt: number
+  lv: number
+  msg_cnt: number
+  nick_nm: string
+  nsfw: number
+  tags: string
+  title: string
+  user_key: number
+  world_list_detail_chrbot_key: number
+}
+
+
+// InquiryList Response
+export interface InquiryListResponse {
+  notice: {
+    current_page: number;
+    data: Array<InquiryData>;
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: Array<PaginationLink>;
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number | null;
+    total: number;
+    result: ApiResult;
+  }
+}
+
+// Inquiry Data
+export interface InquiryData {
+  notice_key: number
+  title: string
+  content: string
+  sort: number
+  create_dt: string
+}
+
+// BankList Response
+export interface BankListResponse {
+  bank_list: Array<BankData>;
+  result: ApiResult;
+}
+
+export interface BankData {
+  bank_key: number
+  bank_nm: string
+  img_url: string
+  sort: number
+}
+
+// WriteRemailEdit Response
+export interface WriteRemailEditResponse {
+  result: ApiResult;
+}
+
+
+// BankAccountEdit Response
+export interface BankAccountEditResponse {
+  result: ApiResult;
+}
+
+// ChangePersonaName Response
+export interface ChangePersonaNameResponse {
+  result: ApiResult;
+}
+
+// ViewTerms Response
+export interface ViewTermsResponse {
+  result: ApiResult;
+  URL: string;
+}
+
+
+// SendFeedback Response
+export interface SendFeedbackResponse {
+  result: ApiResult;
+}
+
+// WriterInfo Response
+export interface WriterInfoResponse {
+  result: ApiResult;
+  book_writer: WriterInfoData;
+}
+
+export interface WriterInfoData {
+  account_no: string;
+  bank_nm: string;
+  cellphone: string;
+  email: string;
+  user_key: number;
+  user_nm: string;
+}
 
 
 // API Result

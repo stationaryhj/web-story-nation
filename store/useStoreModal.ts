@@ -18,6 +18,7 @@ type ModalType =
   | 'adultVerification'
   | 'chatMode'
   | 'report'
+  | 'bankInfo'
 
 interface ModalState {
   isOpen: boolean

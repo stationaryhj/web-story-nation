@@ -16,12 +16,15 @@ import type {
   CoinChargeUseHistoryResponse,
   SaleMonthlyIncomeListResponse,
   ChatUseResponse,
-  TagListResponse
+  TagListResponse,
+  InquiryListResponse,
+  BankListResponse,
+  CharbotTop10NewResponse,
 } from '@/types/api'
 
-import { contentApi, settlementApi, createApi, chatApi } from '../api/storyNationApi';
+import { contentApi, settlementApi, createApi, chatApi } from '../api/storyNationApi'
 
-export type CategoryId = 'all' | 'male' | 'female' | 'unknown';
+export type CategoryId = 'all' | 'male' | 'female' | 'unknown'
 type Category = {
   id: CategoryId
   name: string
@@ -42,6 +45,20 @@ export const ReqTop10Characters = () => {
       const response = await contentApi.GetTop10()
 
       return response?.data as CharbotTop10Response
+    },
+  })
+
+  return { data, isLoading, error, refetch }
+}
+
+
+export const ReqTop10CharactersNew = () => {
+  const { data, isLoading, error, refetch } = useQuery<CharbotTop10NewResponse>({
+    queryKey: ['RequestTop10New'],
+    queryFn: async () => {
+      const response = await contentApi.GetTop10New()
+
+      return response?.data as CharbotTop10NewResponse
     },
   })
 
@@ -166,7 +183,7 @@ export const ReqGetOrderId = () => {
   const { data, isLoading, error, refetch } = useQuery<OrderIdResponse>({
     queryKey: ['orderId'],
     queryFn: async () => {
-      const response = await settlementApi.GetOrderId(0)
+      const response = await settlementApi.GetOrderId('0')
       return response.data as OrderIdResponse
     },
   })
@@ -249,45 +266,56 @@ export const GetSettlementList = (type: number, page: number, paginate: number) 
 
 export const UseChat = (chrbot_chat_key: number, chat_mode: number) => {
   const { data, isLoading, error, refetch } = useQuery<ChatUseResponse>({
-    queryKey: [ 'useChat', chrbot_chat_key, chat_mode ],
-    queryFn: async() => {
-      const response = await chatApi.UseChat(chrbot_chat_key, chat_mode);
-      return response.data as ChatUseResponse;
-    }
-  });
+    queryKey: ['useChat', chrbot_chat_key, chat_mode],
+    queryFn: async () => {
+      const response = await chatApi.UseChat(chrbot_chat_key, chat_mode)
+      return response.data as ChatUseResponse
+    },
+  })
 
-  return { data, isLoading, error, refetch };
-};
-
+  return { data, isLoading, error, refetch }
+}
 
 export const ReqGetCreateChatBotInProgress = (world_list_detail_chrbot_key: number | null) => {
   const { data, isLoading, error, refetch } = useQuery<CharbotInprogressResponse>({
-    queryKey: [ 'createChatBotInProgress', world_list_detail_chrbot_key ],
-    queryFn: async() => {
-      const response = await createApi.GetCreateChatBotInProgress(world_list_detail_chrbot_key);
-      return response.data as CharbotInprogressResponse;
-    }
-  });
+    queryKey: ['createChatBotInProgress', world_list_detail_chrbot_key],
+    queryFn: async () => {
+      const response = await createApi.GetCreateChatBotInProgress(world_list_detail_chrbot_key)
+      return response.data as CharbotInprogressResponse
+    },
+  })
 
-  return { data, isLoading, error, refetch };
-};
+  return { data, isLoading, error, refetch }
+}
+
+export const ReqGetInquiryList = (page: number, paginate: number) => {
+  const { data, isLoading, error, refetch } = useQuery<InquiryListResponse>({
+    queryKey: ['inquiryList', page, paginate],
+    queryFn: async () => {
+      const response = await contentApi.GetInquiryList(page, paginate)
+      return response.data as InquiryListResponse
+    },
+  })
+
+  return { data, isLoading, error, refetch }
+}
 
 // SaveInProgress API 호출을 위한 함수 추가
 export const ReqSaveCreateChatBotInProgress = async (payload: {
-  world_list_detail_chrbot_key: string;
-  img_url: string;
-  title: string;
-  gender: number;
-  intro: string;
-  first_talk: string;
-  content: string;
-  example: string;
-  nsfw: number;
-  img_url_nsfw: string;
-  show_yn: number;
-  content_show_yn: number;
-  example_show_yn: number;
-  finish_yn: number;
+  world_list_detail_chrbot_key: string
+  img_url: string
+  title: string
+  gender: number
+  intro: string
+  first_talk: string
+  content: string
+  example: string
+  nsfw: number
+  img_url_nsfw: string
+  show_yn: number
+  content_show_yn: number
+  example_show_yn: number
+  finish_yn: number
 }) => {
   try {
     const response = await createApi.SaveInProgress(
@@ -305,23 +333,35 @@ export const ReqSaveCreateChatBotInProgress = async (payload: {
       payload.content_show_yn,
       payload.example_show_yn,
       payload.finish_yn
-    );
-    
-    return { data: response.data, error: null };
+    )
+
+    return { data: response.data, error: null }
   } catch (error) {
-    console.error('SaveInProgress API 호출 오류:', error);
-    return { data: null, error };
+    console.error('SaveInProgress API 호출 오류:', error)
+    return { data: null, error }
   }
-};
+}
 
 export const GetTagList = () => {
   const { data, isLoading, error, refetch } = useQuery<TagListResponse>({
-    queryKey: [ 'tagList' ],
-    queryFn: async() => {
-      const response = await contentApi.GetTagList();
-      return response.data as TagListResponse;
-    }
-  });
+    queryKey: ['tagList'],
+    queryFn: async () => {
+      const response = await contentApi.GetTagList()
+      return response.data as TagListResponse
+    },
+  })
+
+  return { data, isLoading, error, refetch }
+}
+
+export const GetBankList = () => {
+  const { data, isLoading, error, refetch } = useQuery<BankListResponse>({
+    queryKey: ['bankList'],
+    queryFn: async () => {
+      const response = await contentApi.GetBankList()
+      return response.data as BankListResponse
+    },
+  })
 
   return { data, isLoading, error, refetch }
 }

@@ -14,14 +14,17 @@ import { API_URL, CHAT_URL } from '@/services/api/storyNationApi'
 import { useAccountStore } from '@/store/useStoreData'
 
 export default function Providers({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        refetchOnWindowFocus: false,
-        retry: 1,
-      },
-    },
-  }))
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchOnWindowFocus: false,
+            retry: 1,
+          },
+        },
+      })
+  )
   const { isDarkMode } = useThemeStore()
   const [mounted, setMounted] = useState(false)
   const { isLogin, data } = useAccountStore()
@@ -90,13 +93,16 @@ export default function Providers({ children }: { children: ReactNode }) {
           release : bslive1, bslive2, bslive1
           <br />
           dev : BS1, BS2, BS3, 천마신군
-        </pre><br />
+        </pre>
+        <br />
 
         <pre>
-          IS LOGIN : {isLogin ? 'true' : 'false'}<br />
+          IS LOGIN : {isLogin ? 'true' : 'false'}
+          <br />
           {isLogin && (
             <>
-              NICKNAME : {data?.nick_nm}<br />
+              NICKNAME : {data?.nick_nm}
+              <br />
             </>
           )}
         </pre>
@@ -107,19 +113,30 @@ export default function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} />
-      <SkeletonThemeProvider
-        baseColor={skeletonBaseColor}
-        highlightColor={skeletonHighlightColor}
-        borderRadius="0.25rem"
-        duration={1.5}
+      <div
+        className="relative w-full h-full mobile-scroll-container"
+        style={{
+          width: '100%',
+          height: '100%',
+          maxWidth: '100vw',
+          maxHeight: '100vh',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch',
+        }}
       >
-        <InitDataLoader>
-          <AnimatePresence mode="wait">{children}</AnimatePresence>
-          <ModalManager />
-        </InitDataLoader>
-      </SkeletonThemeProvider>
-
-      <DevNote />
+        <SkeletonThemeProvider
+          baseColor={skeletonBaseColor}
+          highlightColor={skeletonHighlightColor}
+          borderRadius="0.25rem"
+          duration={1.5}
+        >
+          <InitDataLoader>
+            <AnimatePresence mode="wait">{children}</AnimatePresence>
+            <ModalManager />
+          </InitDataLoader>
+        </SkeletonThemeProvider>
+      </div>
     </QueryClientProvider>
   )
 }
