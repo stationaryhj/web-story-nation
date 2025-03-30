@@ -357,13 +357,13 @@ export interface CharbotTagData {
 
 // SaleMonthlyIncomeList Response
 export interface SaleMonthlyIncomeListResponse {
-  IncomeList: Array<IncomeList>;
+  IncomeList: IncomeList;
   result: ApiResult;
 }
 
 export interface IncomeList {
   current_page: number;
-  data: any;
+  data: Array<IncomeData>;
   first_page_url: string;
   from: number;
   last_page: number;
@@ -376,6 +376,15 @@ export interface IncomeList {
   to: number | null;
   total: number;
 }
+
+export interface IncomeData {
+  cnt: number;
+  content: string;
+  create_dt: string;
+  pen: string;
+  title: string;
+}
+
 
 // CharbotLike Response
 export interface CharbotLikeResponse {
@@ -618,6 +627,15 @@ export interface WriterWithdrawResponse {
   withdraw_pen: number;
   allow: number;
 }
+
+// GetPassInfo Response
+export interface GetPassInfoResponse {
+  enc_data: string;
+  result: ApiResult;
+  returnMsg: string;
+}
+
+
 
 
 // API Result

@@ -32,6 +32,8 @@ import type {
   GetUuidResponse,
   TagListResponse,
   WriterWithdrawResponse,
+  GetPassInfoResponse,
+  SaleMonthlyIncomeListResponse,
 } from '../../types/api'
 
 // API 기본 설정
@@ -494,6 +496,43 @@ export const contentApi = {
       terms_type,
     })
   },
+
+    /* 2025-03-30 추가 */
+  // 닉네임 중복 확인
+  NicknmCheck: async (nick_nm: string): Promise<ApiResponse> => {
+    return api.post('/api/nicknmcheck', {
+      nick_nm,
+    })
+  },
+
+  // 패스인증
+  GetPassInfo: async (success_url: string, failed_url: string, mode = 1): Promise<ApiResponse<GetPassInfoResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/getpassinfo', {
+      success_url,
+      failed_url,
+      mode,
+    })
+  },
+
+  // 패스인증 성공
+  PassSuccess: async (enc_data: string): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/pass/success', {
+      enc_data,
+    })
+  },
+
+  // 패스인증 실패
+  PassFailed: async (enc_data: string): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/pass/failed', {
+      enc_data,
+    })
+  },
 }
 
 // 채팅 API
@@ -640,7 +679,7 @@ export const settlementApi = {
    * @param page 페이지
    * @param paginate 페이지 당 아이템 수
    */
-  GetSettlementList: async (type: number, page: number, paginate: number): Promise<ApiResponse> => {
+  GetSettlementList: async (type: number, page: number, paginate: number): Promise<ApiResponse<SaleMonthlyIncomeListResponse>> => {
     return api.post('/api/sales/monthlyIncomeList_v2', {
       type,
       page,

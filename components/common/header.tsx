@@ -77,7 +77,7 @@ export default function Header() {
     { href: '/', label: '홈', requireLogin: false, icon: faHome },
     { href: '/chat-list', label: '대화', requireLogin: true, icon: faComment },
     { href: '/my-characters', label: '캐릭터 만들기', requireLogin: true, icon: faUser },
-    { href: '/live', label: 'Live', requireLogin: true, icon: faVideo },
+    // { href: '/live', label: 'Live', requireLogin: true, icon: faVideo },
     { href: '/my-account', label: '수익 관리', requireLogin: true, icon: faChartLine },
     { href: '/shop-recharge', label: '상점', requireLogin: true, icon: faStore },
   ]

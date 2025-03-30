@@ -378,3 +378,16 @@ export const GetWriterWithdrawStatus = () => {
 
   return { data, isLoading, error, refetch }
 }
+
+
+export const GetSearch = (search: string, order: number, paginate: number, page: number) => {
+  const { data, isLoading, error, refetch } = useQuery<CharbotSearchResponse>({
+    queryKey: ['search', search, order, paginate, page],
+    queryFn: async () => {
+      const response = await contentApi.GetSearch(search, order, paginate, page)
+      return response.data as CharbotSearchResponse
+    },
+  })
+
+  return { data, isLoading, error, refetch }
+}

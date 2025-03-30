@@ -180,7 +180,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
             setIsConnecting(false);
             return;
           }
-          
+
           // 새 소켓 생성
           const newSocket = client.createSocket(useSSL);
           socketRef.current = newSocket;
@@ -808,7 +808,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
       // 2. 디바이스 ID 생성 및 인증
       const deviceId = `chatbot_jackpot_${userKey}`;
-      console.log('디바이스 인증 시작:', deviceId);
+      console.log('디바이스 인증 시작:', deviceId, _client);
       
       const newSession = await _client.authenticateDevice(deviceId, false, userKey?.toString());
       console.log('인증 성공, 세션 생성됨');

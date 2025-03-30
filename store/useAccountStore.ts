@@ -36,6 +36,7 @@ interface AccountState {
   fetchWriterInfo: () => Promise<void>
   updateBankAccount: (bank: string, accountNumber: string, accountHolder: string) => Promise<{success: boolean, message: string}>
   updateWriterEmail: (email: string) => Promise<{success: boolean, message: string}>
+  verifyIdentity: () => Promise<{success: boolean, message: string}>
 }
 
 // 네트워크 에러 타입 정의
@@ -384,6 +385,7 @@ export const useAccountStore = create<AccountState>()(
             state: JSON.stringify(state)
           })
 
+
           if (type === 'APPLE') {
             params.append('response_mode', 'form_post')
           }
@@ -420,6 +422,10 @@ export const useAccountStore = create<AccountState>()(
               
               try {
                 const { code, state: callbackState, error } = event.data;
+
+                console.log('code : ', code)
+                console.log('callbackState : ', callbackState)
+                console.log('error : ', error)
                 
                 if (error) {
                   throw new Error(`로그인 실패: ${error}`);
@@ -737,6 +743,200 @@ export const useAccountStore = create<AccountState>()(
             success: false, 
             message: '이메일 저장 중 오류가 발생했습니다.' 
           }
+        }
+      },
+
+      verifyIdentity: async (): Promise<{success: boolean, message: string}> => {
+        try {
+          // 현재 창의 URL 호스트를 기반으로 콜백 URL 구성
+          const host = window.location.origin;
+          const successUrl = `${host}/pass/pass_success`;
+          const failedUrl = `${host}/pass/pass_failed`;
+          
+          // 본인인증 정보 요청
+          const response = await contentApi.GetPassInfo(successUrl, failedUrl, 1);
+          
+          if (response.data && response.data.result && response.data.result.err === 0) {
+            const encData = response.data.enc_data;
+            
+            if (!encData) {
+              return { 
+                success: false, 
+                message: '본인인증 정보를 가져오는데 실패했습니다.' 
+              };
+            }
+            
+            // 팝업 창 위치 및 크기 계산
+            const { width, height, left, top } = calculatePopupPosition();
+            
+            // 폼과 팝업 생성을 위한 HTML - beforeunload 이벤트 제거
+            const formHtml = `
+              <html>
+              <head>
+                <title>본인인증</title>
+                <script>
+                  function fnSubmit() {
+                    document.form_chk.action = "https://nice.checkplus.co.kr/CheckPlusSafeModel/checkplus.cb";
+                    document.form_chk.submit();
+                  }
+                </script>
+              </head>
+              <body onload="fnSubmit()">
+                <form name="form_chk" method="post">
+                  <input type="hidden" name="m" value="checkplusService">
+                  <input type="hidden" name="EncodeData" value="${encData}">
+                </form>
+              </body>
+              </html>
+            `;
+            
+            // 데이터 URL 생성
+            const blob = new Blob([formHtml], { type: 'text/html' });
+            const dataUrl = URL.createObjectURL(blob);
+            
+            // 팝업 창 열기
+            const popup = window.open(
+              dataUrl,
+              'popupChk',
+              `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+            );
+            
+            if (!popup) {
+              URL.revokeObjectURL(dataUrl);
+              return { 
+                success: false, 
+                message: '팝업 창이 차단되었습니다. 팝업 차단을 해제해주세요.' 
+              };
+            }
+            
+            // 메시지 이벤트 처리를 위한 Promise
+            return new Promise((resolve) => {
+              let isProcessing = false;
+              
+              // 30초 타임아웃 설정
+              const timeout = setTimeout(() => {
+                if (!isProcessing) {
+                  isProcessing = true;
+                  clearInterval(checkClosed);
+                  window.removeEventListener('message', messageHandler);
+                  URL.revokeObjectURL(dataUrl);
+                  if (!popup.closed) popup.close();
+                  resolve({ 
+                    success: false, 
+                    message: '본인인증 시간이 초과되었습니다.' 
+                  });
+                }
+              }, 30000); // 30초 타임아웃
+              
+              const messageHandler = async (event: MessageEvent) => {
+                // 메시지 출처 검증 (같은 도메인에서 온 메시지만 처리)
+                if (event.origin !== window.location.origin) {
+                  return;
+                }
+                
+                // 중복 처리 방지
+                if (isProcessing) return;
+                
+                // 타임아웃 클리어
+                clearTimeout(timeout);
+                
+                const { type, encData, message } = event.data;
+                
+                // PASS_CLOSED 타입 처리 추가
+                if (type === 'PASS_CLOSED') {
+                  isProcessing = true;
+                  window.removeEventListener('message', messageHandler);
+                  URL.revokeObjectURL(dataUrl);
+                  if (!popup.closed) popup.close();
+                  resolve({ 
+                    success: false, 
+                    message: message || '본인인증이 취소되었습니다.' 
+                  });
+                  return;
+                }
+                
+                if (type === 'PASS_SUCCESS' && encData) {
+                  isProcessing = true;
+                  try {
+                    // 성공 처리
+                    await contentApi.PassSuccess(encData);
+                    window.removeEventListener('message', messageHandler);
+                    URL.revokeObjectURL(dataUrl);
+                    if (!popup.closed) popup.close();
+                    resolve({ 
+                      success: true, 
+                      message: '본인인증이 성공적으로 완료되었습니다.' 
+                    });
+                  } catch (error) {
+                    console.error('본인인증 성공 처리 중 오류:', error);
+                    window.removeEventListener('message', messageHandler);
+                    URL.revokeObjectURL(dataUrl);
+                    if (!popup.closed) popup.close();
+                    resolve({ 
+                      success: false, 
+                      message: '본인인증 처리 중 오류가 발생했습니다.' 
+                    });
+                  }
+                } else if (type === 'PASS_FAILED' && encData) {
+                  isProcessing = true;
+                  try {
+                    // 실패 처리
+                    await contentApi.PassFailed(encData);
+                    window.removeEventListener('message', messageHandler);
+                    URL.revokeObjectURL(dataUrl);
+                    if (!popup.closed) popup.close();
+                    resolve({ 
+                      success: false, 
+                      message: '본인인증에 실패했습니다.' 
+                    });
+                  } catch (error) {
+                    console.error('본인인증 실패 처리 중 오류:', error);
+                    window.removeEventListener('message', messageHandler);
+                    URL.revokeObjectURL(dataUrl);
+                    if (!popup.closed) popup.close();
+                    resolve({ 
+                      success: false, 
+                      message: '본인인증 처리 중 오류가 발생했습니다.' 
+                    });
+                  }
+                }
+              };
+              
+              // 메시지 이벤트 리스너 등록
+              window.addEventListener('message', messageHandler);
+              
+              // 팝업 창 닫힘 감지 (폴링 방식으로만 처리)
+              const checkClosed = setInterval(() => {
+                // 팝업이 유효하지 않거나 닫혔는지 확인
+                if (!popup || popup.closed) {
+                  clearInterval(checkClosed);
+                  clearTimeout(timeout); // 타임아웃 클리어 추가
+                  
+                  // 아직 처리되지 않은 경우만 처리
+                  if (!isProcessing) {
+                    isProcessing = true;
+                    window.removeEventListener('message', messageHandler);
+                    URL.revokeObjectURL(dataUrl);
+                    resolve({ 
+                      success: false, 
+                      message: '본인인증이 취소되었습니다.' 
+                    });
+                  }
+                }
+              }, 500);
+            });
+          } else {
+            return { 
+              success: false, 
+              message: response.data?.result?.msg || '본인인증 정보를 가져오는데 실패했습니다.' 
+            };
+          }
+        } catch (error) {
+          console.error('본인인증 요청 중 오류 발생:', error);
+          return { 
+            success: false, 
+            message: '본인인증 요청 중 오류가 발생했습니다.' 
+          };
         }
       },
     }),

@@ -27,11 +27,7 @@ export default function MyPageView() {
   }
 
 
-  const {
-    data: settlementListData,
-    isLoading: settlementListLoading,
-    error: settlementListError,
-    refetch: settlementListRefetch } = GetSettlementList(1, 1, 10);
+
 
   const incomeHistory = [
     { date: '25.03.17', source: '캐릭터 채팅', amount: 170.5, character: '캐릭터1' },
