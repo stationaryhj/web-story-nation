@@ -366,10 +366,6 @@ body > div.mobile-gnb {
 }
 
 @media (max-width: 767px) {
-  body {
-    padding-bottom: 64px !important;
-  }
-
   /* iOS Safari specific fix */
   @supports (-webkit-touch-callout: none) {
     body {

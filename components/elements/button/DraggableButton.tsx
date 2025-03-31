@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Pen, Lightbulb, Minus } from 'lucide-react'
+import { Plus, Pen, Lightbulb, Minus, X } from 'lucide-react'
 import IdeaShareModal from '../../modal/IdeaShareModal'
 import RewardModal from '../../modal/RewardModal'
 import { contentApi } from '@/services/api/storyNationApi'
@@ -31,6 +31,7 @@ interface DraggableButtonProps {
   initialPosition?: { x: number; y: number }
   size?: number
   floatingMenuButtons?: FloatingMenuButton[]
+  id?: string
 }
 
 export default function DraggableButton({
@@ -41,6 +42,7 @@ export default function DraggableButton({
   initialPosition,
   size = 70,
   floatingMenuButtons,
+  id = 'default-draggable-button',
 }: DraggableButtonProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
@@ -54,13 +56,9 @@ export default function DraggableButton({
 
   const mouseDownPosition = useRef({ x: 0, y: 0 })
   const hasMoved = useRef(false)
-  // 사용자가 드래그하여 위치를 변경했는지 여부
   const hasUserRepositioned = useRef(false)
-  // 현재 위치를 ref로 저장 (의존성 순환 방지)
   const positionRef = useRef({ x: 0, y: 0 })
-  // 초기화 여부 추적
   const isInitialized = useRef(false)
-  // 이전 화면 모드 (모바일/데스크톱) 추적
   const prevIsMobile = useRef(false)
 
   // 드래그로 간주할 최소 이동 거리 (픽셀)
@@ -81,34 +79,6 @@ export default function DraggableButton({
   const NAV_BUTTON_SIZE = isMobile ? 50 : 60
   // 버튼 간 거리
   const BUTTON_DISTANCE = isMobile ? 70 : 80
-
-  // 기본 플로팅 메뉴 버튼 정의
-  const defaultFloatingMenuButtons = [
-    {
-      id: 'microphone',
-      icon: <Lightbulb size={20} color="white" />,
-      label: '아이디어 제안',
-      color: 'bg-primary-500',
-      onClick: () => setIdeaModalOpen(true),
-      position: { x: 0, y: -BUTTON_DISTANCE },
-    },
-    {
-      id: 'pen',
-      icon: <Pen size={20} color="white" />,
-      label: '리워드 받기',
-      color: 'bg-primary-500',
-      onClick: () => setRewardModalOpen(true),
-      position: { x: 0, y: -BUTTON_DISTANCE * 2 },
-    },
-  ]
-
-  // 아이디어 제출 처리
-  const handleIdeaSubmit = async (idea: string) => {
-    const response = await contentApi.SendFeedback(idea)
-    if (response.data.result.err === 0) {
-      setIdeaModalOpen(false)
-    }
-  }
 
   // 모바일 환경 감지 함수
   const checkIfMobile = useCallback(() => {
@@ -176,15 +146,83 @@ export default function DraggableButton({
     }
   }, [checkIfMobile, calculatePosition, size])
 
+  // localStorage에서 버튼의 닫힌 상태 확인
+  useEffect(() => {
+    const isButtonHidden = localStorage.getItem(`draggable-button-hidden-${id}`)
+    if (isButtonHidden === 'true') {
+      setIsVisible(false)
+    } else {
+      setIsVisible(true)
+    }
+  }, [id])
+
+  // 페이지 새로고침 시 버튼 다시 보이기
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      localStorage.removeItem(`draggable-button-hidden-${id}`)
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [id])
+
+  // 드래그 이벤트 처리
+  useEffect(() => {
+    if (isDragging) {
+      window.addEventListener('mousemove', handleMouseMove)
+      window.addEventListener('mouseup', handleMouseUp)
+      window.addEventListener('touchmove', handleTouchMove, { passive: false })
+      window.addEventListener('touchend', handleTouchEnd)
+
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchend', handleTouchEnd)
+      document.body.style.overflow = ''
+    }
+  }, [isDragging, dragStart, actualSize])
+
+  // 위치 ref 업데이트
+  useEffect(() => {
+    positionRef.current = position
+  }, [position])
+
+  // 초기 위치 업데이트
+  useEffect(() => {
+    const forceUpdateTimer = setTimeout(() => {
+      if (isInitialized.current) {
+        updatePositionAndSize()
+      }
+    }, 1000)
+
+    return () => clearTimeout(forceUpdateTimer)
+  }, [updatePositionAndSize])
+
+  // ESC 키로 메뉴 닫기
+  useEffect(() => {
+    const handleEscKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isMenuOpen) {
+        setIsMenuOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleEscKey)
+    return () => window.removeEventListener('keydown', handleEscKey)
+  }, [isMenuOpen])
+
   // 초기 설정 및 리사이징 이벤트 처리
   useEffect(() => {
     if (typeof window === 'undefined') return
 
-    // 초기 설정
     updatePositionAndSize()
     setIsVisible(true)
 
-    // 브라우저 크기 변경 이벤트 리스너 (디바운싱 적용)
     const handleResize = () => {
       if (window.resizeTimer) {
         clearTimeout(window.resizeTimer)
@@ -204,6 +242,45 @@ export default function DraggableButton({
       }
     }
   }, [updatePositionAndSize])
+
+  // 기본 플로팅 메뉴 버튼 정의
+  const defaultFloatingMenuButtons = [
+    {
+      id: 'microphone',
+      icon: <Lightbulb size={20} color="white" />,
+      label: '아이디어 제안',
+      color: 'bg-primary-500',
+      onClick: () => setIdeaModalOpen(true),
+      position: { x: 0, y: -BUTTON_DISTANCE },
+    },
+    {
+      id: 'pen',
+      icon: <Pen size={20} color="white" />,
+      label: '리워드 받기',
+      color: 'bg-primary-500',
+      onClick: () => setRewardModalOpen(true),
+      position: { x: 0, y: -BUTTON_DISTANCE * 2 },
+    },
+    {
+      id: 'close',
+      icon: <X size={20} color="white" />,
+      label: '닫기',
+      color: 'bg-red-500',
+      onClick: () => {
+        setIsVisible(false)
+        localStorage.setItem(`draggable-button-hidden-${id}`, 'true')
+      },
+      position: { x: 0, y: -BUTTON_DISTANCE * 3 },
+    },
+  ]
+
+  // 아이디어 제출 처리
+  const handleIdeaSubmit = async (idea: string) => {
+    const response = await contentApi.SendFeedback(idea)
+    if (response.data.result.err === 0) {
+      setIdeaModalOpen(false)
+    }
+  }
 
   const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
     // 마우스 다운 위치 저장
@@ -332,56 +409,6 @@ export default function DraggableButton({
       return false
     }
   }
-
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove)
-      window.addEventListener('mouseup', handleMouseUp)
-      window.addEventListener('touchmove', handleTouchMove, { passive: false })
-      window.addEventListener('touchend', handleTouchEnd)
-
-      // 드래그 중에는 body의 스크롤을 방지
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-      window.removeEventListener('touchmove', handleTouchMove)
-      window.removeEventListener('touchend', handleTouchEnd)
-      document.body.style.overflow = ''
-    }
-  }, [isDragging, dragStart, actualSize])
-
-  // 위치가 변경될 때마다 ref 업데이트 (순환 방지)
-  useEffect(() => {
-    positionRef.current = position
-  }, [position])
-
-  // 컴포넌트가 마운트된 후 1초 후에 강제로 위치 업데이트 (초기화 이슈 대응)
-  useEffect(() => {
-    const forceUpdateTimer = setTimeout(() => {
-      if (isInitialized.current) {
-        updatePositionAndSize()
-      }
-    }, 1000)
-
-    return () => clearTimeout(forceUpdateTimer)
-  }, [updatePositionAndSize])
-
-  // 메뉴가 열릴 때 ESC 키로 닫기 가능하도록 설정
-  useEffect(() => {
-    const handleEscKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isMenuOpen) {
-        setIsMenuOpen(false)
-      }
-    }
-
-    window.addEventListener('keydown', handleEscKey)
-    return () => window.removeEventListener('keydown', handleEscKey)
-  }, [isMenuOpen])
 
   // 아이콘 컨텐츠 기본값 설정
   const buttonContent = children || (

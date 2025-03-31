@@ -96,7 +96,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body className="font-sans bg-white dark:bg-gray-900 transition-colors duration-300" suppressHydrationWarning>
         <Providers>
-          <div className="flex min-h-screen flex-col pb-16 md:pb-0">
+          <div className="flex min-h-screen flex-col md:pb-0">
             <div className="flex-1">{children}</div>
           </div>
         </Providers>
