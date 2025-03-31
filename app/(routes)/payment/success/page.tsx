@@ -9,6 +9,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 import { settlementApi } from '@/services/api/storyNationApi';
+import { useAccountStore } from '@/store/useAccountStore';
+import { ConfirmTossPaymentResponse } from '@/types/api';
 
 // 실제 콘텐츠를 처리하는 컴포넌트
 function PaymentSuccessContent() {
@@ -16,6 +18,7 @@ function PaymentSuccessContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [paymentData, setPaymentData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const { updateAccountData, data: accountData } = useAccountStore()
 
   const paymentKey = searchParams.get('paymentKey');
   const orderId = searchParams.get('orderId');
@@ -54,9 +57,12 @@ function PaymentSuccessContent() {
           receiptUrl: `https://dashboard.tosspayments.com/receipt/${paymentKey}`
         });
 
-
         const response = await settlementApi.ConfirmTossPayment(paymentKey, orderId, Number(amount));
-        console.log('@@ response :: ', response);
+
+        if(response.data.result.err === 0) {
+          const {coin_user, coin_free, coin_register} = response.data as ConfirmTossPaymentResponse
+          updateAccountData(coin_free, accountData?.coin_free_dt || 0, coin_register, coin_user)
+        }
         
         setIsLoading(false);
       } catch (err) {

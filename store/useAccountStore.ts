@@ -385,7 +385,6 @@ export const useAccountStore = create<AccountState>()(
             state: JSON.stringify(state)
           })
 
-
           if (type === 'APPLE') {
             params.append('response_mode', 'form_post')
           }
@@ -397,6 +396,8 @@ export const useAccountStore = create<AccountState>()(
           
           // 팝업 창 위치 및 크기 계산
           const { width, height, left, top } = calculatePopupPosition();
+
+          console.log('authUrl : ', authUrl)
           
           // 팝업 창 열기
           const popup = window.open(
@@ -436,6 +437,7 @@ export const useAccountStore = create<AccountState>()(
                 }
                 
                 if (!code || !callbackState) {
+                  console.log('@@@@@@@@@@@@ ???')
                   throw new Error('인증 정보가 올바르지 않습니다.');
                 }
                 
@@ -458,19 +460,6 @@ export const useAccountStore = create<AccountState>()(
                 
                 const errorMessage = handleNetworkError(error);
                 set({ error: errorMessage, loading: false });
-
-                // 로컬 스토리지 초기화
-                localStorage.clear();
-
-                // 세션 스토리지 초기화
-                sessionStorage.clear();
-
-                // 쿠키 초기화 (카카오 도메인 관련)
-                document.cookie.split(";").forEach(function(c) {
-                  if (c.indexOf("kakao") !== -1) {
-                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-                  }
-                });
 
                 reject(error);
               } finally {
