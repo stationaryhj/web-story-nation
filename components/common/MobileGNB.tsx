@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHome, faComment, faUser, faVideo, faStore } from '@fortawesome/free-solid-svg-icons'
+import { Home, MessageCircle, UserRoundPlus, Store, HandCoins } from 'lucide-react'
 import { useModalStore } from '@/store/useStoreModal'
 import { useAccountStore } from '@/store/useStoreData'
 
@@ -41,11 +41,11 @@ export default function MobileGNB() {
 
   // 네비게이션 링크 (아이콘 추가)
   const navLinks = [
-    { href: '/', label: '홈', requireLogin: false, icon: faHome },
-    { href: '/chat-list', label: '대화', requireLogin: true, icon: faComment },
-    { href: '/my-characters', label: '캐릭터 만들기', requireLogin: true, icon: faUser },
-    { href: '/live', label: 'Live', requireLogin: true, icon: faVideo },
-    { href: '/shop-recharge', label: '상점', requireLogin: true, icon: faStore },
+    { href: '/', label: '홈', requireLogin: false, icon: Home },
+    { href: '/chat-list', label: '대화', requireLogin: true, icon: MessageCircle },
+    { href: '/my-characters', label: '캐릭터 만들기', requireLogin: true, icon: UserRoundPlus },
+    { href: '/my-account', label: '수익 관리', requireLogin: true, icon: HandCoins },
+    { href: '/shop-recharge', label: '상점', requireLogin: true, icon: Store },
   ]
 
   // 로그인 필요한 링크 체크 핸들러
@@ -73,29 +73,26 @@ export default function MobileGNB() {
       }}
     >
       <div className="grid grid-cols-5 h-full">
-        {navLinks
-          .filter(link => link.href !== '/') // 홈 링크 제외
-          .map(link => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={e => handleNavLinkClick(e, link)}
-              className={`flex flex-col items-center justify-center ${
+        {navLinks.map(link => (
+          <Link
+            key={link.href}
+            href={link.href}
+            onClick={e => handleNavLinkClick(e, link)}
+            className={`flex flex-col items-center justify-center ${
+              activeLink === link.href
+                ? 'text-primary-500 dark:text-dark-primary-500'
+                : 'text-secondary-600 dark:text-dark-secondary-400'
+            }`}
+          >
+            {React.createElement(link.icon, {
+              className: `w-6 h-6 ${
                 activeLink === link.href
                   ? 'text-primary-500 dark:text-dark-primary-500'
                   : 'text-secondary-600 dark:text-dark-secondary-400'
-              }`}
-            >
-              <FontAwesomeIcon
-                icon={link.icon}
-                className={`text-2xl ${
-                  activeLink === link.href
-                    ? 'text-primary-500 dark:text-dark-primary-500'
-                    : 'text-secondary-600 dark:text-dark-secondary-400'
-                }`}
-              />
-            </Link>
-          ))}
+              }`,
+            })}
+          </Link>
+        ))}
       </div>
     </div>
   )

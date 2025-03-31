@@ -54,7 +54,7 @@ const CharacterRankingSection = memo(() => {
   return (
     <section className="pt-10 pb-20">
       {/* 모바일에서는 container를 사용하지 않음 */}
-      <div className="sm:container sm:mx-auto pl-4 pr-0 sm:px-4">
+      <div className="container mx-auto px-4 sm:container sm:mx-auto pl-4 pr-0 sm:px-4">
         {/* 캐릭터 랭킹 탭 */}
         <div className="sm:px-0 mb-6">
           <div className="flex justify-between items-center mb-4 z-[1000]">
