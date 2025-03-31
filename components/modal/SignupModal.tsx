@@ -10,6 +10,7 @@ import { faCheck, faCheckSquare, faSquare, faPen } from '@fortawesome/free-solid
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAccountStore } from '@/store/useAccountStore'
+import { contentApi } from '@/services/api/storyNationApi'
 
 interface SignupModalProps {
   isOpen: boolean
@@ -40,7 +41,7 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
   const allRequiredAgreed = serviceAgreed && privacyAgreed && paidServiceAgreed
 
   // 닉네임 중복 확인
-  const checkNickname = () => {
+  const checkNickname = async () => {
     if (!nickname) {
       toast.error('닉네임을 입력해주세요.')
       return
@@ -51,18 +52,29 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
       return
     }
 
-    // 실제 API 호출 대신 가상의 중복 확인 로직
-    const isDuplicate = false // API 호출 결과에 따라 변경
-
-    if (isDuplicate) {
-      toast.error('이미 사용 중인 닉네임입니다.')
-      setIsNicknameValid(false)
-    } else {
+    const response = await contentApi.NicknmCheck(nickname)
+    if(response.data.result.err === 0) {
       toast.success('사용 가능한 닉네임입니다.')
       setIsNicknameValid(true)
+      setIsNicknameChecked(true)
+    } else {
+      toast.error('이미 사용 중인 닉네임입니다.')
+      setIsNicknameValid(false)
+      setIsNicknameChecked(false)
     }
 
-    setIsNicknameChecked(true)
+    // 실제 API 호출 대신 가상의 중복 확인 로직
+    // const isDuplicate = false // API 호출 결과에 따라 변경
+
+    // if (isDuplicate) {
+    //   toast.error('이미 사용 중인 닉네임입니다.')
+    //   setIsNicknameValid(false)
+    // } else {
+    //   toast.success('사용 가능한 닉네임입니다.')
+    //   setIsNicknameValid(true)
+    // }
+
+    // setIsNicknameChecked(true)
   }
 
   // 생년월일 유효성 검사

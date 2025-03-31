@@ -23,6 +23,17 @@ export default function MobileGNB() {
     if (pathname) {
       setActiveLink(pathname)
     }
+
+    // 페이지 하단에 패딩 추가
+    const addBottomPadding = () => {
+      document.body.style.paddingBottom = '64px' // GNB 높이
+    }
+
+    addBottomPadding()
+
+    return () => {
+      document.body.style.paddingBottom = '0'
+    }
   }, [pathname])
 
   // 마운트되지 않았거나 chat/[id] 페이지인 경우 렌더링하지 않음
@@ -47,18 +58,21 @@ export default function MobileGNB() {
 
   return (
     <div
-      className="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-dark-background-light border-t border-secondary-100 dark:border-dark-secondary-200/10"
+      className="md:hidden sticky bottom-0 left-0 right-0 bg-white dark:bg-dark-background-light border-t border-secondary-100 dark:border-dark-secondary-200/10 h-16"
       style={{
         position: 'fixed',
         bottom: 0,
         left: 0,
         right: 0,
         width: '100%',
-        zIndex: 50,
+        height: '64px',
+        zIndex: 10000,
         boxShadow: '0 -2px 4px rgba(0,0,0,0.05)',
+        margin: 0,
+        padding: 0,
       }}
     >
-      <div className="grid grid-cols-5 h-16">
+      <div className="grid grid-cols-5 h-full">
         {navLinks
           .filter(link => link.href !== '/') // 홈 링크 제외
           .map(link => (

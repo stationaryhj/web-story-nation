@@ -39,6 +39,280 @@ interface CardGridProps {
   sectionId?: string // 각 섹션을 구분하기 위한 고유 ID
 }
 
+// 목데이터 추가
+const mockCharacters: Array<Character> = [
+  {
+    id: '1',
+    name: '김철수',
+    description: '열정적인 마법사',
+    imageUrl: '/images/character1.jpg',
+    category: 'male',
+    isAdult: false,
+    createdAt: new Date().toISOString(),
+    commentCount: 0,
+    hashtags: ['마법사', '열정'],
+    creator: {
+      id: 'user1',
+      nickname: '김철수',
+      username: 'kimchulsu',
+      profileImageUrl: null,
+      isActive: true,
+    },
+  },
+  {
+    id: '2',
+    name: '이영희',
+    description: '신비로운 요정',
+    imageUrl: '/images/character1.jpg',
+    category: 'female',
+    isAdult: false,
+    createdAt: new Date().toISOString(),
+    commentCount: 5,
+    hashtags: ['요정', '신비'],
+    creator: {
+      id: 'user2',
+      nickname: '이영희',
+      username: 'leeyounghee',
+      profileImageUrl: null,
+      isActive: true,
+    },
+  },
+  {
+    id: '3',
+    name: '박지성',
+    description: '용감한 전사',
+    imageUrl: '/images/character1.jpg',
+    category: 'male',
+    isAdult: false,
+    createdAt: new Date().toISOString(),
+    commentCount: 3,
+    hashtags: ['전사', '용감'],
+    creator: {
+      id: 'user3',
+      nickname: '박지성',
+      username: 'parkjisung',
+      profileImageUrl: null,
+      isActive: true,
+    },
+  },
+  {
+    id: '4',
+    name: '최민수',
+    description: '교활한 도적',
+    imageUrl: '/images/character1.jpg',
+    category: 'male',
+    isAdult: true,
+    createdAt: new Date().toISOString(),
+    commentCount: 2,
+    hashtags: ['도적', '교활'],
+    creator: {
+      id: 'user4',
+      nickname: '최민수',
+      username: 'choiminsu',
+      profileImageUrl: null,
+      isActive: true,
+    },
+  },
+  {
+    id: '5',
+    name: '정유미',
+    description: '현명한 마법사',
+    imageUrl: '/images/character1.jpg',
+    category: 'female',
+    isAdult: false,
+    createdAt: new Date().toISOString(),
+    commentCount: 7,
+    hashtags: ['마법사', '현명'],
+    creator: {
+      id: 'user5',
+      nickname: '정유미',
+      username: 'jungyumi',
+      profileImageUrl: null,
+      isActive: true,
+    },
+  },
+  {
+    id: '6',
+    name: '한지민',
+    description: '강력한 전사',
+    imageUrl: '/images/character1.jpg',
+    category: 'male',
+    isAdult: false,
+    createdAt: new Date().toISOString(),
+    commentCount: 4,
+    hashtags: ['전사', '강력'],
+    creator: {
+      id: 'user6',
+      nickname: '한지민',
+      username: 'hanjimin',
+      profileImageUrl: null,
+      isActive: true,
+    },
+  },
+  {
+    id: '7',
+    name: '송혜교',
+    description: '신비로운 요정',
+    imageUrl: '/images/character1.jpg',
+    category: 'female',
+    isAdult: false,
+    createdAt: new Date().toISOString(),
+    commentCount: 6,
+    hashtags: ['요정', '신비'],
+    creator: {
+      id: 'user7',
+      nickname: '송혜교',
+      username: 'songhyekyo',
+      profileImageUrl: null,
+      isActive: true,
+    },
+  },
+  {
+    id: '8',
+    name: '이병헌',
+    description: '교활한 도적',
+    imageUrl: '/images/character1.jpg',
+    category: 'male',
+    isAdult: true,
+    createdAt: new Date().toISOString(),
+    commentCount: 1,
+    hashtags: ['도적', '교활'],
+    creator: {
+      id: 'user8',
+      nickname: '이병헌',
+      username: 'leebyunghun',
+      profileImageUrl: null,
+      isActive: true,
+    },
+  },
+  {
+    id: '9',
+    name: '김태희',
+    description: '현명한 마법사',
+    imageUrl: '/images/character1.jpg',
+    category: 'female',
+    isAdult: false,
+    createdAt: new Date().toISOString(),
+    commentCount: 8,
+    hashtags: ['마법사', '현명'],
+    creator: {
+      id: 'user9',
+      nickname: '김태희',
+      username: 'kimtaehee',
+      profileImageUrl: null,
+      isActive: true,
+    },
+  },
+  {
+    id: '10',
+    name: '원빈',
+    description: '강력한 전사',
+    imageUrl: '/images/character1.jpg',
+    category: 'male',
+    isAdult: false,
+    createdAt: new Date().toISOString(),
+    commentCount: 9,
+    hashtags: ['전사', '강력'],
+    creator: {
+      id: 'user10',
+      nickname: '원빈',
+      username: 'wonbin',
+      profileImageUrl: null,
+      isActive: true,
+    },
+  },
+  {
+    id: '11',
+    name: '김하늘',
+    description: '신비로운 요정',
+    imageUrl: '/images/character1.jpg',
+    category: 'female',
+    isAdult: false,
+    createdAt: new Date().toISOString(),
+    commentCount: 10,
+    hashtags: ['요정', '신비'],
+    creator: {
+      id: 'user11',
+      nickname: '김하늘',
+      username: 'kimhaneul',
+      profileImageUrl: null,
+      isActive: true,
+    },
+  },
+  {
+    id: '12',
+    name: '장동건',
+    description: '교활한 도적',
+    imageUrl: '/images/character1.jpg',
+    category: 'male',
+    isAdult: true,
+    createdAt: new Date().toISOString(),
+    commentCount: 11,
+    hashtags: ['도적', '교활'],
+    creator: {
+      id: 'user12',
+      nickname: '장동건',
+      username: 'jangdonggun',
+      profileImageUrl: null,
+      isActive: true,
+    },
+  },
+  {
+    id: '13',
+    name: '이영애',
+    description: '현명한 마법사',
+    imageUrl: '/images/character1.jpg',
+    category: 'female',
+    isAdult: false,
+    createdAt: new Date().toISOString(),
+    commentCount: 12,
+    hashtags: ['마법사', '현명'],
+    creator: {
+      id: 'user13',
+      nickname: '이영애',
+      username: 'leeyoungae',
+      profileImageUrl: null,
+      isActive: true,
+    },
+  },
+  {
+    id: '14',
+    name: '배수지',
+    description: '강력한 전사',
+    imageUrl: '/images/character1.jpg',
+    category: 'female',
+    isAdult: false,
+    createdAt: new Date().toISOString(),
+    commentCount: 13,
+    hashtags: ['전사', '강력'],
+    creator: {
+      id: 'user14',
+      nickname: '배수지',
+      username: 'baesuji',
+      profileImageUrl: null,
+      isActive: true,
+    },
+  },
+  {
+    id: '15',
+    name: '이민호',
+    description: '신비로운 요정',
+    imageUrl: '/images/character1.jpg',
+    category: 'male',
+    isAdult: false,
+    createdAt: new Date().toISOString(),
+    commentCount: 14,
+    hashtags: ['요정', '신비'],
+    creator: {
+      id: 'user15',
+      nickname: '이민호',
+      username: 'leeminho',
+      profileImageUrl: null,
+      isActive: true,
+    },
+  },
+]
+
 export default function CardGrid({
   title = null,
   subtitle = null,
@@ -65,7 +339,6 @@ export default function CardGrid({
   const [localLoading, setLocalLoading] = useState(true)
   const [reachedEnd, setReachedEnd] = useState(false)
   const [reachedBeginning, setReachedBeginning] = useState(true)
-  const router = useRouter()
   const swiperRef = useRef<SwiperType | null>(null)
 
   // 로딩 상태와 에러 상태 통합
@@ -75,19 +348,18 @@ export default function CardGrid({
   useEffect(() => {
     // customData가 제공되면 해당 데이터를 사용
     if (customData) {
-      console.log('CardGrid - 원본 데이터 수:', customData.length)
-      console.log('CardGrid - 성인 모드 상태:', isAdultModeEnabled)
-
       // 성인 모드 비활성화 시 성인 컨텐츠 필터링
-      const filteredData = isAdultModeEnabled ? customData : customData.filter(character => !character.isAdult)
-
-      console.log('CardGrid - 필터링 후 데이터 수:', filteredData.length)
-      setCharacters(filteredData)
+      // const filteredData = isAdultModeEnabled ? customData : customData.filter(character => !character.isAdult)
+      // setCharacters(filteredData)
+      setCharacters(mockCharacters)
       setLocalLoading(false)
       return
     }
 
-    // customData가 없으면 기존 로직으로 데이터 로드
+    // 목데이터 사용
+
+    // 기존 데이터 로딩 로직 주석 처리
+    /*
     const loadCharacters = async () => {
       setLocalLoading(true)
       try {
@@ -101,7 +373,12 @@ export default function CardGrid({
     }
 
     loadCharacters()
+    */
   }, [fetchCategoryCharacters, categoryId, customData, isAdultModeEnabled])
+
+  useEffect(() => {
+    console.log('characters', characters)
+  }, [characters])
 
   // 카드 클릭 핸들러
   const handleCardClick = (character: Character) => {
@@ -132,15 +409,15 @@ export default function CardGrid({
   const getSlidesPerView = () => {
     switch (cardsPerRow) {
       case 1:
-        return 1
+        return 2.5
       case 2:
-        return { default: 1, sm: 2 }
+        return { default: 2.5, sm: 2.5 }
       case 3:
-        return { default: 1, sm: 2, md: 3 }
+        return { default: 2.5, sm: 2.5, md: 3.5 }
       case 4:
-        return { default: 2, sm: 2, md: 3, lg: 4 }
+        return { default: 2.5, sm: 2.5, md: 3.5, lg: 4.5 }
       default:
-        return { default: 2, sm: 3, md: 4, lg: 5 }
+        return { default: 2.5, sm: 2.5, md: 3.5, lg: 4.5 }
     }
   }
 
@@ -257,7 +534,7 @@ export default function CardGrid({
       )}
 
       {useSwiper ? (
-        <div className="relative swiper-container-wrapper" id={sectionId}>
+        <div className="relative swiper-container-wrapper overflow-visible" id={sectionId}>
           <button
             type="button"
             className={`swiper-button-prev navigation-button navigation-prev-button card-grid-prev-button absolute left-[-20px] z-[9999] hidden md:flex items-center justify-center ${
@@ -314,7 +591,7 @@ export default function CardGrid({
                 }
               }, 100)
             }}
-            className="custom-swiper card-grid-swiper"
+            className="custom-swiper card-grid-swiper overflow-visible"
           >
             {isDataLoading ? renderSkeletons() : renderCards()}
           </Swiper>

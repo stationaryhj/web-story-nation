@@ -11,6 +11,7 @@ import { Character } from '@/store/useStoreData'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAccountStore } from '@/store/useAccountStore'
 import { useModalStore } from '@/store/useStoreModal'
+import { GetSearch } from '@/services/hooks/DataListManager'
 
 type Props = {}
 
@@ -46,6 +47,9 @@ export default function searchPage({}: Props) {
   // 무한 스크롤을 위한 옵저버 ref
   const observerRef = useRef<IntersectionObserver | null>(null)
   const loadMoreRef = useRef<HTMLDivElement | null>(null)
+
+  const { data, isLoading: isLoadingSearch, error, refetch } = GetSearch(searchQuery, sortType === 'popularity' ? 1 : 2, itemsPerPage, currentPage)
+  console.log('@@ data :: ', data)
 
   // 화면 크기 감지하여 모바일/PC 모드 설정
   useEffect(() => {

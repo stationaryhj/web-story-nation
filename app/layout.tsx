@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <meta
           name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, height=device-height"
         />
         {/* 다크모드 초기화를 위한 인라인 스크립트 */}
         <Script
@@ -95,12 +95,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body className="font-sans bg-white dark:bg-gray-900 transition-colors duration-300" suppressHydrationWarning>
         <Providers>
-          <div className="flex min-h-screen flex-col">
+          <div className="flex min-h-screen flex-col pb-16 md:pb-0">
             <div className="flex-1">{children}</div>
-            <MobileGNB />
           </div>
         </Providers>
         <DraggableButtonGrid />
+        <MobileGNB />
       </body>
     </html>
   )

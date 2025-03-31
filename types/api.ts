@@ -5,6 +5,14 @@ export interface ApiResponse<T = any> {
   code?: string;
 }
 
+
+export interface GetUuidResponse {
+  clientId: string;
+  snsauth: string;
+  uuid: string;
+  result: ApiResult;
+}
+
 // Response Data
 // Login
 export interface LoginResponse {
@@ -349,13 +357,13 @@ export interface CharbotTagData {
 
 // SaleMonthlyIncomeList Response
 export interface SaleMonthlyIncomeListResponse {
-  IncomeList: Array<IncomeList>;
+  IncomeList: IncomeList;
   result: ApiResult;
 }
 
 export interface IncomeList {
   current_page: number;
-  data: any;
+  data: Array<IncomeData>;
   first_page_url: string;
   from: number;
   last_page: number;
@@ -368,6 +376,15 @@ export interface IncomeList {
   to: number | null;
   total: number;
 }
+
+export interface IncomeData {
+  cnt: number;
+  content: string;
+  create_dt: string;
+  pen: string;
+  title: string;
+}
+
 
 // CharbotLike Response
 export interface CharbotLikeResponse {
@@ -602,6 +619,23 @@ export interface WriterInfoData {
   user_key: number;
   user_nm: string;
 }
+
+// WriterWithdraw Response
+export interface WriterWithdrawResponse {
+  result: ApiResult;
+  withdraw: number;
+  withdraw_pen: number;
+  allow: number;
+}
+
+// GetPassInfo Response
+export interface GetPassInfoResponse {
+  enc_data: string;
+  result: ApiResult;
+  returnMsg: string;
+}
+
+
 
 
 // API Result

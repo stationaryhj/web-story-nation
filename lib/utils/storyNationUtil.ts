@@ -1,4 +1,4 @@
-import { CharbotChatData, ModuleCreater, CharbotChatListData, CharbotMineData, ChatModeData, ChrbotData, InquiryData, LoginResponse, ModuleCharacter } from '@/types/api';
+import { CharbotChatData, ModuleCreater, CharbotChatListData, CharbotMineData, ChatModeData, ChrbotData, InquiryData, LoginResponse, ModuleCharacter, IncomeData } from '@/types/api';
 import { ChatMode } from '@/components/modal/ChatModeModal';
 
 /**
@@ -304,6 +304,29 @@ export function bridgeInquiryDataToNotification(data: InquiryData) {
     date: new Date(data.create_dt),
     sort: data.sort,
   }
+}
+
+/**
+ * 수익 내역 데이터를 UI에 표시할 형식으로 변환하는 함수
+ * @param data - API에서 받아온 IncomeData 배열
+ * @returns 수익 내역 UI에 표시할 데이터 배열
+ */
+export function bridgeIncomeDataToEarningItems(data: Array<IncomeData>, lastIndex: number | 1) {
+  
+  // 데이터가 없거나 배열이 아닌 경우 빈 배열 반환
+  if (!data || !Array.isArray(data)) {
+    console.warn('Invalid income data:', data)
+    return []
+  }
+  
+  return data.map((item, index) => ({
+    id: index + 1 + (lastIndex * 50), // 고유 ID 생성
+    date: item.create_dt, // 날짜 형식 그대로 사용
+    description: item.content, // 내용 (예: 캐릭터 채팅)
+    amount: parseFloat(item.pen), // pen 값을 숫자로 변환하고 10000을 곱해 펜 단위로 표시
+    cnt: item.cnt, // 횟수 정보 추가
+    title: item.title // 제목 정보 추가
+  }))
 }
 
 function getCategory(gender: number) {

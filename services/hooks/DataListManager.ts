@@ -20,6 +20,7 @@ import type {
   InquiryListResponse,
   BankListResponse,
   CharbotTop10NewResponse,
+  WriterWithdrawResponse,
 } from '@/types/api'
 
 import { contentApi, settlementApi, createApi, chatApi } from '../api/storyNationApi'
@@ -360,6 +361,31 @@ export const GetBankList = () => {
     queryFn: async () => {
       const response = await contentApi.GetBankList()
       return response.data as BankListResponse
+    },
+  })
+
+  return { data, isLoading, error, refetch }
+}
+
+export const GetWriterWithdrawStatus = () => {
+  const { data, isLoading, error, refetch } = useQuery<WriterWithdrawResponse>({
+    queryKey: ['writerWithdrawStatus'],
+    queryFn: async () => {
+      const response = await settlementApi.GetWriterWithdrawStatus()
+      return response.data as WriterWithdrawResponse
+    },
+  })
+
+  return { data, isLoading, error, refetch }
+}
+
+
+export const GetSearch = (search: string, order: number, paginate: number, page: number) => {
+  const { data, isLoading, error, refetch } = useQuery<CharbotSearchResponse>({
+    queryKey: ['search', search, order, paginate, page],
+    queryFn: async () => {
+      const response = await contentApi.GetSearch(search, order, paginate, page)
+      return response.data as CharbotSearchResponse
     },
   })
 

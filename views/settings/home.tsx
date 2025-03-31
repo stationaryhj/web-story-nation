@@ -67,7 +67,8 @@ export default function SettingsForm() {
     accountNumber: settings.bankAccount.accountNumber || '',
     accountHolder: settings.bankAccount.accountHolder || '',
     language: settings.language || 'ko',
-    profileImage: settings.profile.profileImageUrl || null,
+    profileImage: (userInfo?.image_url ?? '') + (userInfo?.profile_url ?? '') || null,
+    minor: userInfo?.minor || 0,
   })
 
   // 페르소나 설정
@@ -369,6 +370,43 @@ export default function SettingsForm() {
     setIsEdited(true)
   }
 
+  // 이메일 저장 핸들러
+  const handleSaveEmail = async () => {
+    try {
+      // useAccountStore의 updateWriterEmail 함수 사용
+      const { updateWriterEmail } = useAccountStore.getState()
+      
+      const result = await updateWriterEmail(profile.email)
+      
+      if (result.success) {
+        toast.success(result.message)
+      } else {
+        toast.error(result.message)
+      }
+    } catch (error) {
+      console.error('이메일 저장 중 오류 발생:', error)
+      toast.error('이메일 저장 중 오류가 발생했습니다.')
+    }
+  }
+
+  // 본인 인증 핸들러
+  const handleAdultVerification = async () => {
+    try {
+      // useAccountStore의 verifyIdentity 함수 사용
+      const { verifyIdentity } = useAccountStore.getState();
+      const result = await verifyIdentity();
+      
+      if (result.success) {
+        toast.success(result.message);
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      console.error('본인 인증 중 오류 발생:', error)
+      toast.error('본인 인증 중 오류가 발생했습니다.')
+    }
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
       {/* 헤더 */}
@@ -444,7 +482,17 @@ export default function SettingsForm() {
 
         {/* 계정 정보 섹션 */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">계정 정보</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">계정 정보</h2>
+            <button
+              onClick={handleAdultVerification}
+              className="sm:flex-shrink-0 px-4 py-3 bg-primary-500 text-white rounded-lg whitespace-nowrap hover:bg-primary-700"
+              disabled={profile.minor > 0}
+            >
+              본인 인증
+            </button>
+          </div>
+
           <div className="space-y-5">
             {/* 연동된 플랫폼 */}
             <div>
@@ -478,7 +526,21 @@ export default function SettingsForm() {
             {/* 이메일 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">이메일</label>
-              <div className="px-4 py-3 bg-gray-100 rounded-lg text-gray-700">{profile.email}</div>
+              <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
+                <input
+                  type="email"
+                  value={profile.email}
+                  onChange={e => handleInputChange(e, 'email')}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                  placeholder="이메일을 입력하세요"
+                />
+                <button
+                  onClick={handleSaveEmail}
+                  className="sm:flex-shrink-0 px-4 py-3 bg-primary-500 text-white rounded-lg whitespace-nowrap hover:bg-primary-700"
+                >
+                  저장
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -640,21 +702,23 @@ export default function SettingsForm() {
           </div>
         </div>
 
-        {/* 로그아웃 버튼 */}
-        <button
-          onClick={handleLogout}
-          className="w-full py-3 text-accent-dark font-medium border border-accent-light rounded-lg bg-white hover:bg-red-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
-        >
-          로그아웃
-        </button>
+        <div className="space-y-3">
+          {/* 로그아웃 버튼 */}
+          <button
+            onClick={handleLogout}
+            className="w-full py-3 text-accent-dark font-medium border border-accent-light rounded-lg bg-white hover:bg-red-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
+          >
+            로그아웃
+          </button>
 
-        {/* 회원탈퇴 버튼 */}
-        <button
-          onClick={handleExit}
-          className="w-full py-3 text-accent-dark font-medium border border-accent-light rounded-lg bg-white hover:bg-red-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
-        >
-          회원탈퇴
-        </button>
+          {/* 회원탈퇴 버튼 */}
+          <button
+            onClick={handleExit}
+            className="w-full py-3 text-accent-dark font-medium border border-accent-light rounded-lg bg-white hover:bg-red-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
+          >
+            회원탈퇴
+          </button>
+        </div>
       </div>
 
       {/* react-toastify 컨테이너 */}
