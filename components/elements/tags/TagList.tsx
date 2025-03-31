@@ -13,19 +13,19 @@ interface Tag {
 }
 
 interface TagListProps {
-  categoryId: string
+  categoryId: string | number
   tags: Tag[]
   isLoading?: boolean
   onTagSelect?: (tagIds: string[]) => void
+  expanded?: boolean
 }
 
-export default function TagList({ categoryId, tags, isLoading = false, onTagSelect }: TagListProps) {
+export default function TagList({ categoryId, tags, isLoading = false, onTagSelect, expanded = false }: TagListProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
   const [selectedTags, setSelectedTags] = useState<string[]>(searchParams.get('tags')?.split('&') || [])
-  const [expanded, setExpanded] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
@@ -100,11 +100,12 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
           params.delete('tags')
         }
 
+        // 페이지 이동 없이 URL 업데이트 (replaceState)
         const newUrl = `${pathname}?${params.toString()}`
-        router.push(newUrl, { scroll: false })
+        window.history.replaceState(null, '', newUrl)
       })
     },
-    [pathname, router, searchParams]
+    [pathname, searchParams]
   )
 
   // 마우스 다운 이벤트 핸들러
@@ -141,19 +142,16 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
   }
 
   // 가로 스크롤 휠 이벤트 핸들러
-  const handleWheel = useCallback(
-    (e: React.WheelEvent) => {
-      if (expanded || !scrollContainerRef.current) return
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    if (expanded || !scrollContainerRef.current) return
 
-      // Shift 키를 누르고 있으면 가로 스크롤, 아니면 휠 이벤트의 deltaX 사용
-      const deltaX = e.shiftKey ? e.deltaY : e.deltaX
-      if (deltaX !== 0) {
-        e.preventDefault()
-        scrollContainerRef.current.scrollLeft += deltaX
-      }
-    },
-    [expanded]
-  )
+    // Shift 키를 누르고 있으면 가로 스크롤, 아니면 휠 이벤트의 deltaX 사용
+    const deltaX = e.shiftKey ? e.deltaY : e.deltaX
+    if (deltaX !== 0) {
+      e.preventDefault()
+      scrollContainerRef.current.scrollLeft += deltaX
+    }
+  }, [])
 
   // 전역 마우스 이벤트 리스너 설정
   useEffect(() => {
@@ -214,21 +212,6 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
     [selectedTags, updateUrlParams, onTagSelect, isDragging, mouseMoved, moveDistance]
   )
 
-  // 모든 태그 필터 초기화
-  const handleRefresh = useCallback(() => {
-    setSelectedTags([])
-    updateUrlParams([])
-
-    if (onTagSelect) {
-      onTagSelect([])
-    }
-  }, [updateUrlParams, onTagSelect])
-
-  // 태그 확장/축소 토글
-  const toggleExpand = useCallback(() => {
-    setExpanded(prev => !prev)
-  }, [])
-
   // 로딩 중이거나 태그가 없는 경우
   if (isLoading || !tags || tags.length === 0) {
     return (
@@ -272,30 +255,6 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
 
   return (
     <div className="flex flex-col mb-2">
-      {/* 컨트롤 버튼 영역 */}
-      <div className="flex justify-end space-x-2 px-2 mb-2">
-        <button
-          className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:hover:bg-dark-secondary-700 flex items-center justify-center"
-          onClick={handleRefresh}
-          aria-label="태그 필터 초기화"
-          disabled={isPending}
-        >
-          <FontAwesomeIcon icon={faRotate} className="text-gray-600 dark:text-dark-secondary-300" />
-        </button>
-
-        <button
-          className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:hover:bg-dark-secondary-700 flex items-center justify-center"
-          onClick={toggleExpand}
-          aria-label={expanded ? '태그 목록 접기' : '태그 목록 펼치기'}
-          disabled={isPending}
-        >
-          <FontAwesomeIcon
-            icon={expanded ? faChevronUp : faChevronDown}
-            className="text-gray-600 dark:text-dark-secondary-300"
-          />
-        </button>
-      </div>
-
       {/* 태그 목록 */}
       <div className="w-full overflow-hidden">
         <div

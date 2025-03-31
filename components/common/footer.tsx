@@ -25,7 +25,7 @@ export default function Footer() {
   return (
     <>
       {/* 기존 푸터 - 모바일에서는 패딩 추가 */}
-      <footer className="bg-white dark:bg-dark-background-light border-t border-secondary-100 dark:border-dark-secondary-200 py-8 md:pb-8 pb-24">
+      <footer className="bg-white dark:bg-dark-background-light border-t border-secondary-100 dark:border-dark-secondary-200 py-8 md:pb-8 pb-10">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between">
             <div className="mb-6 md:mb-0">

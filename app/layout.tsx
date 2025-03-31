@@ -7,8 +7,9 @@ import Script from 'next/script'
 import type { ReactNode } from 'react'
 
 import Providers from './providers'
-import DraggableButtonGrid from '@/components/grid/DraggableButtonGrid'
+import DraggableButton from '@/components/elements/button/DraggableButton'
 import MobileGNB from '@/components/common/MobileGNB'
+import { Plus } from 'lucide-react'
 
 // Poppins 폰트 설정
 const poppins = Poppins({
@@ -29,7 +30,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <meta
           name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, height=device-height"
         />
         {/* 다크모드 초기화를 위한 인라인 스크립트 */}
         <Script
@@ -94,8 +95,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body className="font-sans bg-white dark:bg-gray-900 transition-colors duration-300" suppressHydrationWarning>
-        <Providers>{children}</Providers>
-        <DraggableButtonGrid />
+        <Providers>
+          <div className="flex min-h-screen flex-col md:pb-0">
+            <div className="flex-1">{children}</div>
+          </div>
+        </Providers>
+
+        {/* 메인 플로팅 메뉴 버튼 */}
+        <DraggableButton color="bg-primary-500" />
+
         <MobileGNB />
       </body>
     </html>

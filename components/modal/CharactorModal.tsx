@@ -34,7 +34,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
     data: chatBotData,
     isLoading: chatBotLoading,
     error: chatBotError,
-    refetch
+    refetch,
   } = ReqGetChatBot(Number(selectedCharacter?.id))
 
   useEffect(() => {

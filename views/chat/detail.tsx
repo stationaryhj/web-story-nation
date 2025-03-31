@@ -18,6 +18,8 @@ import {
   faRocket,
   faDownload,
   faPen,
+  faEllipsisV,
+  faImage,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion } from 'framer-motion'
@@ -29,9 +31,10 @@ import { useModalStore } from '@/store/useStoreModal'
 import type { ChatMode } from '@/components/modal/ChatModeModal'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import type { ChrbotData } from '@/types/api'
-import { bridgeCharbotDataToCharacter } from '@/lib/utils/storyNationUtil'
+import { bridgeCharbotDataToCharacter, bridgeChatModeDataToChatMode } from '@/lib/utils/storyNationUtil'
 import { useNakama } from '@/app/providers/NakamaProviders'
 import { useChatModeStore } from '@/store/useStoreData'
+import BaseSidebar from '@/components/elements/sidebar/BaseSidebar'
 
 // 메시지 타입 정의
 interface ChatMessage {
@@ -57,6 +60,53 @@ const defaultNames: Record<number, string> = {
 const getChatModeName = (modeId: number) => {
   return defaultNames[modeId] || defaultNames[0]
 }
+
+const customChatModes: ChatMode[] = [
+  {
+    id: 1,
+    name: '가성비모드',
+    description: '일반적인 대화에 최적화된 모드입니다.',
+    penCost: 1,
+    ai: 'GPT-3.5',
+    icon: faPiggyBank,
+    discount: 0,
+    original_coin: 0,
+    isShow: true,
+  },
+  {
+    id: 2,
+    name: '스토리모드',
+    description: '이야기 생성과 연속성이 필요한 대화에 적합합니다.',
+    penCost: 3,
+    ai: 'GPT-4o',
+    icon: faBookOpen,
+    discount: 0,
+    original_coin: 0,
+    isShow: true,
+  },
+  {
+    id: 3,
+    name: '짜릿모드 1.0',
+    description: '보다 자유롭고 창의적인 대화를 원할 때 사용하세요.',
+    penCost: 4,
+    ai: 'Gemini 1.5 Pro',
+    icon: faFire,
+    discount: 0,
+    original_coin: 0,
+    isShow: true,
+  },
+  {
+    id: 4,
+    name: '짜릿모드 2.0',
+    description: '가장 높은 품질과 창의성을 제공하는 최고급 모드입니다.',
+    penCost: 7,
+    ai: 'Claude 3.5 Sonnet',
+    icon: faRocket,
+    discount: 0,
+    original_coin: 0,
+    isShow: true,
+  },
+]
 
 export default function ChatDetailClient({ characterId, charbotData }: ChatDetailClientProps) {
   const { data: accountData } = useAccountStore(state => ({
@@ -92,7 +142,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   const [isWaitingForAI, setIsWaitingForAI] = useState<boolean>(false) // AI 응답 대기 상태
   const { chatMode } = useChatModeStore()
 
-  const { openModal, closeModal } = useModalStore()
+  const { openModal, closeModal, setSelectedCharacter } = useModalStore()
 
   // 캐릭터 데이터 변환
   const character = bridgeCharbotDataToCharacter(charbotData as ChrbotData)
@@ -102,6 +152,25 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 먼저 새로운 모바일 이미지 보기 모달을 위한 상태를 추가합니다
   const [showImageModal, setShowImageModal] = useState(false)
+
+  // 모바일 환경 감지
+  const [isMoreSidebarOpen, setIsMoreSidebarOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // 배경 이미지 상태 추가
+  const [isBackgroundEnabled, setIsBackgroundEnabled] = useState(true)
+
+  // 모바일 환경 감지
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkIsMobile()
+    window.addEventListener('resize', checkIsMobile)
+
+    return () => window.removeEventListener('resize', checkIsMobile)
+  }, [])
 
   // 메시지 디버깅을 위한 로깅 추가
   useEffect(() => {
@@ -448,7 +517,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
-        className={`flex flex-col`}
+        className={`flex flex-col ${chat.sender === 'user' ? 'items-end' : 'items-start'}`}
       >
         {chat.sender === 'character' && (
           <div
@@ -555,18 +624,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
           {/* 캐릭터 프로필 */}
           <div className="flex items-center min-w-0 overflow-hidden">
-            {/* 캐릭터 프로필 이미지 */}
-            <Link href={`/chat/character/${characterId}`} className="md:pointer-events-auto pointer-events-none">
-              <div
-                className="relative w-10 h-10 rounded-full overflow-hidden mr-3 border border-gray-200 flex-shrink-0 hover:opacity-90 transition-opacity shadow-sm"
-                onClick={e => {
-                  // 모바일에서만 이벤트 처리
-                  if (window.innerWidth < 768) {
-                    e.preventDefault()
-                    handleProfileImageClick()
-                  }
-                }}
-              >
+            {/* 캐릭터 프로필 이미지 - PC에서만 표시 */}
+            <Link href={`/chat/character/${characterId}`} className="hidden md:block">
+              <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 border border-gray-200 flex-shrink-0 hover:opacity-90 transition-opacity shadow-sm">
                 <Image
                   src={character.imageUrl || '/images/character1.jpg'}
                   alt={character.name}
@@ -580,17 +640,24 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
               <div className="flex items-center">
                 {/* 캐릭터 이름 */}
                 <h2 className="font-medium text-gray-800 truncate">{character.name}</h2>
-                {/* 프로필 상세 버튼 */}
-                <Link
-                  href={`/chat/character/${characterId}`}
-                  className="ml-2 text-violet-500 hover:text-violet-600 flex-shrink-0"
+                {/* 프로필 상세 버튼 - PC에서만 표시 */}
+                <div
+                  onClick={() => {
+                    // TODO: 캐릭터 정보 받아와서 캐릭터 관련 모달 열어야됨
+                    // setSelectedCharacter(character)
+                    openModal('character')
+                  }}
                 >
-                  <FontAwesomeIcon icon={faInfoCircle} size="sm" />
-                </Link>
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    size="sm"
+                    className="ml-2 text-violet-500 hover:text-violet-600 flex-shrink-0"
+                  />
+                </div>
               </div>
 
-              {/* 해시태그 */}
-              <div className="flex flex-wrap gap-1 mt-0.5 overflow-hidden">
+              {/* 해시태그 - PC에서만 표시 */}
+              <div className="hidden md:flex flex-wrap gap-1 mt-0.5 overflow-hidden">
                 {character.hashtags?.slice(0, 2).map((tag: string, index: number) => (
                   <span key={index} className="text-xs text-gray-500 truncate">
                     #{tag}
@@ -610,8 +677,8 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         </div>
 
         {/* 헤더 우측 아이콘들 */}
-        <div className="flex items-center space-x-4">
-          {/* 짜릿모드 버튼 - 클릭 시 모달 */}
+        <div className="flex items-center space-x-2 md:space-x-4">
+          {/* 짜릿모드 버튼 - PC에서만 표시 */}
           <BaseButton
             color="gradient"
             size="sm"
@@ -621,32 +688,40 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                 onSelectMode: handleModeSelect,
               })
             }
-            className="flex items-center"
+            className="flex items-center hidden md:flex"
           >
             <FontAwesomeIcon icon={getModeIcon(currentModeId)} className="mr-1.5" />
-            <span className="text-sm font-medium md:inline hidden">{getChatModeName(currentModeId)}</span>
+            <span className="text-sm font-medium">{getChatModeName(currentModeId)}</span>
             <FontAwesomeIcon icon={faCaretDown} className="text-xs ml-1.5" />
           </BaseButton>
 
-          {/* 무료 재화 (펜) - 클릭 시 사이드바 */}
+          {/* 무료 재화 (펜) */}
           <div className="flex items-center">
-            <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-              <FontAwesomeIcon icon={faGift} />
+            <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+              <FontAwesomeIcon icon={faGift} className="text-sm md:text-base" />
             </div>
-            <span className="ml-1.5 text-sm font-semibold text-gray-700">{accountData?.coin_free || 0}</span>
+            <span className="ml-1 text-sm font-semibold text-gray-700">{accountData?.coin_free || 0}</span>
           </div>
 
-          {/* 유료 재화 (펜) - 클릭 시 사이드바 */}
-          <div className="hidden md:flex items-center">
-            <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-              <FontAwesomeIcon icon={faCoins} className="h-4 w-4" />
+          {/* 유료 재화 (펜) */}
+          <div className="flex items-center">
+            <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+              <FontAwesomeIcon icon={faCoins} className="h-3 w-3 md:h-4 md:w-4" />
             </div>
-            <span className="ml-1.5 text-sm font-semibold text-gray-700">{accountData?.coin_user || 0}</span>
+            <span className="ml-1 text-sm font-semibold text-gray-700">{accountData?.coin_user || 0}</span>
           </div>
 
-          {/* 채팅방 삭제 버튼 */}
+          {/* 더보기 버튼 - 모바일에서만 표시 */}
+          <button
+            className="md:hidden w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors"
+            onClick={() => setIsMoreSidebarOpen(true)}
+          >
+            <FontAwesomeIcon icon={faEllipsisV} />
+          </button>
+
+          {/* 채팅방 삭제 버튼 - PC에서만 표시 */}
           <div
-            className="w-9 h-9 rounded-full bg-red-50 flex items-center justify-center text-red-500 cursor-pointer hover:bg-red-100 transition-colors"
+            className="hidden md:flex w-9 h-9 rounded-full bg-red-50 items-center justify-center text-red-500 cursor-pointer hover:bg-red-100 transition-colors"
             onClick={() => {
               openModal('confirmAction', {
                 title: '채팅 삭제',
@@ -661,6 +736,113 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           </div>
         </div>
       </header>
+
+      {/* 더보기 사이드바 */}
+      <BaseSidebar
+        isOpen={isMoreSidebarOpen}
+        onClose={() => setIsMoreSidebarOpen(false)}
+        title="더보기"
+        side="right"
+        width="100%"
+      >
+        <div className="p-4">
+          {/* 채팅 모드 선택 */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-4">채팅 모드 선택</h3>
+            <div className="space-y-3">
+              {chatMode.map((mode, index) => {
+                const chatMode = bridgeChatModeDataToChatMode(mode, customChatModes[index])
+                if (!chatMode.isShow) return null
+                return (
+                  <div
+                    key={chatMode.id}
+                    className={`p-4 rounded-lg border cursor-pointer transition-colors ${
+                      currentModeId === chatMode.id
+                        ? 'border-primary-500 bg-primary-50'
+                        : 'border-gray-200 hover:bg-gray-50'
+                    }`}
+                    onClick={() => {
+                      handleModeSelect(chatMode)
+                      setIsMoreSidebarOpen(false)
+                    }}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div className="flex items-center">
+                        <FontAwesomeIcon
+                          icon={chatMode.icon}
+                          className={`mr-3 ${currentModeId === chatMode.id ? 'text-primary-500' : 'text-gray-500'}`}
+                        />
+                        <div>
+                          <h4
+                            className={`font-medium ${currentModeId === chatMode.id ? 'text-primary-700' : 'text-gray-900'}`}
+                          >
+                            {chatMode.name}
+                          </h4>
+                          <p className="text-sm text-gray-500">{chatMode.description}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center bg-primary-100 px-3 py-1 rounded-full self-start sm:self-auto">
+                        <span className="text-primary-700 font-medium text-sm whitespace-nowrap">
+                          <FontAwesomeIcon icon={faPen} className="mr-1" />
+                          {chatMode.penCost}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* 배경 이미지 토글 */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-4">배경 설정</h3>
+            <div className="flex items-center justify-between p-4 rounded-lg border border-gray-200">
+              <div className="flex items-center">
+                <FontAwesomeIcon icon={faImage} className="mr-3 text-gray-500" />
+                <div>
+                  <h4 className="font-medium text-gray-900">배경 이미지</h4>
+                  <p className="text-sm text-gray-500">채팅창 배경에 캐릭터 이미지 표시</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsBackgroundEnabled(!isBackgroundEnabled)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  isBackgroundEnabled ? 'bg-primary-500' : 'bg-gray-200'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    isBackgroundEnabled ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
+
+          {/* 채팅방 나가기 */}
+          <div className="border-t pt-4">
+            <button
+              className="w-full py-3 px-4 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center"
+              onClick={() => {
+                openModal('confirmAction', {
+                  title: '채팅 삭제',
+                  description: '삭제된 채팅 내용은 복구할 수 없습니다. 그래도 삭제하시겠습니까?',
+                  onConfirm: () => {
+                    handleDeleteChat()
+                    setIsMoreSidebarOpen(false)
+                  },
+                  confirmText: '삭제',
+                  confirmButtonClass: 'bg-red-500 hover:bg-red-600 text-white',
+                })
+              }}
+            >
+              <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+              채팅방 나가기
+            </button>
+          </div>
+        </div>
+      </BaseSidebar>
 
       {/* 메인 채팅 영역 */}
       <main className="flex flex-1 overflow-hidden">
@@ -706,7 +888,18 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         </div>
 
         {/* 오른쪽 채팅 영역 - 남은 공간 모두 차지 */}
-        <div className="flex-1 flex flex-col bg-gradient-to-b from-gray-50 to-white" style={{ minWidth: 0 }}>
+        <div
+          className="flex-1 flex flex-col bg-gradient-to-b from-gray-50 to-white"
+          style={{
+            minWidth: 0,
+            backgroundImage:
+              isMobile && isBackgroundEnabled
+                ? `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(${character.imageUrl || '/images/character1.jpg'})`
+                : 'none',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
           {/* 연결 상태 표시 */}
           {!isConnected && !isConnecting && (
             <div className="bg-red-50 p-3 border-b border-red-100 flex items-center justify-between">
@@ -771,7 +964,79 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                   <p>메시지가 없습니다. 채팅을 시작해보세요!</p>
                 </div>
               ) : (
-                chatMessages.map((chat, index) => renderChatMessage(chat, index))
+                chatMessages.map((chat, index) => {
+                  const isLastAiMessage =
+                    chat.sender === 'character' &&
+                    chat.id === chatMessages.filter(msg => msg.sender === 'character').slice(-1)[0]?.id &&
+                    chat.id !== '1'
+
+                  return (
+                    <motion.div
+                      key={chat.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className={`flex flex-col ${chat.sender === 'user' ? 'items-end' : 'items-start'}`}
+                    >
+                      {chat.sender === 'character' && (
+                        <div
+                          className="relative w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0 shadow-sm border border-gray-200 cursor-pointer md:cursor-default"
+                          onClick={() => handleProfileImageClick()}
+                        >
+                          <Image
+                            src={character.imageUrl || '/images/character1.jpg'}
+                            alt={character.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      )}
+
+                      <motion.div
+                        initial={{ scale: 0.95 }}
+                        animate={{ scale: 1 }}
+                        className={`inline-block max-w-[85%] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 shadow-sm ${
+                          chat.sender === 'user'
+                            ? 'bg-primary-500 text-white rounded-tr-none'
+                            : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none'
+                        }`}
+                        style={{ wordBreak: 'break-word', overflow: 'hidden' }}
+                      >
+                        <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed break-words">
+                          {formatMessageWithSituations(chat.message)}
+                        </p>
+                        <p
+                          className={`text-xs mt-2 text-right ${chat.sender === 'user' ? 'text-violet-200' : 'text-gray-500'}`}
+                        >
+                          {formatTime(chat.timestamp)}
+                        </p>
+                      </motion.div>
+
+                      {/* 마지막 AI 메시지인 경우 새로고침/삭제 버튼 표시 */}
+                      {isLastAiMessage && (
+                        <div className="flex ml-2 items-center justify-start max-w-[85%] mt-2">
+                          {/* 새로고침 버튼 */}
+                          <button
+                            onClick={handleRefreshLastAIMessage}
+                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-500 hover:text-violet-600 hover:bg-violet-100 transition-colors mr-1.5 shadow-sm"
+                            title="응답 새로고침"
+                          >
+                            <FontAwesomeIcon icon={faSync} className="text-sm sm:text-base" />
+                          </button>
+
+                          {/* 삭제 버튼 */}
+                          <button
+                            onClick={handleDeleteLastAIMessage}
+                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-100 transition-colors shadow-sm"
+                            title="응답 삭제"
+                          >
+                            <FontAwesomeIcon icon={faTrashAlt} className="text-sm sm:text-base" />
+                          </button>
+                        </div>
+                      )}
+                    </motion.div>
+                  )
+                })
               )}
             </div>
           </div>

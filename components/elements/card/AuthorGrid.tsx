@@ -228,8 +228,8 @@ export default function AuthorGrid({
               enabled: true,
             }}
             breakpoints={{
-              320: { slidesPerView: 2 },
-              640: { slidesPerView: 2 },
+              320: { slidesPerView: 3 },
+              640: { slidesPerView: 3 },
               768: { slidesPerView: 3 },
               1024: { slidesPerView: 4 },
               1280: { slidesPerView: cardsPerRow > 4 ? cardsPerRow : 4 },

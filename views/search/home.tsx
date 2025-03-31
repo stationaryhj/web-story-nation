@@ -48,7 +48,12 @@ export default function searchPage({}: Props) {
   const observerRef = useRef<IntersectionObserver | null>(null)
   const loadMoreRef = useRef<HTMLDivElement | null>(null)
 
-  const { data, isLoading: isLoadingSearch, error, refetch } = GetSearch(searchQuery, sortType === 'popularity' ? 1 : 2, itemsPerPage, currentPage)
+  const {
+    data,
+    isLoading: isLoadingSearch,
+    error,
+    refetch,
+  } = GetSearch(searchQuery, sortType === 'popularity' ? 1 : 2, itemsPerPage, currentPage)
   console.log('@@ data :: ', data)
 
   // 화면 크기 감지하여 모바일/PC 모드 설정
@@ -333,12 +338,7 @@ export default function searchPage({}: Props) {
         <div>
           <SearchBar onSearch={handleSearch} placeholder="캐릭터나 작가를 검색해보세요" initialValue={searchQuery} />
         </div>
-        <div className="flex justify-between items-center py-4">
-          <div className="text-xl text-gray-700 font-bold dark:text-dark-gray-300">
-            {searchQuery && <span className="text-primary-600 dark:text-dark-primary-400 mr-1">'{searchQuery}'</span>}
-            {searchOption === 'creator' && searchQuery && <span className="mr-1">작가</span>}
-            {totalItems > 0 ? `${totalItems}개의 검색결과` : '검색 결과가 없습니다'}
-          </div>
+        <div className="flex justify-end items-center py-4">
           <div>
             <Dropdown
               value={sortType}
@@ -350,9 +350,14 @@ export default function searchPage({}: Props) {
             />
           </div>
         </div>
+        <div className="text-xl text-gray-700 font-bold dark:text-dark-gray-300 mt-2 mb-6">
+          {searchQuery && <span className="text-primary-600 dark:text-dark-primary-400 mr-1">'{searchQuery}'</span>}
+          {searchOption === 'creator' && searchQuery && <span className="mr-1">작가</span>}
+          {totalItems > 0 ? `${totalItems}개의 검색결과` : '검색 결과가 없습니다'}
+        </div>
         <div>
           {totalItems === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="flex flex-col items-center justify-center text-center h-[calc(100vh-300px)] min-h-[400px]">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-dark-gray-200 mb-4">검색된 캐릭터가 없어요</h2>
               <p className="text-gray-600 dark:text-dark-gray-400 mb-8">내가 원하는 캐릭터를 직접 만들어 보세요!</p>
               <button

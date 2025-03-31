@@ -90,7 +90,7 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
   }
 
   return (
-    <BaseSidebar isOpen={isOpen} onClose={onClose} title="캐릭터 랭킹">
+    <BaseSidebar isOpen={isOpen} onClose={onClose} title="캐릭터 랭킹" width="600px">
       {/* 필터 영역 */}
       <div className="px-6 py-4 border-b dark:border-dark-secondary-200/10 space-y-4">
         {/* 탭 */}

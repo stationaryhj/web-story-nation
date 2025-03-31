@@ -195,7 +195,7 @@ export default function Card({
             )}
 
             {/* 댓글 수 표시 - 이미지 우측 하단으로 이동 */}
-            <div className="absolute bottom-4 right-4 flex items-center gap-[5px] text-white text-xs z-10">
+            <div className="absolute bottom-2 right-2 flex md:bottom-4 md:right-4 items-center gap-[5px] text-white z-10">
               <Image src="/images/comment_black.svg" alt="댓글" width={22} height={22} />
               <span className="text-[20px]">{commentCount}</span>
             </div>

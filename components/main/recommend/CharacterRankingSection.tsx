@@ -53,6 +53,7 @@ const CharacterRankingSection = memo(() => {
 
   return (
     <section className="pt-10 pb-20">
+      {/* 제목과 탭 영역 - 좌우 여백 유지 */}
       <div className="container mx-auto px-4">
         {/* 캐릭터 랭킹 탭 */}
         <div className="mb-6">
@@ -77,8 +78,10 @@ const CharacterRankingSection = memo(() => {
             onTabChange={handleCharacterRankingTabChange}
           />
         </div>
+      </div>
 
-        {/* 캐릭터 랭킹 그리드 */}
+      {/* 카드 그리드 영역 - 오른쪽 여백 제거 */}
+      <div className="container mx-auto pl-4 pr-0">
         <SectionTransition>
           <div className="w-full">
             <CardGrid
