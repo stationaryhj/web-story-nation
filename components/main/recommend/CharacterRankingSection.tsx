@@ -53,10 +53,10 @@ const CharacterRankingSection = memo(() => {
 
   return (
     <section className="pt-10 pb-20">
-      {/* 모바일에서는 container를 사용하지 않음 */}
-      <div className="container mx-auto px-4 sm:container sm:mx-auto pl-4 pr-0 sm:px-4">
+      {/* 제목과 탭 영역 - 좌우 여백 유지 */}
+      <div className="container mx-auto px-4">
         {/* 캐릭터 랭킹 탭 */}
-        <div className="sm:px-0 mb-6">
+        <div className="mb-6">
           <div className="flex justify-between items-center mb-4 z-[1000]">
             <h2 className="text-2xl font-bold text-secondary-900 dark:text-dark-secondary-700 relative inline-block">
               캐릭터 랭킹
@@ -78,8 +78,10 @@ const CharacterRankingSection = memo(() => {
             onTabChange={handleCharacterRankingTabChange}
           />
         </div>
+      </div>
 
-        {/* 캐릭터 랭킹 그리드 */}
+      {/* 카드 그리드 영역 - 오른쪽 여백 제거 */}
+      <div className="container mx-auto pl-4 pr-0">
         <SectionTransition>
           <div className="w-full">
             <CardGrid
@@ -88,7 +90,7 @@ const CharacterRankingSection = memo(() => {
               hasRanking={true}
               useSwiper={true}
               sectionId="character-ranking-section"
-              className="overflow-visible"
+              className="overflow-hidden"
             />
           </div>
         </SectionTransition>
