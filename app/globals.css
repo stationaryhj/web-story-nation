@@ -240,7 +240,6 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2) !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
-
   margin-top: -18px !important;
   opacity: 1 !important;
   visibility: visible !important;
@@ -254,9 +253,16 @@ body {
   isolation: isolate !important;
   border: none !important;
   outline: none !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
+  display: none !important; /* 기본적으로 숨김 */
+}
+
+/* md 브레이크포인트 이상에서만 표시 */
+@media (min-width: 768px) {
+  .navigation-button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
 }
 
 .navigation-button:hover {
@@ -308,23 +314,6 @@ body {
   padding-bottom: 40px;
   position: relative !important;
   isolation: isolate !important;
-}
-
-@media (max-width: 768px) {
-  .navigation-button {
-    width: 30px !important;
-    height: 30px !important;
-    margin-top: -15px !important;
-  }
-  .navigation-button:after {
-    font-size: 14px !important;
-  }
-  .navigation-next-button {
-    right: -20px !important;
-  }
-  .navigation-prev-button {
-    left: -20px !important;
-  }
 }
 
 /* 카드 그리드 스와이퍼 스타일 */

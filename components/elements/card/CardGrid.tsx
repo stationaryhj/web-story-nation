@@ -260,7 +260,7 @@ export default function CardGrid({
         <div className="relative swiper-container-wrapper" id={sectionId}>
           <button
             type="button"
-            className={`swiper-button-prev navigation-button navigation-prev-button card-grid-prev-button absolute left-[-20px] z-[9999] flex items-center justify-center ${
+            className={`swiper-button-prev navigation-button navigation-prev-button card-grid-prev-button absolute left-[-20px] z-[9999] hidden md:flex items-center justify-center ${
               reachedBeginning ? 'swiper-button-disabled' : ''
             }`}
             onClick={e => {
@@ -275,7 +275,7 @@ export default function CardGrid({
           ></button>
           <button
             type="button"
-            className={`swiper-button-next navigation-button navigation-next-button card-grid-next-button absolute right-[-20px] z-[9999] flex items-center justify-center ${
+            className={`swiper-button-next navigation-button navigation-next-button card-grid-next-button absolute right-[-20px] z-[9999] hidden md:flex items-center justify-center ${
               reachedEnd ? 'swiper-button-disabled' : ''
             }`}
             onClick={e => {

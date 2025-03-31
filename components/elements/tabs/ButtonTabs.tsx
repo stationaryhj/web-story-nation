@@ -168,7 +168,7 @@ export default function ButtonTabs({
                 tabsRef.current[index] = el
               }}
               className={cn(
-                'py-2 px-1 text-sm font-medium whitespace-nowrap transition-colors relative',
+                'py-2 px-1 text-sm sm:text-sm md:text-lg font-bold whitespace-nowrap transition-colors relative',
                 activeTabId === tab.id
                   ? 'text-primary-600 dark:text-dark-primary-500'
                   : 'text-secondary-600 hover:text-primary-500 dark:text-dark-secondary-400 dark:hover:text-dark-primary-400'

@@ -13,6 +13,13 @@ import {
   faBars,
   faTimes,
   faSignOutAlt,
+  faHome,
+  faComment,
+  faUser,
+  faVideo,
+  faChartLine,
+  faStore,
+  faFire,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -29,7 +36,7 @@ const SimpleToggle = ({ isOn, onToggle }: { isOn: boolean; onToggle: () => void 
   return (
     <div className="flex items-center">
       <FontAwesomeIcon icon={faFire} className="text-primary-500 dark:text-dark-primary-500 mr-2" />
-      <span className="mr-2 text-sm text-secondary-600 dark:text-dark-secondary-400">짜릿모드</span>
+      <span className="hidden sm:visible mr-2 text-sm text-secondary-600 dark:text-dark-secondary-400">짜릿모드</span>
       <button
         onClick={onToggle}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
@@ -79,10 +86,7 @@ export default function Header() {
 
   // 로그인 필요한 링크 체크 핸들러
   const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, link: (typeof navLinks)[0]) => {
-  const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, link: (typeof navLinks)[0]) => {
     if (link.requireLogin && !isLogin) {
-      e.preventDefault()
-      openModal('login')
       e.preventDefault()
       openModal('login')
     }
@@ -141,43 +145,38 @@ export default function Header() {
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center">
             <Link href="/" className="text-xl font-bold text-primary-600 dark:text-dark-primary-600 mr-10">
-              <Image src="/images/logo.svg" alt="스토리네이션" width={143} height={100} />
+              <Image
+                src={`${isDarkMode ? '/images/logo.svg' : '/images/logo_dark.svg'}`}
+                alt="스토리네이션"
+                width={143}
+                height={100}
+              />
             </Link>
 
-          {/* 데스크탑 네비게이션 - 태블릿 이상에서는 숨김 */}
-          <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={e => handleNavLinkClick(e, link)}
-                className={`text-sm font-medium transition-colors hover:text-primary-500 dark:hover:text-dark-primary-500 ${
-                  activeLink === link.href
-                    ? 'text-primary-500 dark:text-dark-primary-500'
-                    : 'text-secondary-700 dark:text-dark-secondary-400'
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
+            {/* 데스크탑 네비게이션 - 태블릿 이상에서는 숨김 */}
+            <nav className="hidden md:flex items-center gap-8">
+              {navLinks.map(link => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={e => handleNavLinkClick(e, link)}
+                  className={`text-sm font-medium transition-colors hover:text-primary-500 dark:hover:text-dark-primary-500 ${
+                    activeLink === link.href
+                      ? 'text-primary-500 dark:text-dark-primary-500'
+                      : 'text-secondary-700 dark:text-dark-secondary-400'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
 
           <div className="flex items-center space-x-2 md:space-x-4 gap-1">
             {/* 짜릿모드 토글 - 모바일에서도 표시 */}
             {mounted && (
               <div>
-                <div className="hidden sm:block">
-                  <SimpleToggle isOn={isAdultModeEnabled} onToggle={handleAdultModeToggle} />
-                </div>
-                <motion.button
-                  onClick={handleAdultModeToggle}
-                  className="sm:hidden text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <FontAwesomeIcon icon={faFire} className="text-lg" />
-                </motion.button>
+                <SimpleToggle isOn={isAdultModeEnabled} onToggle={handleAdultModeToggle} />
               </div>
             )}
 
@@ -255,33 +254,32 @@ export default function Header() {
       <AnimatePresence>
         {isSidebarOpen && mounted && (
           <Portal>
-            <>
-              {/* 배경 오버레이 */}
-              <motion.div
-                className="fixed inset-0 bg-black/50 z-[999]"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setIsSidebarOpen(false)}
-              />
+            {/* 배경 오버레이 */}
+            <motion.div
+              className="fixed inset-0 bg-black/50 z-[999]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsSidebarOpen(false)}
+            />
 
-              {/* 사이드바 */}
-              <motion.div
-                className="fixed top-0 right-0 h-full w-72 bg-white dark:bg-dark-background-light shadow-xl z-[999] overflow-y-auto"
-                initial={{ x: '100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '100%' }}
-                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              >
-                <div className="p-5 flex justify-between items-center border-b border-secondary-100 dark:border-dark-secondary-200/20">
-                  <h2 className="text-xl font-bold text-primary-600 dark:text-dark-primary-600">메뉴</h2>
-                  <button
-                    onClick={() => setIsSidebarOpen(false)}
-                    className="p-2 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
-                  >
-                    <FontAwesomeIcon icon={faTimes} className="text-xl" />
-                  </button>
-                </div>
+            {/* 사이드바 */}
+            <motion.div
+              className="fixed top-0 right-0 h-full w-72 bg-white dark:bg-dark-background-light shadow-xl z-[999] overflow-y-auto"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            >
+              <div className="p-5 flex justify-between items-center border-b border-secondary-100 dark:border-dark-secondary-200/20">
+                <h2 className="text-xl font-bold text-primary-600 dark:text-dark-primary-600">메뉴</h2>
+                <button
+                  onClick={() => setIsSidebarOpen(false)}
+                  className="p-2 text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
+                >
+                  <FontAwesomeIcon icon={faTimes} className="text-xl" />
+                </button>
+              </div>
 
               <nav className="p-5">
                 <ul className="space-y-5">
@@ -342,7 +340,7 @@ export default function Header() {
                 </div>
               </nav>
             </motion.div>
-          </>
+          </Portal>
         )}
       </AnimatePresence>
     </>

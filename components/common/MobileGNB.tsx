@@ -15,6 +15,19 @@ export default function MobileGNB() {
   const { openModal } = useModalStore()
   const { isLogin } = useAccountStore()
 
+  // 컴포넌트가 마운트되었는지 확인
+  useEffect(() => {
+    setMounted(true)
+
+    // 현재 경로 확인
+    if (pathname) {
+      setActiveLink(pathname)
+    }
+  }, [pathname])
+
+  // 마운트되지 않았거나 chat/[id] 페이지인 경우 렌더링하지 않음
+  if (!mounted || (pathname && pathname.startsWith('/chat/') && pathname !== '/chat-list')) return null
+
   // 네비게이션 링크 (아이콘 추가)
   const navLinks = [
     { href: '/', label: '홈', requireLogin: false, icon: faHome },
@@ -31,18 +44,6 @@ export default function MobileGNB() {
       openModal('login')
     }
   }
-
-  // 컴포넌트가 마운트되었는지 확인
-  useEffect(() => {
-    setMounted(true)
-
-    // 현재 경로 확인
-    if (pathname) {
-      setActiveLink(pathname)
-    }
-  }, [pathname])
-
-  if (!mounted) return null
 
   return (
     <div

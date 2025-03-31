@@ -132,16 +132,16 @@ export default function SearchBar({
     <div className={`w-full ${className} relative`}>
       <div className="mx-auto w-full">
         <div className="bg-white dark:bg-dark-background-DEFAULT p-3 rounded-xl shadow-sm">
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-            <div className="w-full sm:w-1/5 sm:min-w-[120px] z-49">
+          <form onSubmit={handleSubmit} className="flex">
+            <div className="max-w-[90px] sm:max-w-[90px] md:max-w-[120px] z-49">
               <BaseSelectBox
                 options={searchOptions}
                 selectedOption={selectedOption}
                 onChange={handleOptionChange}
-                className="rounded-xl sm:rounded-r-none sm:rounded-l-xl"
+                className="rounded-xl rounded-r-none"
               />
             </div>
-            <div className="flex flex-1 sm:rounded-r-xl overflow-hidden">
+            <div className="flex flex-1 rounded-r-xl overflow-hidden">
               <BaseInput
                 ref={inputRef}
                 placeholder={`${selectedOption.label}으로 검색하세요`}
@@ -152,89 +152,18 @@ export default function SearchBar({
                     onSearch(query, selectedOption.value)
                   }
                 }}
-                className="rounded-l-xl rounded-r-0 sm:rounded-l-none sm:rounded-r-none sm:border-l border-gray-200 outline-none"
-                // onFocus={() => setIsFocused(true)}
-                // onBlur={() => setIsFocused(false)}
+                className="rounded-l-none rounded-r-0 border-l border-gray-200"
               />
               <BaseButton
                 color="primary"
                 type="submit"
-                className="sm:rounded-l-none sm:rounded-r-xl rounded-l-none rounded-r-xl bg-gray-50 hover:bg-violet-500 hover:text-white text-gray-700 transition-colors"
+                className="rounded-l-none rounded-r-xl bg-gray-50 hover:bg-violet-500 hover:text-white text-gray-700 transition-colors"
                 disabled={!query.trim()}
               >
                 <FontAwesomeIcon icon={faSearch} className="mr-2" />
               </BaseButton>
             </div>
           </form>
-
-          {/* 검색 결과 표시 영역 */}
-          {/* {debouncedQuery.trim() && (
-            <div className="absolute top-full left-0 right-0 mt-2 rounded-lg bg-white dark:bg-dark-background-light shadow-lg overflow-hidden z-50 w-full">
-              {showNoResults ? (
-                <div className="p-6 text-center text-gray-500">
-                  <p>'{debouncedQuery}'에 대한 검색 결과가 없습니다.</p>
-                </div>
-              ) : (
-                searchResults.length > 0 && (
-                  <div className="max-h-80 overflow-y-auto">
-                    <div className="p-3 bg-gray-50 dark:bg-dark-background-DEFAULT border-b border-gray-200 dark:border-dark-secondary-800">
-                      <h3 className="font-medium text-gray-800 dark:text-dark-secondary-300">
-                        {selectedOption.label} 검색 결과 ({searchResults.length}개)
-                      </h3>
-                    </div>
-                    <ul>
-                      {searchResults.map(item => (
-                        <li
-                          key={item.id}
-                          className="p-3 hover:bg-gray-50 dark:hover:bg-dark-background-light border-b border-gray-100 dark:border-dark-secondary-800 cursor-pointer"
-                          onClick={() => {
-                            if (onSearch) {
-                              onSearch(item.name, selectedOption.value)
-                              setQuery(item.name)
-                            }
-                          }}
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-gray-800 dark:text-dark-secondary-200">{item.name}</span>
-                            {selectedOption.value === 'character' && (
-                              <span
-                                className={`text-xs px-2 py-1 rounded-full ${
-                                  item.gender === 'male'
-                                    ? 'bg-blue-100 text-blue-800'
-                                    : item.gender === 'female'
-                                      ? 'bg-pink-100 text-pink-800'
-                                      : 'bg-gray-100 text-gray-800'
-                                }`}
-                              >
-                                {item.gender === 'male' ? '남성' : item.gender === 'female' ? '여성' : '기타'}
-                              </span>
-                            )}
-                            {selectedOption.value === 'creator' && (
-                              <span className="text-xs text-gray-600 dark:text-dark-secondary-400">
-                                작품 {item.works}개
-                              </span>
-                            )}
-                          </div>
-                          {selectedOption.value === 'character' && item.tags && (
-                            <div className="mt-1 flex flex-wrap gap-1">
-                              {item.tags.map((tag: string, idx: number) => (
-                                <span
-                                  key={idx}
-                                  className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-dark-secondary-800 text-gray-700 dark:text-dark-secondary-400 rounded-full"
-                                >
-                                  #{tag}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )
-              )}
-            </div>
-          )} */}
         </div>
       </div>
     </div>

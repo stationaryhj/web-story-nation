@@ -94,9 +94,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body className="font-sans bg-white dark:bg-gray-900 transition-colors duration-300" suppressHydrationWarning>
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="flex min-h-screen flex-col">
+            <div className="flex-1">{children}</div>
+            <MobileGNB />
+          </div>
+        </Providers>
         <DraggableButtonGrid />
-        <MobileGNB />
       </body>
     </html>
   )

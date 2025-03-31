@@ -52,9 +52,15 @@ export const BaseSelectBox = ({
   }
 
   return (
-    <div ref={selectRef} className={cn('relative inline-block w-full text-left', className)}>
+    <div
+      ref={selectRef}
+      className={cn(
+        'relative inline-block w-full text-left max-w-[90px] sm:max-w-[90px] md:max-w-[120px] z-49',
+        className
+      )}
+    >
       <div
-        className="cursor-pointer flex items-center justify-between rounded-xl sm:rounded-r-none sm:rounded-l-xl bg-gray-100 py-3 px-4 text-base text-gray-800 hover:bg-gray-200 focus:outline-none"
+        className="cursor-pointer flex items-center justify-between rounded-xl rounded-r-none rounded-l-xl bg-gray-100 py-2 px-3 text-[11px] md:py-3 md:px-4 md:text-base text-gray-800 hover:bg-gray-200 focus:outline-none"
         onClick={toggleDropdown}
       >
         <span className="mr-2 truncate">{selectedOption.label || placeholder}</span>
@@ -65,13 +71,13 @@ export const BaseSelectBox = ({
       </div>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full origin-top-right rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <div className="absolute z-50 mt-1 w-full origin-top-right rounded-lg bg-white shadow-lg focus:outline-none">
           <div className="py-1 max-h-60 overflow-y-auto">
             {options.map(option => (
               <div
                 key={option.value}
                 className={cn(
-                  'block px-4 py-2 text-sm cursor-pointer hover:bg-gray-100',
+                  'block py-2 px-3 text-[11px] md:py-3 md:px-4 md:text-base cursor-pointer hover:bg-gray-100',
                   selectedOption.value === option.value ? 'bg-violet-50 text-violet-700 font-medium' : 'text-gray-700'
                 )}
                 onClick={() => handleOptionClick(option)}
