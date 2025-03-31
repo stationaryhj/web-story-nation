@@ -1045,29 +1045,27 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         return;
       }
 
-      // 연결 끊기 전 이벤트 처리를 위한 임시 핸들러
-      const originalOnDisconnect = socketRef.current.ondisconnect;
-      
-      socketRef.current.ondisconnect = (evt) => {
-        // 원래 이벤트 핸들러 호출
-        if (originalOnDisconnect) {
-          originalOnDisconnect(evt);
-        }
-        
-        socketRef.current = null;
-        setSocket(null);
-        setIsConnected(false);
-        resolve();
-      };
-
-      // 소켓 연결 종료 시도
+      // 연결 끊기 전에 원래 이벤트 핸들러를 빈 함수로 설정하여 오류 방지
       try {
-        socketRef.current?.disconnect(true);
+        // 오류가 발생하는 핸들러를 빈 함수로 대체
+        socketRef.current.ondisconnect = () => {}; // 빈 함수로 설정하여 타입 에러 방지
+        
+        // 소켓 연결 종료 시도
+        socketRef.current.disconnect(true);
       } catch (err) {
         console.error('Nakama 소켓 연결 해제 중 오류:', err);
+      } finally {
+        // 상태 업데이트
         socketRef.current = null;
         setSocket(null);
         setIsConnected(false);
+        
+        // 다른 상태 초기화
+        setChannelId(null);
+        setRoomName(null);
+        setIsInitRoom(false);
+        
+        console.log('소켓 연결 해제 완료');
         resolve();
       }
 
@@ -1075,9 +1073,15 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       setTimeout(() => {
         if (socketRef.current) {
           console.warn('소켓 연결 해제 타임아웃, 강제 정리');
+          socketRef.current.ondisconnect = () => {}; // 빈 함수로 설정하여 타입 에러 방지
           socketRef.current = null;
           setSocket(null);
           setIsConnected(false);
+          
+          // 다른 상태 초기화
+          setChannelId(null);
+          setRoomName(null);
+          setIsInitRoom(false);
         }
         resolve();
       }, 1000);

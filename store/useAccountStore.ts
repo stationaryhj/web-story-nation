@@ -424,7 +424,7 @@ export const useAccountStore = create<AccountState>()(
           // 팝업 창 위치 및 크기 계산
           const { width, height, left, top } = calculatePopupPosition();
 
-          console.log('authUrl : ', authUrl)
+          console.log('authUrl :: ', authUrl)
           
           // 팝업 창 열기
           const popup = window.open(
@@ -450,14 +450,43 @@ export const useAccountStore = create<AccountState>()(
               
               // 중복 처리 방지
               if (isProcessing) return;
+              
+              console.log(':::: event.data :::: ', event.data)
+              
+              // 우리가 콜백 페이지에서 명시적으로 보낸 데이터인지 확인 (패턴 검사)
+              // 1. 객체가 너무 복잡하면 우리 데이터가 아님 (React DevTools는 매우 긴 payload를 가짐)
+              // 2. login_type이 있으면 우리 데이터일 가능성 높음
+              // 3. code나 error 속성이 있으면 우리 데이터일 가능성 높음
+              
+              // 객체 구조가 간단한지 검사 (JSON 문자열화 했을 때 길이로 판단)
+              const isSimpleObject = JSON.stringify(event.data).length < 500;
+              
+              // 우리 콜백 데이터에 expected_properties 중 하나는 반드시 있어야 함
+              const expectedProperties = ['code', 'error', 'login_type'];
+              const hasExpectedProperty = expectedProperties.some(prop => 
+                Object.prototype.hasOwnProperty.call(event.data, prop)
+              );
+              
+              // 우리 데이터가 아니면 무시 (React DevTools, 메타마스크 등)
+              if (!isSimpleObject || !hasExpectedProperty) {
+                console.log('콜백 데이터가 아닙니다, 무시합니다:', 
+                  isSimpleObject ? '객체가 너무 복잡함' : '예상 속성이 없음');
+                return;
+              }
+              
               isProcessing = true;
               
               try {
-                const { code, state: callbackState, error } = event.data;
-
+                // 안전하게 속성 추출 (undefined일 수 있음)
+                const code = event.data.code;
+                const callbackState = event.data.state;
+                const error = event.data.error;
+                const login_type = event.data.login_type;
+                
                 console.log('code : ', code)
                 console.log('callbackState : ', callbackState)
                 console.log('error : ', error)
+                console.log('login_type : ', login_type)
                 
                 if (error) {
                   throw new Error(`로그인 실패: ${error}`);

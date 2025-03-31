@@ -25,6 +25,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import type { FormEvent } from 'react'
 import { useEffect, useState, useRef } from 'react'
 import { useModalStore } from '@/store/useStoreModal'
@@ -109,6 +110,8 @@ const customChatModes: ChatMode[] = [
 ]
 
 export default function ChatDetailClient({ characterId, charbotData }: ChatDetailClientProps) {
+  const router = useRouter()
+
   const { data: accountData } = useAccountStore(state => ({
     isLogin: state.isLogin,
     data: state.data,
@@ -277,10 +280,29 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
     // 컴포넌트 언마운트 시 정리
     return () => {
-      if (channelId) {
-        leaveChat(channelId).catch(err => console.error('채팅방 나가기 오류:', err))
-      }
-      disconnectSocket()
+      // 비동기 함수를 IIFE로 호출하여 안전하게 처리
+      (async () => {
+        try {
+          console.log('언마운트: 정리 시작');
+          if (channelId) {
+            try {
+              await leaveChat(channelId);
+              console.log('언마운트: 채팅방 나가기 완료');
+            } catch (err) {
+              console.error('언마운트: 채팅방 나가기 오류:', err);
+            }
+          }
+          
+          try {
+            await disconnectSocket();
+            console.log('언마운트: 소켓 연결 종료 완료');
+          } catch (err) {
+            console.error('언마운트: 소켓 연결 종료 오류:', err);
+          }
+        } catch (err) {
+          console.error('언마운트: 정리 중 오류 발생:', err);
+        }
+      })();
     }
   }, [
     character?.id,
@@ -422,25 +444,47 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   // 채팅방 삭제 함수
   const handleDeleteChat = async () => {
     try {
-      // 채팅방에서 나가기
+      setIsLoading(true); // 로딩 상태 표시
+      console.log('채팅방 삭제 시작...');
+      
+      // 1. 채팅방에서 나가기
       if (channelId) {
-        await leaveChat(channelId)
+        try {
+          const leaveResult = await leaveChat(channelId);
+          console.log('채팅방 나가기 결과:', leaveResult);
+        } catch (error) {
+          console.error('채팅방 나가기 중 오류:', error);
+          // 오류가 발생해도 계속 진행
+        }
       }
-
-      // 상태 초기화
-      clearChatHistory()
-      hasInitialized.current = false
+      
+      // 2. 소켓 연결 종료
+      try {
+        await disconnectSocket();
+        console.log('소켓 연결 종료 완료');
+      } catch (error) {
+        console.error('소켓 연결 종료 중 오류:', error);
+        // 오류가 발생해도 계속 진행
+      }
+      
+      // 3. 상태 정리
+      clearChatHistory();
+      hasInitialized.current = false;
 
       // 모달 닫기
-      closeModal()
+      closeModal();
 
-      // 페이지 리디렉션
-      window.location.href = '/chat'
+      // 4. 페이지 리디렉션 (Next.js 라우터 사용)
+      router.push('/chat');
     } catch (error) {
-      console.error('채팅방 삭제 중 오류:', error)
-      setError('채팅방 삭제에 실패했습니다. 다시 시도해주세요.')
+      console.error('채팅방 삭제 프로세스 중 오류 발생:', error);
+      setError('채팅방 삭제에 실패했습니다. 다시 시도해주세요.');
+      // 에러가 발생해도 페이지 이동
+      router.push('/chat');
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
   // 메시지 내용에서 상황 설명(*로 감싸진 텍스트)를 찾아 스타일을 적용하는 함수
   const formatMessageWithSituations = (message: string) => {
@@ -593,7 +637,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-red-600">
           <p>{error}</p>
         </div>
-        <BaseButton color="primary" onClick={() => window.location.reload()}>
+        <BaseButton color="primary" onClick={() => router.refresh()}>
           다시 시도
         </BaseButton>
       </div>
@@ -616,11 +660,58 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         {/* 왼쪽 그룹: 뒤로가기 + 캐릭터 프로필 */}
         <div className="flex items-center min-w-0">
           {/* 1: 뒤로가기 버튼 */}
-          <Link href="/chat-list" className="mr-3">
+          <button
+            onClick={async () => {
+              try {
+                setIsLoading(true); // 로딩 상태 표시
+                console.log('채팅방 나가기 시작...');
+                
+                // 1. 채팅방에서 나가기
+                if (channelId) {
+                  try {
+                    const leaveResult = await leaveChat(channelId);
+                    console.log('채팅방 나가기 결과:', leaveResult);
+                  } catch (error) {
+                    console.error('채팅방 나가기 중 오류:', error);
+                    // 오류가 발생해도 계속 진행
+                  }
+                }
+                
+                // 2. 소켓 연결 종료
+                try {
+                  await disconnectSocket();
+                  console.log('소켓 연결 종료 완료');
+                } catch (error) {
+                  console.error('소켓 연결 종료 중 오류:', error);
+                  // 오류가 발생해도 계속 진행
+                }
+                
+                // 3. 상태 정리
+                clearChatHistory();
+                hasInitialized.current = false;
+                
+                // 4. 채팅 목록 페이지로 이동 (Next.js 라우터 사용)
+                router.push('/chat-list');
+              } catch (error) {
+                console.error('채팅방 나가기 프로세스 중 오류 발생:', error);
+                // 에러가 발생해도 페이지 이동
+                router.push('/chat-list');
+              } finally {
+                setIsLoading(false);
+              }
+            }}
+            className="mr-3"
+            disabled={isLoading}
+            aria-label="뒤로 가기"
+          >
             <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center transition-colors hover:bg-gray-200">
-              <FontAwesomeIcon icon={faArrowLeft} className="text-gray-600" />
+              {isLoading ? (
+                <div className="w-4 h-4 border-2 border-t-transparent border-gray-600 rounded-full animate-spin"></div>
+              ) : (
+                <FontAwesomeIcon icon={faArrowLeft} className="text-gray-600" />
+              )}
             </div>
-          </Link>
+          </button>
 
           {/* 캐릭터 프로필 */}
           <div className="flex items-center min-w-0 overflow-hidden">
@@ -836,9 +927,19 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                   confirmButtonClass: 'bg-red-500 hover:bg-red-600 text-white',
                 })
               }}
+              disabled={isLoading}
             >
-              <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-              채팅방 나가기
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-t-transparent border-red-600 rounded-full animate-spin mr-2"></div>
+                  처리 중...
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+                  채팅방 나가기
+                </>
+              )}
             </button>
           </div>
         </div>
@@ -911,8 +1012,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                 </p>
               </div>
               <button
-                onClick={() => window.location.reload()}
+                onClick={() => router.refresh()}
                 className="px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded text-xs font-medium transition-colors flex items-center"
+                aria-label="새로고침"
               >
                 <FontAwesomeIcon icon={faSync} className="mr-1.5" />
                 새로고침
