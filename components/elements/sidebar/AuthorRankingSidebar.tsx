@@ -15,19 +15,6 @@ const rankingTabs: TabItem[] = [
   { id: 'all', label: '전체' },
 ]
 
-// 목업 작가 데이터
-const generateMockAuthors = (count: number) => {
-  return Array.from({ length: count }, (_, i) => ({
-    id: `author-${i + 1}`,
-    name: `작가${i + 1}`,
-    nickname: `작가닉네임${i + 1}`,
-    description: `${i + 1}번 작가의 간단한 소개입니다. 캐릭터 창작을 좋아하는 스토리텔러입니다.`,
-    profileImageUrl: i % 5 === 0 ? null : `/images/profile/author${(i % 4) + 1}.jpg`,
-    characterCount: Math.floor(Math.random() * 20) + 1,
-    isVerified: i % 10 === 0, // 10번째마다 인증된 작가
-  }))
-}
-
 interface AuthorRankingSidebarProps {
   isOpen: boolean
   onClose: () => void

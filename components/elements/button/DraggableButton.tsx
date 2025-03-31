@@ -1,29 +1,46 @@
 'use client'
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { MessageSquare, Pen, Lightbulb } from 'lucide-react'
+import IdeaShareModal from '../../modal/IdeaShareModal'
+import RewardModal from '../../modal/RewardModal'
+import { contentApi } from '@/services/api/storyNationApi'
 
 // 타입 정의는 types/window.ts 파일로 이동했습니다
 // window.resizeTimer 속성을 사용하기 위해 타입 참조
 import '../../../types/window'
 
+interface FloatingMenuButton {
+  id: string
+  icon: React.JSX.Element
+  label: string
+  color: string
+  onClick: () => void
+  position: {
+    x: number
+    y: number
+  }
+}
+
 interface DraggableButtonProps {
   color?: string
-  children: React.ReactNode
+  children?: React.ReactNode
+  icon?: React.ReactNode
   onClick?: () => void
   initialPosition?: { x: number; y: number }
   size?: number
-  buttonIndex?: number // 여러 버튼 사용 시 위치 계산을 위한 인덱스
-  buttonsCount?: number // 전체 버튼 개수 (간격 계산용)
+  floatingMenuButtons?: FloatingMenuButton[]
 }
 
 export default function DraggableButton({
   color = 'bg-blue-500',
   children,
+  icon,
   onClick,
   initialPosition,
   size = 70,
-  buttonIndex = 0, // 기본값은 0 (첫 번째 버튼)
-  buttonsCount = 2, // 기본값은 2개 버튼
+  floatingMenuButtons,
 }: DraggableButtonProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
@@ -31,6 +48,9 @@ export default function DraggableButton({
   const [isVisible, setIsVisible] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [actualSize, setActualSize] = useState(size)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [ideaModalOpen, setIdeaModalOpen] = useState(false)
+  const [rewardModalOpen, setRewardModalOpen] = useState(false)
 
   const mouseDownPosition = useRef({ x: 0, y: 0 })
   const hasMoved = useRef(false)
@@ -49,13 +69,46 @@ export default function DraggableButton({
   const MOBILE_BREAKPOINT = 768
   // 모바일에서 버튼 크기 축소 비율
   const MOBILE_SIZE_RATIO = 0.7
-  // 모바일에서 추가 상단 여백 (픽셀)
-  const MOBILE_EXTRA_MARGIN_TOP = 80
+  // 버튼 여백
+  const BUTTON_MARGIN = 20
+  // 모바일 GNB 높이
+  const MOBILE_GNB_HEIGHT = 64
   // 버튼 간 간격 (픽셀)
-  const BUTTON_SPACING_DESKTOP = 20
-  const BUTTON_SPACING_MOBILE = 15
+  const BUTTON_SPACING = 80
   // 버튼 투명도 값
   const BUTTON_OPACITY_NORMAL = 0.8
+  // 메뉴 버튼 크기
+  const NAV_BUTTON_SIZE = isMobile ? 50 : 60
+  // 버튼 간 거리
+  const BUTTON_DISTANCE = isMobile ? 70 : 80
+
+  // 기본 플로팅 메뉴 버튼 정의
+  const defaultFloatingMenuButtons = [
+    {
+      id: 'microphone',
+      icon: <Lightbulb size={20} color="white" />,
+      label: '아이디어 제안',
+      color: 'bg-primary-500',
+      onClick: () => setIdeaModalOpen(true),
+      position: { x: 0, y: -BUTTON_DISTANCE },
+    },
+    {
+      id: 'pen',
+      icon: <Pen size={20} color="white" />,
+      label: '리워드 받기',
+      color: 'bg-primary-500',
+      onClick: () => setRewardModalOpen(true),
+      position: { x: 0, y: -BUTTON_DISTANCE * 2 },
+    },
+  ]
+
+  // 아이디어 제출 처리
+  const handleIdeaSubmit = async (idea: string) => {
+    const response = await contentApi.SendFeedback(idea)
+    if (response.data.result.err === 0) {
+      setIdeaModalOpen(false)
+    }
+  }
 
   // 모바일 환경 감지 함수
   const checkIfMobile = useCallback(() => {
@@ -68,156 +121,89 @@ export default function DraggableButton({
     if (typeof window === 'undefined') return { x: 0, y: 0 }
 
     const buttonSize = isMobile ? Math.round(size * MOBILE_SIZE_RATIO) : size
-    const margin = isMobile ? 15 : 20
-    const spacing = isMobile ? BUTTON_SPACING_MOBILE : BUTTON_SPACING_DESKTOP
-
     const screenWidth = window.innerWidth
     const screenHeight = window.innerHeight
-    const totalButtonsWidth = buttonsCount * buttonSize + (buttonsCount - 1) * spacing
 
-    let leftStart = screenWidth - margin - totalButtonsWidth
-    let initialX
-
-    if (isMobile && totalButtonsWidth > screenWidth - 2 * margin) {
-      const availableWidth = screenWidth - 2 * margin
-      const buttonSectionWidth = availableWidth / buttonsCount
-      const centerPoint = margin + buttonIndex * buttonSectionWidth + buttonSectionWidth / 2
-      initialX = centerPoint - buttonSize / 2
-    } else {
-      initialX = leftStart + buttonIndex * (buttonSize + spacing)
-    }
-
-    const bottomMargin = isMobile ? margin + MOBILE_EXTRA_MARGIN_TOP : margin
-    let initialY = screenHeight - bottomMargin - buttonSize
-
-    initialX = Math.min(initialX, screenWidth - margin - buttonSize)
-    initialX = Math.max(margin, initialX)
+    // 왼쪽 하단에 위치하도록 변경
+    const initialX = BUTTON_MARGIN
+    // 모바일에서는 GNB 높이를 고려하여 위치 조정
+    const bottomMargin = isMobile ? BUTTON_MARGIN + MOBILE_GNB_HEIGHT : BUTTON_MARGIN
+    const initialY = screenHeight - bottomMargin - buttonSize
 
     return { x: initialX, y: initialY }
-  }, [isMobile, size, buttonIndex, buttonsCount])
+  }, [isMobile, size])
 
-  // 버튼 위치 계산 함수
+  // 버튼 위치 계산 함수 최적화
   const calculatePosition = useCallback(() => {
     if (typeof window === 'undefined') return { x: 0, y: 0 }
 
     const buttonSize = isMobile ? Math.round(size * MOBILE_SIZE_RATIO) : size
 
-    // 사용자가 드래그로 위치를 변경했으면 재계산하지 않음 (화면 안으로만 조정)
-    if (hasUserRepositioned.current && positionRef.current.x !== 0 && positionRef.current.y !== 0) {
-      // 화면 밖으로 나가는 것만 방지
+    // 사용자가 드래그로 위치를 변경한 경우
+    if (hasUserRepositioned.current) {
       const maxX = Math.max(0, window.innerWidth - buttonSize)
       const maxY = Math.max(0, window.innerHeight - buttonSize)
 
       return {
-        x: Math.min(positionRef.current.x, maxX),
-        y: Math.min(positionRef.current.y, maxY),
+        x: Math.min(Math.max(0, positionRef.current.x), maxX),
+        y: Math.min(Math.max(0, positionRef.current.y), maxY),
       }
     }
 
-    // 기본 위치 계산
+    // 기본 위치 반환
     return calculateDefaultPosition()
   }, [isMobile, size, calculateDefaultPosition])
 
-  // 위치 및 크기 업데이트
+  // 위치 및 크기 업데이트 최적화
   const updatePositionAndSize = useCallback(() => {
     const newIsMobile = checkIfMobile()
+    const newSize = newIsMobile ? Math.round(size * MOBILE_SIZE_RATIO) : size
 
+    // 모바일 상태가 변경된 경우에만 크기 업데이트
     if (newIsMobile !== prevIsMobile.current) {
       setIsMobile(newIsMobile)
       prevIsMobile.current = newIsMobile
-
-      const newSize = newIsMobile ? Math.round(size * MOBILE_SIZE_RATIO) : size
       setActualSize(newSize)
+    }
 
-      const defaultPosition = calculateDefaultPosition()
-      positionRef.current = defaultPosition
-      setPosition(defaultPosition)
+    // 위치 업데이트
+    const newPosition = calculatePosition()
+    positionRef.current = newPosition
+    setPosition(newPosition)
 
-      hasUserRepositioned.current = false
-    } else if (isInitialized.current) {
-      const newPosition = calculatePosition()
-      positionRef.current = newPosition
-      setPosition(newPosition)
-    } else {
-      const newSize = newIsMobile ? Math.round(size * MOBILE_SIZE_RATIO) : size
-      setActualSize(newSize)
-
-      const newPosition = calculatePosition()
-      positionRef.current = newPosition
-      setPosition(newPosition)
-
+    if (!isInitialized.current) {
       isInitialized.current = true
     }
-  }, [checkIfMobile, calculatePosition, calculateDefaultPosition, size])
+  }, [checkIfMobile, calculatePosition, size])
 
   // 초기 설정 및 리사이징 이벤트 처리
   useEffect(() => {
     if (typeof window === 'undefined') return
 
     // 초기 설정
-    if (!isInitialized.current) {
-      updatePositionAndSize()
-    }
+    updatePositionAndSize()
+    setIsVisible(true)
 
-    // 렌더링 이후에만 버튼을 표시 (하이드레이션 이슈 방지)
-    const visibilityTimer = setTimeout(() => {
-      setIsVisible(true)
-    }, 100)
-
-    // 브라우저 크기 변경 이벤트 리스너
+    // 브라우저 크기 변경 이벤트 리스너 (디바운싱 적용)
     const handleResize = () => {
-      // 디바운싱 적용 (성능 최적화)
       if (window.resizeTimer) {
         clearTimeout(window.resizeTimer)
       }
 
-      window.resizeTimer = setTimeout(() => {
-        updatePositionAndSize()
-      }, 100)
+      window.resizeTimer = setTimeout(updatePositionAndSize, 100)
     }
 
     window.addEventListener('resize', handleResize)
+    window.addEventListener('orientationchange', handleResize)
 
-    // 모바일 모드 전환 강제 체크 (iOS Safari 등에서 스크롤 시 주소창 크기 변화 감지를 위함)
-    const scrollCheck = () => {
-      if (window.resizeTimer) {
-        clearTimeout(window.resizeTimer)
-      }
-
-      window.resizeTimer = setTimeout(() => {
-        const currentIsMobile = checkIfMobile()
-        if (currentIsMobile !== prevIsMobile.current) {
-          updatePositionAndSize()
-        }
-      }, 100)
-    }
-
-    window.addEventListener('scroll', scrollCheck)
-
-    // 모바일 환경에서 방향 전환(orientation) 감지
-    const handleOrientationChange = () => {
-      if (window.resizeTimer) {
-        clearTimeout(window.resizeTimer)
-      }
-
-      window.resizeTimer = setTimeout(() => {
-        updatePositionAndSize()
-      }, 100)
-    }
-
-    window.addEventListener('orientationchange', handleOrientationChange)
-
-    // 컴포넌트 언마운트 시 이벤트 리스너 및 타이머 정리
     return () => {
       window.removeEventListener('resize', handleResize)
-      window.removeEventListener('scroll', scrollCheck)
-      window.removeEventListener('orientationchange', handleOrientationChange)
-      clearTimeout(visibilityTimer)
+      window.removeEventListener('orientationchange', handleResize)
       if (window.resizeTimer) {
         clearTimeout(window.resizeTimer)
       }
     }
-  }, [updatePositionAndSize, checkIfMobile])
+  }, [updatePositionAndSize])
 
   const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
     // 마우스 다운 위치 저장
@@ -267,18 +253,22 @@ export default function DraggableButton({
   }
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    // 드래그가 아닌 단순 클릭인 경우에만 클릭 이벤트 실행
-    if (!hasMoved.current && onClick) {
-      onClick()
+    // 이벤트 전파 중지를 가장 먼저 실행
+    e.preventDefault()
+    e.stopPropagation()
+
+    // 드래그가 아닌 단순 클릭인 경우에만 메뉴 토글
+    if (!hasMoved.current) {
+      setIsMenuOpen(!isMenuOpen)
     }
   }
 
   const handleTouchStart = (e: React.TouchEvent<HTMLButtonElement>) => {
-    if (e.touches.length !== 1) return
-
-    // 터치 시작 시 기본 동작 방지 (스크롤 방지)
+    // 이벤트 전파 중지를 가장 먼저 실행
     e.preventDefault()
     e.stopPropagation()
+
+    if (e.touches.length !== 1) return
 
     const touch = e.touches[0]
     mouseDownPosition.current = { x: touch.clientX, y: touch.clientY }
@@ -328,11 +318,18 @@ export default function DraggableButton({
     setPosition(newPosition)
   }
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e: TouchEvent) => {
     setIsDragging(false)
 
-    if (!hasMoved.current && onClick) {
-      onClick()
+    // 드래그하지 않은 경우에만 메뉴 토글
+    if (!hasMoved.current) {
+      // 이벤트 전파 중지
+      e.preventDefault()
+      e.stopPropagation()
+      // 메뉴 토글
+      setIsMenuOpen(!isMenuOpen)
+      // onClick prop이 실행되지 않도록 return
+      return false
     }
   }
 
@@ -374,45 +371,143 @@ export default function DraggableButton({
     return () => clearTimeout(forceUpdateTimer)
   }, [updatePositionAndSize])
 
+  // 메뉴가 열릴 때 ESC 키로 닫기 가능하도록 설정
+  useEffect(() => {
+    const handleEscKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isMenuOpen) {
+        setIsMenuOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleEscKey)
+    return () => window.removeEventListener('keydown', handleEscKey)
+  }, [isMenuOpen])
+
+  // 아이콘 컨텐츠 기본값 설정
+  const buttonContent = children || (
+    <div className="flex flex-col items-center justify-center">{icon || <MessageSquare size={24} color="white" />}</div>
+  )
+
   if (!isVisible) return null
 
+  // 사용할 플로팅 메뉴 버튼 결정
+  const menuButtons = floatingMenuButtons || defaultFloatingMenuButtons
+
   return (
-    <button
-      onClick={handleClick}
-      onMouseDown={handleMouseDown}
-      onTouchStart={handleTouchStart}
-      className={`
-        fixed
-        ${color}
-        text-white
-        rounded-full
-        shadow-lg
-        cursor-pointer
-        select-none
-        flex
-        items-center
-        justify-center
-        transition-transform
-        duration-200
-        hover:scale-110
-        active:scale-95
-        touch-none
-      `}
-      style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        zIndex: 50,
-        width: `${actualSize}px`,
-        height: `${actualSize}px`,
-        fontSize: isMobile ? '0.875rem' : '1rem',
-        transform: 'translate3d(0,0,0)',
-        opacity: BUTTON_OPACITY_NORMAL,
-        userSelect: 'none',
-        WebkitTapHighlightColor: 'transparent',
-        touchAction: 'none',
-      }}
-    >
-      <div className="transform scale-125 flex items-center justify-center w-full h-full">{children}</div>
-    </button>
+    <>
+      <button
+        onClick={handleClick}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={e => {
+          e.preventDefault()
+          e.stopPropagation()
+          if (!hasMoved.current) {
+            setIsMenuOpen(!isMenuOpen)
+          }
+        }}
+        className={`
+          fixed
+          ${color}
+          text-white
+          rounded-full
+          shadow-lg
+          cursor-pointer
+          select-none
+          flex
+          items-center
+          justify-center
+          transition-transform
+          duration-200
+          hover:scale-110
+          active:scale-95
+          touch-none
+        `}
+        style={{
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+          zIndex: 999,
+          width: `${actualSize}px`,
+          height: `${actualSize}px`,
+          fontSize: isMobile ? '0.875rem' : '1rem',
+          transform: 'translate3d(0,0,0)',
+          opacity: BUTTON_OPACITY_NORMAL,
+          userSelect: 'none',
+          WebkitTapHighlightColor: 'transparent',
+          touchAction: 'none',
+        }}
+      >
+        <div className="transform scale-125 flex items-center justify-center w-full h-full">{buttonContent}</div>
+      </button>
+
+      {/* 플로팅 메뉴 버튼 (메인 버튼 클릭 시 표시) */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <>
+            {/* 메뉴 배경 (클릭 시 메뉴 닫힘) */}
+            <motion.div
+              className="fixed inset-0 bg-black/10"
+              style={{ zIndex: 998 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={e => {
+                e.preventDefault()
+                e.stopPropagation()
+                setIsMenuOpen(false)
+              }}
+            />
+
+            {/* 플로팅 메뉴 버튼 렌더링 */}
+            {menuButtons.map(button => (
+              <motion.button
+                key={button.id}
+                className={`fixed rounded-full ${button.color} text-white flex items-center gap-2 shadow-lg px-4`}
+                style={{
+                  left: `${position.x + actualSize / 2 - NAV_BUTTON_SIZE / 2}px`,
+                  top: `${position.y}px`,
+                  height: `${NAV_BUTTON_SIZE}px`,
+                  minWidth: `${NAV_BUTTON_SIZE}px`,
+                  zIndex: 999,
+                }}
+                initial={{
+                  opacity: 0,
+                  x: '0',
+                  y: '0',
+                }}
+                animate={{
+                  opacity: 1,
+                  x: `${button.position.x}px`,
+                  y: `${button.position.y}px`,
+                  transition: {
+                    duration: 0.2,
+                    delay: 0.05 * menuButtons.indexOf(button),
+                  },
+                }}
+                exit={{
+                  opacity: 0,
+                  x: '0',
+                  y: '0',
+                  transition: { duration: 0.2 },
+                }}
+                onClick={e => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  setIsMenuOpen(false)
+                  button.onClick()
+                }}
+              >
+                {button.icon}
+                <span className="text-sm whitespace-nowrap">{button.label}</span>
+              </motion.button>
+            ))}
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* 모달 컴포넌트 */}
+      <IdeaShareModal isOpen={ideaModalOpen} onClose={() => setIdeaModalOpen(false)} onSubmit={handleIdeaSubmit} />
+      <RewardModal isOpen={rewardModalOpen} onClose={() => setRewardModalOpen(false)} />
+    </>
   )
 }

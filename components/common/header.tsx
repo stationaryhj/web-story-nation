@@ -30,6 +30,7 @@ import { useState, useEffect } from 'react'
 import { useSettingsStore } from '../../store/useStoreSettings'
 import Image from 'next/image'
 import HeaderSidebar from '@/components/elements/sidebar/HeaderSidebar'
+import { useRouter } from 'next/navigation'
 
 // 토글 스위치 컴포넌트 추가 (불꽃 아이콘 추가)
 const SimpleToggle = ({
@@ -74,6 +75,7 @@ export default function Header() {
   const { openModal } = useModalStore()
   const { isAdultModeEnabled, toggleAdultMode } = useSettingsStore()
   const { isLogin, logout } = useAccountStore()
+  const router = useRouter()
 
   // 짜릿모드 토글 핸들러
   const handleAdultModeToggle = () => {
@@ -140,7 +142,15 @@ export default function Header() {
       >
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-primary-600 dark:text-dark-primary-600 mr-10">
+            <Link
+              href="/"
+              className="text-xl font-bold text-primary-600 dark:text-dark-primary-600 mr-10"
+              onClick={e => {
+                // 메인 페이지로 이동 시 URL에서 tab 파라미터를 삭제하여 추천 탭으로 강제 이동
+                e.preventDefault()
+                router.push('/')
+              }}
+            >
               <Image
                 src={`${isDarkMode ? '/images/logo.svg' : '/images/logo_dark.svg'}`}
                 alt="스토리네이션"

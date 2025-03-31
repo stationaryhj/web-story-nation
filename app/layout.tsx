@@ -7,8 +7,9 @@ import Script from 'next/script'
 import type { ReactNode } from 'react'
 
 import Providers from './providers'
-import DraggableButtonGrid from '@/components/grid/DraggableButtonGrid'
+import DraggableButton from '@/components/elements/button/DraggableButton'
 import MobileGNB from '@/components/common/MobileGNB'
+import { Fan } from 'lucide-react'
 
 // Poppins 폰트 설정
 const poppins = Poppins({
@@ -99,7 +100,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <div className="flex-1">{children}</div>
           </div>
         </Providers>
-        <DraggableButtonGrid />
+
+        {/* 메인 플로팅 메뉴 버튼 */}
+        <DraggableButton color="bg-primary-500" icon={<Fan size={24} color="white" />} />
+
         <MobileGNB />
       </body>
     </html>

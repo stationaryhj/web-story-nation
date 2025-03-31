@@ -566,6 +566,18 @@ export default function CardGrid({
             disabled={reachedEnd}
           ></button>
           <Swiper
+            onSwiper={swiper => {
+              swiperRef.current = swiper
+              setReachedBeginning(swiper.isBeginning)
+              setReachedEnd(swiper.isEnd)
+
+              // 스와이퍼 초기화 후 버튼 재연결
+              setTimeout(() => {
+                if (swiper && swiper.navigation) {
+                  swiper.navigation.update()
+                }
+              }, 100)
+            }}
             modules={[Navigation]}
             spaceBetween={16}
             loop={false}
@@ -579,18 +591,6 @@ export default function CardGrid({
             onReachEnd={handleReachEnd}
             onReachBeginning={handleReachBeginning}
             onSlideChange={handleSlideChange}
-            onSwiper={swiper => {
-              swiperRef.current = swiper
-              setReachedBeginning(swiper.isBeginning)
-              setReachedEnd(swiper.isEnd)
-
-              // 스와이퍼 초기화 후 버튼 재연결
-              setTimeout(() => {
-                if (swiper && swiper.navigation) {
-                  swiper.navigation.update()
-                }
-              }, 100)
-            }}
             className="custom-swiper card-grid-swiper overflow-visible"
           >
             {isDataLoading ? renderSkeletons() : renderCards()}

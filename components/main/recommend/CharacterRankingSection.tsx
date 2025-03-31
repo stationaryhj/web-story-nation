@@ -90,7 +90,6 @@ const CharacterRankingSection = memo(() => {
               hasRanking={true}
               useSwiper={true}
               sectionId="character-ranking-section"
-              className="overflow-hidden"
             />
           </div>
         </SectionTransition>
