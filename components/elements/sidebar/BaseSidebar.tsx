@@ -27,7 +27,7 @@ export default function BaseSidebar({
   title,
   children,
   headerExtra,
-  width = '600px',
+  width = '',
   side = 'right',
   className,
 }: BaseSidebarProps) {
@@ -63,6 +63,15 @@ export default function BaseSidebar({
     }
   }, [isOpen])
 
+  // 반응형 너비 설정 로직
+  const getWidth = () => {
+    if (width) {
+      return width
+    }
+
+    return isMobile ? '100%' : '600px'
+  }
+
   if (!isOpen) return null
 
   const sidebarContent = (
@@ -78,9 +87,17 @@ export default function BaseSidebar({
 
       {/* 사이드바 컨테이너 */}
       <motion.div
-        className={`fixed top-0 ${side === 'right' ? 'right-0' : 'left-0'} h-full ${
-          width ? width : 'w-72'
-        } bg-white dark:bg-dark-background-light shadow-xl z-[1000] overflow-y-auto ${className}`}
+        className={`fixed top-0 ${side === 'right' ? 'right-0' : 'left-0'} h-full bg-white dark:bg-dark-background-light shadow-xl z-[1000] overflow-hidden ${className}`}
+        style={{
+          width: getWidth(),
+          minWidth: isMobile ? 'auto' : '600px',
+          maxWidth: isMobile ? '100%' : 'none',
+          maxHeight: '100vh',
+          overflowX: 'hidden',
+          overflowY: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
         initial={{ x: side === 'right' ? '100%' : '-100%' }}
         animate={{ x: 0 }}
         exit={{ x: side === 'right' ? '100%' : '-100%' }}
@@ -102,7 +119,7 @@ export default function BaseSidebar({
         </div>
 
         {/* 컨텐츠 영역 */}
-        <div className="h-[calc(100%-74px)] overflow-y-auto">{children}</div>
+        <div className="flex-1 overflow-y-auto overflow-x-hidden">{children}</div>
       </motion.div>
     </>
   )

@@ -131,40 +131,38 @@ export default function SearchBar({
   return (
     <div className={`w-full ${className} relative`}>
       <div className="mx-auto w-full">
-        <div className="bg-white dark:bg-dark-background-DEFAULT p-3 rounded-xl shadow-sm">
-          <form onSubmit={handleSubmit} className="flex">
-            <div className="max-w-[90px] sm:max-w-[90px] md:max-w-[120px] z-49">
-              <BaseSelectBox
-                options={searchOptions}
-                selectedOption={selectedOption}
-                onChange={handleOptionChange}
-                className="rounded-xl rounded-r-none"
-              />
-            </div>
-            <div className="flex flex-1 rounded-r-xl overflow-hidden">
-              <BaseInput
-                ref={inputRef}
-                placeholder={`${selectedOption.label}으로 검색하세요`}
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                onEnterPress={() => {
-                  if (query.trim() && onSearch) {
-                    onSearch(query, selectedOption.value)
-                  }
-                }}
-                className="rounded-l-none rounded-r-0 border-l border-gray-200"
-              />
-              <BaseButton
-                color="primary"
-                type="submit"
-                className="rounded-l-none rounded-r-xl bg-gray-50 hover:bg-violet-500 hover:text-white text-gray-700 transition-colors"
-                disabled={!query.trim()}
-              >
-                <FontAwesomeIcon icon={faSearch} className="mr-2" />
-              </BaseButton>
-            </div>
-          </form>
-        </div>
+        <form onSubmit={handleSubmit} className="flex">
+          <div>
+            <BaseSelectBox
+              options={searchOptions}
+              selectedOption={selectedOption}
+              onChange={handleOptionChange}
+              className="rounded-xl rounded-r-none"
+            />
+          </div>
+          <div className="flex flex-1 rounded-r-xl overflow-hidden">
+            <BaseInput
+              ref={inputRef}
+              placeholder={`${selectedOption.label}으로 검색하세요`}
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              onEnterPress={() => {
+                if (query.trim() && onSearch) {
+                  onSearch(query, selectedOption.value)
+                }
+              }}
+              className="rounded-l-none rounded-r-0 border-l border-gray-200"
+            />
+            <BaseButton
+              color="primary"
+              type="submit"
+              className="rounded-l-none rounded-r-xl bg-gray-50 hover:bg-violet-500 hover:text-white text-gray-700 transition-colors !px-2 !flex !justify-center !items-center"
+              disabled={!query.trim()}
+            >
+              <FontAwesomeIcon icon={faSearch} className="mr-2" />
+            </BaseButton>
+          </div>
+        </form>
       </div>
     </div>
   )
