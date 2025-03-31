@@ -389,6 +389,9 @@ export const useAccountStore = create<AccountState>()(
           if (type === 'APPLE') {
             params.append('response_mode', 'form_post')
           }
+          else if(type === 'KAKAO') {
+            params.append('prompt', 'login')
+          }
 
           const authUrl = `${providerConfig.endpoints.OAUTH_URL}?${params.toString()}`
           
@@ -411,6 +414,7 @@ export const useAccountStore = create<AccountState>()(
             let isProcessing = false;
             
             const messageHandler: MessageHandler = async (event) => {
+              
               // 메시지 출처 검증
               if (new URL(event.origin).hostname !== new URL(REDIRECT_URI).hostname) {
                 return;
@@ -447,11 +451,27 @@ export const useAccountStore = create<AccountState>()(
                 } else {
                   // handleCallback에서 이미 리다이렉션 처리된 경우 (회원가입 처리는 별도로 했으므로 여기서는 처리 완료)
                   set({ loading: false });
+                  
                   resolve();
                 }
               } catch (error) {
+                
                 const errorMessage = handleNetworkError(error);
                 set({ error: errorMessage, loading: false });
+
+                // 로컬 스토리지 초기화
+                localStorage.clear();
+
+                // 세션 스토리지 초기화
+                sessionStorage.clear();
+
+                // 쿠키 초기화 (카카오 도메인 관련)
+                document.cookie.split(";").forEach(function(c) {
+                  if (c.indexOf("kakao") !== -1) {
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                  }
+                });
+
                 reject(error);
               } finally {
                 // 이벤트 리스너 제거
