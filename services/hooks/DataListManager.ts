@@ -21,6 +21,9 @@ import type {
   BankListResponse,
   CharbotTop10NewResponse,
   WriterWithdrawResponse,
+  GetPresignedUrlResponse,
+  WithdrawRequestListResponse,
+  SaleMonthlyIncomeResponse,
 } from '@/types/api'
 
 import { contentApi, settlementApi, createApi, chatApi } from '../api/storyNationApi'
@@ -333,7 +336,7 @@ export const ReqSaveCreateChatBotInProgress = async (payload: {
       payload.show_yn,
       payload.content_show_yn,
       payload.example_show_yn,
-      payload.finish_yn
+      payload.finish_yn,
     )
 
     return { data: response.data, error: null }
@@ -391,3 +394,30 @@ export const GetSearch = (search: string, order: number, paginate: number, page:
 
   return { data, isLoading, error, refetch }
 }
+
+export const GetWithdrawRequestList = (page: number, paginate: number) => {
+  const { data, isLoading, error, refetch } = useQuery<WithdrawRequestListResponse>({
+    queryKey: ['withdrawRequestList', page, paginate],
+    queryFn: async () => {
+      const response = await settlementApi.GetWithdrawRequestList(page, paginate)
+      return response.data as WithdrawRequestListResponse
+    },
+  })
+
+  return { data, isLoading, error, refetch }
+}
+
+
+
+export const GetMonthlyIncome = (type: number) => {
+  const { data, isLoading, error, refetch } = useQuery<SaleMonthlyIncomeResponse>({
+    queryKey: ['monthlyIncome', type],
+    queryFn: async () => {
+      const response = await settlementApi.GetMonthlyIncome(type)
+      return response.data as SaleMonthlyIncomeResponse
+    },
+  })
+
+  return { data, isLoading, error, refetch }
+}
+

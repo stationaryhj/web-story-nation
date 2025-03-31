@@ -44,17 +44,30 @@ export interface CharacterFormData {
 
   // 이미지 설정 - 실제 데이터는 별도 스토어에 저장
   images: Array<CharacterImage>
+  
+  // S3에 업로드된 이미지 URL (edit.tsx에서 사용)
+  imgUrl?: string
+  imgUrlNsfw?: string
+  
+  // 추가 API 호환성 속성
+  imageUrl?: string
+  img_url?: string
+  img_url_nsfw?: string
+  
+  // 추가 속성을 위한 인덱스 시그니처
+  [key: string]: any
 }
 
 // 이미지 스토어 인터페이스 - 메모리에만 저장되는 별도 스토어
 interface ImageStore {
-  images: Array<CharacterImage>
+  normalImage: CharacterImage | null;
+  adultImage: CharacterImage | null;
   activeImageTab: ImageType
   setActiveImageTab: (tab: ImageType) => void
-  addImage: (url: string, type: ImageType) => void
-  removeImage: (id: string) => void
-  updateImageType: (id: string, type: ImageType) => void
+  addNormalImage: (url: string) => void
+  addAdultImage: (url: string) => void
   clearImages: () => void
+  getImages: () => Array<CharacterImage>
 }
 
 interface CharacterFormStore {
@@ -97,95 +110,86 @@ const defaultFormData: CharacterFormData = {
   favoriteTopics: [],
   avoidanceTopics: [],
   images: [], // 실제 이미지 데이터는 imageStore에 저장
+  imgUrl: '', // 일반 이미지 URL (API 연동 시 사용)
+  imgUrlNsfw: '', // 성인 이미지 URL (API 연동 시 사용)
+  imageUrl: '',
+  img_url: '',
+  img_url_nsfw: '',
 }
 
 // 이미지 스토어 생성 - 메모리에만 저장 (persist 사용하지 않음)
 export const useImageStore = create<ImageStore>(set => ({
-  images: [],
+  normalImage: null,
+  adultImage: null,
   activeImageTab: 'normal',
 
   setActiveImageTab: tab => set({ activeImageTab: tab }),
 
-  addImage: (url, type) =>
-    set(state => {
+  addNormalImage: (url) =>
+    set(_state => {
       const newImage: CharacterImage = {
         id: generateId(),
         url,
-        type,
+        type: 'normal',
       }
-
-      return { images: [newImage, ...state.images] }
+      return { normalImage: newImage }
     }),
 
-  removeImage: id =>
-    set(state => {
-      console.log('Store: Removing image with id:', id)
-      console.log('Store: Current images:', state.images)
-
-      if (!state.images || state.images.length === 0) {
-        console.log('Store: No images to remove')
-        return state
+  addAdultImage: (url) =>
+    set(_state => {
+      const newImage: CharacterImage = {
+        id: generateId(),
+        url,
+        type: 'adult',
       }
-
-      const updatedImages = state.images.filter(img => img.id !== id)
-      console.log('Store: Updated images:', updatedImages)
-
-      return { images: updatedImages }
+      return { adultImage: newImage }
     }),
 
-  updateImageType: (id, type) =>
-    set(state => {
-      if (!state.images) return state
-
-      return {
-        images: state.images.map(img => (img.id === id ? { ...img, type } : img)),
-      }
-    }),
-
-  clearImages: () => set({ images: [] }),
+  clearImages: () => set({ normalImage: null, adultImage: null }),
+  
+  // 호환성을 위한 getImages 함수
+  getImages: () => {
+    const state = useImageStore.getState()
+    const images: CharacterImage[] = []
+    
+    if (state.normalImage) images.push(state.normalImage)
+    if (state.adultImage) images.push(state.adultImage)
+    
+    return images
+  }
 }))
 
 // 이미지 정보만 추출하는 함수 (base64 데이터 없이)
 export const getImageInfoForSubmit = () => {
-  const { images } = useImageStore.getState()
-
-  // 이미지 URL 데이터를 제외한 메타데이터만 추출
-  return images.map(img => ({
-    id: img.id,
-    type: img.type,
-    // 실제 API 연동 시 서버에 업로드된 URL로 대체
-    url: img.url.substring(0, 100) + '...', // URL 정보는 간략히 저장
-  }))
+  const { normalImage, adultImage } = useImageStore.getState()
+  const images: Array<Partial<CharacterImage>> = []
+  
+  if (normalImage) {
+    images.push({
+      id: normalImage.id,
+      type: normalImage.type,
+      url: normalImage.url.substring(0, 100) + '...' // URL 정보는 간략히 저장
+    })
+  }
+  
+  if (adultImage) {
+    images.push({
+      id: adultImage.id,
+      type: adultImage.type,
+      url: adultImage.url.substring(0, 100) + '...' // URL 정보는 간략히 저장
+    })
+  }
+  
+  return images
 }
 
 // 이미지를 서버에 업로드하는 함수 (실제 구현 시 추가)
 export const uploadImagesToServer = async () => {
-  const { images } = useImageStore.getState()
-
-  // 실제 구현에서는 이미지를 FormData로 변환하여 서버에 업로드
-  // 예시 코드:
-  /*
-  const formData = new FormData();
-
-  // base64 이미지를 Blob으로 변환하여 추가
-  for (const image of images) {
-    const blob = await fetch(image.url).then(r => r.blob());
-    formData.append('images', blob, `image_${image.id}.jpg`);
-    formData.append('types', image.type);
-  }
-
-  // API 요청
-  const response = await fetch('/api/upload-images', {
-    method: 'POST',
-    body: formData
-  });
-
-  // 응답에서 업로드된 이미지 URL 배열 추출
-  const uploadedUrls = await response.json();
-
-  // 업로드된 URL 반환
-  return uploadedUrls;
-  */
+  const { normalImage, adultImage } = useImageStore.getState()
+  const images: Array<CharacterImage> = []
+  
+  if (normalImage) images.push(normalImage)
+  if (adultImage) images.push(adultImage)
 
   // 임시 구현: 이미지가 업로드된 것처럼 처리
   console.log(`${images.length}개 이미지 업로드 요청 시뮬레이션`)

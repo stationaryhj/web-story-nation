@@ -7,12 +7,16 @@ import Image from 'next/image'
 import type { ChangeEvent, MouseEvent } from 'react'
 import { useState, useEffect, useMemo, useRef } from 'react'
 
-import { useCharacterFormStore, useImageStore } from '../../store/useCharacterFormStore'
+import { useCharacterFormStore, useImageStore, ImageType } from '../../store/useCharacterFormStore'
 import { useSettingsStore } from '../../store/useStoreSettings'
 import { useModalStore } from '@/store/useStoreModal'
 
 import ConfirmActionModal from '../modal/ConfirmActionModal'
 import { toast } from 'react-toastify'
+import { contentApi } from '@/services/api'
+
+// 고유 ID 생성 함수
+const generateId = () => Math.random().toString(36).substring(2, 11)
 
 // 필수 입력값 표시 컴포넌트
 const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
@@ -69,7 +73,8 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
     setConversationExampleVisibility,
   } = useCharacterFormStore()
 
-  const { images, activeImageTab, setActiveImageTab, addImage, removeImage } = useImageStore()
+  const { normalImage, adultImage, activeImageTab, setActiveImageTab, addNormalImage, addAdultImage } = useImageStore()
+  const getImages = useImageStore.getState().getImages
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [visibleWarnigModal, setVisibleWarnigModal] = useState(false)
@@ -87,14 +92,30 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
     }
   }, [formData, setFormField])
 
-  // 이미지 기본 이미지 유효성 검사
+  // 기존 데이터 로드 시 이미지 설정
+  useEffect(() => {
+    if (mode === 'image') {
+      // 기존 일반 이미지가 있는 경우 로드 (여러 속성을 확인하여 호환성 유지)
+      const normalImgUrl = formData.imgUrl || formData.img_url || formData.imageUrl
+      if (normalImgUrl && !normalImage) {
+        addNormalImage(normalImgUrl)
+      }
+      
+      // 기존 성인 이미지가 있는 경우 로드
+      const adultImgUrl = formData.imgUrlNsfw || formData.img_url_nsfw
+      if (adultImgUrl && !adultImage) {
+        addAdultImage(adultImgUrl)
+      }
+    }
+  }, [mode, formData, normalImage, adultImage, addNormalImage, addAdultImage])
+
+  // 이미지 유효성 검사
   useEffect(() => {
     if (mode === 'image' && onValidationChange) {
-      // 이미지가 있고 기본 이미지가 설정되어 있으면 유효함
-      const isValid = images?.length > 0 && selectedImage !== null
-      onValidationChange(isValid)
+      // 이미지가 필수가 아니므로 항상 유효함
+      onValidationChange(true)
     }
-  }, [mode, images, selectedImage, onValidationChange])
+  }, [mode, onValidationChange])
 
   // 최초 대화 예시가 없는 경우 자동으로 하나만 생성합니다
   useEffect(() => {
@@ -106,11 +127,11 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
   // 이미지가 있는데 selectedImage가 없으면 첫 번째 이미지를 기본 이미지로 설정
   useEffect(() => {
     if (mode === 'image') {
-      if (images && images.length > 0 && !selectedImage) {
-        setSelectedImage(images[0].id)
+      if (getImages() && getImages().length > 0 && !selectedImage) {
+        setSelectedImage(getImages()[0].id)
       }
     }
-  }, [mode, images, selectedImage])
+  }, [mode, getImages(), selectedImage])
 
   // 입력 필드 변경 핸들러
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -207,80 +228,167 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
     const files = e.target.files
     if (!files || files.length === 0) return
 
-    if ((images?.length || 0) + files.length > 30) {
-      toast.error('최대 30개의 이미지만 업로드할 수 있습니다.')
+    // 첫 번째 파일만 처리
+    const file = files[0]
+    
+    // 파일 크기 확인 (10MB 제한)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error(`파일 크기가 너무 큽니다: ${file.name} (최대 10MB)`)
+      e.target.value = ''
       return
     }
 
-    // 업로드 중 UI 표시 (필요시 구현)
+    try {
+      // 파일을 dataURL로 변환
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result as string)
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
 
-    for (const file of Array.from(files)) {
-      // 파일 크기 확인 (10MB 제한)
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error(`파일 크기가 너무 큽니다: ${file.name} (최대 10MB)`)
-        continue
+      // 이미지 압축
+      const compressedImage = await compressImage(dataUrl)
+
+      // 파일 확장자 추출
+      const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'jpeg'
+      const fileType = `.${fileExtension}`
+
+      // api 호출하여 presigned URL 가져오기
+      const response = await contentApi.GetPresignedUrl(file.name, fileType, 5)
+      console.log('response :::: ', response)
+
+      if (response?.data?.result?.err === 0 && response?.data?.presignedUrl) {
+        // Base64 데이터 URL에서 실제 바이너리 데이터 추출
+        const base64Data = compressedImage.split(',')[1]
+        const binaryData = atob(base64Data)
+        const byteArray = new Uint8Array(binaryData.length)
+        for (let i = 0; i < binaryData.length; i++) {
+          byteArray[i] = binaryData.charCodeAt(i)
+        }
+        const blob = new Blob([byteArray], { type: `image/${fileExtension}` })
+
+        // presigned URL을 이용하여 S3에 이미지 업로드 (PUT 요청)
+        try {
+          const uploadResponse = await fetch(response.data.presignedUrl, {
+            method: 'PUT',
+            body: blob,
+            headers: {
+              'Content-Type': `image/${fileExtension}`
+            }
+          })
+
+          if (uploadResponse.ok) {
+            console.log('이미지 업로드 성공')
+            // 이미지 경로 가져오기
+            const imgPath = response.data.path
+            
+            // 이용등급에 따라 다른 이미지 저장
+            if (formData.rating === 'all') {
+              // 일반 이미지 저장
+              addNormalImage(compressedImage)
+              
+              // formData에 저장된 img_url을 업데이트
+              if (formData && setFormField) {
+                setFormField('imgUrl', imgPath)
+                
+                // 이미지 배열에도 추가 (기존 코드와의 호환성)
+                const existingImages = formData.images || []
+                const normalImgIndex = existingImages.findIndex(img => img.type === 'normal')
+                
+                if (normalImgIndex >= 0) {
+                  // 기존 이미지가 있으면 교체
+                  const updatedImages = [...existingImages]
+                  updatedImages[normalImgIndex] = {
+                    id: generateId(),
+                    url: imgPath,
+                    type: 'normal'
+                  }
+                  setFormField('images', updatedImages)
+                } else {
+                  // 새 이미지 추가
+                  setFormField('images', [
+                    ...existingImages,
+                    {
+                      id: generateId(),
+                      url: imgPath,
+                      type: 'normal'
+                    }
+                  ])
+                }
+              }
+            } else if (formData.rating === 'adult') {
+              // 성인 이미지 저장
+              addAdultImage(compressedImage)
+              
+              // formData에 저장된 이미지 URL을 업데이트
+              if (formData && setFormField) {
+                setFormField('imgUrlNsfw', imgPath)
+                
+                // 이미지 배열에도 추가 (기존 코드와의 호환성)
+                const existingImages = formData.images || []
+                const adultImgIndex = existingImages.findIndex(img => img.type === 'adult')
+                
+                if (adultImgIndex >= 0) {
+                  // 기존 이미지가 있으면 교체
+                  const updatedImages = [...existingImages]
+                  updatedImages[adultImgIndex] = {
+                    id: generateId(),
+                    url: imgPath,
+                    type: 'adult'
+                  }
+                  setFormField('images', updatedImages)
+                } else {
+                  // 새 이미지 추가
+                  setFormField('images', [
+                    ...existingImages,
+                    {
+                      id: generateId(),
+                      url: imgPath,
+                      type: 'adult'
+                    }
+                  ])
+                }
+              }
+            }
+            
+            // 이미지 업로드 성공 메시지 표시
+            toast.success('이미지가 성공적으로 업로드되었습니다.')
+          } else {
+            console.error('이미지 업로드 실패:', uploadResponse.statusText)
+            toast.error('이미지 업로드에 실패했습니다.')
+          }
+        } catch (uploadError) {
+          console.error('이미지 업로드 중 오류 발생:', uploadError)
+          toast.error('이미지 업로드 중 오류가 발생했습니다.')
+        }
+      } else {
+        console.error('Presigned URL 획득 실패')
+        toast.error('이미지 업로드 준비 중 오류가 발생했습니다.')
       }
-
-      try {
-        // 파일을 dataURL로 변환
-        const dataUrl = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader()
-          reader.onload = () => resolve(reader.result as string)
-          reader.onerror = reject
-          reader.readAsDataURL(file)
-        })
-
-        // 이미지 압축
-        const compressedImage = await compressImage(dataUrl)
-
-        // 압축된 이미지 저장
-        addImage(compressedImage, 'normal')
-      } catch (error) {
-        console.error('이미지 처리 오류:', error)
-        toast.error(`이미지 처리 중 오류가 발생했습니다: ${file.name}`)
-      }
+    } catch (error) {
+      console.error('이미지 처리 오류:', error)
+      toast.error(`이미지 처리 중 오류가 발생했습니다: ${file.name}`)
     }
 
     // 파일 입력 초기화 (같은 파일 다시 선택 가능하도록)
     e.target.value = ''
   }
 
-  // 이미지 삭제 핸들러
-  const handleImageDelete = (id: string, e?: MouseEvent) => {
-    // 이벤트가 있으면 이벤트 전파 중지
-    if (e) {
-      e.stopPropagation()
-      e.preventDefault()
-    }
-
-    console.log('Deleting image with id:', id)
-    console.log('Current images:', images)
-
-    // 이미지 삭제
-    removeImage(id)
-
-    // 선택된 이미지인 경우 선택 취소
-    if (selectedImage === id) {
-      setSelectedImage(null)
-    }
-  }
-
-  // 이미지 필터 기능 예시 (성인 이미지 필터링)
+  // 세부 정보 페이지에서 가능한 이미지 리스트를 계산
   const filteredImages = useMemo(() => {
     if (isAdultModeEnabled) {
       // 성인 모드가 활성화되면 모든 이미지 표시
-      return images || []
+      return getImages() || []
     } else {
       // 성인 모드가 비활성화되면 성인 이미지 필터링
-      return (images || []).filter(img => img.type !== 'adult')
+      return (getImages() || []).filter(img => img.type !== 'adult')
     }
-  }, [images, isAdultModeEnabled])
+  }, [getImages, isAdultModeEnabled])
 
   // 대화 예시 추가 버튼 핸들러
   const handleAddExample = () => {
-    if (formData.conversationExamples.length < 3) {
-      addConversationExample()
-    }
+    addConversationExample()
   }
 
   // 대화 예시 텍스트 변경 핸들러
@@ -368,15 +476,23 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
     }
   }
 
+  // 이미지가 있는데 selectedImage가 없으면 첫 번째 이미지를 기본 이미지로 설정
+  useEffect(() => {
+    if (mode === 'image') {
+      if (getImages() && getImages().length > 0 && !selectedImage) {
+        setSelectedImage(getImages()[0].id)
+      }
+    }
+  }, [mode, getImages(), selectedImage])
+
   // 이미지 업로드 폼 렌더링
   if (mode === 'image') {
+    // 호환성을 위해 이미지 배열 가져오기
+    const images = getImages()
+    
     // 기본 이미지 설정 메시지
     const renderValidationMessage = () => {
-      if (images?.length === 0) {
-        return <p className="text-red-500 dark:text-red-400 text-sm mt-2">이미지를 하나 이상 업로드해주세요.</p>
-      } else if (!selectedImage) {
-        return <p className="text-red-500 dark:text-red-400 text-sm mt-2">기본 이미지를 설정해주세요.</p>
-      }
+      // 이미지가 필수가 아니므로 유효성 메시지 표시 안함
       return null
     }
 
@@ -406,7 +522,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
               onClick={() => handleRatingSelect('adult')}
               disabled={!isAdultModeEnabled}
               className={`rounded-lg px-4 py-3 text-center transition-colors ${
-                formData.rating === 'adult'
+                formData.rating === 'adult' && isAdultModeEnabled
                   ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                   : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
               } ${!isAdultModeEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -421,55 +537,53 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
 
         {/* 이미지 그리드 */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
-          {/* 이미지 목록 (먼저 렌더링) */}
-          {images?.map(img => (
-            <div
-              key={img.id}
-              className={`relative aspect-square rounded-lg overflow-hidden border-2 cursor-pointer ${
-                selectedImage === img.id
-                  ? 'border-primary-500 dark:border-dark-primary-500'
-                  : 'border-secondary-200 dark:border-dark-secondary-200/10'
-              }`}
-              onClick={() => setSelectedImage(img.id)}
-            >
-              <Image src={img.url} alt={`캐릭터 이미지 ${img.id}`} fill className="object-cover" />
-              <button
-                onClick={e => handleImageDelete(img.id, e)}
-                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center"
-                aria-label="이미지 삭제"
-              >
-                <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />
-              </button>
-              {selectedImage === img.id && (
-                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
-                  기본 이미지
-                </div>
-              )}
+          {/* 현재 이미지 표시 - 이용등급에 따라 이미지 표시 */}
+          {formData.rating === 'all' && normalImage && (
+            <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
+              <Image src={normalImage.url} alt="캐릭터 일반 이미지" fill className="object-cover" />
+              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
+                전체이용가 이미지
+              </div>
             </div>
-          ))}
+          )}
+          
+          {formData.rating === 'adult' && isAdultModeEnabled && adultImage && (
+            <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
+              <Image src={adultImage.url} alt="캐릭터 성인 이미지" fill className="object-cover" />
+              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
+                성인 이미지
+              </div>
+            </div>
+          )}
 
-          {/* 이미지 업로드 버튼 (항상 마지막에 위치) */}
+          {/* 이미지 업로드 버튼 */}
           <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
-            <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
+            <input 
+              type="file" 
+              accept="image/*" 
+              onChange={handleImageUpload}
+              className="hidden" 
+            />
             <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
               <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
-              <span className="text-xs sm:text-sm">이미지 업로드</span>
-              <span className="text-xs mt-1 hidden sm:inline">(최대 30개)</span>
+              <span className="text-xs sm:text-sm">
+                {formData.rating === 'all' && normalImage || formData.rating === 'adult' && adultImage 
+                  ? '이미지 교체' 
+                  : '이미지 업로드'
+                }
+              </span>
             </div>
           </label>
         </div>
 
         {/* 이미지가 없을 때 안내 메시지 */}
-        {images?.length === 0 && (
+        {(formData.rating === 'all' && !normalImage) || (formData.rating === 'adult' && !adultImage) ? (
           <div className="text-center p-4 bg-secondary-50 dark:bg-dark-secondary-100/5 rounded-lg">
             <p className="text-sm text-secondary-500 dark:text-dark-secondary-500">
               이미지가 없습니다. 이미지를 업로드해주세요.
             </p>
           </div>
-        )}
-
-        {/* 유효성 검사 메시지 */}
-        {renderValidationMessage()}
+        ) : null}
 
         {/* 이미지 가이드라인 경고 메시지 */}
         <div className="mt-4 p-4 bg-secondary-50 dark:bg-dark-secondary-100/5 rounded-lg">

@@ -40,6 +40,7 @@ export interface LoginResponse {
   user_key: number;
   user_property: string;
   writerchk: number;
+  intro?: string;
   result: ApiResult;
 }
 
@@ -355,6 +356,15 @@ export interface CharbotTagData {
   world_list_detail_chrbot_key: number;
 }
 
+// SaleMonthlyIncomeResponse
+export interface SaleMonthlyIncomeResponse {
+  monthlyIncome: number;
+  result: ApiResult;
+}
+
+
+
+
 // SaleMonthlyIncomeList Response
 export interface SaleMonthlyIncomeListResponse {
   IncomeList: IncomeList;
@@ -635,8 +645,48 @@ export interface GetPassInfoResponse {
   returnMsg: string;
 }
 
+// GetPresignedUrl Response
+export interface GetPresignedUrlResponse {
+  result: ApiResult;
+  path: string;
+  presignedUrl: string;
+}
 
 
+// WithdrawRequestListResponse
+export interface WithdrawRequestListResponse {
+  result: {
+    err: number
+    msg: string
+  }
+  withdrawrequest: {
+    current_page: number
+    data: WithdrawRequestItem[]
+    first_page_url: string
+    from: number
+    last_page: number
+    last_page_url: string
+    links: Array<{
+      url: string | null
+      label: string
+      active: boolean
+    }>
+    next_page_url: string | null
+    path: string
+    per_page: string
+    prev_page_url: string | null
+    to: number
+    total: number
+  }
+  sum_price: string
+}
+
+export interface WithdrawRequestItem {
+  withdraw_request_key: number
+  price: number
+  pen: number
+  create_dt: string
+}
 
 // API Result
 export type ApiResult = {

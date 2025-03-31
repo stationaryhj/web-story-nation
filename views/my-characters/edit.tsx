@@ -122,28 +122,33 @@ export default function EditCharacterPage() {
       // 폼 데이터에서 API 요청에 필요한 데이터 추출
       const payload = {
         world_list_detail_chrbot_key: characterId,
-        img_url: inProgressData?.chrbot?.img_url || '',
+        // 이미지 URL (있는 경우에만 포함)
+        img_url: formData.imgUrl || inProgressData?.chrbot?.img_url || '',
+        // 성인 이미지 URL (있는 경우에만 포함)
+        img_url_nsfw: formData.imgUrlNsfw || inProgressData?.chrbot?.img_url_nsfw || '',
         title: formData.name || '',
         gender: formData.gender === 'male' ? 1 : formData.gender === 'female' ? 2 : 0,
         intro: formData.bio || '',
         first_talk: formData.firstMessage || '',
         content: formData.bioDetail || '',
         example: formData.conversationExamples?.map(example => example.text).join('\n\n') || '',
-        nsfw: inProgressData?.chrbot?.nsfw || 0,
-        img_url_nsfw: inProgressData?.chrbot?.img_url_nsfw || '',
+        // 성인 등급 설정 - formData의 rating 필드 사용
+        nsfw: formData.rating === 'adult' ? 1 : 0,
         show_yn: formData.visibility === 'public' ? 1 : 0,
         content_show_yn: inProgressData?.chrbot?.content_show_yn || 0,
         example_show_yn: inProgressData?.chrbot?.example_show_yn || 0,
         finish_yn: finishYn,
       }
 
+      console.log('저장할 데이터:', payload)
+
       // API 호출
       const response = await ReqSaveCreateChatBotInProgress(payload)
-
+      
       if (response.error) {
         throw new Error(response.error.toString())
       }
-
+      
       return true
     } catch (error) {
       console.error('저장 실패:', error)

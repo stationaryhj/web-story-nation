@@ -34,6 +34,9 @@ import type {
   WriterWithdrawResponse,
   GetPassInfoResponse,
   SaleMonthlyIncomeListResponse,
+  GetPresignedUrlResponse,
+  WithdrawRequestListResponse,
+  SaleMonthlyIncomeResponse,
 } from '../../types/api'
 
 // API 기본 설정
@@ -115,6 +118,31 @@ export const GetApiUrl = () => {
 // 콘텐츠 API
 export const contentApi = {
   /**
+   * 프로필 이미지 수정
+   * @param profile_url 프로필 이미지 주소
+   */
+  myprofileupdate: async (profile_url: string): Promise<ApiResponse> => {
+    const _access_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = _access_token
+    return api.post('/api/myprofileupdate', {
+      profile_url,
+    })
+  },
+
+
+  /**
+   * 자기소개 수정
+   * @param intro 자기소개
+   */
+  myintroupdate: async (intro: string): Promise<ApiResponse> => {
+    const _access_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = _access_token
+    return api.post('/api/myintroupdate', {
+      intro,
+    })
+  },
+
+  /**
    * 로그인
    * @param snsauth   소셜 로그인 인증 키
    * @param snstype   1: 카카오, 2: 네이버, 3: 구글, 4: 애플
@@ -149,6 +177,14 @@ export const contentApi = {
     const _access_token = `Bearer ${access_token}`
     api.defaults.headers.common['Authorization'] = _access_token
     return api.get('/api/userinfo')
+    // return api.post('/api/myuserinfo')
+  },
+
+
+  userinfo2: async (access_token: string): Promise<ApiResponse> => {
+    const _access_token = `Bearer ${access_token}`
+    api.defaults.headers.common['Authorization'] = _access_token
+    return api.post('/api/myuserinfo')
   },
 
   /**
@@ -292,7 +328,8 @@ export const contentApi = {
     nsfw: number,
     order: number,
     page: number,
-    paginate: number
+    paginate: number,
+    countryCode: string = 'KR'
   ): Promise<ApiResponse<CharbotSearchResponse>> => {
     return api.post('/api/charbot/getlist', {
       type,
@@ -301,6 +338,7 @@ export const contentApi = {
       order,
       page,
       paginate,
+      countryCode
     })
   },
 
@@ -533,6 +571,17 @@ export const contentApi = {
       enc_data,
     })
   },
+
+  // 파일 업로드 전 사전 서명 요청
+  GetPresignedUrl: async (file_name: string, file_type: string, type: 5): Promise<ApiResponse<GetPresignedUrlResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/s3/presignedurl', {
+      file_name,
+      file_type,
+      type,
+    })
+  },
 }
 
 // 채팅 API
@@ -673,6 +722,17 @@ export const chatApi = {
 
 // 정산 API
 export const settlementApi = {
+
+  // 월별 수익 내역
+  GetMonthlyIncome: async (type: number): Promise<ApiResponse<SaleMonthlyIncomeResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/sales/monthlyIncome_V1', {
+      type,
+    })
+  },
+
+
   /**
    * 수익 내역
    * @param type 1: 이달, 2: 전달
@@ -686,6 +746,18 @@ export const settlementApi = {
       paginate,
     })
   },
+
+
+  // 출금 신청 내역
+  GetWithdrawRequestList: async (page: number, paginate: number): Promise<ApiResponse<WithdrawRequestListResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/sales/withdrawrequestList', {
+      page,
+      paginate,
+    })
+  },
+
 
   /**
    * 주문 아이디 가져오기
@@ -772,6 +844,15 @@ export const settlementApi = {
       resno2,
     })
   },
+
+  /**
+   * 무료 펜 사용
+   */
+  UseFreePen: async (): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/charbot/chat/freepen')
+  },
 }
 
 // 크리에이트 API ( 캐봇 작성 )
@@ -805,7 +886,8 @@ export const createApi = {
     show_yn: number,
     content_show_yn: number,
     example_show_yn: number,
-    finish_yn: number
+    finish_yn: number,
+    countryCode: string = 'KR'
   ): Promise<ApiResponse> => {
     return api.post('/api/charbot/inprogress/save', {
       world_list_detail_chrbot_key,
@@ -822,6 +904,7 @@ export const createApi = {
       finish_yn,
       content_show_yn,
       example_show_yn,
+      countryCode,
     })
   },
 

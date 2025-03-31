@@ -14,12 +14,11 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useAccountStore } from '@/store/useStoreData'
-import { bridgeLoginDataToUserInfo } from '@/lib/utils/storyNationUtil'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import { useSettingsStore } from '@/store/useStoreSettings'
-import { contentApi, createApi } from '@/services/api/storyNationApi'
+import { contentApi } from '@/services/api/storyNationApi'
 import { useModalStore } from '@/store/useStoreModal'
 import { useBankStore } from '@/store/useGlobalStore'
 
@@ -69,6 +68,7 @@ export default function SettingsForm() {
     language: settings.language || 'ko',
     profileImage: (userInfo?.image_url ?? '') + (userInfo?.profile_url ?? '') || null,
     minor: userInfo?.minor || 0,
+    intro: userInfo?.intro || '',
   })
 
   // 페르소나 설정
@@ -443,7 +443,22 @@ export default function SettingsForm() {
       <div className="max-w-[1300px] mx-auto w-full p-4 pb-16">
         {/* 프로필 이미지 섹션 */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-6">프로필</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold">프로필</h2>
+            <button
+              onClick={async () => {
+                const result = await useAccountStore.getState().updateIntro(profile.intro)
+                if (result.success) {
+                  toast.success(result.message)
+                } else {
+                  toast.error(result.message)
+                }
+              }}
+              className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600"
+            >
+              저장
+            </button>
+          </div>
           <div className="flex flex-col items-center">
             <div className="relative mb-4">
               <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
@@ -476,6 +491,27 @@ export default function SettingsForm() {
                 )}
               </div>
               <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
+            </div>
+            <div className="w-full max-w-md">
+              <label className="block text-sm font-medium text-gray-700 mb-2">한줄 소개</label>
+              <div className="relative">
+                <textarea
+                  value={profile.intro || ''}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 50) {
+                      setProfile(prev => ({ ...prev, intro: e.target.value }))
+                      setIsEdited(true)
+                    }
+                  }}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white resize-none min-h-[100px] shadow-sm transition-all duration-200 ease-in-out hover:border-primary-300"
+                  placeholder="자신을 한 줄로 소개해주세요 (최대 50자)"
+                  rows={3}
+                  maxLength={50}
+                />
+                <div className="absolute bottom-2 right-2 text-xs text-gray-500">
+                  {profile.intro?.length || 0}/50
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -37,7 +37,9 @@ export default function MyCharacterPage() {
 
   // 캐릭터 카드 클릭 처리
   const handleCardClick = (character: Character) => {
-    router.push(`/my-characters/edit/${character.id}`)
+    if(character.finish_yn === 1) {
+      router.push(`/chat/${character.id}`)
+    }
   }
 
   // 수정 버튼 클릭 처리
@@ -107,6 +109,7 @@ export default function MyCharacterPage() {
             onEdit={handleEditClick}
             onDelete={handleDeleteClick}
             useSwiper={false}
+            // onCardClick={handleCardClick}
           />
         )}
 

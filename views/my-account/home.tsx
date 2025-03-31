@@ -21,9 +21,9 @@ import 'react-toastify/dist/ReactToastify.css'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import WithdrawModal from '@/components/modal/WithdrawModal'
 import { useAccountStore } from '@/store/useAccountStore'
-import { GetSettlementList, GetWriterWithdrawStatus } from '@/services/hooks/DataListManager'
+import { GetSettlementList, GetWithdrawRequestList, GetWriterWithdrawStatus, GetMonthlyIncome } from '@/services/hooks/DataListManager'
 import { settlementApi } from '@/services/api/storyNationApi'
-import { bridgeIncomeDataToEarningItems } from '@/lib/utils/storyNationUtil'
+import { bridgeIncomeDataToEarningItems, bridgeWithdrawDataToWithdrawItems } from '@/lib/utils/storyNationUtil'
 
 export default function MyEarningsView() {
   const router = useRouter()
@@ -32,6 +32,14 @@ export default function MyEarningsView() {
   const [hasMore, setHasMore] = useState(true)
 
   const { data: userInfo, writerInfo, fetchWriterInfo } = useAccountStore()
+
+  // 월별 수익 내역 ( 1: 이번달, 2: 지난달 )
+  const {
+    data: monthlyIncomeV1,
+    isLoading: monthlyIncomeV1Loading,
+    error: monthlyIncomeV1Error,
+    refetch: monthlyIncomeV1Refetch
+  } = GetMonthlyIncome(2)
 
   // 수익 내역
   const {
@@ -46,14 +54,29 @@ export default function MyEarningsView() {
   // 출금 상태
   const { data: writerWithdrawStatus } = GetWriterWithdrawStatus()
 
+  // 출금 내역
+  const {
+    data: withdrawRequestList,
+    isLoading: withdrawRequestListLoading,
+    error: withdrawRequestListError,
+    refetch: withdrawRequestListRefetch
+  } = GetWithdrawRequestList(1, 50)
+
+  // 출금 내역 데이터 처리
+  const [withdrawItems, setWithdrawItems] = useState<Array<{
+    id: number
+    date: string
+    amount: number
+    status: string
+  }>>([])
 
   // 정산 관련 상태
   const [totalEarnings, setTotalEarnings] = useState(userInfo?.coin_user || 0) // 총 수익 (펜 단위)
+  const [thisMonthEarnings, setThisMonthEarnings] = useState(monthlyIncomeV1?.monthlyIncome || 0) // 이번달 수익 (펜 단위)
   const [lastMonthEarnings, setLastMonthEarnings] = useState(35000) // 지난달 수익 (펜 단위)
-  const [totalPayouts, setTotalPayouts] = useState(writerWithdrawStatus?.withdraw || 0) // 총 정산액 (펜 단위)
+  const [totalPayouts, setTotalPayouts] = useState(withdrawRequestList?.sum_price || 0) // 총 정산액 (펜 단위)
   const [availableAmount, setAvailableAmount] = useState(writerWithdrawStatus?.withdraw_pen || 0) // 정산 가능 금액 (펜 단위)
   const [requestAmount, setRequestAmount] = useState(1500) // 요청 금액 (펜 단위, 최소 1500펜)
-  
   
   // 무한 스크롤을 위한 관찰자 ref
   const observerRef = useRef<IntersectionObserver | null>(null)
@@ -83,6 +106,18 @@ export default function MyEarningsView() {
       }
     }
   }, [settlementListData, settlementListLoading, currentPage])
+
+  // 출금 내역 데이터 로드 및 처리
+  useEffect(() => {
+    if (withdrawRequestList?.withdrawrequest?.data && !withdrawRequestListLoading) {
+      try {
+        const newItems = bridgeWithdrawDataToWithdrawItems(withdrawRequestList.withdrawrequest.data)
+        setWithdrawItems(newItems)
+      } catch (error) {
+        console.error('출금 내역 데이터 처리 오류:', error)
+      }
+    }
+  }, [withdrawRequestList, withdrawRequestListLoading])
 
   // 무한 스크롤 설정
   useEffect(() => {
@@ -127,12 +162,6 @@ export default function MyEarningsView() {
     accountHolder: writerInfo?.user_nm || '',
   })
 
-  // 정산 요청 내역
-  const [payoutRequests, setPayoutRequests] = useState([
-    { id: 1, date: '2023.12.15', amount: 30000, status: '완료' },
-    { id: 2, date: '2024.01.20', amount: 20000, status: '완료' },
-  ])
-
   // 모달 상태
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false)
 
@@ -176,20 +205,6 @@ export default function MyEarningsView() {
       toast.error('출금 요청에 실패했습니다.')
     }
 
-    // 실제 API 호출 코드 추가 필요
-    // const newPayoutRequest = {
-    //   id: payoutRequests.length + 1,
-    //   date: new Date()
-    //     .toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
-    //     .replace(/\. /g, '.')
-    //     .replace('.', ''),
-    //   amount: requestAmount,
-    //   status: '처리중',
-    // }
-
-    // setPayoutRequests([newPayoutRequest, ...payoutRequests])
-    // setAvailableAmount(prev => prev - requestAmount)
-    // toast.success('출금 요청이 접수되었습니다.')
     setIsWithdrawModalOpen(false)
   }
 
@@ -320,7 +335,7 @@ export default function MyEarningsView() {
             <div className="mb-4 p-3 bg-gray-50 rounded-lg">
               <div className="text-gray-700">지난달까지 총 수익</div>
               <div className="font-semibold text-xl flex items-center mt-1">
-                {formatPen(totalEarnings)} <FontAwesomeIcon icon={faPen} className="ml-1" />
+                {formatPen(thisMonthEarnings)} <FontAwesomeIcon icon={faPen} className="ml-1" />
               </div>
             </div>
             
@@ -359,12 +374,14 @@ export default function MyEarningsView() {
             <div className="mb-4 p-3 bg-gray-50 rounded-lg">
               <div className="text-gray-700">총 출금 금액</div>
               <div className="font-semibold text-xl flex items-center mt-1">
-                {formatPen(totalPayouts)} <FontAwesomeIcon icon={faPen} className="ml-1" />
+                {formatPen(Number(withdrawRequestList?.sum_price || 0))} <FontAwesomeIcon icon={faPen} className="ml-1" />
               </div>
             </div>
-            {payoutRequests.length > 0 ? (
+            {withdrawRequestListLoading ? (
+              <div className="text-center text-gray-500 py-6">로딩 중...</div>
+            ) : withdrawItems.length > 0 ? (
               <div className="divide-y divide-gray-200">
-                {payoutRequests.map(request => (
+                {withdrawItems.map(request => (
                   <div key={request.id} className="py-3 flex justify-between">
                     <div className="text-sm text-gray-500">{request.date}</div>
                     <div className="flex items-center font-medium">

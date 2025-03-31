@@ -125,6 +125,7 @@ export function bridgeCharbotGetListMineDataToCharacter(dataList: Array<CharbotM
       id: item.world_list_detail_chrbot_key.toString(),
     },
     category: 'unspecified',
+    finish_yn: item.finish_yn,
   }))
 
   return characters
@@ -261,8 +262,8 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
     content: data.content,
     example: data.example,
     nsfw: data.nsfw,
-    img_url: data.img_url,
-    img_url_nsfw: data.img_url_nsfw,
+    img_url: getImageUri(data.img_url),
+    img_url_nsfw: getImageUri(data.img_url_nsfw),
     show_yn: data.show_yn,
     content_show_yn: data.content_show_yn,
     example_show_yn: data.example_show_yn,
@@ -326,6 +327,22 @@ export function bridgeIncomeDataToEarningItems(data: Array<IncomeData>, lastInde
     amount: parseFloat(item.pen), // pen 값을 숫자로 변환하고 10000을 곱해 펜 단위로 표시
     cnt: item.cnt, // 횟수 정보 추가
     title: item.title // 제목 정보 추가
+  }))
+}
+
+// 출금 내역 데이터를 UI에 맞게 변환하는 함수
+export const bridgeWithdrawDataToWithdrawItems = (data: any[], page: number = 1) => {
+  return data.map((item, index) => ({
+    id: item.withdraw_request_key,
+    date: new Date(item.create_dt).toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).replace(/\. /g, '.').replace('.', ''),
+    amount: item.pen,
+    status: '완료' // API에서 상태 정보가 없어서 기본값으로 '완료' 설정
   }))
 }
 

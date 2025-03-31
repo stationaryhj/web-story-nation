@@ -37,6 +37,8 @@ interface AccountState {
   updateBankAccount: (bank: string, accountNumber: string, accountHolder: string) => Promise<{success: boolean, message: string}>
   updateWriterEmail: (email: string) => Promise<{success: boolean, message: string}>
   verifyIdentity: () => Promise<{success: boolean, message: string}>
+  updateIntro: (intro: string) => Promise<{success: boolean, message: string}>
+  updateUserInfoFromUserInfo2: () => Promise<boolean>
 }
 
 // 네트워크 에러 타입 정의
@@ -322,6 +324,31 @@ export const useAccountStore = create<AccountState>()(
         }
       },
 
+      updateUserInfoFromUserInfo2: async () => {
+        try {
+          const userInfoResponse = await contentApi.userinfo2(get().data?.access_token || '')
+          
+          if (userInfoResponse) {
+            const currentData = get().data
+            if (currentData) {
+              set({
+                data: {
+                  ...currentData,
+                  intro: userInfoResponse.data.intro,
+                  profile_url: userInfoResponse.data.profile_url,
+                  image_url: userInfoResponse.data.image_url
+                }
+              })
+            }
+            return true
+          }
+          return false
+        } catch (error) {
+          console.error('userinfo2 업데이트 중 오류 발생:', error)
+          return false
+        }
+      },
+
       guestLogin: async (nickname: string): Promise<boolean> => {
         const { isInitialized } = get()
         if (!isInitialized) {
@@ -338,8 +365,8 @@ export const useAccountStore = create<AccountState>()(
               loading: false,
             })
 
-            contentApi.userinfo(response.data.access_token)
-
+            // userinfo2 데이터 업데이트
+            await get().updateUserInfoFromUserInfo2()
             await get().fetchWriterInfo()
             return true
           }
@@ -370,7 +397,7 @@ export const useAccountStore = create<AccountState>()(
 
           const response = await contentApi.getUuid(providerConfig.id)
           const { clientId, snsauth } = response.data
-          
+
           const state: OAuthState = {
             provider: providerConfig.name as OAuthProvider,
             snsauth,
@@ -525,10 +552,8 @@ export const useAccountStore = create<AccountState>()(
             const loginResponse = await contentApi.login2(snsauth, Number(snstype), snsid, String(kr_gb))
             set({ isLogin: true, data: loginResponse.data, loading: false })
             
-            // 작가 정보 가져오기
-            // if (loginResponse.data.writerchk === 1) {
-            //   await get().fetchWriterInfo()
-            // }
+            // userinfo2 데이터 업데이트
+            await get().updateUserInfoFromUserInfo2()
             await get().fetchWriterInfo()
             
             // 로그인 성공 콜백 호출
@@ -558,13 +583,13 @@ export const useAccountStore = create<AccountState>()(
               return false;
             } else {
               // 기존 동작 유지 (리다이렉션 방식)
-              const state = encodeURIComponent(JSON.stringify({ 
-                snstype, 
-                snsauth, 
-                snsid, 
-                accessToken: token 
-              }))
-              window.location.href = `/register?state=${state}`
+            const state = encodeURIComponent(JSON.stringify({ 
+              snstype, 
+              snsauth, 
+              snsid, 
+              accessToken: token 
+            }))
+            window.location.href = `/register?state=${state}`
               return false;
             }
           }
@@ -946,6 +971,27 @@ export const useAccountStore = create<AccountState>()(
             success: false, 
             message: '본인인증 요청 중 오류가 발생했습니다.' 
           };
+        }
+      },
+
+      updateIntro: async (intro: string) => {
+        try {
+          const response = await contentApi.myintroupdate(intro)
+          
+          if (response.data.result.err === 0) {
+            // userinfo2 데이터 업데이트
+            const success = await get().updateUserInfoFromUserInfo2()
+            
+            if (success) {
+              return { success: true, message: '한줄 소개가 저장되었습니다.' }
+            }
+            return { success: false, message: '사용자 정보 업데이트에 실패했습니다.' }
+          } else {
+            return { success: false, message: response.data.result.msg || '한줄 소개 저장에 실패했습니다.' }
+          }
+        } catch (error) {
+          console.error('한줄 소개 업데이트 중 오류 발생:', error)
+          return { success: false, message: '한줄 소개 저장 중 오류가 발생했습니다.' }
         }
       },
     }),

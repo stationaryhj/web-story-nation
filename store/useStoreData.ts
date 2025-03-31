@@ -25,6 +25,7 @@ export interface Character {
   category: 'male' | 'female' | 'unspecified' // 카테고리 추가
   gender?: 'male' | 'female' | 'unknown' // 성별 추가
   createdAt?: string // 생성 날짜 추가
+  finish_yn?: number | 0
 }
 
 // 스토어 타입 정의
