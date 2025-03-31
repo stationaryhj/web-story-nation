@@ -142,7 +142,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   const [isWaitingForAI, setIsWaitingForAI] = useState<boolean>(false) // AI 응답 대기 상태
   const { chatMode } = useChatModeStore()
 
-  const { openModal, closeModal } = useModalStore()
+  const { openModal, closeModal, setSelectedCharacter } = useModalStore()
 
   // 캐릭터 데이터 변환
   const character = bridgeCharbotDataToCharacter(charbotData as ChrbotData)
@@ -641,12 +641,19 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                 {/* 캐릭터 이름 */}
                 <h2 className="font-medium text-gray-800 truncate">{character.name}</h2>
                 {/* 프로필 상세 버튼 - PC에서만 표시 */}
-                <Link
-                  href={`/chat/character/${characterId}`}
-                  className="ml-2 text-violet-500 hover:text-violet-600 flex-shrink-0"
+                <div
+                  onClick={() => {
+                    // TODO: 캐릭터 정보 받아와서 캐릭터 관련 모달 열어야됨
+                    // setSelectedCharacter(character)
+                    openModal('character')
+                  }}
                 >
-                  <FontAwesomeIcon icon={faInfoCircle} size="sm" />
-                </Link>
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    size="sm"
+                    className="ml-2 text-violet-500 hover:text-violet-600 flex-shrink-0"
+                  />
+                </div>
               </div>
 
               {/* 해시태그 - PC에서만 표시 */}
