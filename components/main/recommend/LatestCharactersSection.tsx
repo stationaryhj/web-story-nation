@@ -57,7 +57,7 @@ const LatestCharactersSection = memo(() => {
             cardsPerRow={5}
             hasRanking={false}
             sectionId="latest-characters-section" // 고유 ID 추가
-            useSwiper={true}
+            useSwiper={shouldUseSwiper}
           />
         </SectionTransition>
       </div>

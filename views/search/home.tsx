@@ -350,7 +350,7 @@ export default function searchPage({}: Props) {
             />
           </div>
         </div>
-        <div className="text-xl text-gray-700 font-bold dark:text-dark-gray-300 mt-2 mb-6">
+        <div className="text-2xl text-gray-700 font-bold dark:text-dark-gray-300 mt-2 mb-6 w-full flex items-center justify-center">
           {searchQuery && <span className="text-primary-600 dark:text-dark-primary-400 mr-1">'{searchQuery}'</span>}
           {searchOption === 'creator' && searchQuery && <span className="mr-1">작가</span>}
           {totalItems > 0 ? `${totalItems}개의 검색결과` : '검색 결과가 없습니다'}
