@@ -9,7 +9,7 @@ import type { ReactNode } from 'react'
 import Providers from './providers'
 import DraggableButton from '@/components/elements/button/DraggableButton'
 import MobileGNB from '@/components/common/MobileGNB'
-import { Fan } from 'lucide-react'
+import { Plus } from 'lucide-react'
 
 // Poppins 폰트 설정
 const poppins = Poppins({
@@ -102,7 +102,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </Providers>
 
         {/* 메인 플로팅 메뉴 버튼 */}
-        <DraggableButton color="bg-primary-500" icon={<Fan size={24} color="white" />} />
+        <DraggableButton color="bg-primary-500" />
 
         <MobileGNB />
       </body>

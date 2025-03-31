@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { MessageSquare, Pen, Lightbulb } from 'lucide-react'
+import { Plus, Pen, Lightbulb, Minus } from 'lucide-react'
 import IdeaShareModal from '../../modal/IdeaShareModal'
 import RewardModal from '../../modal/RewardModal'
 import { contentApi } from '@/services/api/storyNationApi'
@@ -385,7 +385,41 @@ export default function DraggableButton({
 
   // 아이콘 컨텐츠 기본값 설정
   const buttonContent = children || (
-    <div className="flex flex-col items-center justify-center">{icon || <MessageSquare size={24} color="white" />}</div>
+    <div className="flex flex-col items-center justify-center">
+      <motion.div
+        key={isMenuOpen ? 'minus' : 'plus'}
+        initial={{ rotate: -180, scale: 0 }}
+        animate={{ rotate: 0, scale: 1 }}
+        exit={{ rotate: 180, scale: 0 }}
+        transition={{
+          type: 'spring',
+          stiffness: 260,
+          damping: 20,
+          duration: 0.3,
+        }}
+        className="flex items-center justify-center"
+      >
+        {isMenuOpen ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Minus size={24} color="white" />
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Plus size={24} color="white" />
+          </motion.div>
+        )}
+      </motion.div>
+    </div>
   )
 
   if (!isVisible) return null
