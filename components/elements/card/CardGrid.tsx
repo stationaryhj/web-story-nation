@@ -351,7 +351,8 @@ export default function CardGrid({
       // 성인 모드 비활성화 시 성인 컨텐츠 필터링
       // const filteredData = isAdultModeEnabled ? customData : customData.filter(character => !character.isAdult)
       // setCharacters(filteredData)
-      setCharacters(mockCharacters)
+      // setCharacters(mockCharacters)
+      setCharacters(customData)
       setLocalLoading(false)
       return
     }
