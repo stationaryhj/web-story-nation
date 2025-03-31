@@ -7,6 +7,7 @@ import SignupModal from './SignupModal'
 import { useAccountStore } from '@/store/useAccountStore'
 import { OAuthProvider } from '@/types/login'
 import GuestLoginForm from '@/components/form/GuestLoginForm'
+import { toast } from 'react-toastify'
 
 interface LoginModalProps {
   isOpen: boolean
@@ -41,8 +42,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         }
       )
     } catch (error) {
-      console.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.', error)
-      // toast.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+      toast.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
     } finally {
       setLoading(false)
     }
@@ -138,11 +138,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       </BaseModal>
 
       {showSignup && (
-        <SignupModal 
-          isOpen={isOpen && showSignup} 
-          onClose={handleSignupClose} 
-          onSuccess={handleSignupSuccess}
-        />
+        <SignupModal isOpen={isOpen && showSignup} onClose={handleSignupClose} onSuccess={handleSignupSuccess} />
       )}
     </>
   )

@@ -32,7 +32,7 @@ import Image from 'next/image'
 import HeaderSidebar from '@/components/elements/sidebar/HeaderSidebar'
 import { useRouter } from 'next/navigation'
 
-// 토글 스위치 컴포넌트 추가 (불꽃 아이콘 추가)
+// 토글 스위치 컴포넌트 수정
 const SimpleToggle = ({
   isOn,
   onToggle,
@@ -45,11 +45,9 @@ const SimpleToggle = ({
   return (
     <div className="flex items-center">
       <FontAwesomeIcon icon={faFire} className="text-red-500 dark:text-dark-primary-500 mr-2" />
-      {isSidebar && (
-        <span className="flex items-center w-full py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors">
-          짜릿모드
-        </span>
-      )}
+      <span className="hidden md:flex items-center py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors mr-2">
+        짜릿모드
+      </span>
       <button
         onClick={onToggle}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
@@ -179,7 +177,7 @@ export default function Header() {
           </div>
 
           <div className="flex items-center md:space-x-4 gap-1">
-            {/* 짜릿모드 토글 - 모바일에서도 표시 */}
+            {/* 짜릿모드 토글 - 모든 화면에서 표시 */}
             {mounted && (
               <div>
                 <SimpleToggle isOn={isAdultModeEnabled} onToggle={handleAdultModeToggle} />
@@ -204,16 +202,18 @@ export default function Header() {
               <NotificationButton />
             </div>
 
-            {/* 내 정보 버튼 */}
-            <Link href={isLogin ? '/my-account' : '/login'} className="hidden md:block">
-              <motion.button
-                className="text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 transition-colors"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <FontAwesomeIcon icon={faUser} className="text-xl" />
-              </motion.button>
-            </Link>
+            {/* 내 정보 버튼 - PC에서만 표시 */}
+            {isLogin && (
+              <Link href="/settings" className="hidden md:block">
+                <motion.button
+                  className="text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 transition-colors"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <FontAwesomeIcon icon={faUser} className="text-xl" />
+                </motion.button>
+              </Link>
+            )}
 
             {/* 장바구니 버튼 */}
             <Link href="/cart">
