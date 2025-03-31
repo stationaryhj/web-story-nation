@@ -51,6 +51,9 @@ const CharacterRankingSection = memo(() => {
     return mainStoreRankingCharacters
   }
 
+  // 데이터 길이에 따라 swiper 사용 여부 결정
+  const shouldUseSwiper = getCharacterRankingData().length > 5
+
   return (
     <section className="pt-10 pb-20">
       {/* 제목과 탭 영역 - 좌우 여백 유지 */}
@@ -88,7 +91,7 @@ const CharacterRankingSection = memo(() => {
               customData={getCharacterRankingData()}
               cardsPerRow={5}
               hasRanking={true}
-              useSwiper={true}
+              useSwiper={shouldUseSwiper}
               sectionId="character-ranking-section"
             />
           </div>
