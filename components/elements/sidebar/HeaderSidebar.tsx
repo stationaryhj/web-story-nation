@@ -59,34 +59,7 @@ export default function HeaderSidebar({
   const sidebarContent = (
     <>
       <nav className="p-5">
-        <ul className="space-y-5">
-          {navLinks.map(link => (
-            <li key={link.href}>
-              <Link
-                href={link.href}
-                className={`block py-2 text-lg font-medium transition-colors ${
-                  activeLink === link.href
-                    ? 'text-primary-600 dark:text-dark-primary-600'
-                    : 'text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600'
-                }`}
-                onClick={e => {
-                  if (link.requireLogin && !isLogin) {
-                    e.preventDefault()
-                    onClose()
-                    openModal('login')
-                  } else {
-                    setActiveLink(link.href)
-                    onClose()
-                  }
-                }}
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-
-        <div className="mt-8 pt-6 border-t border-secondary-100 dark:border-dark-secondary-200/20">
+        <div className="">
           <h3 className="text-sm font-semibold text-secondary-500 dark:text-dark-secondary-500 mb-4">설정</h3>
           <ul className="space-y-4">
             <li>

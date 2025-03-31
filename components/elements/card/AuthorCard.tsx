@@ -112,7 +112,7 @@ export default function AuthorCard({
 
             {/* 작가 설명 */}
             {description && (
-              <p className="mt-1 text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 max-h-10 overflow-hidden">
+              <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 group-hover:text-secondary-800 dark:group-hover:text-dark-secondary-400 transition-colors min-h-[2.5rem] leading-[1.25rem]">
                 {description}
               </p>
             )}
@@ -189,11 +189,9 @@ export default function AuthorCard({
             </div>
             <div className={`flex items-center w-full ${isSidebar ? '' : 'justify-center'}`}>
               {/* 작가 소개 */}
-              {description && (
-                <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 group-hover:text-secondary-800 dark:group-hover:text-dark-secondary-400 transition-colors">
-                  {description}
-                </p>
-              )}
+              <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 group-hover:text-secondary-800 dark:group-hover:text-dark-secondary-400 transition-colors min-h-[2.5rem] leading-[1.25rem]">
+                {description}
+              </p>
             </div>
           </div>
         </div>

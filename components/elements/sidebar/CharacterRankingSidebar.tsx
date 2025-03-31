@@ -9,6 +9,7 @@ import CardGrid from '@/components/elements/card/CardGrid'
 import BaseSidebar from './BaseSidebar'
 import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
 import { bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil'
+import { SidebarSelectBox } from '@/components/elements/selectbox/SidebarSelectBox'
 
 // 캐릭터 랭킹 탭 정의
 const rankingTabs: TabItem[] = [
@@ -99,14 +100,16 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
         </div>
 
         {/* 성별 필터 */}
-        <div className="flex items-center space-x-3">
+        <div className="w-full flex items-center justify-between">
           <span className="text-sm text-secondary-700 dark:text-dark-secondary-300 min-w-20">성별 필터:</span>
-          <div className="flex-1">
-            <BaseSelectBox
+          <div>
+            <SidebarSelectBox
               options={genderOptions}
               selectedOption={selectedGender}
               onChange={handleGenderChange}
               placeholder="성별 선택"
+              isSidebar={true}
+              className="w-[100px]"
             />
           </div>
         </div>
