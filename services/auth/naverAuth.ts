@@ -8,112 +8,23 @@ import {
 } from './types';
 import { contentApi } from '@/services/api';
 import { OAuthResponse } from '@/types/login';
-
-// 네이버 SDK 타입 정의
-declare global {
-  interface Window {
-    naver: {
-      LoginWithNaverId: {
-        new(options: any): {
-          getLoginStatus(callback: (status: boolean) => void): void;
-          authorize(): void;
-          logout(): void;
-          getAccessToken(): string;
-          accessToken: {
-            accessToken: string;
-            tokenType: string;
-          };
-          user: {
-            id: string;
-            email: string;
-            name: string;
-            nickname: string;
-            profileImage: string;
-            age: string;
-            birthday: string;
-            gender: string;
-            mobile: string;
-            getEmail(): string;
-            getName(): string;
-            getNickName(): string;
-            getProfileImage(): string;
-            getBirthday(): string;
-            getAge(): string;
-            getGender(): string;
-            getMobile(): string;
-            getId(): string;
-          };
-        };
-      };
-    };
-  }
-}
+import he from 'he';
 
 // 네이버 인증 서비스
 export class NaverAuthService extends BaseAuthService {
-  private naverLogin: any = null;
-
   constructor() {
     super('NAVER');
   }
 
-  // SDK 초기화
+  // 초기화 메소드 - REST API 방식에서는 간단하게 유지
   async init(): Promise<void> {
-    // 이미 초기화되었다면 스킵
-    if (this.initialized) {
-      return;
-    }
-
-    try {
-      // SDK 로드 확인
-      if (!window.naver || !window.naver.LoginWithNaverId) {
-        await this.loadNaverSDK();
-        
-        // 다시 확인
-        if (!window.naver || !window.naver.LoginWithNaverId) {
-          console.error('네이버 SDK 로드 실패');
-          return;
-        }
-      }
-
-      console.log('네이버 SDK 초기화 완료');
-      this.initialized = true;
-    } catch (error) {
-      console.error('네이버 로그인 SDK 초기화 오류:', error);
-    }
-  }
-
-  // SDK 동적 로딩
-  private async loadNaverSDK(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      if (window.naver && window.naver.LoginWithNaverId) {
-        resolve();
-        return;
-      }
-      
-      const script = document.createElement('script');
-      script.src = 'https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js';
-      script.async = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('네이버 로그인 SDK 로드 실패'));
-      document.head.appendChild(script);
-    });
+    // REST API 방식에서는 특별한 초기화가 필요 없음
+    this.initialized = true;
   }
 
   // 네이버 로그인
   async login(params: LoginParams, callbacks: SocialLoginCallbacks): Promise<LoginResult> {
     try {
-      // SDK가 로드되었는지 확인
-      if (!window.naver || !window.naver.LoginWithNaverId) {
-        // SDK 동적 로딩 시도
-        await this.loadNaverSDK();
-        
-        // 다시 확인
-        if (!window.naver || !window.naver.LoginWithNaverId) {
-          throw new Error('네이버 로그인 SDK를 로드할 수 없습니다.');
-        }
-      }
-
       // 상태 정보를 단순 객체로 생성하고 문자열화
       const stateStr = JSON.stringify({
         provider: 'NAVER',
@@ -123,34 +34,26 @@ export class NaverAuthService extends BaseAuthService {
       });
       
       // 로컬 스토리지에 상태 저장
-      localStorage.setItem('naver_login_state', stateStr);
       localStorage.setItem('social_login_state', stateStr);
       localStorage.setItem('social_login_type', 'naver');
       
-      console.log('네이버 로그인 시작: 직접 URL로 인증 처리');
-      
-      // SDK 대신 직접 URL을 구성하여 팝업 띄우기
+      // REST API 방식으로 OAuth URL 구성
       const authUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${params.clientId}&redirect_uri=${encodeURIComponent(this.redirectUri)}&state=${encodeURIComponent(stateStr)}`;
       
-      // 팝업 크기와 위치 계산
+      // 팝업 창 열기
       const width = 500;
       const height = 700;
       const left = window.screenX + (window.outerWidth - width) / 2;
       const top = window.screenY + (window.outerHeight - height) / 2;
       
-      // 팝업 창 열기
       const popup = window.open(
         authUrl,
         'naverLogin',
         `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
       );
       
-      // 팝업 창이 차단된 경우
       if (!popup) {
-        return {
-          success: false,
-          error: '팝업 창이 차단되었습니다. 팝업 차단을 해제해주세요.'
-        };
+        throw new Error('팝업 창이 차단되었습니다. 팝업 차단을 해제해주세요.');
       }
       
       // 30초 타임아웃 설정
@@ -164,9 +67,8 @@ export class NaverAuthService extends BaseAuthService {
         }
       }, 30000);
       
-      // 로컬 스토리지에 타임아웃 ID 저장
       localStorage.setItem('naver_login_timeout', loginTimeout.toString());
-
+      
       return {
         success: false,
         error: '네이버 로그인이 진행 중입니다. 인증창에서 로그인을 완료해주세요.'
@@ -182,25 +84,45 @@ export class NaverAuthService extends BaseAuthService {
 
   // 콜백 처리
   async handleCallback(params: CallbackParams): Promise<LoginResult> {
+    // 중복 호출 방지를 위한 처리 상태 확인
+    const callbackProcessing = localStorage.getItem('naver_callback_processing');
+    if (callbackProcessing === 'true') {
+      console.log('네이버 콜백 처리가 이미 진행 중입니다.');
+      return {
+        success: false,
+        error: '처리 중입니다. 잠시만 기다려주세요.'
+      };
+    }
+    
+    // 처리 상태 플래그 설정
+    localStorage.setItem('naver_callback_processing', 'true');
+    
     try {
+      console.log('네이버 콜백 처리 시작 ::', params);
+      
       // 타임아웃 클리어
       const timeoutId = localStorage.getItem('naver_login_timeout');
       if (timeoutId) {
         clearTimeout(parseInt(timeoutId));
         localStorage.removeItem('naver_login_timeout');
       }
-      
-      console.log('네이버 콜백 처리 시작 ::', params);
 
-      // 필수 파라미터 확인
-      if (!params.code) {
-        throw new Error('인증 코드가 없습니다.');
-      }
-
-      // 로컬 스토리지에서 저장된 state 정보 가져오기
+      // 로컬 스토리지에서 state 정보 가져오기
       const savedState = localStorage.getItem('social_login_state');
       if (!savedState) {
         throw new Error('저장된 로그인 정보가 없습니다. 다시 로그인해주세요.');
+      }
+      
+      // callback에서 전달된 state가 HTML entity로 인코딩되어 있는 경우 처리
+      let state = params.state;
+      if (state && state.includes('&quot;')) {
+        try {
+          // HTML entity 디코딩 (예: &quot; -> ")
+          state = he.decode(state);
+          console.log('he로 디코딩된 state:', state);
+        } catch (decodeError) {
+          console.error('he 디코딩 오류:', decodeError);
+        }
       }
       
       // 상태 정보 파싱
@@ -208,7 +130,7 @@ export class NaverAuthService extends BaseAuthService {
       
       console.log('네이버 OAuth 정보:', { snsauth, snstype });
       
-      // OAuth 액세스 토큰 요청
+      // 백엔드 API를 통해 액세스 토큰 획득
       const tokenResponse = await this.getAccessToken(params.code, clientId);
       const accessToken = tokenResponse.access_token;
       
@@ -233,9 +155,9 @@ export class NaverAuthService extends BaseAuthService {
         
         // 임시 데이터 삭제
         localStorage.removeItem('naver_login_timeout');
-        localStorage.removeItem('naver_login_state');
         localStorage.removeItem('social_login_state');
         localStorage.removeItem('social_login_type');
+        localStorage.removeItem('naver_callback_processing'); // 처리 상태 플래그 제거
         
         return {
           success: true,
@@ -255,6 +177,7 @@ export class NaverAuthService extends BaseAuthService {
         
         // 임시 데이터 삭제
         localStorage.removeItem('naver_login_timeout');
+        localStorage.removeItem('naver_callback_processing'); // 처리 상태 플래그 제거
         
         return {
           success: false,
@@ -266,6 +189,7 @@ export class NaverAuthService extends BaseAuthService {
     } catch (error) {
       // 오류 발생 시 임시 데이터 정리
       localStorage.removeItem('naver_login_timeout');
+      localStorage.removeItem('naver_callback_processing'); // 처리 상태 플래그 제거
       
       console.error('네이버 로그인 콜백 처리 오류:', error);
       return {

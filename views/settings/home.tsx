@@ -53,7 +53,7 @@ export default function SettingsForm() {
   const [activeTab, setActiveTab] = useState<'support' | 'terms' | 'privacy' | 'paid' | 'policy'>('support')
 
   const { settings, updateProfile, updateBankAccount, setLanguage, uploadProfileImage } = useSettingsStore()
-  const { data: userInfo, writerInfo, fetchWriterInfo } = useAccountStore()
+  const { data: userInfo, writerInfo, fetchWriterInfo, logout } = useAccountStore()
   const { openModal } = useModalStore()
   const { bankList, getBankList } = useBankStore()
 
@@ -314,13 +314,15 @@ export default function SettingsForm() {
   // 로그아웃 핸들러
   const handleLogout = () => {
     // 여기에 실제 로그아웃 로직이 들어갈 수 있음
-    router.push('/login')
+    logout()
+    router.push('/')
   }
 
   // 회원탈퇴
   const handleExit = async () => {
     try {
       await contentApi.Signout()
+      logout()
       router.push('/')
     } catch (error) {
       console.error('회원탈퇴 중 오류 발생:', error)

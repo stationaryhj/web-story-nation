@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import he from 'he'
 
 export default function CallbackPage() {
   const router = useRouter()
@@ -11,10 +12,12 @@ export default function CallbackPage() {
     const processCallback = async () => {
       // 원본 URL 로깅
       console.log('Original URL:', window.location.href)
-
       
-
-      
+      // 중복 처리 방지 (이미 메시지를 보냈는지 확인)
+      if (sessionStorage.getItem('callback_message_sent') === 'true') {
+        console.log('이미 메시지가 전송되었습니다. 중복 처리 방지');
+        return;
+      }
 
       // 콜백 파라미터 가져오기
       const code = searchParams?.get('code')
@@ -22,8 +25,6 @@ export default function CallbackPage() {
       const errorDescription = searchParams?.get('error_description')
       const state = searchParams?.get('state')
 
-      alert('callback :: ' + code)
-      
       // 디버깅을 위한 검색 파라미터 전체 로깅
       const allParams: Record<string, string> = {};
       searchParams?.forEach((value, key) => {
@@ -39,13 +40,30 @@ export default function CallbackPage() {
         if (state) {
           console.log('State 파라미터 원본:', state);
           
-          // 어떤 형태로든 파싱 시도
+          // 네이버의 경우 HTML entity로 인코딩된 state 값 처리
+          let decodedState = state;
+          
+          // 로컬 스토리지에서 로그인 타입 확인
+          const socialLoginType = localStorage.getItem('social_login_type');
+          
+          // 네이버 로그인인 경우 he 라이브러리로 디코딩 추가 처리
+          if (socialLoginType === 'naver') {
+            try {
+              // HTML entity 디코딩 (예: &quot; -> ")
+              decodedState = he.decode(state);
+              console.log('he로 디코딩된 state:', decodedState);
+            } catch (decodeError) {
+              console.error('he 디코딩 오류:', decodeError);
+            }
+          }
+          
+          // JSON 파싱 시도
           try {
-            stateObj = JSON.parse(state);
-          } catch {
+            stateObj = JSON.parse(decodedState);
+          } catch (parseError) {
             // URL 디코딩 후 다시 시도
             try {
-              stateObj = JSON.parse(decodeURIComponent(state));
+              stateObj = JSON.parse(decodeURIComponent(decodedState));
             } catch (e) {
               console.error('State 파싱 모든 시도 실패');
             }
@@ -63,6 +81,10 @@ export default function CallbackPage() {
       // 부모 창에 메시지 전달 
       if (window.opener) {
         console.log('부모 창에 메시지 전달 시작');
+        
+        // 중복 메시지 방지를 위해 플래그 설정
+        sessionStorage.setItem('callback_message_sent', 'true');
+        
         // 에러가 있는 경우
         if (error) {
           console.log('에러 메시지 전송:', error);
@@ -91,6 +113,8 @@ export default function CallbackPage() {
         // 5초 후 창 닫기 (안전장치)
         setTimeout(() => {
           console.log('콜백 창 닫기 시도');
+          // 세션 스토리지 정리
+          sessionStorage.removeItem('callback_message_sent');
           window.close()
         }, 5000)
       } else {
@@ -108,7 +132,11 @@ export default function CallbackPage() {
       <h1 className="text-xl font-bold">로그인 처리 중...</h1>
       <p className="mt-2 text-gray-600">잠시만 기다려주세요. 자동으로 창이 닫힙니다.</p>
       <button
-        onClick={() => window.close()}
+        onClick={() => {
+          // 세션 스토리지 정리
+          sessionStorage.removeItem('callback_message_sent');
+          window.close();
+        }}
         className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
       >
         창 닫기

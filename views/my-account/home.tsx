@@ -170,11 +170,7 @@ export default function MyEarningsView() {
     router.push('/')
   }
 
-  // 계좌 정보 수정 페이지로 이동
-  const handleEditBankAccount = () => {
-    router.push('/my-profile')
-  }
-
+  
   // 출금 요청 핸들러
   const handleWithdrawRequest = () => {
     if (availableAmount < 1500) {

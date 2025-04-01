@@ -223,8 +223,9 @@ export class AuthManager {
       );
 
       if (response.data.result.err === 0) {
-        // 회원가입 성공 후 바로 로그인
-        const loginResponse = await contentApi.login2(snsauth, Number(snstype), snsid, "1"); // 1은 kr_gb 값
+        // 회원가입 성공 후 데이터 변경
+        const { access_token, nick_nm, snsaccesstoken, token_type } = response.data
+        const loginResponse = await contentApi.userinfo(access_token);
         
         // 모든 임시 데이터 삭제
         localStorage.removeItem('signup_data');
@@ -232,10 +233,15 @@ export class AuthManager {
         localStorage.removeItem('social_login_type');
         this.clearSocialAuthInfo();
         
-        // 성공 결과 반환
+        // 성공 결과 반환 (토큰 정보 포함)
         return {
           success: true,
-          data: loginResponse.data
+          data: {
+            ...loginResponse.data,
+            access_token,
+            token_type,
+            sns_access_token: snsaccesstoken
+          }
         };
       } else {
         // 회원가입 실패

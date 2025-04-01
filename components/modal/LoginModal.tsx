@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import BaseModal from './BaseModal'
 import SignupModal from './SignupModal'
@@ -15,58 +15,22 @@ interface LoginModalProps {
   onClose: () => void
 }
 
-// 네이버 SDK 로드
-const loadNaverSDK = () => {
-  return new Promise<void>((resolve) => {
-    if (window.naver && window.naver.LoginWithNaverId) {
-      resolve();
-      return;
-    }
-    
-    const script = document.createElement('script');
-    script.src = 'https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js';
-    script.async = true;
-    script.onload = () => {
-      console.log('네이버 SDK 로드 완료');
-      resolve();
-    };
-    script.onerror = () => {
-      console.error('네이버 SDK 로드 실패');
-      resolve(); // 실패해도 계속 진행
-    };
-    document.head.appendChild(script);
-  });
-};
-
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login')
   const [showSignup, setShowSignup] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [sdkLoaded, setSdkLoaded] = useState(false)
-
-  // SDK 초기 로드
-  useEffect(() => {
-    const initSDK = async () => {
-      try {
-        await loadNaverSDK();
-        setSdkLoaded(true);
-      } catch (err) {
-        console.error('SDK 로드 오류:', err);
-      }
-    };
-    
-    initSDK();
-  }, []);
+  // 이벤트 처리 중인지 추적하는 ref (중복 메시지 처리 방지)
+  const processingCallback = useRef(false);
 
   // 모달이 열리면 authService 초기화
   useEffect(() => {
-    if (isOpen && sdkLoaded) {
+    if (isOpen) {
       authService.init().catch(err => {
         console.error('인증 서비스 초기화 오류:', err);
       });
     }
-  }, [isOpen, sdkLoaded]);
+  }, [isOpen]);
 
   // 로그인 타임아웃 핸들러
   const handleLoginTimeout = useCallback(() => {
@@ -80,8 +44,10 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       localStorage.removeItem('naver_login_timeout');
     }
     localStorage.removeItem('social_login_state');
-    localStorage.removeItem('naver_login_state');
     localStorage.removeItem('social_login_type');
+    
+    // 콜백 처리 상태 초기화
+    processingCallback.current = false;
   }, []);
 
   // 소셜 로그인 콜백 메시지 처리 함수
@@ -100,11 +66,21 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       if (!data || typeof data !== 'object') return;
 
       // 소셜 로그인 데이터 확인
-      if (data.type === 'social_login_callback' && (data.code || data.error)) {
+      if (data.code || data.error) {
+        // 이미 처리 중인 경우 중복 처리 방지
+        if (processingCallback.current) {
+          console.log('이미 콜백을 처리 중입니다. 중복 처리 방지');
+          return;
+        }
+        
+        // 처리 중 상태로 설정
+        processingCallback.current = true;
+        
         // 에러 처리
         if (data.error) {
           setLoading(false);
           toast.error(`로그인 중 오류가 발생했습니다: ${data.error}`);
+          processingCallback.current = false;
           return;
         }
 
@@ -147,6 +123,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           toast.error('로그인 처리 중 오류가 발생했습니다.');
         } finally {
           setLoading(false);
+          // 처리 완료 후 상태 초기화
+          processingCallback.current = false;
         }
       }
     };
@@ -157,6 +135,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     // cleanup 함수
     return () => {
       window.removeEventListener('message', handleCallbackMessage);
+      // 모달이 닫힐 때 처리 상태 초기화
+      processingCallback.current = false;
     };
   }, [isOpen, onClose]);
 
@@ -174,11 +154,6 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const handleSocialLogin = async (provider: OAuthProvider) => {
     try {
       setLoading(true);
-      
-      // 네이버 로그인의 경우 SDK 로드 확인
-      if (provider === 'NAVER' && !window.naver) {
-        await loadNaverSDK();
-      }
       
       const result = await authService.socialLogin(
         provider,
@@ -218,7 +193,6 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     // 임시 저장 데이터 정리
     localStorage.removeItem('social_login_state');
     localStorage.removeItem('social_login_type');
-    localStorage.removeItem('naver_login_state');
     
     setShowSignup(false)
     onClose()

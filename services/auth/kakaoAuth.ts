@@ -70,6 +70,19 @@ export class KakaoAuthService extends BaseAuthService {
 
   // 콜백 처리
   async handleCallback(params: CallbackParams): Promise<LoginResult> {
+    // 중복 호출 방지를 위한 처리 상태 확인
+    const callbackProcessing = localStorage.getItem('kakao_callback_processing');
+    if (callbackProcessing === 'true') {
+      console.log('카카오 콜백 처리가 이미 진행 중입니다.');
+      return {
+        success: false,
+        error: '처리 중입니다. 잠시만 기다려주세요.'
+      };
+    }
+    
+    // 처리 상태 플래그 설정
+    localStorage.setItem('kakao_callback_processing', 'true');
+    
     try {
       console.log('카카오 로그인 콜백 처리 시작');
 
@@ -127,9 +140,15 @@ export class KakaoAuthService extends BaseAuthService {
       if (!result.success && result.error?.includes('회원가입이 필요합니다')) {
         result.signupRequired = true;
       }
+      
+      // 처리 상태 플래그 제거
+      localStorage.removeItem('kakao_callback_processing');
 
       return result;
     } catch (error) {
+      // 처리 상태 플래그 제거
+      localStorage.removeItem('kakao_callback_processing');
+      
       console.error('카카오 로그인 콜백 처리 오류:', error);
       return {
         success: false,

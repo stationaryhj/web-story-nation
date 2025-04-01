@@ -688,6 +688,15 @@ export interface WithdrawRequestItem {
   create_dt: string
 }
 
+// register4 Response
+export interface Register4Response {
+  access_token: string;
+  nick_nm: string;
+  snsaccesstoken: string;
+  token_type: string;
+  result: ApiResult;
+}
+
 // API Result
 export type ApiResult = {
   err: number;

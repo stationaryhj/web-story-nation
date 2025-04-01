@@ -37,6 +37,7 @@ import type {
   GetPresignedUrlResponse,
   WithdrawRequestListResponse,
   SaleMonthlyIncomeResponse,
+  Register4Response,
 } from '../../types/api'
 
 // API 기본 설정
@@ -149,7 +150,11 @@ export const contentApi = {
    * @param snsid     소셜 로그인 아이디
    * @param kr_gb     0: 외국인, 1: 국내인
    */
-  login2: async (snsauth: string, snstype: number, snsid: string, kr_gb: string): Promise<ApiResponse<LoginResponse>> => {
+  login2: async (snsauth: string, snstype: number, snsid: string, kr_gb: string, access_token: string = ''): Promise<ApiResponse<LoginResponse>> => {
+    if (access_token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
+    }
+    
     return api.post('/api/login2', {
       snsauth,
       snstype,
@@ -205,7 +210,7 @@ export const contentApi = {
     birth: string,
     accessToken: string,
     marketing_agree: number
-  ): Promise<ApiResponse> => {
+  ): Promise<ApiResponse<Register4Response>> => {
     return api.post('/api/register4', {
       snsauth,
       snstype,
