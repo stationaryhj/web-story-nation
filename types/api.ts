@@ -138,7 +138,12 @@ export interface ModuleCreater {
 
 export interface TagListResponse {
   result: ApiResult;
-  tagList: Array<TagRanking>;
+  charbot_tag: {
+    group1: TagRanking[];
+    group2: TagRanking[];
+    group3: TagRanking[];
+    [key: string]: TagRanking[];
+  };
 }
 
 
