@@ -36,6 +36,8 @@ import { bridgeCharbotDataToCharacter, bridgeChatModeDataToChatMode } from '@/li
 import { useNakama } from '@/app/providers/NakamaProviders'
 import { useChatModeStore } from '@/store/useStoreData'
 import BaseSidebar from '@/components/elements/sidebar/BaseSidebar'
+import { chatApi } from '@/services/api/storyNationApi'
+
 
 // 메시지 타입 정의
 interface ChatMessage {
@@ -474,13 +476,16 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       // 모달 닫기
       closeModal();
 
+      // 채팅방 삭제
+      await chatApi.CloseChat(Number(characterId));
+
       // 4. 페이지 리디렉션 (Next.js 라우터 사용)
-      router.push('/chat');
+      router.back();
     } catch (error) {
-      console.error('채팅방 삭제 프로세스 중 오류 발생:', error);
-      setError('채팅방 삭제에 실패했습니다. 다시 시도해주세요.');
-      // 에러가 발생해도 페이지 이동
-      router.push('/chat');
+      // console.error('채팅방 삭제 프로세스 중 오류 발생:', error);
+      // setError('채팅방 삭제에 실패했습니다. 다시 시도해주세요.');
+      // // 에러가 발생해도 페이지 이동
+      // router.push('/chat');
     } finally {
       setIsLoading(false);
     }

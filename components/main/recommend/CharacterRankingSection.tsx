@@ -1,13 +1,12 @@
 'use client'
 
 import { useState, memo } from 'react'
-import { Character } from '@/store/useStoreData'
 import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
 import CardGrid from '@/components/elements/card/CardGrid'
 import { SectionTransition } from '@/components/motion/PageTransition'
 import CharacterRankingSidebar from '@/components/elements/sidebar/CharacterRankingSidebar'
 import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
-import { bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil'
+import { SidebarSelectBox } from '@/components/elements/selectbox/SidebarSelectBox'
 
 // 캐릭터 랭킹 탭 정의
 const characterRankingTabs: TabItem[] = [
@@ -15,6 +14,14 @@ const characterRankingTabs: TabItem[] = [
   { id: 'daily', label: '일간' },
   { id: 'weekly', label: '주간' },
   { id: 'monthly', label: '월간' },
+]
+
+// 성별 필터 옵션 정의
+const genderOptions = [
+  { value: 4, label: '전체' },
+  { value: 1, label: '남자' },
+  { value: 2, label: '여자' },
+  { value: 3, label: '모름' },
 ]
 
 // 랭킹 탭에 따른 업데이트 문구
@@ -36,19 +43,25 @@ const getRankingUpdateMessage = (tabId: string) => {
 // 캐릭터 랭킹 섹션 컴포넌트
 const CharacterRankingSection = memo(() => {
   const [characterActiveTab, setCharacterActiveTab] = useState('realtime')
+  const [selectedGender, setSelectedGender] = useState(genderOptions[0])
   const [isCharacterRankingSidebarOpen, setIsCharacterRankingSidebarOpen] = useState(false)
 
-  const { rankingCharacters: mainStoreRankingCharacters } = useRecommendSectionStoreData()
+  const { rankingCharacters, UpdateRankingTopCharacter } = useRecommendSectionStoreData()
 
   const handleCharacterRankingTabChange = (tabId: string) => {
+    const topid = tabId === 'realtime' ? 4 : tabId === 'daily' ? 1 : tabId === 'weekly' ? 2 : 3
+    UpdateRankingTopCharacter('KR', topid, Number(selectedGender.value), false)
     setCharacterActiveTab(tabId)
-    // 여기서 실제로는 해당 탭에 맞는 데이터를 가져오는 API 호출이 필요합니다.
+  }
+
+  const handleGenderChange = (option: { value: number; label: string }) => {
+    const topid = characterActiveTab === 'realtime' ? 4 : characterActiveTab === 'daily' ? 1 : characterActiveTab === 'weekly' ? 2 : 3
+    UpdateRankingTopCharacter('KR', topid, option.value, false)
+    setSelectedGender(option)
   }
 
   const getCharacterRankingData = () => {
-    // 실제로는 탭에 따라 다른 데이터를 반환하는 로직이 필요함
-    // 현재는 목업으로 characters 데이터 사용
-    return mainStoreRankingCharacters
+    return rankingCharacters
   }
 
   return (
@@ -72,11 +85,20 @@ const CharacterRankingSection = memo(() => {
           <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-4">
             {getRankingUpdateMessage(characterActiveTab)}
           </p>
-          <ButtonTabs
-            tabs={characterRankingTabs}
-            defaultTabId="realtime"
-            onTabChange={handleCharacterRankingTabChange}
-          />
+          <div className="flex justify-between items-center">
+            <ButtonTabs
+              tabs={characterRankingTabs}
+              defaultTabId="realtime"
+              onTabChange={handleCharacterRankingTabChange}
+            />
+            <SidebarSelectBox
+              options={genderOptions}
+              selectedOption={selectedGender}
+              onChange={handleGenderChange}
+              placeholder="성별 선택"
+              className="w-[100px]"
+            />
+          </div>
         </div>
       </div>
 

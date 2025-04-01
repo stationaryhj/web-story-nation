@@ -1,27 +1,19 @@
 import { useState, memo } from 'react'
-import { Character } from '@/store/useStoreData'
 import CardGrid from '@/components/elements/card/CardGrid'
 import { SectionTransition } from '@/components/motion/PageTransition'
 import NewCharacterSidebar from '@/components/elements/sidebar/NewCharacterSidebar'
 import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
-import { bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil'
 
 // 최신 캐릭터 섹션 컴포넌트
 const LatestCharactersSection = memo(() => {
   const [isNewCharacterSidebarOpen, setIsNewCharacterSidebarOpen] = useState(false)
-  const { modules_1, modules_2, modules_3 } = useRecommendSectionStoreData()
+  const { modules_sum, UpdateLatestCharacters } = useRecommendSectionStoreData()
 
   const getLatestCharactersData = () => {
-    // modules_1, modules_2, modules_3을 하나의 배열로 합침
-    const combinedModules = [...modules_1, ...modules_2, ...modules_3]
-
-    // 최신순으로 정렬 (생성일 기준)
-    // const sortedModules = combinedModules.sort((a, b) =>
-    //   new Date(b.create_dt).getTime() - new Date(a.create_dt).getTime()
-    // );
+    const combinedModules = modules_sum
 
     // 상위 5개만 추출
-    const latestModules = combinedModules.slice(0, 5)
+    const latestModules = combinedModules.slice(0, 10)
 
     // Character 타입으로 변환하여 반환
     return latestModules

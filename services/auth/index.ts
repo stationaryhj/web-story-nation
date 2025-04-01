@@ -225,7 +225,7 @@ export class AuthManager {
       if (response.data.result.err === 0) {
         // 회원가입 성공 후 데이터 변경
         const { access_token, nick_nm, snsaccesstoken, token_type } = response.data
-        const loginResponse = await contentApi.userinfo(access_token);
+        const loginResponse = await contentApi.userinfo2(access_token);
         
         // 모든 임시 데이터 삭제
         localStorage.removeItem('signup_data');

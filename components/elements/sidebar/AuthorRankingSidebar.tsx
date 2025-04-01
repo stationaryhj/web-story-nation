@@ -25,7 +25,12 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
   const [activeTab, setActiveTab] = useState('weekly')
   const [rankingData, setRankingData] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const { rankingCreaters } = useRecommendSectionStoreData()
+  const { rankingCreatersSlide, UpdateRankingTopCreater } = useRecommendSectionStoreData()
+  
+  useEffect(() => {
+    // 주간
+    UpdateRankingTopCreater('KR', 2, true)
+  }, [])
 
   // 랭킹 데이터 가져오기
   useEffect(() => {
@@ -38,7 +43,7 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
           // 목업 작가 데이터 생성
           // const mockAuthors = generateMockAuthors(200)
 
-          const mockAuthors = rankingCreaters.map(character => ({
+          const mockAuthors = rankingCreatersSlide.map(character => ({
             id: character.id,
             name: character.name,
             nickname: character.creator?.nickname || character.name,
@@ -77,11 +82,13 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
     if (isOpen) {
       fetchRankingData()
     }
-  }, [isOpen, activeTab])
+  }, [isOpen, activeTab, rankingCreatersSlide])
 
   // 탭 변경 핸들러
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId)
+    const topid = tabId === 'weekly' ? 2 : tabId === 'monthly' ? 3 : tabId === 'all' ? 5 : 2
+    UpdateRankingTopCreater('KR', topid, true)
   }
 
   // 작가 클릭 핸들러

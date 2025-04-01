@@ -32,7 +32,7 @@ export default function Home() {
   const { openModal, setSelectedCharacter } = useModalStore()
 
   // URL 파라미터에서 현재 탭 가져오기
-  const tabParam = searchParams.get('tab') || 'all'
+  const tabParam = searchParams?.get('tab') || 'all'
 
   // 상태 관리
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
@@ -50,7 +50,7 @@ export default function Home() {
   // 네비게이션 핸들러
   const handleCategoryChange = (categoryId: string) => {
     // 페이지 이동
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString() || '')
 
     if (categoryId !== 'all') {
       params.set('tab', categoryId)
