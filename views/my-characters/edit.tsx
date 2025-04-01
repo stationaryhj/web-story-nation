@@ -4,165 +4,53 @@ import { SectionTransition, FadeIn } from '@/components/motion/PageTransition'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
-import { useCharacterFormStore } from '@/store/useCharacterFormStore'
+import { useCreateCharacterData, isFormValid as checkFormValidity } from '@/store/useCreateCharacterData'
 import CharacterForm from '@/components/form/CharacterForm'
-
-import { ReqGetCreateChatBotInProgress, ReqSaveCreateChatBotInProgress } from '@/services/hooks/DataListManager'
-import { bridgeCharacterInProgressToCharacter } from '@/lib/utils/storyNationUtil'
 import { toast } from 'react-toastify'
-
-// 임시 데이터 (실제로는 API에서 가져옴)
-const MOCK_CHARACTER = {
-  id: '1',
-  name: '고양이 앤지',
-  gender: 'female',
-  visibility: 'private',
-  bio: '뾰로롱~ 고양이 앤지에요! 집사님과 놀아요~',
-  firstMessage: '안녕하세요 집사님~! 오늘은 저를 얼마나 예뻐해 주실 건가요?',
-  hashtags: ['#로맨스', '#판타지', '#성장'],
-  bioDetail:
-    '한국의 서울에 사는 4살 고양이입니다. 츤데레 성격이지만 마음은 따뜻해요. 집사를 좋아하고 츄르를 좋아해요. 가끔 새침하게 굴지만 관심을 많이 받고 싶어하는 귀여운 성격이에요.',
-  detailVisibility: 'private',
-  conversationExamples: [
-    {
-      id: '1',
-      text: '집사: 앤지야 오늘 뭐하고 놀까?\n앤지: 츄르주면 같이 놀아줄게냥. 아, 딱히 놀고싶어서가 아니라 심심해서 그런거야!',
-      isEditing: false,
-      visibility: 'private',
-    },
-    {
-      id: '2',
-      text: '집사: 앤지 오늘 너무 귀엽다~\n앤지: 흥! 당연하지! 난 매일 귀여운걸! ...근데 오늘은 특별히 더 귀엽다고...?',
-      isEditing: false,
-      visibility: 'private',
-    },
-  ],
-  imageUrl: '/images/character-1.jpg',
-}
 
 export default function EditCharacterPage() {
   const params = useParams()
-  const characterId = params.id as string
+  const characterId = params?.id as string
 
   const router = useRouter()
-  const { activeTab, setActiveTab, formData, setFormField, resetForm } = useCharacterFormStore()
-
-  const {
-    data: inProgressData,
-    isLoading: inProgressLoading,
-    error: inProgressError,
-    refetch: inProgressRefetch,
-  } = ReqGetCreateChatBotInProgress(Number(characterId))
+  const { activeTab, setActiveTab, formData, resetForm, fetchInProgressData, saveInProgress, isLoadingData, isSaving, error: storeError } = useCreateCharacterData()
 
   // 유효성 검사 상태
   const [isFormValid, setIsFormValid] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [isSaving, setIsSaving] = useState(false)
 
   // 캐릭터 데이터 로드
   useEffect(() => {
     const loadCharacter = async () => {
       try {
-        setIsLoading(true)
-
-        if (inProgressData) {
-          resetForm() // 이전 데이터 초기화
-
-          // API 데이터 브릿지 함수를 사용하여 변환
-          const characterData = bridgeCharacterInProgressToCharacter(inProgressData?.chrbot)
-
-          // 캐릭터 데이터를 스토어에 설정
-          Object.entries(characterData).forEach(([key, value]) => {
-            if (key !== 'id') {
-              setFormField(key as any, value)
-            }
-          })
-        }
-
-        setIsLoading(false)
-      } catch (error) {
-        console.error('캐릭터 로딩 실패:', error)
+        await fetchInProgressData(Number(characterId))
+      } catch (loadError) {
+        console.error('캐릭터 로딩 실패:', loadError)
         setError('캐릭터를 불러오는 중 오류가 발생했습니다.')
-        setIsLoading(false)
       }
     }
 
-    if (!inProgressLoading && inProgressData) {
-      loadCharacter()
-    }
+    loadCharacter()
 
     // 컴포넌트 언마운트 시 폼 초기화
     return () => {
       resetForm()
     }
-  }, [characterId, resetForm, setFormField, inProgressData, inProgressLoading])
+  }, [characterId, resetForm, fetchInProgressData])
 
   // 폼 유효성 검사
   useEffect(() => {
-    const validateForm = () => {
-      if (activeTab === 'basic') {
-        return formData.name?.trim() !== '' && formData.bio?.trim() !== '' && formData.firstMessage?.trim() !== ''
-      } else if (activeTab === 'detail') {
-        // 상세 설정에서의 유효성 검사 - 최소한 상세 설명이 있어야 함
-        return formData.bioDetail?.trim() !== ''
-      }
-
-      return true
+    const validateCurrentForm = () => {
+      return checkFormValidity(formData, activeTab)
     }
 
-    setIsFormValid(validateForm())
+    setIsFormValid(validateCurrentForm())
   }, [activeTab, formData])
-
-  // API 호출하여 현재 진행 상태 저장
-  const saveProgress = async (finishYn = 0) => {
-    try {
-      setIsSaving(true)
-
-      // 폼 데이터에서 API 요청에 필요한 데이터 추출
-      const payload = {
-        world_list_detail_chrbot_key: characterId,
-        // 이미지 URL (있는 경우에만 포함)
-        img_url: formData.imgUrl || inProgressData?.chrbot?.img_url || '',
-        // 성인 이미지 URL (있는 경우에만 포함)
-        img_url_nsfw: formData.imgUrlNsfw || inProgressData?.chrbot?.img_url_nsfw || '',
-        title: formData.name || '',
-        gender: formData.gender === 'male' ? 1 : formData.gender === 'female' ? 2 : 0,
-        intro: formData.bio || '',
-        first_talk: formData.firstMessage || '',
-        content: formData.bioDetail || '',
-        example: formData.conversationExamples?.map(example => example.text).join('\n\n') || '',
-        // 성인 등급 설정 - formData의 rating 필드 사용
-        nsfw: formData.rating === 'adult' ? 1 : 0,
-        show_yn: formData.visibility === 'public' ? 1 : 0,
-        content_show_yn: inProgressData?.chrbot?.content_show_yn || 0,
-        example_show_yn: inProgressData?.chrbot?.example_show_yn || 0,
-        finish_yn: finishYn,
-      }
-
-      console.log('저장할 데이터:', payload)
-
-      // API 호출
-      const response = await ReqSaveCreateChatBotInProgress(payload)
-      
-      if (response.error) {
-        throw new Error(response.error.toString())
-      }
-      
-      return true
-    } catch (error) {
-      console.error('저장 실패:', error)
-      toast.error('저장에 실패했습니다. 다시 시도해주세요.')
-      return false
-    } finally {
-      setIsSaving(false)
-    }
-  }
 
   // 다음 버튼 클릭 핸들러
   const handleNext = async () => {
     // 현재 단계 저장
-    const saveResult = await saveProgress()
+    const saveResult = await saveInProgress()
     if (!saveResult) return
 
     if (activeTab === 'basic') {
@@ -179,7 +67,7 @@ export default function EditCharacterPage() {
   const handleSubmit = async () => {
     try {
       // 완료 상태로 저장
-      const saveResult = await saveProgress(1)
+      const saveResult = await saveInProgress(1)
       if (!saveResult) return
 
       toast.success('캐릭터가 성공적으로 수정되었습니다!')
@@ -190,7 +78,7 @@ export default function EditCharacterPage() {
     }
   }
 
-  if (inProgressLoading || isLoading) {
+  if (isLoadingData) {
     return (
       <div className="min-h-screen bg-secondary-50 dark:bg-dark-background flex items-center justify-center">
         <div className="animate-pulse text-secondary-500 dark:text-dark-secondary-500">
@@ -200,7 +88,7 @@ export default function EditCharacterPage() {
     )
   }
 
-  if (inProgressError || error) {
+  if (storeError || error) {
     return (
       <div className="min-h-screen bg-secondary-50 dark:bg-dark-background flex items-center justify-center">
         <div className="text-red-500 dark:text-red-400">{error || '데이터를 불러오는데 실패했습니다.'}</div>
@@ -250,7 +138,7 @@ export default function EditCharacterPage() {
             {/* 폼 컨텐츠 */}
             <div className="p-6">
               <FadeIn>
-                <CharacterForm formType="edit" mode={activeTab} />
+                <CharacterForm formType="edit" mode={activeTab} onValidationChange={setIsFormValid} />
               </FadeIn>
             </div>
 
