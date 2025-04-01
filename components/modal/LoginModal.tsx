@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import BaseModal from './BaseModal'
 import SignupModal from './SignupModal'
@@ -15,16 +15,79 @@ interface LoginModalProps {
   onClose: () => void
 }
 
+// 네이버 SDK 로드
+const loadNaverSDK = () => {
+  return new Promise<void>((resolve) => {
+    if (window.naver && window.naver.LoginWithNaverId) {
+      resolve();
+      return;
+    }
+    
+    const script = document.createElement('script');
+    script.src = 'https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js';
+    script.async = true;
+    script.onload = () => {
+      console.log('네이버 SDK 로드 완료');
+      resolve();
+    };
+    script.onerror = () => {
+      console.error('네이버 SDK 로드 실패');
+      resolve(); // 실패해도 계속 진행
+    };
+    document.head.appendChild(script);
+  });
+};
+
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const router = useRouter()
+  const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login')
   const [showSignup, setShowSignup] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [sdkLoaded, setSdkLoaded] = useState(false)
 
-  // 콜백 메시지 리스너 추가
+  // SDK 초기 로드
+  useEffect(() => {
+    const initSDK = async () => {
+      try {
+        await loadNaverSDK();
+        setSdkLoaded(true);
+      } catch (err) {
+        console.error('SDK 로드 오류:', err);
+      }
+    };
+    
+    initSDK();
+  }, []);
+
+  // 모달이 열리면 authService 초기화
+  useEffect(() => {
+    if (isOpen && sdkLoaded) {
+      authService.init().catch(err => {
+        console.error('인증 서비스 초기화 오류:', err);
+      });
+    }
+  }, [isOpen, sdkLoaded]);
+
+  // 로그인 타임아웃 핸들러
+  const handleLoginTimeout = useCallback(() => {
+    setLoading(false);
+    toast.error('로그인 시간이 초과되었습니다. 다시 시도해주세요.');
+    
+    // 타임아웃 관련 데이터 정리
+    const timeoutId = localStorage.getItem('naver_login_timeout');
+    if (timeoutId) {
+      clearTimeout(parseInt(timeoutId));
+      localStorage.removeItem('naver_login_timeout');
+    }
+    localStorage.removeItem('social_login_state');
+    localStorage.removeItem('naver_login_state');
+    localStorage.removeItem('social_login_type');
+  }, []);
+
+  // 소셜 로그인 콜백 메시지 처리 함수
   useEffect(() => {
     if (!isOpen) return;
 
-    // 소셜 로그인 콜백 메시지 처리 함수
     const handleCallbackMessage = async (event: MessageEvent) => {
       // 출처 확인 (보안)
       if (event.origin !== window.location.origin) {
@@ -37,9 +100,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       if (!data || typeof data !== 'object') return;
 
       // 소셜 로그인 데이터 확인
-      if (data.login_type && (data.code || data.error)) {
-        console.log('소셜 로그인 콜백 메시지 수신:', data);
-        
+      if (data.type === 'social_login_callback' && (data.code || data.error)) {
         // 에러 처리
         if (data.error) {
           setLoading(false);
@@ -51,6 +112,13 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         try {
           setLoading(true);
           
+          // 타임아웃 클리어
+          const timeoutId = localStorage.getItem('naver_login_timeout');
+          if (timeoutId) {
+            clearTimeout(parseInt(timeoutId));
+            localStorage.removeItem('naver_login_timeout');
+          }
+          
           // authService.handleCallback 호출
           const result = await authService.handleCallback({
             code: data.code,
@@ -58,17 +126,17 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           });
           
           if (result.success) {
-            // 로그인 성공 시 모달 닫기
-            onClose();
-            
             // 로그인 성공 시 상태 업데이트 (useAccountStore)
             if (result.data) {
               useAccountStore.getState().setLoginState(true, result.data);
               await useAccountStore.getState().updateUserInfoFromUserInfo2();
               await useAccountStore.getState().fetchWriterInfo();
+              
+              // 성공 시에만 모달 닫기
+              onClose();
             }
           } else if (result.signupRequired || result.needSignup) {
-            // 회원가입 필요
+            // 회원가입 필요 - 모달 닫지 않고 회원가입 모달로 전환
             setShowSignup(true);
           } else {
             // 기타 오류
@@ -85,7 +153,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
     // 이벤트 리스너 등록
     window.addEventListener('message', handleCallbackMessage);
-
+    
     // cleanup 함수
     return () => {
       window.removeEventListener('message', handleCallbackMessage);
@@ -105,32 +173,30 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   // 통합된 소셜 로그인 처리 함수
   const handleSocialLogin = async (provider: OAuthProvider) => {
     try {
-      setLoading(true)
+      setLoading(true);
+      
+      // 네이버 로그인의 경우 SDK 로드 확인
+      if (provider === 'NAVER' && !window.naver) {
+        await loadNaverSDK();
+      }
       
       const result = await authService.socialLogin(
         provider,
-        // 회원가입 필요 시 콜백
-        () => {
-          setShowSignup(true)
-        },
-        // 로그인 성공 시 콜백
-        () => {
-          onClose()
+        {
+          onLoginTimeout: handleLoginTimeout
         }
-      )
+      );
       
-      if (result.success) {
-        onClose()
-      } else {
-        console.log('로그인 진행 중:', result.error)
+      if (!result.success && result.error) {
+        toast.error(result.error);
       }
     } catch (error) {
-      console.error('소셜 로그인 오류:', error)
-      toast.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+      console.error('소셜 로그인 오류:', error);
+      toast.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleGuestLogin = async (nickname: string) => {
     try {
@@ -149,12 +215,18 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
   // 회원가입 성공 시 모달 닫기
   const handleSignupSuccess = () => {
+    // 임시 저장 데이터 정리
+    localStorage.removeItem('social_login_state');
+    localStorage.removeItem('social_login_type');
+    localStorage.removeItem('naver_login_state');
+    
     setShowSignup(false)
     onClose()
   }
 
   return (
     <>
+      {/* 로그인 모달 - 회원가입 모달이 표시 중일 때 숨김 */}
       <BaseModal
         isOpen={isOpen && !showSignup}
         onClose={onClose}
@@ -170,28 +242,28 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               disabled={loading}
               className="flex w-full items-center justify-center rounded-full bg-yellow-400 py-3 px-4 font-medium text-yellow-900 shadow transition-colors hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? '로그인 중...' : '카카오로 로그인'}
+              <span>카카오로 시작하기</span>
             </button>
             <button
               onClick={() => handleSocialLogin('NAVER')}
               disabled={loading}
               className="flex w-full items-center justify-center rounded-full bg-green-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? '로그인 중...' : '네이버로 로그인'}
+              <span>네이버로 시작하기</span>
             </button>
             <button
               onClick={() => handleSocialLogin('APPLE')}
               disabled={loading}
               className="flex w-full items-center justify-center rounded-full bg-black py-3 px-4 font-medium text-white shadow transition-colors hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? '로그인 중...' : '애플로 로그인'}
+              <span>애플로 시작하기</span>
             </button>
             <button
               onClick={() => handleSocialLogin('GOOGLE')}
               disabled={loading}
               className="flex w-full items-center justify-center rounded-full bg-blue-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? '로그인 중...' : '구글로 로그인'}
+              <span>구글로 시작하기</span>
             </button>
           </div>
 
@@ -221,8 +293,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         </div>
       </BaseModal>
 
+      {/* 회원가입 모달 - isOpen 조건만 체크하여 로그인 모달과 독립적으로 표시 */}
       {showSignup && (
-        <SignupModal isOpen={isOpen && showSignup} onClose={handleSignupClose} onSuccess={handleSignupSuccess} />
+        <SignupModal isOpen={isOpen} onClose={handleSignupClose} onSuccess={handleSignupSuccess} />
       )}
     </>
   )

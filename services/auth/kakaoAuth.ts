@@ -1,4 +1,4 @@
-import { OAUTH_PROVIDERS, OAuthProvider } from '@/types/login';
+import { OAUTH_PROVIDERS, OAuthProvider, OAuthState } from '@/types/login';
 import { BaseAuthService } from './baseAuth';
 import { 
   LoginParams, 
@@ -87,7 +87,11 @@ export class KakaoAuthService extends BaseAuthService {
       let stateData: Record<string, any> = {};
       if (params.state) {
         try {
-          stateData = JSON.parse(params.state as unknown as string) as Record<string, any>;
+          // 타입 변환 개선
+          const stateStr = typeof params.state === 'string' 
+            ? params.state 
+            : JSON.stringify(params.state);
+          stateData = JSON.parse(stateStr);
         } catch (e) {
           console.error('상태 정보 파싱 오류:', e);
         }
@@ -118,10 +122,10 @@ export class KakaoAuthService extends BaseAuthService {
 
       // 공통 로그인 처리 로직 호출
       const result = await this.processLogin(tokenResponse, loginParams);
-
-      // 성공적으로 처리되면 임시 데이터 삭제
-      if (result.success) {
-        localStorage.removeItem('social_login_state');
+      
+      // 회원가입 필요 시 signupRequired 플래그 명시적 설정
+      if (!result.success && result.error?.includes('회원가입이 필요합니다')) {
+        result.signupRequired = true;
       }
 
       return result;

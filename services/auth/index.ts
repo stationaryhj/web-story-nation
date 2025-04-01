@@ -10,7 +10,7 @@ const naverAuth = new NaverAuthService();
 // 카카오 로그인 서비스
 const kakaoAuth = new KakaoAuthService();
 
-// API에서 가져온 소셜 로그인 정보 인터페이스
+// API에서 가져온 소셜 로그인, 문자열로 통일
 interface SocialAuthInfo {
   clientId: string;
   snsauth: string;
@@ -88,8 +88,7 @@ export class AuthManager {
   // 소셜 로그인
   async socialLogin(
     provider: OAuthProvider,
-    onSignupRequired?: () => void,
-    onLoginSuccess?: () => void
+    callbacks: SocialLoginCallbacks = {}
   ): Promise<LoginResult> {
     try {
       // 초기화 확인
@@ -97,16 +96,13 @@ export class AuthManager {
         await this.init();
       }
       
-      // 콜백 함수
-      const callbacks: SocialLoginCallbacks = {
-        onSignupRequired,
-        onLoginSuccess
-      };
+      // 로그인 진행 상태 저장
+      localStorage.setItem('social_login_in_progress', '1');
       
       // 백엔드에서 소셜 인증 정보 가져오기
       const authInfo = await this.getSocialAuthInfoFromBackend(provider);
       
-      console.log(`${provider} 인증 정보:`, authInfo);
+      console.log(`${provider} 로그인 시작`, { clientId: authInfo.clientId });
       
       // 플랫폼별 로그인 파라미터
       const params: LoginParams = {
@@ -130,14 +126,20 @@ export class AuthManager {
       let result: LoginResult;
       switch (provider) {
         case 'NAVER':
+          console.log('네이버 로그인 서비스 호출');
           result = await naverAuth.login(params, callbacks);
           break;
         case 'KAKAO':
+          console.log('카카오 로그인 서비스 호출');
           result = await kakaoAuth.login(params, callbacks);
           break;
         case 'GOOGLE':
         case 'APPLE':
-          throw new Error(`아직 지원하지 않는 로그인 방식입니다: ${provider}`);
+          console.log('아직 지원하지 않는 로그인 방식입니다:', provider);
+          return {
+            success: false,
+            error: `아직 지원하지 않는 로그인 방식입니다: ${provider}`
+          };
         default:
           throw new Error('지원하지 않는 로그인 방식입니다.');
       }
@@ -145,11 +147,19 @@ export class AuthManager {
       // 로그인 완료 후 인증 정보 초기화 (성공 여부와 상관없이)
       this.clearSocialAuthInfo();
       
+      // 팝업이 제대로 열렸으면 로그인 진행 중 상태 유지
+      if (!result.success && !result.error?.includes('팝업 창이 차단되었습니다')) {
+        return result;
+      }
+      
+      // 오류 발생 시 로그인 진행 상태 제거
+      localStorage.removeItem('social_login_in_progress');
       return result;
     } catch (error) {
       // 오류 발생 시 로컬 스토리지 정리 및 인증 정보 초기화
       localStorage.removeItem('social_login_state');
       localStorage.removeItem('social_login_type');
+      localStorage.removeItem('social_login_in_progress');
       this.clearSocialAuthInfo();
       
       return {
@@ -216,8 +226,11 @@ export class AuthManager {
         // 회원가입 성공 후 바로 로그인
         const loginResponse = await contentApi.login2(snsauth, Number(snstype), snsid, "1"); // 1은 kr_gb 값
         
-        // 임시 데이터 삭제
+        // 모든 임시 데이터 삭제
         localStorage.removeItem('signup_data');
+        localStorage.removeItem('social_login_state');
+        localStorage.removeItem('social_login_type');
+        this.clearSocialAuthInfo();
         
         // 성공 결과 반환
         return {
@@ -232,6 +245,9 @@ export class AuthManager {
         };
       }
     } catch (error) {
+      // 오류 시에도 임시 데이터 정리 (선택적)
+      // localStorage.removeItem('signup_data');
+      
       return {
         success: false,
         error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'
@@ -259,6 +275,8 @@ export class AuthManager {
       }
       
       const provider = loginType.toUpperCase() as OAuthProvider;
+      console.log('콜백 처리 시작 :: ', provider);
+      
       let result: LoginResult;
       
       switch (provider) {
@@ -270,19 +288,33 @@ export class AuthManager {
           break;
         case 'GOOGLE':
         case 'APPLE':
-          throw new Error(`아직 지원하지 않는 콜백 처리입니다: ${provider}`);
+          return {
+            success: false,
+            error: `아직 지원하지 않는 로그인 방식입니다: ${provider}`
+          };
         default:
           throw new Error('지원하지 않는 로그인 타입입니다.');
       }
       
-      // 콜백 처리 후 인증 정보 초기화 (성공 여부와 상관없이)
-      this.clearSocialAuthInfo();
+      // 로그인 성공 시에만 인증 정보와 로컬 스토리지 데이터 초기화
+      if (result.success) {
+        localStorage.removeItem('social_login_state');
+        localStorage.removeItem('social_login_type');
+        localStorage.removeItem('social_login_in_progress');
+        this.clearSocialAuthInfo();
+      } else if (result.signupRequired || result.needSignup) {
+        // 회원가입이 필요한 경우 로그인 정보는 유지
+        // 인증 정보만 초기화 (메모리 누수 방지)
+        localStorage.removeItem('social_login_in_progress');
+        this.clearSocialAuthInfo();
+      }
       
       return result;
     } catch (error) {
       // 오류 발생 시 로컬 스토리지 정리 및 인증 정보 초기화
       localStorage.removeItem('social_login_state');
       localStorage.removeItem('social_login_type');
+      localStorage.removeItem('social_login_in_progress');
       this.clearSocialAuthInfo();
       
       return {

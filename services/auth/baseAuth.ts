@@ -2,7 +2,7 @@ import axios from 'axios';
 import { contentApi } from '@/services/api';
 import { OAUTH_PROVIDERS, OAuthProvider, OAuthResponse, OAuthState } from '@/types/login';
 import { 
-  AuthServiceInterface, 
+  AuthService, 
   LoginParams, 
   CallbackParams, 
   LoginResult, 
@@ -68,13 +68,15 @@ export const handleNetworkError: ErrorHandler = (error) => {
 };
 
 // 기본 인증 서비스 클래스
-export abstract class BaseAuthService implements AuthServiceInterface {
+export abstract class BaseAuthService implements AuthService {
+  readonly name: string;
   protected provider: OAuthProvider;
   protected redirectUri: string;
-  protected initialized: boolean = false;
+  initialized: boolean = false;
   
   constructor(provider: OAuthProvider) {
     this.provider = provider;
+    this.name = provider;
     this.redirectUri = getRedirectUri();
   }
   
@@ -84,10 +86,10 @@ export abstract class BaseAuthService implements AuthServiceInterface {
   }
   
   // 로그인 함수 (자식 클래스에서 구현)
-  public abstract login(params: LoginParams, callbacks?: SocialLoginCallbacks): Promise<LoginResult>;
+  public abstract login(params: LoginParams, callbacks: SocialLoginCallbacks): Promise<LoginResult>;
   
   // 콜백 처리 함수 (자식 클래스에서 구현)
-  public abstract handleCallback(params: CallbackParams, callbacks?: SocialLoginCallbacks): Promise<LoginResult>;
+  public abstract handleCallback(params: CallbackParams): Promise<LoginResult>;
   
   // 유틸리티 메소드: 팝업 창 열기
   protected openPopup(url: string, title: string): Window | null {
@@ -182,7 +184,7 @@ export abstract class BaseAuthService implements AuthServiceInterface {
         // 로그인 처리
         const loginResponse = await contentApi.login2(
           params.snsauth, 
-          Number(params.snstype), 
+          params.snstype, 
           snsid, 
           String(kr_gb)
         );
@@ -208,11 +210,11 @@ export abstract class BaseAuthService implements AuthServiceInterface {
         return {
           success: false,
           signupRequired: true,
+          needSignup: true,
           error: '회원가입이 필요합니다.'
         };
       }
     } catch (error) {
-      console.error('로그인 처리 중 오류 발생:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.'

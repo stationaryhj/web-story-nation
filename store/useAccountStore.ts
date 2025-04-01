@@ -394,7 +394,17 @@ export const useAccountStore = create<AccountState>()(
         
         try {
           // 인증 서비스를 사용하여 로그인
-          const result = await authService.socialLogin(type, onSignupRequired, onLoginSuccess);
+          const result = await authService.socialLogin(
+            type,
+            {
+              onSignupRequired,
+              onSuccess: onLoginSuccess,
+              onLoginTimeout: () => {
+                set({ loading: false });
+                set({ error: "로그인 시간이 초과되었습니다. 다시 시도해주세요." });
+              }
+            }
+          );
           
           if (result.success && result.data) {
             // 로그인 성공
@@ -413,7 +423,7 @@ export const useAccountStore = create<AccountState>()(
               onLoginSuccess();
             }
             return true;
-          } else if (result.needSignup) {
+          } else if (result.needSignup || result.signupRequired) {
             // 회원가입 필요
             set({ loading: false });
             
@@ -421,11 +431,6 @@ export const useAccountStore = create<AccountState>()(
             if (onSignupRequired) {
               onSignupRequired();
             }
-            return false;
-          } else if (result.redirectUrl) {
-            // 리다이렉션 필요
-            set({ loading: false });
-            window.location.href = result.redirectUrl;
             return false;
           } else {
             // 에러 처리
