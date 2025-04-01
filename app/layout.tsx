@@ -93,6 +93,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             `,
           }}
         />
+
+        {/* naver sdk */}
+        <Script
+          id="naver-sdk"
+          type='text/javascript'
+          src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js"
+          strategy="afterInteractive"
+        />
       </head>
       <body className="font-sans bg-white dark:bg-gray-900 transition-colors duration-300" suppressHydrationWarning>
         <Providers>
