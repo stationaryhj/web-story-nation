@@ -348,7 +348,7 @@ export default function SettingsForm() {
     // 각 탭에 따라 다른 페이지로 이동
     switch (tab) {
       case 'support':
-        window.open('https://pf.kakao.com/_xoIvlxj', '_blank')
+        window.open('https://pf.kakao.com/_lMJmb', '_blank')
         break
       case 'terms':
         window.open('/terms?tab=terms', '_blank')
@@ -552,12 +552,6 @@ export default function SettingsForm() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
                   placeholder="닉네임을 입력하세요"
                 />
-                <button
-                  onClick={handleDuplicateCheck}
-                  className="sm:flex-shrink-0 px-4 py-3 bg-primary-500 text-white rounded-lg whitespace-nowrap hover:bg-primary-700"
-                >
-                  중복 확인
-                </button>
               </div>
             </div>
 

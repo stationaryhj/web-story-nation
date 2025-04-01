@@ -16,6 +16,8 @@ const authorRankingTabs: TabItem[] = [
 
 // 랭킹 탭에 따른 업데이트 문구
 const getRankingUpdateMessage = (tabId: string) => {
+  return '캐릭터 매출 20% 현금 정산 이벤트!(종료 후 10%) 15,000원부터 출금 가능!'
+  
   switch (tabId) {
     case 'realtime':
       return `${Math.floor(Math.random() * 60)}분 전 업데이트`
