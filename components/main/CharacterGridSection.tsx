@@ -101,10 +101,9 @@ export default function CharacterGridSection({
           <h2 className="text-2xl font-bold mb-6">{categoryName}</h2>
           <FilterControls
             categoryId={categoryIdNumber}
-            order={filter.order}
-            setOrder={handleOrderChange}
-            nsfw={filter.nsfw}
-            setNsfw={handleNsfwChange}
+            onOrderChange={handleOrderChange}
+            onNsfwChange={handleNsfwChange}
+            onTagsChange={handleTagsChange}
           />
           <p className="mt-8 text-center text-gray-500 dark:text-dark-secondary-400">
             {selectedTags.length > 0 ? '선택한 태그에 해당하는 캐릭터가 없습니다.' : '데이터가 없습니다.'}
@@ -120,10 +119,8 @@ export default function CharacterGridSection({
         {/* 공통 필터 컴포넌트 적용 */}
         <FilterControls
           categoryId={categoryIdNumber}
-          order={filter.order}
-          setOrder={handleOrderChange}
-          nsfw={filter.nsfw}
-          setNsfw={handleNsfwChange}
+          onOrderChange={handleOrderChange}
+          onNsfwChange={handleNsfwChange}
           onTagsChange={handleTagsChange}
         />
 
