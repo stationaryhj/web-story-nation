@@ -21,10 +21,6 @@ const LatestCharactersSection = memo(() => {
 
   // 최신 캐릭터 데이터
   const latestCharacters = getLatestCharactersData()
-  // 카드 수가 캐럿셀 사용이 필요한지 확인 (카드가 5개 이하면 스와이퍼 사용 안함)
-  const shouldUseSwiper = latestCharacters.length > 5
-
-  console.log('최신 캐릭터 수:', latestCharacters.length, '스와이퍼 사용:', shouldUseSwiper)
 
   return (
     <section className="py-20">

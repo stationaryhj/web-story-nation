@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import BaseModal from './BaseModal'
 import { BaseButton } from '@/components/elements/button/BaseButton'
@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAccountStore } from '@/store/useAccountStore'
 import { contentApi } from '@/services/api/storyNationApi'
+import { createPortal } from 'react-dom'
 
 interface SignupModalProps {
   isOpen: boolean
@@ -26,6 +27,7 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
   const [isNicknameChecked, setIsNicknameChecked] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [birthError, setBirthError] = useState<string | null>(null)
 
   // 계정 스토어에서 회원가입 함수와 로딩 상태 가져오기
   const { registerWithSocialData, loading, error } = useAccountStore()
@@ -53,46 +55,107 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
     }
 
     const response = await contentApi.NicknmCheck(nickname)
-    if(response.data.result.err === 0) {
+    if (response.data.result.err === 0) {
       toast.success('사용 가능한 닉네임입니다.')
       setIsNicknameValid(true)
       setIsNicknameChecked(true)
     } else {
       toast.error('이미 사용 중인 닉네임입니다.')
       setIsNicknameValid(false)
-      setIsNicknameChecked(false)
+      setIsNicknameChecked(true)
     }
-
-    // 실제 API 호출 대신 가상의 중복 확인 로직
-    // const isDuplicate = false // API 호출 결과에 따라 변경
-
-    // if (isDuplicate) {
-    //   toast.error('이미 사용 중인 닉네임입니다.')
-    //   setIsNicknameValid(false)
-    // } else {
-    //   toast.success('사용 가능한 닉네임입니다.')
-    //   setIsNicknameValid(true)
-    // }
-
-    // setIsNicknameChecked(true)
   }
 
   // 생년월일 유효성 검사
   const isValidBirthdate = (value: string) => {
-    if (!value || value.length !== 8) return false
+    console.log('Starting birthdate validation for:', value)
+    if (!value) {
+      console.log('Empty value, clearing error')
+      setBirthError(null)
+      return false
+    }
 
-    const year = parseInt(value.substring(0, 4))
-    const month = parseInt(value.substring(4, 6))
-    const day = parseInt(value.substring(6, 8))
+    // 숫자가 한 자리라도 입력된 경우에만 검사
+    if (value.length > 0) {
+      // 연도 검사 (1900년 이상)
+      if (value.length >= 4) {
+        const year = parseInt(value.substring(0, 4))
+        console.log('Checking year:', year)
+        if (year < 1900) {
+          console.log('Invalid year, setting error')
+          setBirthError('1900년 이상의 연도를 입력해주세요.')
+          return false
+        }
+      }
 
-    const currentYear = new Date().getFullYear()
-    const age = currentYear - year
+      // 월 검사 (01-12)
+      if (value.length >= 6) {
+        const month = parseInt(value.substring(4, 6))
+        console.log('Checking month:', month)
+        if (month < 1 || month > 12) {
+          console.log('Invalid month, setting error')
+          setBirthError('월은 01부터 12까지 입력 가능합니다.')
+          return false
+        }
+      }
 
-    // 기본적인 날짜 유효성 검사
-    if (year < 1900 || year > currentYear || month < 1 || month > 12 || day < 1 || day > 31) return false
+      // 일 검사 (해당 월의 마지막 날짜까지)
+      if (value.length === 8) {
+        const year = parseInt(value.substring(0, 4))
+        const month = parseInt(value.substring(4, 6))
+        const day = parseInt(value.substring(6, 8))
+        const lastDayOfMonth = new Date(year, month, 0).getDate()
 
-    // 만 14세 이상 확인
-    return age >= 14
+        console.log('Checking day:', day, 'Last day of month:', lastDayOfMonth)
+        if (day < 1 || day > lastDayOfMonth) {
+          console.log('Invalid day, setting error')
+          setBirthError(`${month}월은 01부터 ${lastDayOfMonth}까지 입력 가능합니다.`)
+          return false
+        }
+
+        // 만 14세 검사 (UTC 기준)
+        const birthDate = new Date(Date.UTC(year, month - 1, day))
+        const today = new Date()
+        const age = today.getFullYear() - birthDate.getFullYear()
+        const monthDiff = today.getMonth() - birthDate.getMonth()
+
+        console.log('Checking age:', age, 'Month diff:', monthDiff)
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+          if (age - 1 < 14) {
+            console.log('Invalid age (under 14), setting error')
+            setBirthError('만 14세 이상이어야 합니다.')
+            return false
+          }
+        } else if (age < 14) {
+          console.log('Invalid age (under 14), setting error')
+          setBirthError('만 14세 이상이어야 합니다.')
+          return false
+        }
+      }
+    }
+
+    console.log('Validation passed, clearing error')
+    setBirthError(null)
+    return true
+  }
+
+  // 생년월일 입력 처리
+  const handleBirthdateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 8)
+    setBirthdate(value)
+    // 입력 중에는 에러 메시지를 표시하지 않음
+    setBirthError(null)
+  }
+
+  // 생년월일 focus 해제 처리
+  const handleBirthdateBlur = () => {
+    console.log('Birthdate blur event triggered')
+    if (birthdate.length > 0) {
+      console.log('Validating birthdate:', birthdate)
+      const isValid = isValidBirthdate(birthdate)
+      console.log('Validation result:', isValid)
+      console.log('Current birthError:', birthError)
+    }
   }
 
   // 모든 약관 동의/해제
@@ -134,13 +197,12 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
 
     // 생년월일 유효성 검사
     if (!birthdate) {
-      toast.error('생년월일을 입력해주세요.')
+      setBirthError('생년월일을 입력해주세요.')
       return
     }
 
     if (!isValidBirthdate(birthdate)) {
-      toast.error('유효한 생년월일 형식이 아니거나 만 14세 이상이어야 합니다.')
-      return
+      return // isValidBirthdate 함수 내에서 이미 에러 메시지를 설정하므로 여기서는 추가 메시지 없음
     }
 
     // 필수 약관 동의 확인
@@ -153,7 +215,7 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
       setIsSubmitting(true)
       // 회원가입 처리 호출 (성공 콜백 전달)
       const success = await registerWithSocialData(nickname, birthdate, marketingAgreed, onSuccess)
-      
+
       if (success) {
         // 회원가입 성공 시 완료 화면으로 전환
         setIsCompleted(true)
@@ -175,6 +237,10 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
       toast.error(error)
     }
   }, [error])
+
+  useEffect(() => {
+    console.log('console', isNicknameChecked, isNicknameValid)
+  }, [isNicknameChecked, isNicknameValid])
 
   // 모달이 닫힐 때 상태 초기화
   useEffect(() => {
@@ -206,12 +272,18 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
           <input
             type="text"
             id="nickname"
-            className="w-full rounded-lg border border-gray-300 p-3 pr-20 focus:border-primary-500 focus:outline-none dark:border-gray-600 dark:bg-dark-background dark:focus:border-primary-400"
+            className={`w-full rounded-lg border p-3 pr-20 focus:outline-none dark:bg-dark-background
+              ${
+                isNicknameChecked && !isNicknameValid
+                  ? 'border-red-500 focus:border-red-500 dark:border-red-500 dark:focus:border-red-500'
+                  : 'border-gray-300 focus:border-primary-500 dark:border-gray-600 dark:focus:border-primary-400'
+              }`}
             placeholder="닉네임을 입력하세요. (20자 이내)"
             value={nickname}
             onChange={e => {
               setNickname(e.target.value)
               setIsNicknameChecked(false)
+              setIsNicknameValid(false)
             }}
             maxLength={20}
             disabled={loading || isSubmitting}
@@ -234,13 +306,20 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
         <input
           type="text"
           id="birthdate"
-          className="w-full rounded-lg border border-gray-300 p-3 focus:border-primary-500 focus:outline-none dark:border-gray-600 dark:bg-dark-background dark:focus:border-primary-400"
+          className={`w-full rounded-lg border p-3 focus:outline-none dark:bg-dark-background
+            ${
+              birthError
+                ? 'border-red-500 focus:border-red-500 dark:border-red-500 dark:focus:border-red-500'
+                : 'border-gray-300 focus:border-primary-500 dark:border-gray-600 dark:focus:border-primary-400'
+            }`}
           placeholder="ex. 19970404 (숫자 8자리)"
           value={birthdate}
-          onChange={e => setBirthdate(e.target.value.replace(/[^0-9]/g, '').slice(0, 8))}
+          onChange={handleBirthdateChange}
+          onBlur={handleBirthdateBlur}
           maxLength={8}
           disabled={loading || isSubmitting}
         />
+        {birthError && <p className="text-sm text-red-500 dark:text-red-400">{birthError}</p>}
       </div>
 
       {/* 안내 문구 */}
@@ -386,56 +465,53 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
   )
 
   return (
-    <>
-      <BaseModal
-        isOpen={isOpen}
-        onClose={onClose}
-        title={isCompleted ? '' : '회원가입'}
-        size="md"
-        animation="none"
-        backdropColor="bg-black/70 backdrop-blur-sm"
-        showCloseButton={!isCompleted}
-        preventBackdropClose={isCompleted || loading || isSubmitting}
-        footerContent={
-          <div className="flex justify-center w-full">
-            <BaseButton
-              color="gradient"
-              className="w-full"
-              onClick={isCompleted ? handleCompleteConfirm : handleSubmit}
-              disabled={loading || isSubmitting}
-            >
-              {loading || isSubmitting ? '처리 중...' : '확인'}
-            </BaseButton>
-          </div>
-        }
-      >
-        <div className="relative overflow-hidden">
-          <AnimatePresence mode="wait">
-            {isCompleted ? (
-              <motion.div
-                key="completion"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {completionContent}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="signup"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {signupContent}
-              </motion.div>
-            )}
-          </AnimatePresence>
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={isCompleted ? '' : '회원가입'}
+      size="md"
+      animation="none"
+      backdropColor="bg-black/70 backdrop-blur-sm"
+      showCloseButton={!isCompleted}
+      preventBackdropClose={isCompleted || loading || isSubmitting}
+      footerContent={
+        <div className="flex justify-center w-full">
+          <BaseButton
+            color="gradient"
+            className="w-full"
+            onClick={isCompleted ? handleCompleteConfirm : handleSubmit}
+            disabled={loading || isSubmitting}
+          >
+            {loading || isSubmitting ? '처리 중...' : '확인'}
+          </BaseButton>
         </div>
-      </BaseModal>
-      <ToastContainer position="bottom-center" autoClose={3000} />
-    </>
+      }
+    >
+      <div className="relative overflow-hidden">
+        <AnimatePresence mode="wait">
+          {isCompleted ? (
+            <motion.div
+              key="completion"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {completionContent}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="signup"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {signupContent}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </BaseModal>
   )
 }

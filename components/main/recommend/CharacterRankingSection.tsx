@@ -6,7 +6,7 @@ import CardGrid from '@/components/elements/card/CardGrid'
 import { SectionTransition } from '@/components/motion/PageTransition'
 import CharacterRankingSidebar from '@/components/elements/sidebar/CharacterRankingSidebar'
 import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
-import { SidebarSelectBox } from '@/components/elements/selectbox/SidebarSelectBox'
+import { BaseSelectBox } from '@/components/elements/selectbox/BaseSelectBox'
 
 // 캐릭터 랭킹 탭 정의
 const characterRankingTabs: TabItem[] = [
@@ -55,7 +55,14 @@ const CharacterRankingSection = memo(() => {
   }
 
   const handleGenderChange = (option: { value: number; label: string }) => {
-    const topid = characterActiveTab === 'realtime' ? 4 : characterActiveTab === 'daily' ? 1 : characterActiveTab === 'weekly' ? 2 : 3
+    const topid =
+      characterActiveTab === 'realtime'
+        ? 4
+        : characterActiveTab === 'daily'
+          ? 1
+          : characterActiveTab === 'weekly'
+            ? 2
+            : 3
     UpdateRankingTopCharacter('KR', topid, option.value, false)
     setSelectedGender(option)
   }
@@ -63,6 +70,8 @@ const CharacterRankingSection = memo(() => {
   const getCharacterRankingData = () => {
     return rankingCharacters
   }
+
+  // 데이터 길이에 따라 next/prev 버튼 표시 여부 결정
 
   return (
     <section className="pt-10 pb-20">
@@ -91,7 +100,7 @@ const CharacterRankingSection = memo(() => {
               defaultTabId="realtime"
               onTabChange={handleCharacterRankingTabChange}
             />
-            <SidebarSelectBox
+            <BaseSelectBox
               options={genderOptions}
               selectedOption={selectedGender}
               onChange={handleGenderChange}

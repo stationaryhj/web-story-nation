@@ -21,7 +21,8 @@ import { useSettingsStore } from '@/store/useStoreSettings'
 import { contentApi } from '@/services/api/storyNationApi'
 import { useModalStore } from '@/store/useStoreModal'
 import { useBankStore } from '@/store/useGlobalStore'
-
+import DeleteAccountModal from '@/components/modal/DeleteAccountModal'
+import DuplicateCheckModal from '@/components/modal/DuplicateCheckModal'
 
 const getPlatform = (sns_type: number) => {
   switch (sns_type) {
@@ -51,6 +52,8 @@ export default function SettingsForm() {
   const [isNicknameChanged, setIsNicknameChanged] = useState(false)
   const [originalNickname, setOriginalNickname] = useState('')
   const [activeTab, setActiveTab] = useState<'support' | 'terms' | 'privacy' | 'paid' | 'policy'>('support')
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showDuplicateCheckModal, setShowDuplicateCheckModal] = useState(false)
 
   const { settings, updateProfile, updateBankAccount, setLanguage, uploadProfileImage } = useSettingsStore()
   const { data: userInfo, writerInfo, fetchWriterInfo, logout } = useAccountStore()
@@ -107,11 +110,12 @@ export default function SettingsForm() {
         bank: writerInfo.bank_nm || prev.bank,
         accountNumber: writerInfo.account_no || prev.accountNumber,
         accountHolder: writerInfo.user_nm || prev.accountHolder,
-        email: writerInfo.email || prev.email
+        email: writerInfo.email || prev.email,
       }))
     }
   }, [userInfo?.writerchk, writerInfo, fetchWriterInfo])
 
+  // 닉네임 변경 감지
   useEffect(() => {
     if (profile.nickname === originalNickname) {
       setIsNicknameVerified(true)
@@ -136,69 +140,60 @@ export default function SettingsForm() {
   }, [])
 
   // 닉네임 중복 체크 핸들러
-  const handleDuplicateCheck = () => {
-    // 여기에 실제 API 호출 로직이 들어갈 수 있음
-    const isAvailable = Math.random() > 0.3 // 임시로 랜덤하게 결과 생성
+  const handleDuplicateCheck = async () => {
+    try {
+      // 여기에 실제 API 호출 로직이 들어갈 수 있음
+      const isAvailable = Math.random() > 0.3 // 임시로 랜덤하게 결과 생성
 
-    if (isAvailable) {
-      toast.success('사용 가능한 닉네임입니다.')
-      setIsNicknameVerified(true)
-      setIsNicknameChanged(false) // 중복 체크 통과 후 상태 초기화
-    } else {
-      toast.error('사용할 수 없는 닉네임입니다.')
-      setIsNicknameVerified(false)
-    }
-  }
-
-  // 은행정보 모달
-  const handleOpenBankInfoModal = () => {
-    openModal('bankInfo', {
-      bankInfo: {
-        bank: profile.bank,
-        accountNumber: profile.accountNumber,
-        accountHolder: profile.accountHolder,
-      },
-      onBankInfoChange: (bankInfo: { bank: string; accountNumber: string; accountHolder: string }) => {
-        setProfile(prev => ({
-          ...prev,
-          bank: bankInfo.bank,
-          accountNumber: bankInfo.accountNumber,
-          accountHolder: bankInfo.accountHolder
-        }))
-        setIsEdited(true)
+      if (isAvailable) {
+        setShowDuplicateCheckModal(true)
+        setIsNicknameVerified(true)
+      } else {
+        toast.error('사용할 수 없는 닉네임입니다.')
+        setIsNicknameVerified(false)
       }
-    })
+    } catch (error) {
+      console.error('닉네임 중복 확인 중 오류:', error)
+      toast.error('닉네임 중복 확인 중 오류가 발생했습니다.')
+    }
   }
 
-  // 저장 핸들러
-  const handleSave = () => {
-    // 닉네임이 변경되었고 중복 확인을 하지 않은 경우
-    if (isNicknameChanged && !isNicknameVerified) {
-      toast.error('닉네임 중복 확인이 필요합니다.')
-      return
+  // 닉네임 변경 취소
+  const handleNicknameCancel = () => {
+    setProfile(prev => ({
+      ...prev,
+      nickname: originalNickname,
+    }))
+    setIsNicknameChanged(false)
+    setIsNicknameVerified(false)
+    setShowDuplicateCheckModal(false)
+  }
+
+  // 닉네임 저장 핸들러
+  const handleNicknameSave = async () => {
+    try {
+      // 펜 잔액 확인 (임시로 100펜 이상 있다고 가정)
+      const hasEnoughPens = true // 실제로는 펜 잔액 확인 로직 필요
+
+      if (!hasEnoughPens) {
+        toast.error('닉네임을 수정할 펜이 부족합니다.')
+        return
+      }
+
+      // API 호출 및 펜 차감 로직
+
+      if (true) {
+        setOriginalNickname(profile.nickname)
+        setIsNicknameVerified(true)
+        setIsNicknameChanged(false)
+        toast.success('닉네임이 성공적으로 저장되었습니다.')
+      } else {
+        throw new Error('닉네임 변경 실패')
+      }
+    } catch (error) {
+      console.error('닉네임 저장 중 오류:', error)
+      toast.error('닉네임 저장에 실패했습니다.')
     }
-
-    // 프로필 정보 업데이트
-    updateProfile({
-      nickname: profile.nickname,
-    })
-
-    // 계좌 정보 업데이트
-    updateBankAccount({
-      bank: profile.bank,
-      accountNumber: profile.accountNumber,
-      accountHolder: profile.accountHolder,
-    })
-
-    // 언어 설정 업데이트
-    setLanguage(profile.language as 'ko' | 'en')
-
-    // 저장 완료 알림
-    toast.success('정보가 성공적으로 저장되었습니다.')
-    setIsEdited(false)
-    setOriginalNickname(profile.nickname) // 저장 후 원래 닉네임 업데이트
-    setIsNicknameVerified(true) // 저장 후 닉네임 검증 상태 업데이트
-    setIsNicknameChanged(false) // 저장 후 닉네임 변경 상태 초기화
   }
 
   // 입력 핸들러
@@ -277,7 +272,7 @@ export default function SettingsForm() {
       if (response.data && response.data.result && response.data.result.err === 0) {
         // useAccountStore의 setPersona 함수를 호출하여 상태 업데이트
         useAccountStore.getState().setPersona(persona.name, persona.gender)
-        
+
         // 토스트 메시지 표시
         toast.success('페르소나 데이터를 저장했습니다.')
       } else {
@@ -319,14 +314,8 @@ export default function SettingsForm() {
   }
 
   // 회원탈퇴
-  const handleExit = async () => {
-    try {
-      await contentApi.Signout()
-      logout()
-      router.push('/')
-    } catch (error) {
-      console.error('회원탈퇴 중 오류 발생:', error)
-    }
+  const handleExit = () => {
+    setShowDeleteModal(true)
   }
 
   // 뒤로가기 핸들러
@@ -377,9 +366,9 @@ export default function SettingsForm() {
     try {
       // useAccountStore의 updateWriterEmail 함수 사용
       const { updateWriterEmail } = useAccountStore.getState()
-      
+
       const result = await updateWriterEmail(profile.email)
-      
+
       if (result.success) {
         toast.success(result.message)
       } else {
@@ -395,13 +384,13 @@ export default function SettingsForm() {
   const handleAdultVerification = async () => {
     try {
       // useAccountStore의 verifyIdentity 함수 사용
-      const { verifyIdentity } = useAccountStore.getState();
-      const result = await verifyIdentity();
-      
+      const { verifyIdentity } = useAccountStore.getState()
+      const result = await verifyIdentity()
+
       if (result.success) {
-        toast.success(result.message);
+        toast.success(result.message)
       } else {
-        toast.error(result.message);
+        toast.error(result.message)
       }
     } catch (error) {
       console.error('본인 인증 중 오류 발생:', error)
@@ -410,351 +399,341 @@ export default function SettingsForm() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
-      {/* 헤더 */}
-      <div className="bg-white shadow-sm px-4 py-3 flex items-center justify-between sticky top-0 z-10">
-        <div className="max-w-[1300px] mx-auto w-full flex items-center justify-between">
-          <div className="flex items-center">
-            <button
-              onClick={handleBack}
-              className="w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded-full mr-2"
-            >
-              <FontAwesomeIcon icon={faArrowLeft} />
-            </button>
-            <h1 className="text-xl font-semibold">내 정보</h1>
-          </div>
-          <div>
-            <button
-              onClick={handleOpenBankInfoModal}
-              className="px-4 py-2 mr-2 rounded-lg bg-primary-500 text-white hover:bg-primary-600"
-            >
-              은행정보
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={!isEdited}
-              className={`px-4 py-2 rounded-lg ${isEdited ? 'bg-primary-500 text-white' : 'bg-secondary-200 text-secondary-400'}`}
-            >
-              저장
-            </button>
+    <>
+      <div className="flex flex-col min-h-screen bg-slate-50">
+        {/* 헤더 */}
+        <div className="bg-white shadow-sm px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+          <div className="max-w-[1300px] mx-auto w-full flex items-center justify-between">
+            <div className="flex items-center">
+              <button
+                onClick={handleBack}
+                className="w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded-full mr-2"
+              >
+                <FontAwesomeIcon icon={faArrowLeft} />
+              </button>
+              <h1 className="text-xl font-semibold">내 정보</h1>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* 메인 콘텐츠 */}
-      <div className="max-w-[1300px] mx-auto w-full p-4 pb-16">
-        {/* 프로필 이미지 섹션 */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">프로필</h2>
-            <button
-              onClick={async () => {
-                const result = await useAccountStore.getState().updateIntro(profile.intro)
-                if (result.success) {
-                  toast.success(result.message)
-                } else {
-                  toast.error(result.message)
-                }
-              }}
-              className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600"
-            >
-              저장
-            </button>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="relative mb-4">
-              <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-                {profile.profileImage ? (
-                  <Image
-                    src={profile.profileImage}
-                    alt="프로필"
-                    width={96}
-                    height={96}
-                    className="object-cover w-full h-full"
-                  />
-                ) : (
-                  <FontAwesomeIcon icon={faCircleUser} className="text-5xl text-gray-400" />
-                )}
-              </div>
-              <div className="absolute bottom-0 right-0 flex space-x-1">
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center shadow-md hover:bg-primary-700"
-                >
-                  <FontAwesomeIcon icon={faImage} className="text-sm" />
-                </button>
-                {profile.profileImage && (
-                  <button
-                    onClick={handleDeleteImage}
-                    className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shadow-md hover:bg-red-600"
-                  >
-                    <FontAwesomeIcon icon={faTrash} className="text-sm" />
-                  </button>
-                )}
-              </div>
-              <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
+        {/* 메인 콘텐츠 */}
+        <div className="max-w-[1300px] mx-auto w-full p-4 pb-16">
+          {/* 프로필 이미지 섹션 */}
+          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold">프로필</h2>
+              <button
+                onClick={async () => {
+                  const result = await useAccountStore.getState().updateIntro(profile.intro)
+                  if (result.success) {
+                    toast.success(result.message)
+                  } else {
+                    toast.error(result.message)
+                  }
+                }}
+                className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600"
+              >
+                저장
+              </button>
             </div>
-            <div className="w-full max-w-md">
-              <label className="block text-sm font-medium text-gray-700 mb-2">한줄 소개</label>
-              <div className="relative">
-                <textarea
-                  value={profile.intro || ''}
-                  onChange={(e) => {
-                    if (e.target.value.length <= 50) {
-                      setProfile(prev => ({ ...prev, intro: e.target.value }))
-                      setIsEdited(true)
-                    }
-                  }}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white resize-none min-h-[100px] shadow-sm transition-all duration-200 ease-in-out hover:border-primary-300"
-                  placeholder="자신을 한 줄로 소개해주세요 (최대 50자)"
-                  rows={3}
-                  maxLength={50}
+            <div className="flex flex-col items-center">
+              <div className="relative mb-4">
+                <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+                  {profile.profileImage ? (
+                    <Image
+                      src={profile.profileImage}
+                      alt="프로필"
+                      width={96}
+                      height={96}
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <FontAwesomeIcon icon={faCircleUser} className="text-5xl text-gray-400" />
+                  )}
+                </div>
+                <div className="absolute bottom-0 right-0 flex space-x-1">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center shadow-md hover:bg-primary-700"
+                  >
+                    <FontAwesomeIcon icon={faImage} className="text-sm" />
+                  </button>
+                  {profile.profileImage && (
+                    <button
+                      onClick={handleDeleteImage}
+                      className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shadow-md hover:bg-red-600"
+                    >
+                      <FontAwesomeIcon icon={faTrash} className="text-sm" />
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageUpload}
                 />
-                <div className="absolute bottom-2 right-2 text-xs text-gray-500">
-                  {profile.intro?.length || 0}/50
+              </div>
+              <div className="w-full max-w-md">
+                <label className="block text-sm font-medium text-gray-700 mb-2">한줄 소개</label>
+                <div className="relative">
+                  <textarea
+                    value={profile.intro || ''}
+                    onChange={e => {
+                      if (e.target.value.length <= 50) {
+                        setProfile(prev => ({ ...prev, intro: e.target.value }))
+                        setIsEdited(true)
+                      }
+                    }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white resize-none min-h-[100px] shadow-sm transition-all duration-200 ease-in-out hover:border-primary-300"
+                    placeholder="자신을 한 줄로 소개해주세요 (최대 50자)"
+                    rows={3}
+                    maxLength={50}
+                  />
+                  <div className="absolute bottom-2 right-2 text-xs text-gray-500">{profile.intro?.length || 0}/50</div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* 계정 정보 섹션 */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">계정 정보</h2>
-            <button
-              onClick={handleAdultVerification}
-              className="sm:flex-shrink-0 px-4 py-3 bg-primary-500 text-white rounded-lg whitespace-nowrap hover:bg-primary-700"
-              disabled={profile.minor > 0}
-            >
-              본인 인증
-            </button>
-          </div>
-
-          <div className="space-y-5">
-            {/* 연동된 플랫폼 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">연동된 플랫폼</label>
-              <div className="px-4 py-3 bg-gray-100 rounded-lg text-gray-700">{profile.platform}</div>
+          {/* 계정 정보 섹션 */}
+          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">계정 정보</h2>
+              <button
+                onClick={handleAdultVerification}
+                className="sm:flex-shrink-0 px-4 py-3 bg-primary-500 text-white rounded-lg whitespace-nowrap hover:bg-primary-700"
+                disabled={profile.minor > 0}
+              >
+                본인 인증
+              </button>
             </div>
 
-            {/* 닉네임 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                닉네임
-                {isNicknameChanged && <span className="text-red-500 ml-2 text-xs">중복 확인이 필요합니다</span>}
-              </label>
-              <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
+            <div className="space-y-5">
+              {/* 연동된 플랫폼 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">연동된 플랫폼</label>
+                <div className="px-4 py-3 bg-gray-100 rounded-lg text-gray-700">{profile.platform}</div>
+              </div>
+
+              {/* 닉네임 */}
+              <div>
+                <div className="flex flex-row gap-2 items-center mb-2">
+                  <label className="block text-sm font-medium text-gray-700">닉네임</label>
+                  <div className="text-sm text-[#ff7f00] font-bold">* 수정 시 100펜 소모</div>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
+                  <input
+                    type="text"
+                    value={profile.nickname}
+                    onChange={e => handleInputChange(e, 'nickname')}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                    placeholder="닉네임을 입력하세요"
+                  />
+                  <button
+                    onClick={handleDuplicateCheck}
+                    disabled={!isNicknameChanged}
+                    className={`sm:flex-shrink-0 px-4 py-3 rounded-lg whitespace-nowrap ${
+                      isNicknameChanged
+                        ? 'bg-primary-500 text-white hover:bg-primary-700'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    중복확인
+                  </button>
+                </div>
+                <div className="mt-2">
+                  {isNicknameChanged && <span className="text-red-500 text-sm">중복 확인이 필요합니다</span>}
+                </div>
+              </div>
+
+              {/* 이메일 */}
+              {/* <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+                <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
+                  <input
+                    type="email"
+                    value={profile.email}
+                    onChange={e => handleInputChange(e, 'email')}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+                    placeholder="이메일을 입력하세요"
+                  />
+                  <button
+                    onClick={handleSaveEmail}
+                    className="sm:flex-shrink-0 px-4 py-3 bg-primary-500 text-white rounded-lg whitespace-nowrap hover:bg-primary-700"
+                  >
+                    저장
+                  </button>
+                </div>
+              </div> */}
+            </div>
+          </div>
+
+          {/* 정산 정보 섹션 */}
+          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+            <h2 className="text-lg font-semibold mb-4">정산 정보</h2>
+            <div className="space-y-5">
+              {/* 은행 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">은행</label>
+                <div className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50">
+                  <span className="text-gray-700">{profile.bank || '등록된 은행 정보가 없습니다'}</span>
+                </div>
+              </div>
+
+              {/* 계좌번호 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">계좌번호</label>
+                <div className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50">
+                  <span className="text-gray-700">{profile.accountNumber || '등록된 계좌번호가 없습니다'}</span>
+                </div>
+              </div>
+
+              {/* 예금주 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">예금주</label>
+                <div className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50">
+                  <span className="text-gray-700">{profile.accountHolder || '등록된 예금주가 없습니다'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 페르소나 설정 섹션 */}
+          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold mb-4">페르소나 설정</h2>
+              <BaseButton color="primary" onClick={handleSavePersona}>
+                저장
+              </BaseButton>
+            </div>
+            <div className="space-y-5">
+              {/* 페르소나 이름 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">이름 (최대 25자)</label>
                 <input
                   type="text"
-                  value={profile.nickname}
-                  onChange={e => handleInputChange(e, 'nickname')}
+                  value={persona.name}
+                  onChange={e => handlePersonaChange(e, 'name')}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
-                  placeholder="닉네임을 입력하세요"
+                  placeholder="페르소나 이름"
+                  maxLength={25}
                 />
               </div>
-            </div>
 
-            {/* 이메일 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">이메일</label>
-              <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
-                <input
-                  type="email"
-                  value={profile.email}
-                  onChange={e => handleInputChange(e, 'email')}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
-                  placeholder="이메일을 입력하세요"
-                />
-                <button
-                  onClick={handleSaveEmail}
-                  className="sm:flex-shrink-0 px-4 py-3 bg-primary-500 text-white rounded-lg whitespace-nowrap hover:bg-primary-700"
-                >
-                  저장
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 정산 정보 섹션 */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">정산 정보</h2>
-          <div className="space-y-5">
-            {/* 은행 선택 */}
-            <div className="relative" ref={bankDropdownRef}>
-              <label className="block text-sm font-medium text-gray-700 mb-2">은행</label>
-              <button
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-primary-500 hover:bg-primary-50"
-                onClick={() => setShowBankList(!showBankList)}
-              >
-                <span>{profile.bank || '은행 선택'}</span>
-                <FontAwesomeIcon icon={faChevronDown} className="text-gray-600" />
-              </button>
-              {showBankList && (
-                <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
-                  {bankList.map(bank => (
-                    <div
-                      key={bank.bank_key}
-                      className="px-4 py-2 hover:bg-primary-100 cursor-pointer"
-                      onClick={() => handleBankSelect(bank.bank_nm)}
-                    >
-                      {bank.bank_nm}
-                    </div>
-                  ))}
+              {/* 페르소나 성별 - BaseButton 사용 */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">성별</label>
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                  <BaseButton
+                    onClick={() => handleGenderChange(1)}
+                    color="primary"
+                    className={`w-full sm:w-auto ${persona.gender === 1 ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
+                  >
+                    남성
+                  </BaseButton>
+                  <BaseButton
+                    onClick={() => handleGenderChange(2)}
+                    color="primary"
+                    className={`w-full sm:w-auto ${persona.gender === 2 ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
+                  >
+                    여성
+                  </BaseButton>
+                  <BaseButton
+                    onClick={() => handleGenderChange(3)}
+                    color="primary"
+                    className={`w-full sm:w-auto ${persona.gender === 3 ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
+                  >
+                    알 수 없음
+                  </BaseButton>
                 </div>
-              )}
-            </div>
-
-            {/* 계좌번호 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                계좌번호 <span className="text-xs text-gray-500">(숫자만 입력)</span>
-              </label>
-              <input
-                type="text"
-                value={profile.accountNumber}
-                onChange={e => handleInputChange(e, 'accountNumber')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
-                placeholder="계좌번호"
-                maxLength={14}
-              />
-            </div>
-
-            {/* 예금주 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                예금주 <span className="text-xs text-gray-500">(이름만 입력)</span>
-              </label>
-              <input
-                type="text"
-                value={profile.accountHolder}
-                onChange={e => handleInputChange(e, 'accountHolder')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
-                placeholder="예금주"
-                maxLength={8}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 페르소나 설정 섹션 */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold mb-4">페르소나 설정</h2>
-            <BaseButton color="primary" onClick={handleSavePersona}>
-              저장
-            </BaseButton>
-          </div>
-          <div className="space-y-5">
-            {/* 페르소나 이름 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">이름 (최대 25자)</label>
-              <input
-                type="text"
-                value={persona.name}
-                onChange={e => handlePersonaChange(e, 'name')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
-                placeholder="페르소나 이름"
-                maxLength={25}
-              />
-            </div>
-
-            {/* 페르소나 성별 - BaseButton 사용 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">성별</label>
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-                <BaseButton
-                  onClick={() => handleGenderChange(1)}
-                  color="primary"
-                  className={`w-full sm:w-auto ${persona.gender === 1 ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
-                >
-                  남성
-                </BaseButton>
-                <BaseButton
-                  onClick={() => handleGenderChange(2)}
-                  color="primary"
-                  className={`w-full sm:w-auto ${persona.gender === 2 ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
-                >
-                  여성
-                </BaseButton>
-                <BaseButton
-                  onClick={() => handleGenderChange(3)}
-                  color="primary"
-                  className={`w-full sm:w-auto ${persona.gender === 3 ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
-                >
-                  알 수 없음
-                </BaseButton>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* 고객 지원 및 법적 정보 섹션 */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">고객 지원 및 약관</h2>
+          {/* 고객 지원 및 법적 정보 섹션 */}
+          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+            <h2 className="text-lg font-semibold mb-4">고객 지원 및 약관</h2>
 
-          {/* 세로 버튼 목록으로 변경 */}
+            {/* 세로 버튼 목록으로 변경 */}
+            <div className="space-y-3">
+              <button
+                onClick={() => handleTabChange('support')}
+                className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
+              >
+                <span>카카오톡 문의</span>
+                <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+              </button>
+              <button
+                onClick={() => handleTabChange('terms')}
+                className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
+              >
+                <span>서비스 이용약관</span>
+                <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+              </button>
+              <button
+                onClick={() => handleTabChange('privacy')}
+                className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
+              >
+                <span>개인정보 처리방침</span>
+                <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+              </button>
+              <button
+                onClick={() => handleTabChange('paid')}
+                className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
+              >
+                <span>유료 서비스 이용약관</span>
+                <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+              </button>
+              <button
+                onClick={() => handleTabChange('policy')}
+                className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
+              >
+                <span>운영 정책</span>
+                <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+              </button>
+            </div>
+          </div>
+
           <div className="space-y-3">
+            {/* 로그아웃 버튼 */}
             <button
-              onClick={() => handleTabChange('support')}
-              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
+              onClick={handleLogout}
+              className="w-full py-3 text-accent-dark font-medium border border-accent-light rounded-lg bg-white hover:bg-red-200/40 focus:outline-none"
             >
-              <span>카카오톡 문의</span>
-              <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+              로그아웃
             </button>
+
+            {/* 회원탈퇴 버튼 */}
             <button
-              onClick={() => handleTabChange('terms')}
-              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
+              onClick={handleExit}
+              className="w-full py-3 text-border-[#484554] font-medium border border-[#484554] rounded-lg bg-white hover:bg-[#ada9bb]/40 focus:outline-none"
             >
-              <span>서비스 이용약관</span>
-              <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
-            </button>
-            <button
-              onClick={() => handleTabChange('privacy')}
-              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
-            >
-              <span>개인정보 처리방침</span>
-              <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
-            </button>
-            <button
-              onClick={() => handleTabChange('paid')}
-              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
-            >
-              <span>유료 서비스 이용약관</span>
-              <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
-            </button>
-            <button
-              onClick={() => handleTabChange('policy')}
-              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
-            >
-              <span>운영 정책</span>
-              <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+              회원탈퇴
             </button>
           </div>
-        </div>
-
-        <div className="space-y-3">
-          {/* 로그아웃 버튼 */}
-          <button
-            onClick={handleLogout}
-            className="w-full py-3 text-accent-dark font-medium border border-accent-light rounded-lg bg-white hover:bg-red-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
-          >
-            로그아웃
-          </button>
-
-          {/* 회원탈퇴 버튼 */}
-          <button
-            onClick={handleExit}
-            className="w-full py-3 text-accent-dark font-medium border border-accent-light rounded-lg bg-white hover:bg-red-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
-          >
-            회원탈퇴
-          </button>
         </div>
       </div>
+
+      {/* 회원탈퇴 모달 */}
+      <DeleteAccountModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        userNickname={profile.nickname}
+      />
+
+      {/* 닉네임 중복 확인 모달 */}
+      <DuplicateCheckModal
+        isOpen={showDuplicateCheckModal}
+        onClose={() => setShowDuplicateCheckModal(false)}
+        onConfirm={handleNicknameSave}
+        onCancel={handleNicknameCancel}
+        originalNickname={originalNickname}
+      />
 
       {/* react-toastify 컨테이너 */}
       <ToastContainer position="top-center" autoClose={3000} />
-    </div>
+    </>
   )
 }

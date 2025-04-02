@@ -87,8 +87,7 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
         </div>
 
         {/* 성별 필터 */}
-        <div className="w-full flex items-center justify-between">
-          <span className="text-sm text-secondary-700 dark:text-dark-secondary-300 min-w-20">성별 필터:</span>
+        <div className="w-full flex items-center justify-end">
           <div>
             <SidebarSelectBox
               options={genderOptions}

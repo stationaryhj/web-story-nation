@@ -135,9 +135,10 @@ export default function SearchBar({
           <div>
             <BaseSelectBox
               options={searchOptions}
+              sideRound={true}
               selectedOption={selectedOption}
               onChange={handleOptionChange}
-              className="rounded-xl rounded-r-none"
+              className="rounded-xl rounded-r-none bg-gray-50 hover:bg-gray-100"
             />
           </div>
           <div className="flex flex-1 rounded-r-xl overflow-hidden">

@@ -21,24 +21,36 @@ import 'react-toastify/dist/ReactToastify.css'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import WithdrawModal from '@/components/modal/WithdrawModal'
 import { useAccountStore } from '@/store/useAccountStore'
-import { GetSettlementList, GetWithdrawRequestList, GetWriterWithdrawStatus, GetMonthlyIncome } from '@/services/hooks/DataListManager'
+import {
+  GetSettlementList,
+  GetWithdrawRequestList,
+  GetWriterWithdrawStatus,
+  GetMonthlyIncome,
+} from '@/services/hooks/DataListManager'
 import { settlementApi } from '@/services/api/storyNationApi'
 import { bridgeIncomeDataToEarningItems, bridgeWithdrawDataToWithdrawItems } from '@/lib/utils/storyNationUtil'
+import { useModalStore } from '@/store/useStoreModal'
 
 export default function MyEarningsView() {
   const router = useRouter()
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
+  const [profile, setProfile] = useState({
+    bank: '',
+    accountNumber: '',
+    accountHolder: '',
+  })
 
   const { data: userInfo, writerInfo, fetchWriterInfo } = useAccountStore()
+  const { openModal } = useModalStore()
 
   // 월별 수익 내역 ( 1: 이번달, 2: 지난달 )
   const {
     data: monthlyIncomeV1,
     isLoading: monthlyIncomeV1Loading,
     error: monthlyIncomeV1Error,
-    refetch: monthlyIncomeV1Refetch
+    refetch: monthlyIncomeV1Refetch,
   } = GetMonthlyIncome(2)
 
   // 수익 내역
@@ -46,7 +58,8 @@ export default function MyEarningsView() {
     data: settlementListData,
     isLoading: settlementListLoading,
     error: settlementListError,
-    refetch: settlementListRefetch } = GetSettlementList(1, currentPage, 50);
+    refetch: settlementListRefetch,
+  } = GetSettlementList(1, currentPage, 50)
 
   // 수익 내역 데이터 처리
   const [earningItems, setEarningItems] = useState<Array<any>>([])
@@ -59,16 +72,18 @@ export default function MyEarningsView() {
     data: withdrawRequestList,
     isLoading: withdrawRequestListLoading,
     error: withdrawRequestListError,
-    refetch: withdrawRequestListRefetch
+    refetch: withdrawRequestListRefetch,
   } = GetWithdrawRequestList(1, 50)
 
   // 출금 내역 데이터 처리
-  const [withdrawItems, setWithdrawItems] = useState<Array<{
-    id: number
-    date: string
-    amount: number
-    status: string
-  }>>([])
+  const [withdrawItems, setWithdrawItems] = useState<
+    Array<{
+      id: number
+      date: string
+      amount: number
+      status: string
+    }>
+  >([])
 
   // 정산 관련 상태
   const [totalEarnings, setTotalEarnings] = useState(userInfo?.coin_user || 0) // 총 수익 (펜 단위)
@@ -77,7 +92,7 @@ export default function MyEarningsView() {
   const [totalPayouts, setTotalPayouts] = useState(withdrawRequestList?.sum_price || 0) // 총 정산액 (펜 단위)
   const [availableAmount, setAvailableAmount] = useState(writerWithdrawStatus?.withdraw_pen || 0) // 정산 가능 금액 (펜 단위)
   const [requestAmount, setRequestAmount] = useState(1500) // 요청 금액 (펜 단위, 최소 1500펜)
-  
+
   // 무한 스크롤을 위한 관찰자 ref
   const observerRef = useRef<IntersectionObserver | null>(null)
   const loadMoreRef = useRef<HTMLDivElement>(null)
@@ -88,13 +103,13 @@ export default function MyEarningsView() {
       try {
         // 응답 구조에 맞게 데이터 처리
         const newItems = bridgeIncomeDataToEarningItems(settlementListData.IncomeList.data || [], currentPage * 50)
-        
+
         if (currentPage === 1) {
           setEarningItems(newItems)
         } else {
           setEarningItems(prev => [...prev, ...newItems])
         }
-        
+
         // 페이지네이션 정보 추출
         if (settlementListData.IncomeList) {
           const currPage = Number(settlementListData.IncomeList.current_page) || 1
@@ -170,7 +185,22 @@ export default function MyEarningsView() {
     router.push('/')
   }
 
-  
+  const handleOpenBankInfoModal = () => {
+    openModal('bankInfo', {
+      bankInfo: {
+        bank: bankAccount.bank,
+        accountNumber: bankAccount.accountNumber,
+        accountHolder: bankAccount.accountHolder,
+      },
+      onBankInfoChange: (bankInfo: { bank: string; accountNumber: string; accountHolder: string }) => {
+        setBankAccount({
+          bank: bankInfo.bank,
+          accountNumber: bankInfo.accountNumber,
+          accountHolder: bankInfo.accountHolder,
+        })
+      },
+    })
+  }
   // 출금 요청 핸들러
   const handleWithdrawRequest = () => {
     if (availableAmount < 1500) {
@@ -278,6 +308,12 @@ export default function MyEarningsView() {
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold">지급 계좌 정보</h2>
+              <button
+                className="px-4 py-2 mr-2 rounded-lg bg-primary-500 text-white hover:bg-primary-600"
+                onClick={handleOpenBankInfoModal}
+              >
+                수정하기
+              </button>
             </div>
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center mb-2">
@@ -334,7 +370,7 @@ export default function MyEarningsView() {
                 {formatPen(thisMonthEarnings)} <FontAwesomeIcon icon={faPen} className="ml-1" />
               </div>
             </div>
-            
+
             {/* 수익 내역 리스트 - 스크롤 가능한 영역으로 변경 */}
             <div className="divide-y divide-gray-200 max-h-[300px] overflow-y-auto pr-2">
               {settlementListLoading && earningItems.length === 0 ? (
@@ -354,7 +390,7 @@ export default function MyEarningsView() {
               ) : (
                 <div className="py-4 text-center text-gray-500">수익 내역이 없습니다.</div>
               )}
-              
+
               {/* 무한 스크롤을 위한 로딩 표시기 */}
               {hasMore && (
                 <div ref={loadMoreRef} className="py-2 text-center text-gray-400 text-sm">
@@ -370,7 +406,8 @@ export default function MyEarningsView() {
             <div className="mb-4 p-3 bg-gray-50 rounded-lg">
               <div className="text-gray-700">총 출금 금액</div>
               <div className="font-semibold text-xl flex items-center mt-1">
-                {formatPen(Number(withdrawRequestList?.sum_price || 0))} <FontAwesomeIcon icon={faPen} className="ml-1" />
+                {formatPen(Number(withdrawRequestList?.sum_price || 0))}{' '}
+                <FontAwesomeIcon icon={faPen} className="ml-1" />
               </div>
             </div>
             {withdrawRequestListLoading ? (

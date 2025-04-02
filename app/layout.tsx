@@ -1,6 +1,8 @@
 // app/layout.tsx
 import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 import './globals.css'
 import Script from 'next/script'
@@ -10,6 +12,7 @@ import Providers from './providers'
 import DraggableButton from '@/components/elements/button/DraggableButton'
 import MobileGNB from '@/components/common/MobileGNB'
 import { Plus } from 'lucide-react'
+import { ToastPortal } from '@/components/elements/toast/ToastPortal'
 
 // Poppins 폰트 설정
 const poppins = Poppins({
@@ -105,6 +108,23 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <DraggableButton color="bg-primary-500" />
 
         <MobileGNB />
+
+        {/* 전역 Toast Container */}
+        <ToastContainer
+          position="bottom-center"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          style={{ zIndex: 9999 }}
+        />
+
+        <ToastPortal />
       </body>
     </html>
   )
