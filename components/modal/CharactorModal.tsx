@@ -12,6 +12,7 @@ import { ReqGetChatBot } from '@/services/hooks/DataListManager'
 import { Character } from '@/store/useStoreData'
 import { contentApi } from '@/services/api/storyNationApi'
 import { CharbotLikeResponse } from '@/types/api'
+import { useAccountStore } from '@/store/useStoreData'
 
 // 목업 데이터
 const mockFirstMessage = {
@@ -27,8 +28,9 @@ interface CharactorModalProps {
 
 export default function CharactorModal({ isOpen, onClose }: CharactorModalProps) {
   const router = useRouter()
-  const { selectedCharacter, setSelectedCharacter } = useModalStore()
+  const { selectedCharacter, setSelectedCharacter, openModal } = useModalStore()
   const [isImageLoaded, setIsImageLoaded] = useState(false)
+  const { isLogin } = useAccountStore()
 
   const {
     data: chatBotData,
@@ -64,6 +66,11 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   // 대화 시작 버튼 클릭 시 채팅 페이지로 이동
   const handleStartChat = () => {
     if (selectedCharacter && selectedCharacter.id) {
+      if(!isLogin) {
+        openModal('login')
+        return
+      }
+      
       handleClose()
       const chatId = String(selectedCharacter.id).trim()
       if (chatId) {
