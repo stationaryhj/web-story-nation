@@ -730,6 +730,12 @@ export interface Register4Response {
   result: ApiResult;
 }
 
+// GetSearch Response
+export interface GetSearchResponse {
+  chrbotList: CharbotSearchData;
+  result: ApiResult;
+}
+
 // API Result
 export type ApiResult = {
   err: number;
