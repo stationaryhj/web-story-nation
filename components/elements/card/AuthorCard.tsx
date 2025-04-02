@@ -190,7 +190,7 @@ export default function AuthorCard({
             <div className={`flex items-center w-full ${isSidebar ? '' : 'justify-center'}`}>
               {/* 작가 소개 */}
               <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 group-hover:text-secondary-800 dark:group-hover:text-dark-secondary-400 transition-colors min-h-[2.5rem] leading-[1.25rem]">
-                {description}
+                {description}          
               </p>
             </div>
           </div>

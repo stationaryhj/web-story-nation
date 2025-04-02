@@ -35,6 +35,10 @@ export default function ChatDetailPage({ params }: { params: Promise<{ id: strin
 
   const charbotData = data?.chrbot;
 
+  if(!charbotData) {
+    return <div>캐릭터 정보를 찾을 수 없습니다. {unwrappedParams.id}</div>
+  }
+
   return (
     <div className="flex flex-col justify-center items-center h-screen w-100vw bg-neutral-100 dark:bg-dark-background-DEFAULT">
       <div className="flex flex-col justify-center items-center h-screen max-w-[1280px] w-full bg-neutral-100 dark:bg-dark-background-DEFAULT">
