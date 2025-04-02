@@ -105,7 +105,7 @@ const CharacterRankingSection = memo(() => {
               selectedOption={selectedGender}
               onChange={handleGenderChange}
               placeholder="성별 선택"
-              className="w-[100px]"
+              className="w-[100px] border-none"
             />
           </div>
         </div>

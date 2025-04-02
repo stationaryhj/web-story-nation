@@ -160,7 +160,7 @@ export default function ButtonTabs({
     <div className={cn('', className)}>
       {/* 탭 네비게이션 */}
       <div className="relative flex overflow-x-auto hide-scrollbar">
-        <div className="flex space-x-8">
+        <div className="flex space-x-4 md:space-x-8">
           {tabs.map((tab, index) => (
             <button
               key={tab.id}
