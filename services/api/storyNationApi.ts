@@ -40,6 +40,7 @@ import type {
   Register4Response,
   GetTop10RankingResponse,
   GetTop10RankingCreaterResponse,
+  GetSearchResponse,
 } from '../../types/api'
 
 // API 기본 설정
@@ -444,7 +445,7 @@ export const contentApi = {
    * @param paginate 페이지 당 아이템 수
    * @param page 페이지
    */
-  GetSearch: async (search: string, order: number, paginate: number, page: number): Promise<ApiResponse> => {
+  GetSearch: async (search: string, order: number, paginate: number, page: number): Promise<ApiResponse<GetSearchResponse>> => {
     return api.post('/api/charbot/search', {
       search,
       order,
@@ -452,6 +453,20 @@ export const contentApi = {
       page,
     })
   },
+
+    /**
+   * 닉네임 검색
+   * @param target_nick_nm 닉네임
+   * @param page 페이지
+   * @param paginate 페이지 당 아이템 수
+   */
+    GetCreateChatBotList: async (target_nick_nm: string, page: number, paginate: number): Promise<ApiResponse<GetSearchResponse>> => {
+      return api.post('/api/charbot/getlist/user', {
+        target_nick_nm,
+        page,
+        paginate,
+      })
+    },
 
   /**
    * 캐봇 좋아요
@@ -975,19 +990,6 @@ export const createApi = {
     })
   },
 
-  /**
-   * 캐봇 리스트
-   * @param target_nick_nm 닉네임
-   * @param page 페이지
-   * @param paginate 페이지 당 아이템 수
-   */
-  GetCreateChatBotList: async (target_nick_nm: string, page: number, paginate: number): Promise<ApiResponse> => {
-    return api.post('/api/charbot/getlist/user', {
-      target_nick_nm,
-      page,
-      paginate,
-    })
-  },
 
   /**
    * 작성한 캐봇 리스트 ( 로그인 후 )
