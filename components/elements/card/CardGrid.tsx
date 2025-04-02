@@ -125,7 +125,7 @@ export default function CardGrid({
   }, [fetchCategoryCharacters, categoryId, customData, isAdultModeEnabled])
 
   useEffect(() => {
-    console.log('characters', characters)
+    // console.log('characters', characters)
   }, [characters])
 
   // 카드 클릭 핸들러

@@ -25,7 +25,6 @@ import type {
   ChangePersonaNameResponse,
   ViewTermsResponse,
   CharbotTop10NewResponse,
-  CharbotTop10RankingResponse,
   SendFeedbackResponse,
   CharbotLikeResponse,
   WriterInfoResponse,
@@ -297,11 +296,12 @@ export const contentApi = {
   GetTop10Ranking: async (
     countryCode: string,
     ranking_type: number,
-    gender: number
-  ): Promise<ApiResponse<GetTop10RankingResponse>> => {
+    gender: number,
+    module_type: number
+  ): Promise<ApiResponse> => {
     return api.post('/api/charbot/rcmnd/ranking/top10', {
       countryCode,
-      module_type: 2,
+      module_type,
       ranking_type,
       gender,
     })
