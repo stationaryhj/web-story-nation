@@ -199,10 +199,10 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 나가기 플래그
   const [isExit, setIsExit] = useState(false)
-  
+
   // 마운트 상태 추적용 ref
-  const isMountedRef = useRef(true);
-  
+  const isMountedRef = useRef(true)
+
   // 모바일 환경 감지
   useEffect(() => {
     const checkIsMobile = () => {
@@ -219,176 +219,169 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   useEffect(() => {
     if (chatMessages.length > 0) {
       const lastMsg = chatMessages[chatMessages.length - 1]
-      
+
       // 마지막 메시지 발신자에 따라 AI 응답 대기 상태 업데이트
       // 임시 메시지는 제외하고 실제 메시지만 고려
       if (!lastMsg.id.startsWith('temp_')) {
-        setIsWaitingForAI(lastMsg.sender === 'user');
+        setIsWaitingForAI(lastMsg.sender === 'user')
       }
     }
-  }, [chatMessages]); // 의존성 배열에 chatMessages만 포함
+  }, [chatMessages]) // 의존성 배열에 chatMessages만 포함
 
   // 연결 상태 변화 로깅 - 타이머 클리어 추가
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-    
+    let timer: NodeJS.Timeout
+
     if (isConnected) {
-      setShowConnectedStatus(true);
+      setShowConnectedStatus(true)
       timer = setTimeout(() => {
-        setShowConnectedStatus(false);
-      }, 3000);
+        setShowConnectedStatus(false)
+      }, 3000)
     } else {
-      setShowConnectedStatus(false);
+      setShowConnectedStatus(false)
     }
-    
+
     return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [isConnected]);
+      if (timer) clearTimeout(timer)
+    }
+  }, [isConnected])
 
   // 서버 상태와 채널 ID에 따른 UI 처리 - 의존성 단순화
   useEffect(() => {
     if (!isConnected && !isConnecting && isInitRoom) {
       // 초기화는 됐지만 연결이 끊어진 경우
-      setError('채팅 서버와의 연결이 끊어졌습니다.');
+      setError('채팅 서버와의 연결이 끊어졌습니다.')
     } else if (isConnected && !channelId && isInitRoom) {
       // 연결은 됐지만 채널 ID가 없는 경우
-      setError('채팅 채널 연결에 문제가 발생했습니다.');
+      setError('채팅 채널 연결에 문제가 발생했습니다.')
     } else if (isConnected && channelId) {
       // 정상 상태일 때 에러 초기화
-      setError(null);
+      setError(null)
     }
-  }, [isConnected, isConnecting, channelId, isInitRoom]);
+  }, [isConnected, isConnecting, channelId, isInitRoom])
 
   // 채팅방 정리 및 연결 종료를 위한 공통 함수 최적화
   const cleanupChatRoom = useCallback(async () => {
     try {
-      setIsLoading(true);
-      
+      setIsLoading(true)
+
       // 1. 채팅방에서 나가기
       if (channelId) {
         try {
-          await leaveChat(channelId);
+          await leaveChat(channelId)
         } catch (error) {
-          console.error('채팅방 나가기 중 오류:', error);
+          console.error('채팅방 나가기 중 오류:', error)
           // 오류가 발생해도 계속 진행
         }
       }
-      
+
       // 2. 소켓 연결 종료
       try {
-        await disconnectSocket();
+        await disconnectSocket()
       } catch (error) {
-        console.error('소켓 연결 종료 중 오류:', error);
+        console.error('소켓 연결 종료 중 오류:', error)
         // 오류가 발생해도 계속 진행
       }
-      
+
       // 3. 상태 정리 (clearChatHistory 호출 제거)
-      hasInitialized.current = false;
-      
-      return true;
+      hasInitialized.current = false
+
+      return true
     } catch (error) {
-      console.error('채팅방 정리 중 오류 발생:', error);
-      return false;
+      console.error('채팅방 정리 중 오류 발생:', error)
+      return false
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, [channelId, leaveChat, disconnectSocket]);
+  }, [channelId, leaveChat, disconnectSocket])
 
   // 채팅방 초기화 메서드 - useCallback으로 변경
   const initializeChatRoom = useCallback(async () => {
     // 이미 초기화 중이거나 초기화가 완료된 경우 또는 필요한 데이터가 없는 경우
     if (!character?.id || !accountData?.user_key) {
-      console.log('⚠️ 초기화에 필요한 데이터가 없습니다.');
-      return;
-    }
-    
-    if (hasInitialized.current) {
-      console.log('⚠️ 이미 초기화 요청을 진행했습니다.');
-      return;
-    }
-    
-    // 이미 초기화된 상태인지 확인
-    if (isInitRoom && channelId) {
-      console.log('✅ 채팅방이 이미 초기화되어 있습니다.');
-      return;
+      console.log('⚠️ 초기화에 필요한 데이터가 없습니다.')
+      return
     }
 
-    if(isExit) return;
-    
+    if (hasInitialized.current) {
+      console.log('⚠️ 이미 초기화 요청을 진행했습니다.')
+      return
+    }
+
+    // 이미 초기화된 상태인지 확인
+    if (isInitRoom && channelId) {
+      console.log('✅ 채팅방이 이미 초기화되어 있습니다.')
+      return
+    }
+
+    if (isExit) return
+
     try {
-      setIsLoading(true);
-      setError(null);
-      hasInitialized.current = true;
-      
+      setIsLoading(true)
+      setError(null)
+      hasInitialized.current = true
+
       // 사용 가능한 채팅 모드 중 첫번째 선택 (또는 기본값 2번)
-      const selectedModeId = chatMode && chatMode.length > 0 ? chatMode[0].chat_mode : 2;
-      
-      console.log('💬 채팅방 초기화 시작 - ID:', character.id, '모드:', selectedModeId);
-      
+      const selectedModeId = chatMode && chatMode.length > 0 ? chatMode[0].chat_mode : 2
+
+      console.log('💬 채팅방 초기화 시작 - ID:', character.id, '모드:', selectedModeId)
+
       // 채팅방 초기화 (Nakama 서버 연결 및 인증, 채팅방 참여까지 모두 수행)
-      const result = await chatRoomInit(
-        accountData.user_key.toString(),
-        characterId,
-        selectedModeId
-      );
-      
+      const result = await chatRoomInit(accountData.user_key.toString(), characterId, selectedModeId)
+
       if (!result.success) {
         if (result.error === 'ALREADY_INITIALIZING') {
-          console.log('⚠️ 이미 초기화 중입니다. 대기...');
+          console.log('⚠️ 이미 초기화 중입니다. 대기...')
           // 3초 후 초기화 상태 리셋 (이미 진행 중인 초기화 작업이 실패했을 경우 대비)
           setTimeout(() => {
             if (!isConnected || !channelId) {
-              console.log('🔄 초기화 시간 초과, 상태 리셋');
-              hasInitialized.current = false;
+              console.log('🔄 초기화 시간 초과, 상태 리셋')
+              hasInitialized.current = false
             }
-          }, 3000);
-          return;
+          }, 3000)
+          return
         }
-        
-        console.error('❌ 채팅방 초기화 실패:', result.error);
-        throw new Error(result.error || '채팅방 초기화에 실패했습니다. 다시 시도해주세요.');
+
+        console.error('❌ 채팅방 초기화 실패:', result.error)
+        throw new Error(result.error || '채팅방 초기화에 실패했습니다. 다시 시도해주세요.')
       }
-      
+
       // 현재 모드 설정 업데이트
-      setCurrentModeId(selectedModeId);
-      console.log('✅ 채팅방 초기화 완료:', result);
+      setCurrentModeId(selectedModeId)
+      console.log('✅ 채팅방 초기화 완료:', result)
     } catch (error) {
-      console.error('채팅방 초기화 실패:', error);
-      setError('채팅방을 초기화하는 중 오류가 발생했습니다. 다시 시도해주세요.');
-      hasInitialized.current = false;
+      console.error('채팅방 초기화 실패:', error)
+      setError('채팅방을 초기화하는 중 오류가 발생했습니다. 다시 시도해주세요.')
+      hasInitialized.current = false
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, [character?.id, accountData?.user_key, characterId, chatRoomInit, chatMode, isConnected, channelId, isInitRoom]);
+  }, [character?.id, accountData?.user_key, characterId, chatRoomInit, chatMode, isConnected, channelId, isInitRoom])
 
   // 실제 언마운트 시에만 정리하기 위한 로직
   useEffect(() => {
+    if (isExit) return
 
-    if(isExit) return;
+    isMountedRef.current = true
+    console.log('🌱 컴포넌트 마운트됨')
 
-    isMountedRef.current = true;
-    console.log('🌱 컴포넌트 마운트됨');
-    
     return () => {
-      isMountedRef.current = false;
-      setIsExit(true)
-      console.log('💀 컴포넌트 실제 언마운트됨 - 채팅방 정리 예정');
-      
+      isMountedRef.current = false
+      console.log('💀 컴포넌트 실제 언마운트됨 - 채팅방 정리 예정')
+
       // 이미 언마운트된 상태에서 비동기 작업이 완료되면 의미 없음
       // 약간의 지연을 두어 불필요한 정리를 방지
       setTimeout(() => {
         // 실제 언마운트 상태인 경우에만 정리 수행
         if (!isMountedRef.current) {
-          console.log('🧹 채팅방 정리 실행');
-          cleanupChatRoom()
-            .catch(err => console.error('채팅방 정리 중 오류:', err));
+          console.log('🧹 채팅방 정리 실행')
+          cleanupChatRoom().catch(err => console.error('채팅방 정리 중 오류:', err))
         } else {
-          console.log('⚠️ 채팅방 정리가 취소됨 - 컴포넌트가 다시 마운트됨');
+          console.log('⚠️ 채팅방 정리가 취소됨 - 컴포넌트가 다시 마운트됨')
         }
-      }, 100);
-    };
-  }, [cleanupChatRoom]);  // cleanupChatRoom 의존성 추가
+      }, 100)
+    }
+  }, [cleanupChatRoom]) // cleanupChatRoom 의존성 추가
 
   // 채팅방 초기화 로직 - 채팅방 초기화만 담당
   useEffect(() => {
@@ -397,52 +390,49 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       console.log('✅ 채팅방이 이미 초기화된 상태입니다:', {
         isInitRoom,
         channelId,
-        hasInitialized: hasInitialized.current
-      });
-      hasInitialized.current = true;
-      return;
+        hasInitialized: hasInitialized.current,
+      })
+      hasInitialized.current = true
+      return
     }
-    
+
     // 이미 초기화되었거나 필요한 데이터가 없으면 중단
     if (hasInitialized.current || !character?.id || !accountData?.user_key) {
       console.log('⏭️ 채팅방 초기화 로직 건너뜀', {
         hasInitialized: hasInitialized.current,
         hasCharacterId: !!character?.id,
-        hasUserKey: !!accountData?.user_key
-      });
-      return;
+        hasUserKey: !!accountData?.user_key,
+      })
+      return
     }
-    
+
     // 이 시점에 도달하면 실제로 초기화 필요
-    console.log('🚀 채팅방 초기화 로직 시작');
+    console.log('🚀 채팅방 초기화 로직 시작')
     initializeChatRoom().then(() => {
-      console.log('✅ initializeChatRoom 함수 완료');
-    });
-  }, [character?.id, accountData?.user_key, isInitRoom, channelId, initializeChatRoom]);
+      console.log('✅ initializeChatRoom 함수 완료')
+    })
+  }, [character?.id, accountData?.user_key, isInitRoom, channelId, initializeChatRoom])
 
   // 채팅방 삭제 함수
   const handleDeleteChat = async () => {
     try {
       setIsExit(true)
 
-      await cleanupChatRoom();
+      await cleanupChatRoom()
 
-      
       // 모달 닫기
-      closeModal();
+      closeModal()
 
       // 채팅방 삭제
-      await chatApi.CloseChat(Number(chrBotChatKey));
+      await chatApi.CloseChat(Number(chrBotChatKey))
 
-      
       // 페이지 리디렉션
-      router.push('/chat-list');
+      router.push('/chat-list')
     } catch (error) {
       // 에러가 발생해도 페이지 이동
-      router.push('/chat-list');
-
+      router.push('/chat-list')
     }
-  };
+  }
 
   // 메시지 전송 처리 (Provider의 메서드 사용)
   const handleSendMessage = async (e: FormEvent) => {
@@ -549,7 +539,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     }
   }
 
-
   // 메시지 내용에서 상황 설명(*로 감싸진 텍스트)를 찾아 스타일을 적용하는 함수
   const formatMessageWithSituations = (message: string) => {
     // 정규식으로 *로 감싸진 텍스트 찾기
@@ -643,6 +632,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     )
   }
 
+  // 나머지 UI 부분은 이전과 동일하게 유지
   return (
     <div className="flex flex-col h-screen max-h-screen w-full bg-gray-50">
       {/* 상단 헤더 */}
@@ -653,15 +643,14 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           <button
             onClick={async () => {
               try {
+                await cleanupChatRoom()
 
-                await cleanupChatRoom();
-                
                 // 채팅 목록 페이지로 이동
-                router.push('/chat-list');
+                router.push('/chat-list')
               } catch (error) {
                 console.error('채팅방 나가기 프로세스 중 오류 발생:', error)
                 // 에러가 발생해도 페이지 이동
-                router.push('/chat-list');
+                router.push('/chat-list')
               }
             }}
             className="mr-3"
@@ -1108,58 +1097,131 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             </div>
           </div>
 
-          {/* 입력창 영역 - 채팅 영역 내부로 이동 */}
-          <div className="bg-white border-t border-gray-200 p-3 md:p-4">
-            <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto">
-              <div className="flex items-center relative">
-                {/* 상황 설명 모드 토글 버튼 */}
-                <button
-                  id="message-input"
-                  type="button"
-                  onClick={toggleActionMode}
-                  className={`absolute left-3 w-8 h-8 flex items-center justify-center rounded-full transition-colors ${
-                    isActionMode ? 'bg-violet-100 text-violet-600' : 'text-gray-400 hover:text-gray-600'
-                  }`}
-                  title="상황 설명 모드"
-                >
-                  <FontAwesomeIcon icon={faAsterisk} />
-                </button>
+          {/* 메시지 입력 */}
+          <div className="bg-white p-4 border-t border-gray-200 shadow-sm">
+            <form onSubmit={handleSendMessage} className="flex items-center max-w-3xl mx-auto">
+              {/* 상황 설명 버튼 (별표 아이콘) */}
+              <button
+                id="message-input"
+                type="button"
+                onClick={toggleActionMode}
+                className={`mr-2 p-2.5 rounded-full transition-colors ${
+                  isActionMode ? 'bg-violet-100 text-violet-600' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                }`}
+                title={isActionMode ? '일반 대화 모드로 전환' : '상황 설명 모드로 전환'}
+                disabled={isWaitingForAI}
+              >
+                <FontAwesomeIcon icon={faAsterisk} className="text-base" />
+              </button>
 
-                {/* 메시지 입력 필드 */}
+              <div className="flex-1 relative">
                 <input
                   type="text"
                   value={message}
-                  onChange={handleActionInput}
+                  onChange={isActionMode ? handleActionInput : e => setMessage(e.target.value)}
                   placeholder={
-                    isActionMode ? '상황 설명을 입력하세요... (예: *캐릭터가 웃으며*)' : '메시지를 입력하세요...'
+                    isWaitingForAI
+                      ? 'AI가 응답 중입니다. 잠시만 기다려주세요...'
+                      : isActionMode
+                        ? '상황 설명을 입력하세요. (예: 캐릭터가 웃으며)'
+                        : '대화를 입력하세요. (예: 안녕! 뭐해?)'
                   }
-                  className={`w-full py-3 px-12 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm md:text-base ${
-                    isWaitingForAI ? 'bg-gray-100 text-gray-500' : ''
-                  }`}
+                  className={`w-full py-3 px-4 text-sm sm:text-base bg-gray-100 text-gray-800 rounded-l-xl border-0 focus:outline-none focus:ring-0 ${
+                    isWaitingForAI ? 'bg-gray-200 text-gray-500' : 'hover:bg-gray-200/80'
+                  } transition-all placeholder:text-sm placeholder:text-gray-500`}
                   disabled={isWaitingForAI}
                 />
-
-                {/* 전송 버튼 */}
-                <button
-                  type="submit"
-                  className={`absolute right-2 w-9 h-9 flex items-center justify-center rounded-full text-white transition-colors ${
-                    message.trim() && !isWaitingForAI
-                      ? 'bg-primary-500 hover:bg-primary-600'
-                      : 'bg-gray-300 cursor-not-allowed'
-                  }`}
-                  disabled={!message.trim() || isWaitingForAI}
-                >
-                  {isWaitingForAI ? (
-                    <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
-                  ) : (
-                    <FontAwesomeIcon icon={faPaperPlane} />
-                  )}
-                </button>
+                {isActionMode && !isWaitingForAI && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
+                    <span className="bg-violet-100 px-2 py-0.5 rounded text-violet-600 font-medium">
+                      <FontAwesomeIcon icon={faAsterisk} className="mr-1 text-xs" />
+                      상황 설명 모드
+                    </span>
+                  </div>
+                )}
+                {isWaitingForAI && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="flex items-center space-x-1">
+                      <div
+                        className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce"
+                        style={{ animationDelay: '0ms' }}
+                      ></div>
+                      <div
+                        className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce"
+                        style={{ animationDelay: '150ms' }}
+                      ></div>
+                      <div
+                        className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce"
+                        style={{ animationDelay: '300ms' }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
               </div>
+
+              {/* 전송 버튼 - BaseButton으로 변경 */}
+              <BaseButton
+                type="submit"
+                color={message.trim() && !isWaitingForAI ? 'gradient' : 'secondary'}
+                disabled={!message.trim() || isWaitingForAI}
+                className="rounded-l-none rounded-r-xl py-3 px-4"
+              >
+                <FontAwesomeIcon icon={faPaperPlane} className="text-base" />
+              </BaseButton>
             </form>
           </div>
         </div>
       </main>
+
+      {/* 모바일용 이미지 모달을 추가합니다 (return 문 끝에 추가) */}
+      {showImageModal && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex flex-col items-center justify-center p-4">
+          <div className="relative w-full max-w-md mx-auto">
+            {/* 닫기 버튼 */}
+            <button
+              className="absolute top-0 right-0 z-10 bg-black/50 rounded-full p-2 text-white transform translate-x-3 -translate-y-3"
+              onClick={handleCloseImageModal}
+            >
+              <FontAwesomeIcon icon={faArrowLeft} className="text-lg" />
+            </button>
+
+            {/* 이미지 */}
+            <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden">
+              <Image
+                src={character.imageUrl || '/images/character1.jpg'}
+                alt={character.name}
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+
+            {/* 이미지 정보 및 다운로드 버튼 */}
+            <div className="bg-black/50 backdrop-blur-sm text-white p-4 rounded-b-lg">
+              <h3 className="font-bold text-lg mb-1">{character.name}</h3>
+              <div className="flex items-center justify-between">
+                <div className="flex flex-wrap gap-1">
+                  {character.hashtags?.slice(0, 2).map((tag: string, index: number) => (
+                    <span key={index} className="text-xs text-gray-300">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+                <button
+                  className="bg-violet-600 hover:bg-violet-700 text-white py-2 px-4 rounded-full flex items-center text-sm"
+                  onClick={() => {
+                    handleSaveImage()
+                    handleCloseImageModal()
+                  }}
+                >
+                  <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                  저장하기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 튜토리얼 컴포넌트 */}
       <Tutorial isOpen={showTutorial} onClose={() => setShowTutorial(false)} config={tutorialConfig} />

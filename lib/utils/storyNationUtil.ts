@@ -1,5 +1,6 @@
 import { CharbotChatData, ModuleCreater, CharbotChatListData, CharbotMineData, ChatModeData, ChrbotData, InquiryData, LoginResponse, ModuleCharacter, IncomeData } from '@/types/api';
 import { ChatMode } from '@/components/modal/ChatModeModal';
+import { useAccountStore } from '@/store/useAccountStore';
 
 /**
   get image Uri
@@ -69,7 +70,7 @@ export function bridgeTop10DataToModuleCharacter(dataList: Array<ModuleCharacter
       id: item.world_list_detail_chrbot_key.toString(),
       name: item.title,
       description: item.intro,
-      imageUrl: getImageUri(item.img_url),
+      imageUrl: getImageUri(useAccountStore.getState().isAdult() ? item.img_web_url : item.img_url),
       commentCount: item.msg_cnt,
       likeCount: item.like_cnt,
       hashtags: uniqueTags,
@@ -90,7 +91,7 @@ export function bridgeTop10DataToModuleCharacter(dataList: Array<ModuleCharacter
   return characters
 }
 
-export function bridgeModuleCreaterToCharacter(dataList: Array<ModuleCreater>) {
+export function bridgeModuleCreatorToCharacter(dataList: Array<ModuleCreater>) {
   const creaters = dataList?.map(item => {
     return {
       id: item.user_key.toString(),
@@ -113,7 +114,7 @@ export function bridgeCharbotGetListMineDataToCharacter(dataList: Array<CharbotM
     id: item.world_list_detail_chrbot_key.toString(),
     name: item.title,
     description: item.intro,
-    imageUrl: getImageUri(item.img_url),
+    imageUrl: getImageUri(useAccountStore.getState().isAdult() ? item.img_web_url : item.img_url),
     commentCount: item.msg_cnt,
     likeCount: item.like_cnt,
     chatCount: item.chat_cnt,
@@ -148,7 +149,7 @@ export function bridgeCharacterDataToCharacter(dataList: Array<ModuleCharacter>)
       id: item.world_list_detail_chrbot_key.toString(),
       name: item.title,
       description: item.intro,
-      imageUrl: getImageUri(item.img_url),
+      imageUrl: getImageUri(useAccountStore.getState().isAdult() ? item.img_web_url : item.img_url),
       commentCount: item.msg_cnt,
       likeCount: item.like_cnt,
       chatCount: item.chat_cnt,
@@ -177,7 +178,7 @@ export function bridgeCharbotDataToCharacter(data: ChrbotData) {
     description: data.intro,
     example: data.example,
     first_talk: data.first_talk,
-    imageUrl: getImageUri(data.img_url),
+    imageUrl: getImageUri(useAccountStore.getState().isAdult() ? data.img_web_url : data.img_url),
     commentCount: data.msg_cnt,
     hashtags: data.tags ? data.tags.split(',') : [],
     isAdult: data.nsfw === 1,
@@ -200,7 +201,7 @@ export function bridgeCharbotChatDataToChatList(data: Array<CharbotChatData>) {
     name: item.title,
     lastMessage: item.last_msg,
     time: '',
-    imageUrl: getImageUri(item.img_url),
+    imageUrl: getImageUri(useAccountStore.getState().isAdult() ? item.img_web_url : item.img_url),
     fixed: item.fixed,
   }))
 }
@@ -251,7 +252,7 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
         isEditing: false,
         visibility: data.example_show_yn === 1 ? 'public' : 'private',
       })) : [],
-    imageUrl: getImageUri(data.img_url) || '',
+    imageUrl: data.img_url || '',
     isAdult: data.nsfw === 1,
     createDate: data.create_dt || '',
     world_list_detail_chrbot_key: data.world_list_detail_chrbot_key,
@@ -262,8 +263,9 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
     content: data.content,
     example: data.example,
     nsfw: data.nsfw,
-    img_url: getImageUri(data.img_url),
-    img_url_nsfw: getImageUri(data.img_url_nsfw),
+    img_url: data.img_url,
+    img_url_nsfw: data.img_url_nsfw,
+    img_web_url: data.img_web_url,
     show_yn: data.show_yn,
     content_show_yn: data.content_show_yn,
     example_show_yn: data.example_show_yn,

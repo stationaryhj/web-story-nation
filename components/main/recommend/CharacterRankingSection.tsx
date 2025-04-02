@@ -55,14 +55,7 @@ const CharacterRankingSection = memo(() => {
   }
 
   const handleGenderChange = (option: { value: number; label: string }) => {
-    const topid =
-      characterActiveTab === 'realtime'
-        ? 4
-        : characterActiveTab === 'daily'
-          ? 1
-          : characterActiveTab === 'weekly'
-            ? 2
-            : 3
+    const topid = characterActiveTab === 'realtime' ? 4 : characterActiveTab === 'daily' ? 1 : characterActiveTab === 'weekly' ? 2 : 3
     UpdateRankingTopCharacter('KR', topid, option.value, false)
     setSelectedGender(option)
   }
@@ -70,8 +63,6 @@ const CharacterRankingSection = memo(() => {
   const getCharacterRankingData = () => {
     return rankingCharacters
   }
-
-  // 데이터 길이에 따라 next/prev 버튼 표시 여부 결정
 
   return (
     <section className="pt-10 pb-20">

@@ -4,7 +4,6 @@ import { create } from 'zustand'
 import { createApi, contentApi } from '@/services/api'
 import { toast } from 'react-toastify'
 import { bridgeCharacterInProgressToCharacter } from '@/lib/utils/storyNationUtil'
-import { TagListResponse } from '@/types/api'
 
 export type CharacterGender = 'male' | 'female' | 'unspecified'
 export type CharacterVisibility = 'public' | 'private'
@@ -51,12 +50,10 @@ export interface CharacterFormData {
   bioDetail: string
   conversationExamples: Array<ConversationExample>
   
-  // 이미지 설정
-  images: Array<CharacterImage>
-  
-  // S3에 업로드된 이미지 URL (API 연동 시 사용)
-  imgUrl?: string
-  imgUrlNsfw?: string
+  // 이미지 설정 - 경로만 저장
+  imgUrl: string            // 기본 이미지 경로
+  imgUrlNsfw: string        // 성인 이미지 경로
+  imgWebUrl: string         // 성인 웹 이미지 경로
   
   // API 호환성 속성
   world_list_detail_chrbot_key?: string
@@ -99,8 +96,9 @@ interface CreateCharacterStore {
   setConversationExampleVisibility: (id: string, visibility: CharacterVisibility) => void
   
   // 이미지 관련 함수들
-  setNormalImage: (url: string) => void
-  setAdultImage: (url: string) => void
+  setNormalImage: (path: string) => void
+  setAdultImage: (path: string) => void
+  setAdultNormalImage: (path: string) => void
   
   // API 연동 함수들
   fetchInProgressData: (characterId: number | null) => Promise<void>
@@ -124,9 +122,9 @@ const defaultFormData: CharacterFormData = {
   hashtags: [],
   bioDetail: '',
   conversationExamples: [],
-  images: [],
   imgUrl: '',
   imgUrlNsfw: '',
+  imgWebUrl: '',
 }
 
 // CreateCharacterStore 생성
@@ -261,62 +259,30 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
   })),
   
   // 이미지 관련 함수들
-  setNormalImage: (url) => set((state) => {
-    // 이미지 URL 저장
-    const newImage: CharacterImage = {
-      id: generateId(),
-      url,
-      type: 'normal',
-    }
-    
-    // 이미지 배열 업데이트
-    const existingImages = state.formData.images || []
-    const normalImgIndex = existingImages.findIndex(img => img.type === 'normal')
-    let updatedImages = [...existingImages]
-    
-    if (normalImgIndex >= 0) {
-      // 기존 이미지 교체
-      updatedImages[normalImgIndex] = newImage
-    } else {
-      // 새 이미지 추가
-      updatedImages = [...existingImages, newImage]
-    }
-    
+  setNormalImage: (path: string) => set((state) => {
+    console.log('setNormalImage :: ', path)
     return {
       formData: {
         ...state.formData,
-        images: updatedImages,
-        imgUrl: url,
+        imgUrl: path,
       },
     }
   }),
   
-  setAdultImage: (url) => set((state) => {
-    // 이미지 URL 저장
-    const newImage: CharacterImage = {
-      id: generateId(),
-      url,
-      type: 'adult',
-    }
-    
-    // 이미지 배열 업데이트
-    const existingImages = state.formData.images || []
-    const adultImgIndex = existingImages.findIndex(img => img.type === 'adult')
-    let updatedImages = [...existingImages]
-    
-    if (adultImgIndex >= 0) {
-      // 기존 이미지 교체
-      updatedImages[adultImgIndex] = newImage
-    } else {
-      // 새 이미지 추가
-      updatedImages = [...existingImages, newImage]
-    }
-    
+  setAdultImage: (path: string) => set((state) => {
     return {
       formData: {
         ...state.formData,
-        images: updatedImages,
-        imgUrlNsfw: url,
+        imgUrlNsfw: path,
+      },
+    }
+  }),
+
+  setAdultNormalImage: (path: string) => set((state) => {
+    return {
+      formData: {
+        ...state.formData,
+        imgWebUrl: path,
       },
     }
   }),
@@ -346,6 +312,25 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         if (characterId) {
           get().setFormField('world_list_detail_chrbot_key', characterId.toString())
         }
+
+        // 이미지 URL 정리 (중복 필드 정리)
+        const imgUrl = characterData.img_url || '';
+        const imgUrlNsfw = characterData.img_url_nsfw || '';
+        const imgWebUrl = characterData.img_web_url || '';
+
+        // 한 번에 적절한 필드에만 설정
+        set(state => ({
+          formData: {
+            ...state.formData,
+            imgUrl,
+            imgUrlNsfw,
+            imgWebUrl,
+            // 스네이크 케이스 필드 제거 (API 통신 시에만 사용)
+            img_url: undefined,
+            img_url_nsfw: undefined,
+            img_web_url: undefined
+          }
+        }));
       }
     } catch (error) {
       console.error('캐릭터 데이터 로딩 실패:', error)
@@ -387,6 +372,8 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
       set({ isSaving: true })
       
       const { formData } = get()
+
+      console.log('formData :: ', formData)
       
       // 폼 데이터에서 API 요청에 필요한 데이터 추출
       const payload = {
@@ -395,6 +382,7 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         img_url: formData.imgUrl || '',
         // 성인 이미지 URL (있는 경우에만 포함)
         img_url_nsfw: formData.imgUrlNsfw || '',
+        img_web_url: formData.imgWebUrl || '',
         title: formData.name || '',
         gender: formData.gender === 'male' ? 1 : formData.gender === 'female' ? 2 : 0,
         intro: formData.bio || '',
@@ -426,6 +414,7 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         payload.example,
         payload.nsfw,
         payload.img_url_nsfw,
+        payload.img_web_url,
         payload.show_yn,
         payload.content_show_yn,
         payload.example_show_yn,

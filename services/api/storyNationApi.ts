@@ -637,6 +637,30 @@ export const contentApi = {
       type,
     })
   },
+
+  // 닉네임 변경
+  NicknmChange: async (nick_nm: string): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/nicknmchange', {
+      nick_nm,
+    })
+  },
+
+  // 새로운 알림 추가 ( 갱신 )
+  NewNotice: async (): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/newnoti')
+  },
+
+  // 알림 가져오기
+  GetNotice: async (): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/getnoti')
+  },
+  
 }
 
 // 채팅 API
@@ -938,6 +962,7 @@ export const createApi = {
     example: string,
     nsfw: number,
     img_url_nsfw: string,
+    img_web_url: string,
     show_yn: number,
     content_show_yn: number,
     example_show_yn: number,
@@ -955,6 +980,7 @@ export const createApi = {
       example,
       nsfw,
       img_url_nsfw,
+      img_web_url,
       show_yn,
       finish_yn,
       content_show_yn,

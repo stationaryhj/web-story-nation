@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { useModalStore } from './useStoreModal'
+import { useAccountStore } from './useAccountStore'
 
 // 은행 리스트
 export const BANK_LIST = [
@@ -125,7 +126,7 @@ export const useSettingsStore = create<SettingsStore>()(
 
       resetSettings: () => set({ settings: defaultSettings }),
 
-      isAdultModeEnabled: false,
+      isAdultModeEnabled: useAccountStore.getState().isAdult(),
 
       // 로그인 상태에 따라 성인 모드 활성화 처리
       enableAdultMode: () => {
