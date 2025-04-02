@@ -22,6 +22,7 @@ import { contentApi } from '@/services/api/storyNationApi'
 import { useModalStore } from '@/store/useStoreModal'
 import { useBankStore } from '@/store/useGlobalStore'
 import DeleteAccountModal from '@/components/modal/DeleteAccountModal'
+import DuplicateCheckModal from '@/components/modal/DuplicateCheckModal'
 
 const getPlatform = (sns_type: number) => {
   switch (sns_type) {
@@ -52,6 +53,7 @@ export default function SettingsForm() {
   const [originalNickname, setOriginalNickname] = useState('')
   const [activeTab, setActiveTab] = useState<'support' | 'terms' | 'privacy' | 'paid' | 'policy'>('support')
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [showDuplicateCheckModal, setShowDuplicateCheckModal] = useState(false)
 
   const { settings, updateProfile, updateBankAccount, setLanguage, uploadProfileImage } = useSettingsStore()
   const { data: userInfo, writerInfo, fetchWriterInfo, logout } = useAccountStore()
@@ -113,6 +115,7 @@ export default function SettingsForm() {
     }
   }, [userInfo?.writerchk, writerInfo, fetchWriterInfo])
 
+  // 닉네임 변경 감지
   useEffect(() => {
     if (profile.nickname === originalNickname) {
       setIsNicknameVerified(true)
@@ -137,69 +140,60 @@ export default function SettingsForm() {
   }, [])
 
   // 닉네임 중복 체크 핸들러
-  const handleDuplicateCheck = () => {
-    // 여기에 실제 API 호출 로직이 들어갈 수 있음
-    const isAvailable = Math.random() > 0.3 // 임시로 랜덤하게 결과 생성
+  const handleDuplicateCheck = async () => {
+    try {
+      // 여기에 실제 API 호출 로직이 들어갈 수 있음
+      const isAvailable = Math.random() > 0.3 // 임시로 랜덤하게 결과 생성
 
-    if (isAvailable) {
-      toast.success('사용 가능한 닉네임입니다.')
-      setIsNicknameVerified(true)
-      setIsNicknameChanged(false) // 중복 체크 통과 후 상태 초기화
-    } else {
-      toast.error('사용할 수 없는 닉네임입니다.')
-      setIsNicknameVerified(false)
+      if (isAvailable) {
+        setShowDuplicateCheckModal(true)
+        setIsNicknameVerified(true)
+      } else {
+        toast.error('사용할 수 없는 닉네임입니다.')
+        setIsNicknameVerified(false)
+      }
+    } catch (error) {
+      console.error('닉네임 중복 확인 중 오류:', error)
+      toast.error('닉네임 중복 확인 중 오류가 발생했습니다.')
     }
   }
 
-  // 은행정보 모달
-  const handleOpenBankInfoModal = () => {
-    openModal('bankInfo', {
-      bankInfo: {
-        bank: profile.bank,
-        accountNumber: profile.accountNumber,
-        accountHolder: profile.accountHolder,
-      },
-      onBankInfoChange: (bankInfo: { bank: string; accountNumber: string; accountHolder: string }) => {
-        setProfile(prev => ({
-          ...prev,
-          bank: bankInfo.bank,
-          accountNumber: bankInfo.accountNumber,
-          accountHolder: bankInfo.accountHolder,
-        }))
-        setIsEdited(true)
-      },
-    })
+  // 닉네임 변경 취소
+  const handleNicknameCancel = () => {
+    setProfile(prev => ({
+      ...prev,
+      nickname: originalNickname,
+    }))
+    setIsNicknameChanged(false)
+    setIsNicknameVerified(false)
+    setShowDuplicateCheckModal(false)
   }
 
-  // 저장 핸들러
-  const handleSave = () => {
-    // 닉네임이 변경되었고 중복 확인을 하지 않은 경우
-    if (isNicknameChanged && !isNicknameVerified) {
-      toast.error('닉네임 중복 확인이 필요합니다.')
-      return
+  // 닉네임 저장 핸들러
+  const handleNicknameSave = async () => {
+    try {
+      // 펜 잔액 확인 (임시로 100펜 이상 있다고 가정)
+      const hasEnoughPens = true // 실제로는 펜 잔액 확인 로직 필요
+
+      if (!hasEnoughPens) {
+        toast.error('닉네임을 수정할 펜이 부족합니다.')
+        return
+      }
+
+      // API 호출 및 펜 차감 로직
+
+      if (true) {
+        setOriginalNickname(profile.nickname)
+        setIsNicknameVerified(true)
+        setIsNicknameChanged(false)
+        toast.success('닉네임이 성공적으로 저장되었습니다.')
+      } else {
+        throw new Error('닉네임 변경 실패')
+      }
+    } catch (error) {
+      console.error('닉네임 저장 중 오류:', error)
+      toast.error('닉네임 저장에 실패했습니다.')
     }
-
-    // 프로필 정보 업데이트
-    updateProfile({
-      nickname: profile.nickname,
-    })
-
-    // 계좌 정보 업데이트
-    updateBankAccount({
-      bank: profile.bank,
-      accountNumber: profile.accountNumber,
-      accountHolder: profile.accountHolder,
-    })
-
-    // 언어 설정 업데이트
-    setLanguage(profile.language as 'ko' | 'en')
-
-    // 저장 완료 알림
-    toast.success('정보가 성공적으로 저장되었습니다.')
-    setIsEdited(false)
-    setOriginalNickname(profile.nickname) // 저장 후 원래 닉네임 업데이트
-    setIsNicknameVerified(true) // 저장 후 닉네임 검증 상태 업데이트
-    setIsNicknameChanged(false) // 저장 후 닉네임 변경 상태 초기화
   }
 
   // 입력 핸들러
@@ -419,21 +413,6 @@ export default function SettingsForm() {
               </button>
               <h1 className="text-xl font-semibold">내 정보</h1>
             </div>
-            <div>
-              <button
-                onClick={handleOpenBankInfoModal}
-                className="px-4 py-2 mr-2 rounded-lg bg-primary-500 text-white hover:bg-primary-600"
-              >
-                은행정보
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={!isEdited}
-                className={`px-4 py-2 rounded-lg ${isEdited ? 'bg-primary-500 text-white' : 'bg-secondary-200 text-secondary-400'}`}
-              >
-                저장
-              </button>
-            </div>
           </div>
         </div>
 
@@ -552,6 +531,17 @@ export default function SettingsForm() {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
                     placeholder="닉네임을 입력하세요"
                   />
+                  <button
+                    onClick={handleDuplicateCheck}
+                    disabled={!isNicknameChanged}
+                    className={`sm:flex-shrink-0 px-4 py-3 rounded-lg whitespace-nowrap ${
+                      isNicknameChanged
+                        ? 'bg-primary-500 text-white hover:bg-primary-700'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    중복확인
+                  </button>
                 </div>
                 <div className="mt-2">
                   {isNicknameChanged && <span className="text-red-500 text-sm">중복 확인이 필요합니다</span>}
@@ -559,7 +549,7 @@ export default function SettingsForm() {
               </div>
 
               {/* 이메일 */}
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">이메일</label>
                 <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
                   <input
@@ -576,7 +566,7 @@ export default function SettingsForm() {
                     저장
                   </button>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -731,6 +721,15 @@ export default function SettingsForm() {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         userNickname={profile.nickname}
+      />
+
+      {/* 닉네임 중복 확인 모달 */}
+      <DuplicateCheckModal
+        isOpen={showDuplicateCheckModal}
+        onClose={() => setShowDuplicateCheckModal(false)}
+        onConfirm={handleNicknameSave}
+        onCancel={handleNicknameCancel}
+        originalNickname={originalNickname}
       />
 
       {/* react-toastify 컨테이너 */}
