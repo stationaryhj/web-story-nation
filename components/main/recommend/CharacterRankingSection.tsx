@@ -6,7 +6,7 @@ import CardGrid from '@/components/elements/card/CardGrid'
 import { SectionTransition } from '@/components/motion/PageTransition'
 import CharacterRankingSidebar from '@/components/elements/sidebar/CharacterRankingSidebar'
 import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
-import { SidebarSelectBox } from '@/components/elements/selectbox/SidebarSelectBox'
+import { BaseSelectBox } from '@/components/elements/selectbox/BaseSelectBox'
 
 // 캐릭터 랭킹 탭 정의
 const characterRankingTabs: TabItem[] = [
@@ -100,12 +100,12 @@ const CharacterRankingSection = memo(() => {
               defaultTabId="realtime"
               onTabChange={handleCharacterRankingTabChange}
             />
-            <SidebarSelectBox
+            <BaseSelectBox
               options={genderOptions}
               selectedOption={selectedGender}
               onChange={handleGenderChange}
               placeholder="성별 선택"
-              className="w-[100px] border-none"
+              className="w-[100px]"
             />
           </div>
         </div>

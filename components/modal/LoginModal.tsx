@@ -9,6 +9,7 @@ import { OAuthProvider } from '@/types/login'
 import GuestLoginForm from '@/components/form/GuestLoginForm'
 import { toast } from 'react-toastify'
 import { authService } from '@/services/auth'
+import { SpeechBubble } from '@/components/animation/SpeechBubble'
 
 interface LoginModalProps {
   isOpen: boolean
@@ -21,124 +22,124 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [showSignup, setShowSignup] = useState(false)
   const [loading, setLoading] = useState(false)
   // 이벤트 처리 중인지 추적하는 ref (중복 메시지 처리 방지)
-  const processingCallback = useRef(false);
+  const processingCallback = useRef(false)
 
   // 모달이 열리면 authService 초기화
   useEffect(() => {
     if (isOpen) {
       authService.init().catch(err => {
-        console.error('인증 서비스 초기화 오류:', err);
-      });
+        console.error('인증 서비스 초기화 오류:', err)
+      })
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   // 로그인 타임아웃 핸들러
   const handleLoginTimeout = useCallback(() => {
-    setLoading(false);
-    toast.error('로그인 시간이 초과되었습니다. 다시 시도해주세요.');
-    
+    setLoading(false)
+    toast.error('로그인 시간이 초과되었습니다. 다시 시도해주세요.')
+
     // 타임아웃 관련 데이터 정리
-    const timeoutId = localStorage.getItem('naver_login_timeout');
+    const timeoutId = localStorage.getItem('naver_login_timeout')
     if (timeoutId) {
-      clearTimeout(parseInt(timeoutId));
-      localStorage.removeItem('naver_login_timeout');
+      clearTimeout(parseInt(timeoutId))
+      localStorage.removeItem('naver_login_timeout')
     }
-    localStorage.removeItem('social_login_state');
-    localStorage.removeItem('social_login_type');
-    
+    localStorage.removeItem('social_login_state')
+    localStorage.removeItem('social_login_type')
+
     // 콜백 처리 상태 초기화
-    processingCallback.current = false;
-  }, []);
+    processingCallback.current = false
+  }, [])
 
   // 소셜 로그인 콜백 메시지 처리 함수
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) return
 
     const handleCallbackMessage = async (event: MessageEvent) => {
       // 출처 확인 (보안)
       if (event.origin !== window.location.origin) {
-        console.warn('알 수 없는 출처의 메시지 무시됨:', event.origin);
-        return;
+        console.warn('알 수 없는 출처의 메시지 무시됨:', event.origin)
+        return
       }
 
       // 메시지 데이터 확인
-      const data = event.data;
-      if (!data || typeof data !== 'object') return;
+      const data = event.data
+      if (!data || typeof data !== 'object') return
 
       // 소셜 로그인 데이터 확인
       if (data.code || data.error) {
         // 이미 처리 중인 경우 중복 처리 방지
         if (processingCallback.current) {
-          console.log('이미 콜백을 처리 중입니다. 중복 처리 방지');
-          return;
+          console.log('이미 콜백을 처리 중입니다. 중복 처리 방지')
+          return
         }
-        
+
         // 처리 중 상태로 설정
-        processingCallback.current = true;
-        
+        processingCallback.current = true
+
         // 에러 처리
         if (data.error) {
-          setLoading(false);
-          toast.error(`로그인 중 오류가 발생했습니다: ${data.error}`);
-          processingCallback.current = false;
-          return;
+          setLoading(false)
+          toast.error(`로그인 중 오류가 발생했습니다: ${data.error}`)
+          processingCallback.current = false
+          return
         }
 
         // 콜백 처리
         try {
-          setLoading(true);
-          
+          setLoading(true)
+
           // 타임아웃 클리어
-          const timeoutId = localStorage.getItem('naver_login_timeout');
+          const timeoutId = localStorage.getItem('naver_login_timeout')
           if (timeoutId) {
-            clearTimeout(parseInt(timeoutId));
-            localStorage.removeItem('naver_login_timeout');
+            clearTimeout(parseInt(timeoutId))
+            localStorage.removeItem('naver_login_timeout')
           }
-          
+
           // authService.handleCallback 호출
           const result = await authService.handleCallback({
             code: data.code,
-            state: data.state
-          });
-          
+            state: data.state,
+          })
+
           if (result.success) {
             // 로그인 성공 시 상태 업데이트 (useAccountStore)
             if (result.data) {
-              useAccountStore.getState().setLoginState(true, result.data);
-              await useAccountStore.getState().updateUserInfoFromUserInfo2();
-              await useAccountStore.getState().fetchWriterInfo();
-              
+              useAccountStore.getState().setLoginState(true, result.data)
+              await useAccountStore.getState().updateUserInfoFromUserInfo2()
+              await useAccountStore.getState().fetchWriterInfo()
+
               // 성공 시에만 모달 닫기
-              onClose();
+              onClose()
             }
           } else if (result.signupRequired || result.needSignup) {
             // 회원가입 필요 - 모달 닫지 않고 회원가입 모달로 전환
-            setShowSignup(true);
+            setShowSignup(true)
           } else {
             // 기타 오류
-            toast.error(result.error || '로그인에 실패했습니다.');
+            toast.error(result.error || '로그인에 실패했습니다.')
           }
         } catch (error) {
-          console.error('콜백 처리 중 오류 발생:', error);
-          toast.error('로그인 처리 중 오류가 발생했습니다.');
+          console.error('콜백 처리 중 오류 발생:', error)
+          toast.error('로그인 처리 중 오류가 발생했습니다.')
         } finally {
-          setLoading(false);
+          setLoading(false)
           // 처리 완료 후 상태 초기화
-          processingCallback.current = false;
+          processingCallback.current = false
         }
       }
-    };
+    }
 
     // 이벤트 리스너 등록
-    window.addEventListener('message', handleCallbackMessage);
-    
+    window.addEventListener('message', handleCallbackMessage)
+
     // cleanup 함수
     return () => {
-      window.removeEventListener('message', handleCallbackMessage);
+      window.removeEventListener('message', handleCallbackMessage)
       // 모달이 닫힐 때 처리 상태 초기화
-      processingCallback.current = false;
-    };
-  }, [isOpen, onClose]);
+      processingCallback.current = false
+    }
+  }, [isOpen, onClose])
 
   const handleSignupClick = () => {
     setShowSignup(true)
@@ -153,25 +154,22 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   // 통합된 소셜 로그인 처리 함수
   const handleSocialLogin = async (provider: OAuthProvider) => {
     try {
-      setLoading(true);
-      
-      const result = await authService.socialLogin(
-        provider,
-        {
-          onLoginTimeout: handleLoginTimeout
-        }
-      );
-      
+      setLoading(true)
+
+      const result = await authService.socialLogin(provider, {
+        onLoginTimeout: handleLoginTimeout,
+      })
+
       if (!result.success && result.error) {
-        toast.error(result.error);
+        toast.error(result.error)
       }
     } catch (error) {
-      console.error('소셜 로그인 오류:', error);
-      toast.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      console.error('소셜 로그인 오류:', error)
+      toast.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleGuestLogin = async (nickname: string) => {
     try {
@@ -191,9 +189,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   // 회원가입 성공 시 모달 닫기
   const handleSignupSuccess = () => {
     // 임시 저장 데이터 정리
-    localStorage.removeItem('social_login_state');
-    localStorage.removeItem('social_login_type');
-    
+    localStorage.removeItem('social_login_state')
+    localStorage.removeItem('social_login_type')
+
     setShowSignup(false)
     onClose()
   }
@@ -204,12 +202,19 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       <BaseModal
         isOpen={isOpen && !showSignup}
         onClose={onClose}
-        title="로그인"
+        title="캐릭터와 설레는 대화를 시작하세요!"
         size="md"
         animation="fade"
         backdropColor="bg-black/70 backdrop-blur-sm"
       >
-        <div className="flex flex-col space-y-6 py-4">
+        <div className="flex flex-col space-y-6 pb-4">
+          <div className="flex flex-col justify-center items-center">
+            <div className="text-sm text-gray-500">캐릭터부터 시작하는 세계관 공동 창작</div>
+            <div className="text-sm text-gray-500">스토리네이션</div>
+          </div>
+          <div>
+            <SpeechBubble text="3초만에 가입하고 30펜 받으세요" position="center" />
+          </div>
           <div className="space-y-4">
             <button
               onClick={() => handleSocialLogin('KAKAO')}
@@ -252,15 +257,6 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
           <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} />
 
-          <div className="space-y-4">
-            <button
-              className="flex w-full items-center justify-center rounded-full border border-gray-300 bg-white py-3 px-4 font-medium text-gray-700 shadow transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-dark-background dark:text-gray-300 dark:hover:bg-dark-background-light"
-              onClick={handleSignupClick}
-            >
-              신규 가입하기
-            </button>
-          </div>
-
           <div className="text-center text-xs text-gray-500 dark:text-gray-400">
             <p>계속 진행하면 이용약관 및 개인정보 처리방침에 동의하는 것으로 간주됩니다.</p>
           </div>
@@ -268,9 +264,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       </BaseModal>
 
       {/* 회원가입 모달 - isOpen 조건만 체크하여 로그인 모달과 독립적으로 표시 */}
-      {showSignup && (
-        <SignupModal isOpen={isOpen} onClose={handleSignupClose} onSuccess={handleSignupSuccess} />
-      )}
+      {showSignup && <SignupModal isOpen={isOpen} onClose={handleSignupClose} onSuccess={handleSignupSuccess} />}
     </>
   )
 }

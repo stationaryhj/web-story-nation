@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import BaseModal from './BaseModal'
 import { BaseButton } from '@/components/elements/button/BaseButton'
@@ -53,7 +53,7 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
     }
 
     const response = await contentApi.NicknmCheck(nickname)
-    if(response.data.result.err === 0) {
+    if (response.data.result.err === 0) {
       toast.success('사용 가능한 닉네임입니다.')
       setIsNicknameValid(true)
       setIsNicknameChecked(true)
@@ -153,7 +153,7 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
       setIsSubmitting(true)
       // 회원가입 처리 호출 (성공 콜백 전달)
       const success = await registerWithSocialData(nickname, birthdate, marketingAgreed, onSuccess)
-      
+
       if (success) {
         // 회원가입 성공 시 완료 화면으로 전환
         setIsCompleted(true)
@@ -386,56 +386,53 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
   )
 
   return (
-    <>
-      <BaseModal
-        isOpen={isOpen}
-        onClose={onClose}
-        title={isCompleted ? '' : '회원가입'}
-        size="md"
-        animation="none"
-        backdropColor="bg-black/70 backdrop-blur-sm"
-        showCloseButton={!isCompleted}
-        preventBackdropClose={isCompleted || loading || isSubmitting}
-        footerContent={
-          <div className="flex justify-center w-full">
-            <BaseButton
-              color="gradient"
-              className="w-full"
-              onClick={isCompleted ? handleCompleteConfirm : handleSubmit}
-              disabled={loading || isSubmitting}
-            >
-              {loading || isSubmitting ? '처리 중...' : '확인'}
-            </BaseButton>
-          </div>
-        }
-      >
-        <div className="relative overflow-hidden">
-          <AnimatePresence mode="wait">
-            {isCompleted ? (
-              <motion.div
-                key="completion"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {completionContent}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="signup"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {signupContent}
-              </motion.div>
-            )}
-          </AnimatePresence>
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={isCompleted ? '' : '회원가입'}
+      size="md"
+      animation="none"
+      backdropColor="bg-black/70 backdrop-blur-sm"
+      showCloseButton={!isCompleted}
+      preventBackdropClose={isCompleted || loading || isSubmitting}
+      footerContent={
+        <div className="flex justify-center w-full">
+          <BaseButton
+            color="gradient"
+            className="w-full"
+            onClick={isCompleted ? handleCompleteConfirm : handleSubmit}
+            disabled={loading || isSubmitting}
+          >
+            {loading || isSubmitting ? '처리 중...' : '확인'}
+          </BaseButton>
         </div>
-      </BaseModal>
-      <ToastContainer position="bottom-center" autoClose={3000} />
-    </>
+      }
+    >
+      <div className="relative overflow-hidden">
+        <AnimatePresence mode="wait">
+          {isCompleted ? (
+            <motion.div
+              key="completion"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {completionContent}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="signup"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {signupContent}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </BaseModal>
   )
 }

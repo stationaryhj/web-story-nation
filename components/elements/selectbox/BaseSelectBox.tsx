@@ -5,26 +5,38 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import cn from 'classnames'
 
-interface Option {
-  value: string
+interface Option<T = string> {
+  value: T
   label: string
 }
 
-interface BaseSelectBoxProps {
-  options: Option[]
-  selectedOption: Option
-  onChange: (option: Option) => void
+interface BaseSelectBoxProps<T = string> {
+  options: Option<T>[]
+  selectedOption: Option<T>
+  onChange: (option: Option<T>) => void
   className?: string
   placeholder?: string
+  label?: string
+  isSidebar?: boolean
+  sideRound?: boolean
+  containerClassName?: string
+  selectClassName?: string
+  optionClassName?: string
 }
 
-export const BaseSelectBox = ({
+export const BaseSelectBox = <T extends string | number>({
   options,
   selectedOption,
   onChange,
   className,
   placeholder = '선택하세요',
-}: BaseSelectBoxProps) => {
+  label,
+  isSidebar = false,
+  sideRound = false,
+  containerClassName,
+  selectClassName,
+  optionClassName,
+}: BaseSelectBoxProps<T>) => {
   const [isOpen, setIsOpen] = useState(false)
   const selectRef = useRef<HTMLDivElement>(null)
 
@@ -46,7 +58,7 @@ export const BaseSelectBox = ({
     setIsOpen(!isOpen)
   }
 
-  const handleOptionClick = (option: Option) => {
+  const handleOptionClick = (option: Option<T>) => {
     onChange(option)
     setIsOpen(false)
   }
@@ -55,12 +67,22 @@ export const BaseSelectBox = ({
     <div
       ref={selectRef}
       className={cn(
-        'relative inline-block w-full text-left max-w-[90px] sm:max-w-[90px] md:max-w-[120px] z-49',
+        'relative inline-block w-full text-left',
+        isSidebar ? 'max-w-[200px]' : 'max-w-[90px] sm:max-w-[90px] md:max-w-[120px]',
+        containerClassName,
         className
       )}
     >
+      {label && <label className="block text-sm text-secondary-700 dark:text-dark-secondary-300 mb-2">{label}</label>}
       <div
-        className="cursor-pointer flex items-center justify-between rounded-xl rounded-r-none rounded-l-xl bg-gray-100 py-2 px-3 text-[11px] md:py-3 md:px-4 md:text-base text-gray-800 hover:bg-gray-200 focus:outline-none"
+        className={cn(
+          'cursor-pointer flex items-center justify-between py-2 px-3 text-[11px] md:py-3 md:px-4 md:text-base text-gray-800 focus:outline-none',
+          sideRound ? 'rounded-l-xl rounded-r-none' : 'rounded-xl',
+          isSidebar
+            ? 'bg-white hover:bg-gray-50 focus:border-primary-500 border border-gray-200 w-full'
+            : 'bg-white hover:bg-gray-50 border border-gray-200',
+          selectClassName
+        )}
         onClick={toggleDropdown}
       >
         <span className="mr-2 truncate">{selectedOption.label || placeholder}</span>
@@ -75,10 +97,11 @@ export const BaseSelectBox = ({
           <div className="py-1 max-h-60 overflow-y-auto">
             {options.map(option => (
               <div
-                key={option.value}
+                key={option.value.toString()}
                 className={cn(
                   'block py-2 px-3 text-[11px] md:py-3 md:px-4 md:text-base cursor-pointer hover:bg-gray-100',
-                  selectedOption.value === option.value ? 'bg-violet-50 text-violet-700 font-medium' : 'text-gray-700'
+                  selectedOption.value === option.value ? 'bg-violet-50 text-violet-700 font-medium' : 'text-gray-700',
+                  optionClassName
                 )}
                 onClick={() => handleOptionClick(option)}
               >
