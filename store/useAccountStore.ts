@@ -1,10 +1,11 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { LoginResponse, WriterInfoData } from '@/types/api'
-import { OAuthProvider, OAuthState, OAuthResponse, OAuthUserInfo } from '@/types/login'
+import { OAuthProvider, OAuthResponse, OAuthUserInfo } from '@/types/login'
 import { OAUTH_PROVIDERS } from '@/types/login'
 import { contentApi, createApi } from '@/services/api'
 import axios from 'axios'
+import { authService } from '@/services/auth'
 
 // 환경 변수에서 리다이렉트 URI 가져오기
 const REDIRECT_URI = process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URI
@@ -23,8 +24,8 @@ interface AccountState {
   // Actions
   setLoginState: (isLogin: boolean, data: LoginResponse | null) => void
   guestLogin: (nickname: string) => Promise<boolean>
-  socialLogin: (type: OAuthProvider, onSignupRequired?: () => void, onLoginSuccess?: () => void) => Promise<void>
-  handleCallback: (code: string, state: string, onSignupRequired?: () => void, onLoginSuccess?: () => void) => Promise<boolean>
+  socialLogin: (type: OAuthProvider, onSignupRequired?: () => void, onLoginSuccess?: () => void) => Promise<boolean>
+  handleCallback: (code: string, state?: string, onSignupRequired?: () => void, onLoginSuccess?: () => void) => Promise<boolean>
   registerWithSocialData: (nickname: string, birthdate: string, marketingAgree: boolean, onSuccess?: () => void) => Promise<boolean>
   logout: () => void
   setLoading: (loading: boolean) => void
@@ -357,11 +358,12 @@ export const useAccountStore = create<AccountState>()(
 
         set({ loading: true, error: null })
         try {
-          const response = await contentApi.LoginGuest(nickname)
-          if(response.data.result.err === 0) {
+          const result = await authService.guestLogin(nickname);
+          
+          if(result.success && result.data) {
             set({
               isLogin: true,
-              data: response.data,
+              data: result.data,
               loading: false,
             })
 
@@ -371,17 +373,18 @@ export const useAccountStore = create<AccountState>()(
             return true
           }
           else {
-            console.error('@@ guestLogin error :: ', response.data.result.msg)
+            console.error('@@ guestLogin error :: ', result.error)
+            set({ error: result.error || '로그인 실패', loading: false })
             return false
           }
         } catch (error) {
-          const errorMessage = handleNetworkError(error)
+          const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
           set({ error: errorMessage, loading: false })
           return false
         }
       },
 
-      socialLogin: async (type: OAuthProvider, onSignupRequired?: () => void, onLoginSuccess?: () => void) => {
+      socialLogin: async (type: OAuthProvider, onSignupRequired?: () => void, onLoginSuccess?: () => void): Promise<boolean> => {
         const { isInitialized } = get()
         if (!isInitialized) {
           await get().initialize()
@@ -390,167 +393,61 @@ export const useAccountStore = create<AccountState>()(
         set({ loading: true, error: null })
         
         try {
-          const providerConfig = OAUTH_PROVIDERS[type.toUpperCase() as OAuthProvider]
-          if (!providerConfig) {
-            throw new Error('지원하지 않는 로그인 방식입니다.')
-          }
-
-          const response = await contentApi.getUuid(providerConfig.id)
-          const { clientId, snsauth } = response.data
-
-          const state: OAuthState = {
-            provider: providerConfig.name as OAuthProvider,
-            snsauth,
-            clientId,
-            snstype: providerConfig.id
-          }
-
-          const params = new URLSearchParams({
-            client_id: clientId,
-            redirect_uri: REDIRECT_URI,
-            response_type: 'code',
-            state: JSON.stringify(state)
-          })
-
-          if (type === 'APPLE') {
-            params.append('response_mode', 'form_post')
-          }
-          else if(type === 'KAKAO') {
-            params.append('prompt', 'login')
-          }
-
-          const authUrl = `${providerConfig.endpoints.OAUTH_URL}?${params.toString()}`
-          
-          // 팝업 창 위치 및 크기 계산
-          const { width, height, left, top } = calculatePopupPosition();
-
-          console.log('authUrl :: ', authUrl)
-          
-          // 팝업 창 열기
-          const popup = window.open(
-            authUrl,
-            `${type}Login`,
-            `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+          // 인증 서비스를 사용하여 로그인
+          const result = await authService.socialLogin(
+            type,
+            {
+              onSignupRequired,
+              onSuccess: onLoginSuccess,
+              onLoginTimeout: () => {
+                set({ loading: false });
+                set({ error: "로그인 시간이 초과되었습니다. 다시 시도해주세요." });
+              }
+            }
           );
           
-          if (!popup) {
-            throw new Error('팝업 창이 차단되었습니다. 팝업 차단을 해제해주세요.');
+          if (result.success && result.data) {
+            // 로그인 성공
+            set({ 
+              isLogin: true, 
+              data: result.data, 
+              loading: false 
+            });
+            
+            // 사용자 정보 업데이트
+            await get().updateUserInfoFromUserInfo2();
+            await get().fetchWriterInfo();
+            
+            // 성공 콜백 호출
+            if (onLoginSuccess) {
+              onLoginSuccess();
+            }
+            return true;
+          } else if (result.needSignup || result.signupRequired) {
+            // 회원가입 필요
+            set({ loading: false });
+            
+            // 회원가입 모달 표시
+            if (onSignupRequired) {
+              onSignupRequired();
+            }
+            return false;
+          } else {
+            // 에러 처리
+            set({ 
+              error: result.error || '로그인 중 오류가 발생했습니다.', 
+              loading: false 
+            });
+            return false;
           }
-          
-          // 팝업 창 메시지 수신 처리
-          return new Promise<void>((resolve, reject) => {
-            let isProcessing = false;
-            
-            const messageHandler: MessageHandler = async (event) => {
-              
-              // 메시지 출처 검증
-              if (new URL(event.origin).hostname !== new URL(REDIRECT_URI).hostname) {
-                return;
-              }
-              
-              // 중복 처리 방지
-              if (isProcessing) return;
-              
-              console.log(':::: event.data :::: ', event.data)
-              
-              // 우리가 콜백 페이지에서 명시적으로 보낸 데이터인지 확인 (패턴 검사)
-              // 1. 객체가 너무 복잡하면 우리 데이터가 아님 (React DevTools는 매우 긴 payload를 가짐)
-              // 2. login_type이 있으면 우리 데이터일 가능성 높음
-              // 3. code나 error 속성이 있으면 우리 데이터일 가능성 높음
-              
-              // 객체 구조가 간단한지 검사 (JSON 문자열화 했을 때 길이로 판단)
-              const isSimpleObject = JSON.stringify(event.data).length < 500;
-              
-              // 우리 콜백 데이터에 expected_properties 중 하나는 반드시 있어야 함
-              const expectedProperties = ['code', 'error', 'login_type'];
-              const hasExpectedProperty = expectedProperties.some(prop => 
-                Object.prototype.hasOwnProperty.call(event.data, prop)
-              );
-              
-              // 우리 데이터가 아니면 무시 (React DevTools, 메타마스크 등)
-              if (!isSimpleObject || !hasExpectedProperty) {
-                console.log('콜백 데이터가 아닙니다, 무시합니다:', 
-                  isSimpleObject ? '객체가 너무 복잡함' : '예상 속성이 없음');
-                return;
-              }
-              
-              isProcessing = true;
-              
-              try {
-                // 안전하게 속성 추출 (undefined일 수 있음)
-                const code = event.data.code;
-                const callbackState = event.data.state;
-                const error = event.data.error;
-                const login_type = event.data.login_type;
-                
-                console.log('code : ', code)
-                console.log('callbackState : ', callbackState)
-                console.log('error : ', error)
-                console.log('login_type : ', login_type)
-                
-                if (error) {
-                  throw new Error(`로그인 실패: ${error}`);
-                }
-                
-                if (!code || !callbackState) {
-                  console.log('@@@@@@@@@@@@ ???')
-                  throw new Error('인증 정보가 올바르지 않습니다.');
-                }
-                
-                // 콜백 처리
-                const success = await get().handleCallback(code, callbackState, onSignupRequired, onLoginSuccess);
-                
-                if (success) {
-                  // 로그인 성공 콜백 호출
-                  if (onLoginSuccess) {
-                    onLoginSuccess();
-                  }
-                  resolve();
-                } else {
-                  // handleCallback에서 이미 리다이렉션 처리된 경우 (회원가입 처리는 별도로 했으므로 여기서는 처리 완료)
-                  set({ loading: false });
-                  
-                  resolve();
-                }
-              } catch (error) {
-                
-                const errorMessage = handleNetworkError(error);
-                set({ error: errorMessage, loading: false });
-
-                reject(error);
-              } finally {
-                // 이벤트 리스너 제거
-                window.removeEventListener('message', messageHandler);
-                // 팝업 창 닫기 (아직 열려있는 경우)
-                if (!popup.closed) {
-                  popup.close();
-                }
-              }
-            };
-            
-            // 메시지 이벤트 리스너 등록
-            window.addEventListener('message', messageHandler);
-            
-            // 팝업 창 닫힘 감지
-            const checkClosed = setInterval(() => {
-              if (popup.closed) {
-                clearInterval(checkClosed);
-                if (!isProcessing) {
-                  window.removeEventListener('message', messageHandler);
-                  set({ loading: false, error: '로그인이 취소되었습니다.' });
-                  reject(new Error('로그인이 취소되었습니다.'));
-                }
-              }
-            }, 500);
-          });
         } catch (error) {
-          const errorMessage = handleNetworkError(error);
+          const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
           set({ error: errorMessage, loading: false });
-          throw error;
+          return false;
         }
       },
 
-      handleCallback: async (code: string, state: string, onSignupRequired?: () => void, onLoginSuccess?: () => void): Promise<boolean> => {
+      handleCallback: async (code: string, state?: string, onSignupRequired?: () => void, onLoginSuccess?: () => void): Promise<boolean> => {
         const { isInitialized } = get()
         if (!isInitialized) {
           await get().initialize()
@@ -558,47 +455,58 @@ export const useAccountStore = create<AccountState>()(
 
         set({ loading: true, error: null })
         try {
-          const parsedState = JSON.parse(decodeURIComponent(state)) as OAuthState
-          const { provider, clientId, snsauth, snstype } = parsedState
+          // localStorage에서 저장한 소셜 로그인 정보 가져오기
+          const savedState = localStorage.getItem('social_login_state');
+          if (!savedState) {
+            throw new Error('저장된 소셜 로그인 정보가 없습니다. 다시 로그인해주세요.');
+          }
+          
+          // localStorage에서 파싱한 정보 사용
+          const parsedState = JSON.parse(savedState);
+          const { provider, clientId, snsauth, snstype } = parsedState;
 
-          console.log('@@@@@@@@ provider', provider)
+          console.log('OAuth 인증 정보:', { provider, snstype });
 
           // 액세스 토큰 요청
-          const tokenResponse = await getAccessToken(code, provider, clientId)
-
+          const tokenResponse = await getAccessToken(code, provider, clientId);
+          
           // 토큰 검증
-          const isValid = await verifyToken(tokenResponse.access_token, provider)
-          if (!isValid) throw new Error('토큰 검증 실패')
+          const isValid = await verifyToken(tokenResponse.access_token, provider);
+          if (!isValid) throw new Error('토큰 검증 실패');
 
           // 로그인 처리
-          const response = await contentApi.loginDcheckV2(snsauth, snstype, tokenResponse.access_token)
+          const response = await contentApi.loginDcheckV2(snsauth, snstype, tokenResponse.access_token);
           
           if (response.data.result.err === 0) {
             // 기존 회원
-            const { snsid, user_all } = response.data
-            const kr_gb = user_all[0].kr_gb
+            const { snsid, user_all } = response.data;
+            const kr_gb = user_all[0].kr_gb;
 
-            const loginResponse = await contentApi.login2(snsauth, Number(snstype), snsid, String(kr_gb))
-            set({ isLogin: true, data: loginResponse.data, loading: false })
+            const loginResponse = await contentApi.login2(snsauth, Number(snstype), snsid, String(kr_gb));
+            
+            // 로그인 상태 저장
+            set({ isLogin: true, data: loginResponse.data, loading: false });
             
             // userinfo2 데이터 업데이트
-            await get().updateUserInfoFromUserInfo2()
-            await get().fetchWriterInfo()
+            await get().updateUserInfoFromUserInfo2();
+            await get().fetchWriterInfo();
+            
+            // 로그인 성공 시 임시 데이터 삭제
+            localStorage.removeItem('social_login_state');
             
             // 로그인 성공 콜백 호출
             if (onLoginSuccess) {
               onLoginSuccess();
             }
             
-            return true
+            return true;
           } else {
             // 신규 회원
-            const { snsid, token } = response.data
+            const { snsid, token } = response.data;
             
             // 팝업 로그인인 경우 회원가입 모달 표시를 위한 콜백 호출
             if (onSignupRequired) {
-              // 회원가입에 필요한 데이터 저장 
-              // (실제 앱에서는 회원가입 과정에서 필요한 임시 데이터를 저장하는 별도 로직 추가 필요)
+              // 회원가입에 필요한 데이터 저장
               localStorage.setItem('signup_data', JSON.stringify({ 
                 snstype, 
                 snsauth, 
@@ -606,26 +514,36 @@ export const useAccountStore = create<AccountState>()(
                 accessToken: token 
               }));
               
+              // 로그인용 임시 데이터는 삭제 (회원가입에 필요한 데이터만 유지)
+              localStorage.removeItem('social_login_state');
+              
               // 회원가입 모달 표시 요청
               onSignupRequired();
               set({ loading: false });
               return false;
             } else {
               // 기존 동작 유지 (리다이렉션 방식)
-            const state = encodeURIComponent(JSON.stringify({ 
-              snstype, 
-              snsauth, 
-              snsid, 
-              accessToken: token 
-            }))
-            window.location.href = `/register?state=${state}`
+              const stateParam = encodeURIComponent(JSON.stringify({ 
+                snstype, 
+                snsauth, 
+                snsid, 
+                accessToken: token 
+              }));
+              
+              // 로그인용 임시 데이터는 삭제 (회원가입에 필요한 데이터만 유지)
+              localStorage.removeItem('social_login_state');
+              
+              window.location.href = `/register?state=${stateParam}`;
               return false;
             }
           }
         } catch (error) {
-          const errorMessage = handleNetworkError(error)
-          set({ error: errorMessage, loading: false })
-          throw error
+          // 에러 발생 시 임시 데이터 정리
+          localStorage.removeItem('social_login_state');
+          
+          const errorMessage = handleNetworkError(error);
+          set({ error: errorMessage, loading: false });
+          throw error;
         }
       },
 
@@ -637,69 +555,44 @@ export const useAccountStore = create<AccountState>()(
 
         set({ loading: true, error: null })
         try {
-          // localStorage에서 소셜 로그인 정보 가져오기
-          const signupDataStr = localStorage.getItem('signup_data')
-          if (!signupDataStr) {
-            throw new Error('회원가입 정보가 없습니다. 다시 로그인해주세요.')
-          }
-
-          const signupData = JSON.parse(signupDataStr)
-          const { snstype, snsauth, snsid, accessToken } = signupData
-
-          if (!snstype || !snsauth || !snsid || !accessToken) {
-            throw new Error('필수 회원가입 정보가 부족합니다. 다시 로그인해주세요.')
-          }
-
-          // 회원가입 API 호출
-          const response = await contentApi.register4(
-            snsauth,
-            Number(snstype),
-            snsid,
-            nickname,
-            birthdate,
-            accessToken,
-            marketingAgree ? 1 : 0
-          )
-
-          if (response.data.result.err === 0) {
-            // 회원가입 성공 후 바로 로그인
-            const loginResponse = await contentApi.login2(snsauth, Number(snstype), snsid, "1") // 1은 kr_gb 값으로 가정
-            
-            // 로그인 정보 저장
+          // 인증 서비스를 사용하여 회원가입
+          const result = await authService.registerWithSocialData(nickname, birthdate, marketingAgree);
+          
+          if (result.success && result.data) {
+            // 회원가입 및 로그인 성공
             set({ 
               isLogin: true, 
-              data: loginResponse.data, 
+              data: result.data, 
               loading: false 
-            })
+            });
             
-            await get().fetchWriterInfo()
-            
-            // 임시 데이터 삭제
-            localStorage.removeItem('signup_data')
+            await get().fetchWriterInfo();
             
             // 성공 콜백 호출
             if (onSuccess) {
               onSuccess();
             }
             
-            return true
+            return true;
           } else {
             // 회원가입 실패
             set({ 
-              error: response.data.result.msg || '회원가입에 실패했습니다.', 
+              error: result.error || '회원가입에 실패했습니다.', 
               loading: false 
-            })
-            return false
+            });
+            return false;
           }
         } catch (error) {
-          const errorMessage = handleNetworkError(error)
-          set({ error: errorMessage, loading: false })
-          return false
+          const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+          set({ error: errorMessage, loading: false });
+          return false;
         }
       },
 
       logout: () => {
-        set({ isLogin: false, data: null, writerInfo: null, isInitialized: false })
+        // 인증 서비스를 사용하여 로그아웃
+        authService.logout();
+        set({ isLogin: false, data: null, writerInfo: null, isInitialized: false });
       },
 
       updateBankAccount: async (bank: string, accountNumber: string, accountHolder: string) => {

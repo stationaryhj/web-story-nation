@@ -181,7 +181,7 @@ export default function MyAccountView() {
   // 로그아웃 핸들러
   const handleLogout = () => {
     // 여기에 실제 로그아웃 로직이 들어갈 수 있음
-    router.push('/login')
+    router.push('/')
   }
 
   // 뒤로가기 핸들러

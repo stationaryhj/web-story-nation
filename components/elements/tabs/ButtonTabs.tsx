@@ -38,8 +38,8 @@ export default function ButtonTabs({
   const searchParams = useSearchParams()
 
   // URL 파라미터에서 현재 탭과 태그 가져오기
-  const tabParam = searchParams.get('tab')
-  const tagsParam = searchParams.get('tags')
+  const tabParam = searchParams?.get('tab')
+  const tagsParam = searchParams?.get('tags')
 
   // 초기 상태 설정
   const initialTabId = tabParam || defaultTabId || tabs[0]?.id || ''
@@ -88,7 +88,7 @@ export default function ButtonTabs({
 
   // URL 파라미터 업데이트
   const updateUrlParams = (tabId: string, tags: string[]) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString())
 
     // 탭 ID가 있을 경우에만 URL 업데이트
     const activeTab = tabs.find(tab => tab.id === tabId)

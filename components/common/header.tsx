@@ -178,11 +178,11 @@ export default function Header() {
 
           <div className="flex items-center md:space-x-4 gap-1">
             {/* 짜릿모드 토글 - 모든 화면에서 표시 */}
-            {mounted && (
+            {/* {mounted && (
               <div>
                 <SimpleToggle isOn={isAdultModeEnabled} onToggle={handleAdultModeToggle} />
               </div>
-            )}
+            )} */}
 
             {/* 다크모드 토글 버튼 - 모바일에서는 숨김 */}
             {mounted && (

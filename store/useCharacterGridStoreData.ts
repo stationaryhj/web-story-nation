@@ -131,10 +131,6 @@ export const useCharacterGridStoreData = create<MainStoreCharacterGridStoreData>
     try {
       const { filter, currentTags } = get();
       
-      // 태그 데이터 로드 (병렬로 실행)
-      const categoryIdNumber = Number(CATEGORIES.find(cat => cat.id === categoryId)?.type || 0);
-      get().loadTags(categoryIdNumber);
-      
       // React Query를 통해 데이터 요청
       const data = await queryClient.fetchQuery({
         queryKey: ['characterGrid', categoryId, filter.nsfw, filter.order, tags.join(',')],

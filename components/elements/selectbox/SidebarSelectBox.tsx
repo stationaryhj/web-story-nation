@@ -6,7 +6,7 @@ import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import cn from 'classnames'
 
 interface Option {
-  value: string
+  value: number
   label: string
 }
 

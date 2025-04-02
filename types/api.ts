@@ -78,6 +78,34 @@ export type CharbotTop10RankingResponse = {
 }
 
 
+export type GetTop10RankingResponse = {
+  result: ApiResult;
+  module_9: Array<ModuleCharacterCharacter>;
+}
+
+export type GetTop10RankingCreaterResponse = {
+  result: ApiResult;
+  module_10: Array<ModuleCreater>;
+}
+
+export interface ModuleCharacterCharacter {
+  world_list_detail_chrbot_key: number;
+  title: string;
+  intro: string;
+  img_url: string;
+  lv: number;
+  tags: string;
+  chat_cnt: number;
+  msg_cnt: number;
+  like_cnt: number;
+  create_dt: string;
+  nick_nm: string;
+  nsfw: number;
+  module_id: number;
+  sort: number;
+  module_type: number;
+}
+
 
 // Module Character
 export interface ModuleCharacter {
@@ -110,7 +138,12 @@ export interface ModuleCreater {
 
 export interface TagListResponse {
   result: ApiResult;
-  tagList: Array<TagRanking>;
+  charbot_tag: {
+    group1: TagRanking[];
+    group2: TagRanking[];
+    group3: TagRanking[];
+    [key: string]: TagRanking[];
+  };
 }
 
 
@@ -686,6 +719,15 @@ export interface WithdrawRequestItem {
   price: number
   pen: number
   create_dt: string
+}
+
+// register4 Response
+export interface Register4Response {
+  access_token: string;
+  nick_nm: string;
+  snsaccesstoken: string;
+  token_type: string;
+  result: ApiResult;
 }
 
 // API Result

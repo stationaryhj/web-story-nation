@@ -34,10 +34,12 @@ const getRankingUpdateMessage = (tabId: string) => {
 const AuthorRankingSection = memo(() => {
   const [authorActiveTab, setAuthorActiveTab] = useState('weekly')
   const [isAuthorRankingSidebarOpen, setIsAuthorRankingSidebarOpen] = useState(false)
-  const { rankingCreaters } = useRecommendSectionStoreData()
+  const { rankingCreaters, UpdateRankingTopCreater } = useRecommendSectionStoreData()
 
   const handleAuthorRankingTabChange = (tabId: string) => {
     setAuthorActiveTab(tabId)
+    const topid = tabId === 'weekly' ? 2 : tabId === 'monthly' ? 3 : tabId === 'all' ? 5 : 2
+    UpdateRankingTopCreater('KR', topid, false)
     // 여기서 실제로는 해당 탭에 맞는 데이터를 가져오는 API 호출이 필요합니다.
   }
 

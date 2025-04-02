@@ -38,8 +38,8 @@ function CallbackContent() {
 
   const processCallback = async () => {
     try {
-      const code = searchParams.get('code')
-      const state = searchParams.get('state')
+      const code = searchParams?.get('code')
+      const state = searchParams?.get('state')
 
       if (!code || !state) {
         throw new Error('필수 파라미터가 누락되었습니다.')

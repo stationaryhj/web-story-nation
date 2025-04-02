@@ -810,13 +810,13 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       const deviceId = `chatbot_jackpot_${userKey}`;
       console.log('디바이스 인증 시작:', deviceId, _client);
       
-      let newSession = await _client.authenticateDevice(deviceId, false, userKey?.toString());
-      try {
-        console.log('인증 성공, 세션 생성됨');
-      } catch (error) {
-        console.error('세션 생성 실패:', error);
-        newSession = await _client.authenticateDevice(deviceId, true, userKey?.toString());
-      }
+      let newSession = await _client.authenticateDevice(deviceId, true, userKey?.toString());
+      // try {
+      //   console.log('인증 성공, 세션 생성됨');
+      // } catch (error) {
+      //   console.error('세션 생성 실패:', error);
+      //   newSession = await _client.authenticateDevice(deviceId, true, userKey?.toString());
+      // }
 
       setSession(newSession);
 

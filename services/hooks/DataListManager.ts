@@ -24,6 +24,8 @@ import type {
   GetPresignedUrlResponse,
   WithdrawRequestListResponse,
   SaleMonthlyIncomeResponse,
+  CharbotTop10RankingResponse,
+  GetTop10RankingResponse,
 } from '@/types/api'
 
 import { contentApi, settlementApi, createApi, chatApi } from '../api/storyNationApi'

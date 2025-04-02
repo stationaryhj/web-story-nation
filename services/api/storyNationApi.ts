@@ -37,6 +37,9 @@ import type {
   GetPresignedUrlResponse,
   WithdrawRequestListResponse,
   SaleMonthlyIncomeResponse,
+  Register4Response,
+  GetTop10RankingResponse,
+  GetTop10RankingCreaterResponse,
 } from '../../types/api'
 
 // API 기본 설정
@@ -149,7 +152,11 @@ export const contentApi = {
    * @param snsid     소셜 로그인 아이디
    * @param kr_gb     0: 외국인, 1: 국내인
    */
-  login2: async (snsauth: string, snstype: number, snsid: string, kr_gb: string): Promise<ApiResponse<LoginResponse>> => {
+  login2: async (snsauth: string, snstype: number, snsid: string, kr_gb: string, access_token: string = ''): Promise<ApiResponse<LoginResponse>> => {
+    if (access_token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
+    }
+    
     return api.post('/api/login2', {
       snsauth,
       snstype,
@@ -205,7 +212,7 @@ export const contentApi = {
     birth: string,
     accessToken: string,
     marketing_agree: number
-  ): Promise<ApiResponse> => {
+  ): Promise<ApiResponse<Register4Response>> => {
     return api.post('/api/register4', {
       snsauth,
       snstype,
@@ -285,13 +292,39 @@ export const contentApi = {
    * 캐릭터 - 1: 일간, 2: 주간, 3: 월간, 4: 리얼
    * 작가 - 2: 주간, 3: 월간, 5: 전체  )
    */
-  GetTop10Ranking: async (countryCode: string, module_type: number, ranking_type: number): Promise<ApiResponse<CharbotTop10RankingResponse>> => {
+  GetTop10Ranking: async (
+    countryCode: string,
+    ranking_type: number,
+    gender: number
+  ): Promise<ApiResponse<GetTop10RankingResponse>> => {
     return api.post('/api/charbot/rcmnd/ranking/top10', {
       countryCode,
-      module_type,
+      module_type: 2,
       ranking_type,
+      gender,
     })
   },
+
+
+    /**
+   * Top10 랭킹
+   * @param countryCode 국가 코드 ( KR )
+   * @param module_type 모듈 타입 ( 2: 캐릭터 랭킹 필터, 3 : 작가 랭킹 필터 )
+   * @param ranking_type 랭킹 타입
+   * 캐릭터 - 1: 일간, 2: 주간, 3: 월간, 4: 리얼
+   * 작가 - 2: 주간, 3: 월간, 5: 전체  )
+   */
+    GetTop10RankingCreater: async (
+      countryCode: string,
+      ranking_type: number,
+    ): Promise<ApiResponse<GetTop10RankingCreaterResponse>> => {
+      return api.post('/api/charbot/rcmnd/ranking/top10', {
+        countryCode,
+        module_type: 3,
+        ranking_type,
+      })
+    },
+
 
   /**
    * 추천 리스트
@@ -303,7 +336,13 @@ export const contentApi = {
    * @param paginate 페이지 당 아이템 수
    * @param gender 성별 module_id9 일 경우에만 해당 ( 1: 남자, 2: 여자, 3, 모름, 4: 전체 )
    */
-  GetListRcmnd: async (module_id: number, ranking_type: number, page: number, paginate: number, gender: number): Promise<ApiResponse<Array<CharbotTop10RankingResponse>>> => {
+  GetListRcmnd: async (
+    module_id: number,
+    ranking_type: number,
+    page: number,
+    paginate: number,
+    gender: number
+  ): Promise<ApiResponse<GetTop10RankingResponse>> => {
     return api.post('/api/charbot/rcmnd/getlist', {
       module_id,
       ranking_type,

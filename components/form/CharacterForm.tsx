@@ -7,7 +7,7 @@ import Image from 'next/image'
 import type { ChangeEvent, MouseEvent } from 'react'
 import { useState, useEffect, useMemo, useRef } from 'react'
 
-import { useCharacterFormStore, useImageStore, ImageType } from '../../store/useCharacterFormStore'
+import { useCreateCharacterData, Tag } from '@/store/useCreateCharacterData'
 import { useSettingsStore } from '../../store/useStoreSettings'
 import { useModalStore } from '@/store/useStoreModal'
 
@@ -26,33 +26,8 @@ const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
   </div>
 )
 
-// 해시태그 데이터
-const AVAILABLE_HASHTAGS = [
-  '#집착',
-  '#로맨스',
-  '#판타지',
-  '#중세판타지',
-  '#남매/형제/자매',
-  '#BL',
-  '#GL',
-  '#SF',
-  '#호러',
-  '#코미디',
-  '#드라마',
-  '#액션',
-  '#스릴러',
-  '#미스터리',
-  '#차원이동',
-  '#빙의',
-  '#환생',
-  '#성장',
-  '#착취',
-  '#감금',
-  '#학대',
-  '#폭력',
-  '#고문',
-  '#복수',
-]
+// 더이상 하드코딩된 해시태그 목록을 사용하지 않음
+// const AVAILABLE_HASHTAGS = [ ... ]
 
 interface CharacterFormProps {
   formType: 'create' | 'edit'
@@ -71,19 +46,48 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
     removeConversationExample,
     setConversationExampleEditMode,
     setConversationExampleVisibility,
-  } = useCharacterFormStore()
-
-  const { normalImage, adultImage, activeImageTab, setActiveImageTab, addNormalImage, addAdultImage } = useImageStore()
-  const getImages = useImageStore.getState().getImages
+    setNormalImage,
+    setAdultImage,
+    fetchTagList,
+    saveHashtags,
+    availableTags,
+    isLoadingTags
+  } = useCreateCharacterData()
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [visibleWarnigModal, setVisibleWarnigModal] = useState(false)
+  // 태그 그룹 상태는 더 이상 필요없음
+  // const [activeTagGroup, setActiveTagGroup] = useState<number>(1)
 
   const { isAdultModeEnabled, toggleAdultMode } = useSettingsStore()
   const { openModal } = useModalStore()
 
   // 대화 예시 관련 ref 추가
   const exampleRefs = useRef<{ [key: string]: HTMLTextAreaElement }>({})
+
+  // 태그 데이터 로드
+  useEffect(() => {
+    fetchTagList();
+  }, [fetchTagList]);
+
+  // 그룹별로 태그 정리하기
+  const allAvailableTags = useMemo(() => {
+    // 모든 그룹의 태그를 하나의 배열로 합치기
+    const allTags = [...availableTags];
+    
+    // 정렬 (그룹 순서로 정렬, 같은 그룹 내에서는 sort 값으로 정렬)
+    allTags.sort((a, b) => {
+      if (a.group !== b.group) {
+        return a.group - b.group;
+      }
+      return a.sort - b.sort;
+    });
+    
+    return allTags;
+  }, [availableTags]);
+
+  // 그룹 이름 (이제 사용하지 않음)
+  // const groupNames = { ... };
 
   // 이미지 배열이 없는 경우를 대비한 안전 조치
   useEffect(() => {
@@ -92,30 +96,25 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
     }
   }, [formData, setFormField])
 
-  // 기존 데이터 로드 시 이미지 설정
+  // 유효성 검사
   useEffect(() => {
-    if (mode === 'image') {
-      // 기존 일반 이미지가 있는 경우 로드 (여러 속성을 확인하여 호환성 유지)
-      const normalImgUrl = formData.imgUrl || formData.img_url || formData.imageUrl
-      if (normalImgUrl && !normalImage) {
-        addNormalImage(normalImgUrl)
-      }
-      
-      // 기존 성인 이미지가 있는 경우 로드
-      const adultImgUrl = formData.imgUrlNsfw || formData.img_url_nsfw
-      if (adultImgUrl && !adultImage) {
-        addAdultImage(adultImgUrl)
-      }
-    }
-  }, [mode, formData, normalImage, adultImage, addNormalImage, addAdultImage])
-
-  // 이미지 유효성 검사
-  useEffect(() => {
-    if (mode === 'image' && onValidationChange) {
-      // 이미지가 필수가 아니므로 항상 유효함
+    if (mode === 'basic' && onValidationChange) {
+      // 기본 정보 탭은 필수 입력 항목이 많음
+      const isValid = !!(
+        formData.name?.trim() &&
+        formData.bio?.trim() &&
+        formData.firstMessage?.trim()
+      )
+      onValidationChange(isValid)
+    } else if (mode === 'detail' && onValidationChange) {
+      // 상세 정보 탭은 bioDetail만 필수
+      const isValid = !!formData.bioDetail?.trim()
+      onValidationChange(isValid)
+    } else if (mode === 'image' && onValidationChange) {
+      // 이미지 탭은 필수 항목이 없음
       onValidationChange(true)
     }
-  }, [mode, onValidationChange])
+  }, [formData, mode, onValidationChange])
 
   // 최초 대화 예시가 없는 경우 자동으로 하나만 생성합니다
   useEffect(() => {
@@ -123,15 +122,6 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
       addConversationExample()
     }
   }, [mode, formData.conversationExamples.length, addConversationExample])
-
-  // 이미지가 있는데 selectedImage가 없으면 첫 번째 이미지를 기본 이미지로 설정
-  useEffect(() => {
-    if (mode === 'image') {
-      if (getImages() && getImages().length > 0 && !selectedImage) {
-        setSelectedImage(getImages()[0].id)
-      }
-    }
-  }, [mode, getImages(), selectedImage])
 
   // 입력 필드 변경 핸들러
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -167,15 +157,27 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
   }
 
   // 해시태그 토글 핸들러
-  const handleHashtagToggle = (tag: string) => {
-    if (formData.hashtags.includes(tag)) {
-      removeHashtag(tag)
-    } else {
-      if (formData.hashtags.length < 7) {
-        addHashtag(tag)
+  const handleHashtagToggle = async (tag: string) => {
+    try {
+      if (formData.hashtags.includes(tag)) {
+        // 태그 제거
+        await removeHashtag(tag);
       } else {
-        toast.error('최대 7개의 태그만 선택할 수 있습니다.')
+        // 태그 추가 (최대 7개 제한)
+        if (formData.hashtags.length < 7) {
+          await addHashtag(tag);
+        } else {
+          toast.error('최대 7개의 태그만 선택할 수 있습니다.')
+          return;
+        }
       }
+      
+      // 태그 변경 후 API 호출하여 저장
+      if (formData.world_list_detail_chrbot_key) {
+        await saveHashtags();
+      }
+    } catch (error) {
+      console.error('태그 처리 중 오류:', error);
     }
   }
 
@@ -286,70 +288,17 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
             // 이용등급에 따라 다른 이미지 저장
             if (formData.rating === 'all') {
               // 일반 이미지 저장
-              addNormalImage(compressedImage)
+              setNormalImage(compressedImage)
               
               // formData에 저장된 img_url을 업데이트
-              if (formData && setFormField) {
-                setFormField('imgUrl', imgPath)
-                
-                // 이미지 배열에도 추가 (기존 코드와의 호환성)
-                const existingImages = formData.images || []
-                const normalImgIndex = existingImages.findIndex(img => img.type === 'normal')
-                
-                if (normalImgIndex >= 0) {
-                  // 기존 이미지가 있으면 교체
-                  const updatedImages = [...existingImages]
-                  updatedImages[normalImgIndex] = {
-                    id: generateId(),
-                    url: imgPath,
-                    type: 'normal'
-                  }
-                  setFormField('images', updatedImages)
-                } else {
-                  // 새 이미지 추가
-                  setFormField('images', [
-                    ...existingImages,
-                    {
-                      id: generateId(),
-                      url: imgPath,
-                      type: 'normal'
-                    }
-                  ])
-                }
-              }
+              setFormField('imgUrl', imgPath)
+              
             } else if (formData.rating === 'adult') {
               // 성인 이미지 저장
-              addAdultImage(compressedImage)
+              setAdultImage(compressedImage)
               
               // formData에 저장된 이미지 URL을 업데이트
-              if (formData && setFormField) {
-                setFormField('imgUrlNsfw', imgPath)
-                
-                // 이미지 배열에도 추가 (기존 코드와의 호환성)
-                const existingImages = formData.images || []
-                const adultImgIndex = existingImages.findIndex(img => img.type === 'adult')
-                
-                if (adultImgIndex >= 0) {
-                  // 기존 이미지가 있으면 교체
-                  const updatedImages = [...existingImages]
-                  updatedImages[adultImgIndex] = {
-                    id: generateId(),
-                    url: imgPath,
-                    type: 'adult'
-                  }
-                  setFormField('images', updatedImages)
-                } else {
-                  // 새 이미지 추가
-                  setFormField('images', [
-                    ...existingImages,
-                    {
-                      id: generateId(),
-                      url: imgPath,
-                      type: 'adult'
-                    }
-                  ])
-                }
-              }
+              setFormField('imgUrlNsfw', imgPath)
             }
             
             // 이미지 업로드 성공 메시지 표시
@@ -373,22 +322,6 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
 
     // 파일 입력 초기화 (같은 파일 다시 선택 가능하도록)
     e.target.value = ''
-  }
-
-  // 세부 정보 페이지에서 가능한 이미지 리스트를 계산
-  const filteredImages = useMemo(() => {
-    if (isAdultModeEnabled) {
-      // 성인 모드가 활성화되면 모든 이미지 표시
-      return getImages() || []
-    } else {
-      // 성인 모드가 비활성화되면 성인 이미지 필터링
-      return (getImages() || []).filter(img => img.type !== 'adult')
-    }
-  }, [getImages, isAdultModeEnabled])
-
-  // 대화 예시 추가 버튼 핸들러
-  const handleAddExample = () => {
-    addConversationExample()
   }
 
   // 대화 예시 텍스트 변경 핸들러
@@ -479,16 +412,16 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
   // 이미지가 있는데 selectedImage가 없으면 첫 번째 이미지를 기본 이미지로 설정
   useEffect(() => {
     if (mode === 'image') {
-      if (getImages() && getImages().length > 0 && !selectedImage) {
-        setSelectedImage(getImages()[0].id)
+      if (formData.images && formData.images.length > 0 && !selectedImage) {
+        setSelectedImage(formData.images[0].id)
       }
     }
-  }, [mode, getImages(), selectedImage])
+  }, [mode, formData.images, selectedImage])
 
   // 이미지 업로드 폼 렌더링
   if (mode === 'image') {
     // 호환성을 위해 이미지 배열 가져오기
-    const images = getImages()
+    const images = formData.images || []
     
     // 기본 이미지 설정 메시지
     const renderValidationMessage = () => {
@@ -538,18 +471,18 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         {/* 이미지 그리드 */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
           {/* 현재 이미지 표시 - 이용등급에 따라 이미지 표시 */}
-          {formData.rating === 'all' && normalImage && (
+          {formData.rating === 'all' && formData.images && formData.images.find(img => img.type === 'normal') && (
             <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
-              <Image src={normalImage.url} alt="캐릭터 일반 이미지" fill className="object-cover" />
+              <Image src={formData.images.find(img => img.type === 'normal')!.url} alt="캐릭터 일반 이미지" fill className="object-cover" />
               <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
                 전체이용가 이미지
               </div>
             </div>
           )}
           
-          {formData.rating === 'adult' && isAdultModeEnabled && adultImage && (
+          {formData.rating === 'adult' && isAdultModeEnabled && formData.images && formData.images.find(img => img.type === 'adult') && (
             <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
-              <Image src={adultImage.url} alt="캐릭터 성인 이미지" fill className="object-cover" />
+              <Image src={formData.images.find(img => img.type === 'adult')!.url} alt="캐릭터 성인 이미지" fill className="object-cover" />
               <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
                 성인 이미지
               </div>
@@ -567,9 +500,11 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
             <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
               <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
               <span className="text-xs sm:text-sm">
-                {formData.rating === 'all' && normalImage || formData.rating === 'adult' && adultImage 
+                {formData.rating === 'all' && formData.images && formData.images.find(img => img.type === 'normal')
                   ? '이미지 교체' 
-                  : '이미지 업로드'
+                  : formData.rating === 'adult' && isAdultModeEnabled && formData.images && formData.images.find(img => img.type === 'adult')
+                    ? '이미지 교체'
+                    : '이미지 업로드'
                 }
               </span>
             </div>
@@ -577,7 +512,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         </div>
 
         {/* 이미지가 없을 때 안내 메시지 */}
-        {(formData.rating === 'all' && !normalImage) || (formData.rating === 'adult' && !adultImage) ? (
+        {(formData.rating === 'all' && !formData.images || formData.rating === 'adult' && !formData.images) ? (
           <div className="text-center p-4 bg-secondary-50 dark:bg-dark-secondary-100/5 rounded-lg">
             <p className="text-sm text-secondary-500 dark:text-dark-secondary-500">
               이미지가 없습니다. 이미지를 업로드해주세요.
@@ -786,7 +721,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
             {formData.conversationExamples.length < 3 && (
               <div
                 className="flex items-center justify-center border-2 border-dashed border-secondary-200 dark:border-dark-secondary-200/10 rounded-lg p-4 mt-4 cursor-pointer hover:border-primary-300 dark:hover:border-dark-primary-500/30 transition-colors"
-                onClick={handleAddExample}
+                onClick={() => addConversationExample()}
               >
                 <div className="flex flex-col items-center text-secondary-500 dark:text-dark-secondary-500">
                   <FontAwesomeIcon icon={faPlus} className="mb-2 text-xl" />
@@ -1042,7 +977,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
                         <button
                           type="button"
                           className="ml-1.5 text-primary-500 hover:text-primary-700 dark:text-dark-primary-400 dark:hover:text-dark-primary-300"
-                          onClick={() => removeHashtag(tag)}
+                          onClick={() => handleHashtagToggle(tag)}
                         >
                           ×
                         </button>
@@ -1056,21 +991,31 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
                 </div>
               </div>
               <div className="flex flex-wrap gap-2 mt-3">
-                {AVAILABLE_HASHTAGS.map(tag => (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => handleHashtagToggle(tag)}
-                    className={`px-3 py-1.5 rounded-full text-xs transition-colors ${
-                      formData.hashtags.includes(tag)
-                        ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                        : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-                    }`}
-                  >
-                    {tag}
-                    {formData.hashtags.includes(tag) && <FontAwesomeIcon icon={faCheck} className="ml-1" />}
-                  </button>
-                ))}
+                {isLoadingTags ? (
+                  <div className="w-full py-4 text-center text-secondary-500 dark:text-dark-secondary-400">
+                    태그 목록을 불러오는 중...
+                  </div>
+                ) : allAvailableTags.length > 0 ? (
+                  allAvailableTags.map(tagItem => (
+                    <button
+                      key={tagItem.c_chrbot_tag_key}
+                      type="button"
+                      onClick={() => handleHashtagToggle(tagItem.tag)}
+                      className={`px-3 py-1.5 rounded-full text-xs transition-colors ${
+                        formData.hashtags.includes(tagItem.tag)
+                          ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                          : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                      }`}
+                    >
+                      {tagItem.tag}
+                      {formData.hashtags.includes(tagItem.tag) && <FontAwesomeIcon icon={faCheck} className="ml-1" />}
+                    </button>
+                  ))
+                ) : (
+                  <div className="w-full py-4 text-center text-secondary-500 dark:text-dark-secondary-400">
+                    사용 가능한 태그가 없습니다.
+                  </div>
+                )}
               </div>
             </div>
           </div>

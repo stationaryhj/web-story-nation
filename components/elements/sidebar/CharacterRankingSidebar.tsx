@@ -1,14 +1,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
-import { BaseSelectBox } from '@/components/elements/selectbox/BaseSelectBox'
-import { Character, useStoreData } from '@/store/useStoreData'
 import CardGrid from '@/components/elements/card/CardGrid'
 import BaseSidebar from './BaseSidebar'
 import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
-import { bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil'
 import { SidebarSelectBox } from '@/components/elements/selectbox/SidebarSelectBox'
 
 // 캐릭터 랭킹 탭 정의
@@ -21,10 +17,10 @@ const rankingTabs: TabItem[] = [
 
 // 성별 옵션
 const genderOptions = [
-  { value: 'all', label: '전체' },
-  { value: 'male', label: '남자' },
-  { value: 'female', label: '여자' },
-  { value: 'unknown', label: '성별모름' },
+  { value: 4, label: '전체' },
+  { value: 1, label: '남자' },
+  { value: 2, label: '여자' },
+  { value: 3, label: '성별모름' },
 ]
 
 interface CharacterRankingSidebarProps {
@@ -35,11 +31,14 @@ interface CharacterRankingSidebarProps {
 export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRankingSidebarProps) {
   const [activeTab, setActiveTab] = useState('realtime')
   const [selectedGender, setSelectedGender] = useState(genderOptions[0])
-  // const { characters } = useStoreData()
   const [rankingData, setRankingData] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  const { rankingCharacters } = useRecommendSectionStoreData()
+  const { rankingCharactersSlide, UpdateRankingTopCharacter } = useRecommendSectionStoreData()
+
+  useEffect(() => {
+    UpdateRankingTopCharacter('KR', 4, 4, false)
+  }, [])
 
   // 랭킹 데이터 가져오기
   useEffect(() => {
@@ -49,24 +48,8 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
         // 실제 구현에서는 API를 호출해야 합니다.
         // 현재는 목업으로 characters 데이터를 사용합니다.
         setTimeout(() => {
-          const characters = rankingCharacters
-
-          // 성별에 따라 필터링
-          const filtered =
-            selectedGender.value === 'all'
-              ? characters
-              : characters.filter(char => {
-                  if (selectedGender.value === 'male') return char.gender === 'male'
-                  if (selectedGender.value === 'female') return char.gender === 'female'
-                  if (selectedGender.value === 'unknown') return !char.gender || char.gender === 'unknown'
-                  return true
-                })
-
-          // 랭킹 정렬 (실제로는 백엔드에서 정렬된 데이터가 올 것입니다)
-          const sorted = [...filtered].sort((a, b) => (b.likeCount ?? 0) - (a.likeCount ?? 0))
-
           // 최대 50개까지만 표시
-          setRankingData(sorted.slice(0, 50))
+          setRankingData(rankingCharactersSlide.slice(0, 50))
           setIsLoading(false)
         }, 500)
       } catch (error) {
@@ -78,16 +61,20 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
     if (isOpen) {
       fetchRankingData()
     }
-  }, [isOpen, activeTab, selectedGender, rankingCharacters])
+  }, [isOpen, activeTab, selectedGender, rankingCharactersSlide])
 
   // 탭 변경 핸들러
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId)
+    const topid = tabId === 'realtime' ? 4 : tabId === 'daily' ? 1 : tabId === 'weekly' ? 2 : 3
+    UpdateRankingTopCharacter('KR', topid, Number(selectedGender.value), true)
   }
 
   // 성별 선택 핸들러
   const handleGenderChange = (option: any) => {
     setSelectedGender(option)
+    const topid = activeTab === 'realtime' ? 4 : activeTab === 'daily' ? 1 : activeTab === 'weekly' ? 2 : 3
+    UpdateRankingTopCharacter('KR', topid, option.value, true)
   }
 
   return (
@@ -118,7 +105,7 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
       {/* 컨텐츠 영역 */}
       <div className="px-4 py-6">
         <CardGrid
-          customData={rankingData}
+          customData={rankingCharactersSlide.slice(0, 50)}
           cardsPerRow={1}
           hasRanking={true}
           isLoading={isLoading}

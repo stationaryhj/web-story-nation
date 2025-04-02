@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition, useCallback, useEffect } from 'react'
+import { useState, useTransition, useCallback, useEffect, useRef } from 'react'
 import { useSearchParams, usePathname, useRouter } from 'next/navigation'
 import TagList from '@/components/elements/tags/TagList'
 import { useCharacterGridStoreData } from '@/store/useCharacterGridStoreData'
@@ -10,6 +10,8 @@ import { faRotate, faChevronUp, faChevronDown } from '@fortawesome/free-solid-sv
 // 필터 컨트롤 컴포넌트 타입 정의
 interface FilterControlsProps {
   categoryId?: number | string
+  initialOrder?: number // 초기 정렬 값 추가
+  initialNsfw?: number // 초기 nsfw 값 추가
   onOrderChange?: (order: number) => void
   onTagsChange?: (tagIds: string[]) => void
   onNsfwChange?: (nsfw: number) => void
@@ -20,19 +22,51 @@ interface FilterControlsProps {
  * - 정렬 옵션 (인기순/최신순)
  * - 이용등급 필터 (전체 이용가/짜릿모드/이용등급 전체)
  */
-export default function FilterControls({ categoryId, onOrderChange, onTagsChange, onNsfwChange }: FilterControlsProps) {
-  const [order, setOrder] = useState<number>(1)
-  const [nsfw, setNsfw] = useState<number>(3)
+export default function FilterControls({ 
+  categoryId, 
+  initialOrder = 1, 
+  initialNsfw = 3,
+  onOrderChange, 
+  onTagsChange, 
+  onNsfwChange 
+}: FilterControlsProps) {
+  // 초기화 여부를 추적하는 ref
+  const isInitialized = useRef(false);
+  
+  // URL에서 값을 가져오기
+  const searchParams = useSearchParams();
+  const orderFromUrl = searchParams?.get('order') ? parseInt(searchParams.get('order') as string, 10) : null;
+  const nsfwFromUrl = searchParams?.get('nsfw') ? parseInt(searchParams.get('nsfw') as string, 10) : null;
+  
+  // 초기값 설정 (URL > props > 기본값 순서로 우선순위)
+  const defaultOrder = orderFromUrl || initialOrder || 1;
+  const defaultNsfw = nsfwFromUrl || initialNsfw || 3;
+  
+  const [order, setOrder] = useState<number>(defaultOrder);
+  const [nsfw, setNsfw] = useState<number>(defaultNsfw);
+  
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [isTagListExpanded, setIsTagListExpanded] = useState(false)
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const router = useRouter()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
 
   // useCharacterGridStoreData에서 태그 데이터 가져오기
-  const { tags, isTagsLoading, tagsError, loadTags } = useCharacterGridStoreData()
+  const { tags, isTagsLoading, tagsError, loadTags, filter } = useCharacterGridStoreData()
+
+  // 스토어의 값과 내부 상태의 동기화
+  useEffect(() => {
+    // 스토어의 필터 값이 있고, 이미 초기화된 경우에만 상태 업데이트
+    if (filter && isInitialized.current) {
+      if (filter.order !== order) {
+        setOrder(filter.order);
+      }
+      if (filter.nsfw !== nsfw) {
+        setNsfw(filter.nsfw);
+      }
+    }
+  }, [filter]);
 
   // 컴포넌트 마운트 시 태그 데이터 로드
   useEffect(() => {
@@ -41,7 +75,30 @@ export default function FilterControls({ categoryId, onOrderChange, onTagsChange
       const categoryIdNum = typeof categoryId === 'string' ? parseInt(categoryId, 10) : categoryId
       loadTags(categoryIdNum)
     }
+    
+    // 컴포넌트가 마운트되었음을 표시
+    if (!isInitialized.current) {
+      isInitialized.current = true;
+    }
   }, [categoryId, loadTags])
+
+  // 태그 파라미터에서 초기 선택된 태그 로드
+  useEffect(() => {
+    if (!searchParams) return;
+    
+    const tagsParam = searchParams.get('tags');
+    if (tagsParam) {
+      const tagIds = tagsParam.split('&');
+      setSelectedTags(tagIds);
+      
+      // 초기 로드 시 부모에게 알림
+      if (onTagsChange && !isInitialized.current) {
+        onTagsChange(tagIds);
+      }
+    }
+    
+    isInitialized.current = true;
+  }, []);
 
   // 정렬 변경 핸들러
   const handleOrderChange = (newOrder: number) => {
@@ -52,7 +109,7 @@ export default function FilterControls({ categoryId, onOrderChange, onTagsChange
 
     // URL 파라미터 업데이트 - 페이지 이동 없이 상태만 업데이트
     startTransition(() => {
-      const params = new URLSearchParams(searchParams.toString())
+      const params = new URLSearchParams(searchParams?.toString())
       params.set('order', newOrder.toString())
 
       // 페이지 이동 없이 URL 업데이트 (replaceState)
@@ -71,7 +128,7 @@ export default function FilterControls({ categoryId, onOrderChange, onTagsChange
 
     // URL 파라미터 업데이트 - 페이지 이동 없이 상태만 업데이트
     startTransition(() => {
-      const params = new URLSearchParams(searchParams.toString())
+      const params = new URLSearchParams(searchParams?.toString())
       params.set('nsfw', newNsfw.toString())
 
       // 페이지 이동 없이 URL 업데이트 (replaceState)
@@ -93,7 +150,7 @@ export default function FilterControls({ categoryId, onOrderChange, onTagsChange
 
       // URL 파라미터 업데이트 - 페이지 이동 없이 상태만 업데이트
       startTransition(() => {
-        const params = new URLSearchParams(searchParams.toString())
+        const params = new URLSearchParams(searchParams?.toString())
         if (categoryId) {
           params.set('category', categoryId.toString())
         }
@@ -129,7 +186,7 @@ export default function FilterControls({ categoryId, onOrderChange, onTagsChange
 
     // URL에서 태그 파라미터 제거 - 페이지 이동 없이 상태만 업데이트
     startTransition(() => {
-      const params = new URLSearchParams(searchParams.toString())
+      const params = new URLSearchParams(searchParams?.toString())
       params.delete('tags')
 
       // 페이지 이동 없이 URL 업데이트 (replaceState)

@@ -3,11 +3,9 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowUp, faRotate } from '@fortawesome/free-solid-svg-icons'
-import { useStoreData } from '@/store/useStoreData'
 import CardGrid from '@/components/elements/card/CardGrid'
 import BaseSidebar from './BaseSidebar'
 import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
-import { bridgeTop10DataToModuleCharacter } from '@/lib/utils/storyNationUtil'
 
 interface NewCharacterSidebarProps {
   isOpen: boolean
@@ -20,7 +18,11 @@ export default function NewCharacterSidebar({ isOpen, onClose }: NewCharacterSid
   const [isLoading, setIsLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState<string>('')
   const contentRef = useRef<HTMLDivElement>(null)
-  const { modules_1, modules_2, modules_3 } = useRecommendSectionStoreData()
+  const { modules_sumSlide, UpdateLatestCharactersPaging } = useRecommendSectionStoreData()
+
+  useEffect(() => {
+    UpdateLatestCharactersPaging(1, 4, 1, 50)
+  }, [])
 
   // 시간 포맷 함수
   const formatTime = () => {
@@ -39,7 +41,7 @@ export default function NewCharacterSidebar({ isOpen, onClose }: NewCharacterSid
       setTimeout(() => {
         // 최신순 정렬 (실제로는 백엔드에서 정렬된 데이터가 올 것입니다)
         // 여기서는 임의로 가정하여 전체 캐릭터를 최대 50개까지 표시
-        const combinedModules = [...modules_1, ...modules_2, ...modules_3]
+        const combinedModules = modules_sumSlide
         const characters = combinedModules
 
         const sorted = [...characters]
@@ -70,7 +72,7 @@ export default function NewCharacterSidebar({ isOpen, onClose }: NewCharacterSid
     if (isOpen) {
       loadNewCharacters()
     }
-  }, [isOpen, modules_1, modules_2, modules_3])
+  }, [isOpen, modules_sumSlide])
 
   // 스크롤 맨 위로 이동
   const scrollToTop = () => {
