@@ -27,7 +27,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { FormEvent } from 'react'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { useModalStore } from '@/store/useStoreModal'
 import type { ChatMode } from '@/components/modal/ChatModeModal'
 import { BaseButton } from '@/components/elements/button/BaseButton'
@@ -185,6 +185,12 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   // 배경 이미지 상태 추가
   const [isBackgroundEnabled, setIsBackgroundEnabled] = useState(true)
 
+  // 나가기 플래그
+  const [isExit, setIsExit] = useState(false)
+  
+  // 마운트 상태 추적용 ref
+  const isMountedRef = useRef(true);
+  
   // 모바일 환경 감지
   useEffect(() => {
     const checkIsMobile = () => {
@@ -197,148 +203,234 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     return () => window.removeEventListener('resize', checkIsMobile)
   }, [])
 
-  // 메시지 디버깅을 위한 로깅 추가
+  // 메시지 디버깅을 위한 로깅 추가 - 무한 루프 문제 수정
   useEffect(() => {
-    console.log('🗨️ chatMessages 변경 감지:', chatMessages.length)
     if (chatMessages.length > 0) {
       const lastMsg = chatMessages[chatMessages.length - 1]
-      console.log('마지막 메시지:', {
-        sender: lastMsg.sender,
-        id: lastMsg.id,
-        message: lastMsg.message.substring(0, 50) + (lastMsg.message.length > 50 ? '...' : ''),
-        timestamp: lastMsg.timestamp,
-        isTemp: lastMsg.id.startsWith('temp_'),
-      })
-
-      // 타입별 메시지 수 계산
-      const userCount = chatMessages.filter(msg => msg.sender === 'user').length
-      const aiCount = chatMessages.filter(msg => msg.sender === 'character').length
-      console.log(`메시지 통계: 총 ${chatMessages.length}개 (사용자: ${userCount}, AI: ${aiCount})`)
-
+      
       // 마지막 메시지 발신자에 따라 AI 응답 대기 상태 업데이트
       // 임시 메시지는 제외하고 실제 메시지만 고려
       if (!lastMsg.id.startsWith('temp_')) {
-        if (lastMsg.sender === 'user') {
-          setIsWaitingForAI(true)
-          console.log('🕒 AI 응답 대기 시작')
-        } else if (lastMsg.sender === 'character') {
-          setIsWaitingForAI(false)
-          console.log('✓ AI 응답 수신 완료, 대기 상태 해제')
-        }
+        setIsWaitingForAI(lastMsg.sender === 'user');
       }
     }
-  }, [chatMessages])
+  }, [chatMessages]); // 의존성 배열에 chatMessages만 포함
 
-  // 연결 상태 변화 로깅
+  // 연결 상태 변화 로깅 - 타이머 클리어 추가
   useEffect(() => {
+    let timer: NodeJS.Timeout;
+    
     if (isConnected) {
-      setShowConnectedStatus(true)
-      const timer = setTimeout(() => {
-        setShowConnectedStatus(false)
-      }, 3000)
-      return () => clearTimeout(timer)
+      setShowConnectedStatus(true);
+      timer = setTimeout(() => {
+        setShowConnectedStatus(false);
+      }, 3000);
     } else {
-      setShowConnectedStatus(false)
+      setShowConnectedStatus(false);
     }
-  }, [isConnected, isConnecting])
+    
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [isConnected]);
 
-  // 서버 상태와 채널 ID에 따른 UI 처리
+  // 서버 상태와 채널 ID에 따른 UI 처리 - 의존성 단순화
   useEffect(() => {
     if (!isConnected && !isConnecting && isInitRoom) {
       // 초기화는 됐지만 연결이 끊어진 경우
-      setError('채팅 서버와의 연결이 끊어졌습니다.')
+      setError('채팅 서버와의 연결이 끊어졌습니다.');
     } else if (isConnected && !channelId && isInitRoom) {
       // 연결은 됐지만 채널 ID가 없는 경우
-      setError('채팅 채널 연결에 문제가 발생했습니다.')
-    } else {
-      // 정상 상태이거나 연결 중인 경우
-      setError(null)
+      setError('채팅 채널 연결에 문제가 발생했습니다.');
+    } else if (isConnected && channelId) {
+      // 정상 상태일 때 에러 초기화
+      setError(null);
     }
-  }, [isConnected, isConnecting, channelId, isInitRoom])
+  }, [isConnected, isConnecting, channelId, isInitRoom]);
 
-  // 채팅방 초기화 로직
+  // 채팅방 정리 및 연결 종료를 위한 공통 함수 최적화
+  const cleanupChatRoom = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      
+      // 1. 채팅방에서 나가기
+      if (channelId) {
+        try {
+          await leaveChat(channelId);
+        } catch (error) {
+          console.error('채팅방 나가기 중 오류:', error);
+          // 오류가 발생해도 계속 진행
+        }
+      }
+      
+      // 2. 소켓 연결 종료
+      try {
+        await disconnectSocket();
+      } catch (error) {
+        console.error('소켓 연결 종료 중 오류:', error);
+        // 오류가 발생해도 계속 진행
+      }
+      
+      // 3. 상태 정리 (clearChatHistory 호출 제거)
+      hasInitialized.current = false;
+      
+      return true;
+    } catch (error) {
+      console.error('채팅방 정리 중 오류 발생:', error);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [channelId, leaveChat, disconnectSocket]);
+
+  // 채팅방 초기화 메서드 - useCallback으로 변경
+  const initializeChatRoom = useCallback(async () => {
+    // 이미 초기화 중이거나 초기화가 완료된 경우 또는 필요한 데이터가 없는 경우
+    if (!character?.id || !accountData?.user_key) {
+      console.log('⚠️ 초기화에 필요한 데이터가 없습니다.');
+      return;
+    }
+    
+    if (hasInitialized.current) {
+      console.log('⚠️ 이미 초기화 요청을 진행했습니다.');
+      return;
+    }
+    
+    // 이미 초기화된 상태인지 확인
+    if (isInitRoom && channelId) {
+      console.log('✅ 채팅방이 이미 초기화되어 있습니다.');
+      return;
+    }
+
+    if(isExit) return;
+    
+    try {
+      setIsLoading(true);
+      setError(null);
+      hasInitialized.current = true;
+      
+      // 사용 가능한 채팅 모드 중 첫번째 선택 (또는 기본값 2번)
+      const selectedModeId = chatMode && chatMode.length > 0 ? chatMode[0].chat_mode : 2;
+      
+      console.log('💬 채팅방 초기화 시작 - ID:', character.id, '모드:', selectedModeId);
+      
+      // 채팅방 초기화 (Nakama 서버 연결 및 인증, 채팅방 참여까지 모두 수행)
+      const result = await chatRoomInit(
+        accountData.user_key.toString(),
+        characterId,
+        selectedModeId
+      );
+      
+      if (!result.success) {
+        if (result.error === 'ALREADY_INITIALIZING') {
+          console.log('⚠️ 이미 초기화 중입니다. 대기...');
+          // 3초 후 초기화 상태 리셋 (이미 진행 중인 초기화 작업이 실패했을 경우 대비)
+          setTimeout(() => {
+            if (!isConnected || !channelId) {
+              console.log('🔄 초기화 시간 초과, 상태 리셋');
+              hasInitialized.current = false;
+            }
+          }, 3000);
+          return;
+        }
+        
+        console.error('❌ 채팅방 초기화 실패:', result.error);
+        throw new Error(result.error || '채팅방 초기화에 실패했습니다. 다시 시도해주세요.');
+      }
+      
+      // 현재 모드 설정 업데이트
+      setCurrentModeId(selectedModeId);
+      console.log('✅ 채팅방 초기화 완료:', result);
+    } catch (error) {
+      console.error('채팅방 초기화 실패:', error);
+      setError('채팅방을 초기화하는 중 오류가 발생했습니다. 다시 시도해주세요.');
+      hasInitialized.current = false;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [character?.id, accountData?.user_key, characterId, chatRoomInit, chatMode, isConnected, channelId, isInitRoom]);
+
+  // 실제 언마운트 시에만 정리하기 위한 로직
   useEffect(() => {
+
+    if(isExit) return;
+
+    isMountedRef.current = true;
+    console.log('🌱 컴포넌트 마운트됨');
+    
+    return () => {
+      isMountedRef.current = false;
+      setIsExit(true)
+      console.log('💀 컴포넌트 실제 언마운트됨 - 채팅방 정리 예정');
+      
+      // 이미 언마운트된 상태에서 비동기 작업이 완료되면 의미 없음
+      // 약간의 지연을 두어 불필요한 정리를 방지
+      setTimeout(() => {
+        // 실제 언마운트 상태인 경우에만 정리 수행
+        if (!isMountedRef.current) {
+          console.log('🧹 채팅방 정리 실행');
+          cleanupChatRoom()
+            .catch(err => console.error('채팅방 정리 중 오류:', err));
+        } else {
+          console.log('⚠️ 채팅방 정리가 취소됨 - 컴포넌트가 다시 마운트됨');
+        }
+      }, 100);
+    };
+  }, [cleanupChatRoom]);  // cleanupChatRoom 의존성 추가
+
+  // 채팅방 초기화 로직 - 채팅방 초기화만 담당
+  useEffect(() => {
+    // 이미 초기화된 상태라면 중단하고 초기화 상태만 업데이트
+    if (isInitRoom && channelId) {
+      console.log('✅ 채팅방이 이미 초기화된 상태입니다:', {
+        isInitRoom,
+        channelId,
+        hasInitialized: hasInitialized.current
+      });
+      hasInitialized.current = true;
+      return;
+    }
+    
     // 이미 초기화되었거나 필요한 데이터가 없으면 중단
     if (hasInitialized.current || !character?.id || !accountData?.user_key) {
-      return
+      console.log('⏭️ 채팅방 초기화 로직 건너뜀', {
+        hasInitialized: hasInitialized.current,
+        hasCharacterId: !!character?.id,
+        hasUserKey: !!accountData?.user_key
+      });
+      return;
     }
+    
+    // 이 시점에 도달하면 실제로 초기화 필요
+    console.log('🚀 채팅방 초기화 로직 시작');
+    initializeChatRoom().then(() => {
+      console.log('✅ initializeChatRoom 함수 완료');
+    });
+  }, [character?.id, accountData?.user_key, isInitRoom, channelId, initializeChatRoom]);
 
-    const initializeChatRoom = async () => {
-      try {
-        setIsLoading(true)
-        setError(null)
-        hasInitialized.current = true
+  // 채팅방 삭제 함수
+  const handleDeleteChat = async () => {
+    try {
+      setIsExit(true)
 
-        // 사용 가능한 채팅 모드 중 첫번째 선택 (또는 기본값 2번)
-        const selectedModeId = chatMode && chatMode.length > 0 ? chatMode[0].chat_mode : 2 // 기본값 스토리 모드
+      await cleanupChatRoom();
 
-        // 채팅방 초기화 (Nakama 서버 연결 및 인증, 채팅방 참여까지 모두 수행)
-        const { success, channelId: newChannelId } = await chatRoomInit(
-          accountData.user_key.toString(),
-          characterId,
-          selectedModeId
-        )
-        console.log('채팅방 초기화 완료, 연결 상태:', success, '채널 ID:', newChannelId)
+      
+      // 모달 닫기
+      closeModal();
 
-        if (!success) {
-          throw new Error('채팅방 초기화에 실패했습니다. 다시 시도해주세요.')
-        }
+      // 채팅방 삭제
+      await chatApi.CloseChat(Number(chrBotChatKey));
 
-        // 초기 메시지 설정 (Provider의 메서드 사용)
-        clearChatHistory() // 기존 메시지 초기화
+      
+      // 페이지 리디렉션
+      router.push('/chat-list');
+    } catch (error) {
+      // 에러가 발생해도 페이지 이동
+      router.push('/chat-list');
 
-        // 현재 모드 설정 업데이트
-        setCurrentModeId(selectedModeId)
-      } catch (error) {
-        console.error('채팅방 초기화 실패:', error)
-        setError('채팅방을 초기화하는 중 오류가 발생했습니다. 다시 시도해주세요.')
-        hasInitialized.current = false
-      } finally {
-        setIsLoading(false)
-      }
     }
-
-    initializeChatRoom()
-
-    // 컴포넌트 언마운트 시 정리
-    return () => {
-      // 비동기 함수를 IIFE로 호출하여 안전하게 처리
-      ;(async () => {
-        try {
-          console.log('언마운트: 정리 시작')
-          if (channelId) {
-            try {
-              await leaveChat(channelId)
-              console.log('언마운트: 채팅방 나가기 완료')
-            } catch (err) {
-              console.error('언마운트: 채팅방 나가기 오류:', err)
-            }
-          }
-
-          try {
-            await disconnectSocket()
-            console.log('언마운트: 소켓 연결 종료 완료')
-          } catch (err) {
-            console.error('언마운트: 소켓 연결 종료 오류:', err)
-          }
-        } catch (err) {
-          console.error('언마운트: 정리 중 오류 발생:', err)
-        }
-      })()
-    }
-  }, [
-    character?.id,
-    characterId,
-    accountData?.user_key,
-    chatRoomInit,
-    isConnected,
-    disconnectSocket,
-    channelId,
-    leaveChat,
-    clearChatHistory,
-    addChatMessage,
-    chatMode,
-  ])
+  };
 
   // 메시지 전송 처리 (Provider의 메서드 사용)
   const handleSendMessage = async (e: FormEvent) => {
@@ -375,24 +467,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       setError('메시지 전송에 실패했습니다. 다시 시도해주세요.')
       setIsWaitingForAI(false) // 오류 발생 시 대기 상태 해제
     }
-  }
-
-  // 모드에 따른 펜 비용 계산 함수 수정
-  const getPenCostByMode = (modeId: number): number => {
-    const mode = chatMode.find(m => m.chat_mode === modeId)
-    return mode ? mode.coin : 1 // 기본값 1
-  }
-
-  // 모드별 원래 코인 가격 가져오기
-  const getOriginalCoinByMode = (modeId: number): number => {
-    const mode = chatMode.find(m => m.chat_mode === modeId)
-    return mode ? mode.original_coin : 2 // 기본값 2
-  }
-
-  // 모드별 할인율 가져오기
-  const getDiscountByMode = (modeId: number): number => {
-    const mode = chatMode.find(m => m.chat_mode === modeId)
-    return mode ? mode.discount : 0 // 기본값 0
   }
 
   // 날짜 포맷팅 함수
@@ -463,53 +537,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     }
   }
 
-  // 채팅방 삭제 함수
-  const handleDeleteChat = async () => {
-    try {
-      setIsLoading(true) // 로딩 상태 표시
-      console.log('채팅방 삭제 시작...')
-
-      // 1. 채팅방에서 나가기
-      if (channelId) {
-        try {
-          const leaveResult = await leaveChat(channelId)
-          console.log('채팅방 나가기 결과:', leaveResult)
-        } catch (error) {
-          console.error('채팅방 나가기 중 오류:', error)
-          // 오류가 발생해도 계속 진행
-        }
-      }
-
-      // 2. 소켓 연결 종료
-      try {
-        await disconnectSocket()
-        console.log('소켓 연결 종료 완료')
-      } catch (error) {
-        console.error('소켓 연결 종료 중 오류:', error)
-        // 오류가 발생해도 계속 진행
-      }
-
-      // 3. 상태 정리
-      clearChatHistory()
-      hasInitialized.current = false
-
-      // 모달 닫기
-      closeModal()
-
-      // 채팅방 삭제
-      await chatApi.CloseChat(Number(characterId))
-
-      // 4. 페이지 리디렉션 (Next.js 라우터 사용)
-      router.back()
-    } catch (error) {
-      // console.error('채팅방 삭제 프로세스 중 오류 발생:', error);
-      // setError('채팅방 삭제에 실패했습니다. 다시 시도해주세요.');
-      // // 에러가 발생해도 페이지 이동
-      // router.push('/chat');
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   // 메시지 내용에서 상황 설명(*로 감싸진 텍스트)를 찾아 스타일을 적용하는 함수
   const formatMessageWithSituations = (message: string) => {
@@ -573,79 +600,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     setShowImageModal(false)
   }
 
-  // 채팅 메시지 항목 렌더링 함수를 수정합니다
-  const renderChatMessage = (chat: ChatMessage, index: number) => {
-    const isLastAiMessage =
-      chat.sender === 'character' &&
-      chat.id === chatMessages.filter(msg => msg.sender === 'character').slice(-1)[0]?.id &&
-      chat.id !== '1'
-
-    return (
-      <motion.div
-        key={chat.id}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.2 }}
-        className={`flex flex-col ${chat.sender === 'user' ? 'items-end' : 'items-start'}`}
-      >
-        {chat.sender === 'character' && (
-          <div
-            className="relative w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0 shadow-sm border border-gray-200 cursor-pointer md:cursor-default"
-            onClick={() => handleProfileImageClick()}
-          >
-            <Image
-              src={character.imageUrl || '/images/character1.jpg'}
-              alt={character.name}
-              fill
-              className="object-cover"
-            />
-          </div>
-        )}
-
-        <motion.div
-          initial={{ scale: 0.95 }}
-          animate={{ scale: 1 }}
-          className={`inline-block max-w-[85%] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 shadow-sm ${
-            chat.sender === 'user'
-              ? 'bg-primary-500 text-white rounded-tr-none'
-              : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none'
-          }`}
-          style={{ wordBreak: 'break-word', overflow: 'hidden' }}
-        >
-          <p className="text-sm sm:text-base whitespace-pre-wrap leading-relaxed break-words">
-            {formatMessageWithSituations(chat.message)}
-          </p>
-          <p className={`text-xs mt-2 text-right ${chat.sender === 'user' ? 'text-violet-200' : 'text-gray-500'}`}>
-            {formatTime(chat.timestamp)}
-          </p>
-        </motion.div>
-
-        {/* 마지막 AI 메시지인 경우 새로고침/삭제 버튼 표시 */}
-        {isLastAiMessage && (
-          <div className="flex ml-2 items-center justify-start max-w-[85%] mt-2">
-            {/* 새로고침 버튼 */}
-            <button
-              onClick={handleRefreshLastAIMessage}
-              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-500 hover:text-violet-600 hover:bg-violet-100 transition-colors mr-1.5 shadow-sm"
-              title="응답 새로고침"
-            >
-              <FontAwesomeIcon icon={faSync} className="text-sm sm:text-base" />
-            </button>
-
-            {/* 삭제 버튼 */}
-            <button
-              onClick={handleDeleteLastAIMessage}
-              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-100 transition-colors shadow-sm"
-              title="응답 삭제"
-            >
-              <FontAwesomeIcon icon={faTrashAlt} className="text-sm sm:text-base" />
-            </button>
-          </div>
-        )}
-      </motion.div>
-    )
-  }
-
   // 로딩 상태 표시
   if (isLoading) {
     return (
@@ -687,41 +641,15 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           <button
             onClick={async () => {
               try {
-                setIsLoading(true) // 로딩 상태 표시
-                console.log('채팅방 나가기 시작...')
 
-                // 1. 채팅방에서 나가기
-                if (channelId) {
-                  try {
-                    const leaveResult = await leaveChat(channelId)
-                    console.log('채팅방 나가기 결과:', leaveResult)
-                  } catch (error) {
-                    console.error('채팅방 나가기 중 오류:', error)
-                    // 오류가 발생해도 계속 진행
-                  }
-                }
-
-                // 2. 소켓 연결 종료
-                try {
-                  await disconnectSocket()
-                  console.log('소켓 연결 종료 완료')
-                } catch (error) {
-                  console.error('소켓 연결 종료 중 오류:', error)
-                  // 오류가 발생해도 계속 진행
-                }
-
-                // 3. 상태 정리
-                clearChatHistory()
-                hasInitialized.current = false
-
-                // 4. 채팅 목록 페이지로 이동 (Next.js 라우터 사용)
-                router.push('/chat-list')
+                await cleanupChatRoom();
+                
+                // 채팅 목록 페이지로 이동
+                router.push('/chat-list');
               } catch (error) {
                 console.error('채팅방 나가기 프로세스 중 오류 발생:', error)
                 // 에러가 발생해도 페이지 이동
-                router.push('/chat-list')
-              } finally {
-                setIsLoading(false)
+                router.push('/chat-list');
               }
             }}
             className="mr-3"
@@ -1099,7 +1027,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
                   return (
                     <motion.div
-                      key={chat.id}
+                      key={index}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.2 }}
