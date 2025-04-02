@@ -40,6 +40,7 @@
     "react-intersection-observer": "^9.15.0",
     "react-loading-skeleton": "^3.5.0",
     "react-toastify": "^11.0.5",
+    "shepherd.js": "^14.5.0",
     "swiper": "^11.2.6",
     "tailwind-scrollbar-hide": "^2.0.0",
     "web3": "^4.16.0",
