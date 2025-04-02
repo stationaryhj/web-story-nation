@@ -47,13 +47,20 @@ export interface LoginResponse {
 
 // Charbot Top 10 List
 export type CharbotTop10Response = {
-  module_1: Array<ModuleCharacter>;
-  module_2: Array<ModuleCharacter>;
-  module_3: Array<ModuleCharacter>;
-  module_4: Array<ModuleCharacter>;
-  module_5: Array<ModuleCharacter>;
-  module_6: Array<ModuleCharacter>;
-  module_7: Array<ModuleCharacter>;
+  order: Array<number>;
+  modules: {
+    module_1: Array<ModuleCharacter>;
+    module_2: Array<ModuleCharacter>;
+    module_3: Array<ModuleCharacter>;
+    module_4: Array<ModuleCharacter>;
+    module_5: Array<ModuleCharacter>;
+    module_6: Array<ModuleCharacter>;
+    module_7: Array<ModuleCharacter>;
+    module_8: Array<ModuleCharacter>;
+    module_9: Array<ModuleCharacter>;
+    module_10: Array<ModuleCreater>;
+  }
+  
   result: ApiResult;
 };
 
@@ -80,7 +87,7 @@ export type CharbotTop10RankingResponse = {
 
 export type GetTop10RankingResponse = {
   result: ApiResult;
-  module_9: Array<ModuleCharacterCharacter>;
+  module_8: Array<ModuleCharacterCharacter>;
 }
 
 export type GetTop10RankingCreaterResponse = {

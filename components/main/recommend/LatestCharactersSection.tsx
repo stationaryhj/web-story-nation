@@ -1,26 +1,17 @@
 import { useState, memo } from 'react'
 import CardGrid from '@/components/elements/card/CardGrid'
 import { SectionTransition } from '@/components/motion/PageTransition'
-import NewCharacterSidebar from '@/components/elements/sidebar/NewCharacterSidebar'
 import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
+import LatestCharacterSidebar from '@/components/elements/sidebar/LatestCharacterSidebar'
 
 // 최신 캐릭터 섹션 컴포넌트
 const LatestCharactersSection = memo(() => {
   const [isNewCharacterSidebarOpen, setIsNewCharacterSidebarOpen] = useState(false)
-  const { modules_sum, UpdateLatestCharacters } = useRecommendSectionStoreData()
+  const { latestCharacters: characterList } = useRecommendSectionStoreData()
 
-  const getLatestCharactersData = () => {
-    const combinedModules = modules_sum
-
-    // 상위 5개만 추출
-    const latestModules = combinedModules.slice(0, 10)
-
-    // Character 타입으로 변환하여 반환
-    return latestModules
-  }
-
+  
   // 최신 캐릭터 데이터
-  const latestCharacters = getLatestCharactersData()
+  const latestCharacters = characterList
 
   return (
     <section className="py-20">
@@ -50,7 +41,7 @@ const LatestCharactersSection = memo(() => {
         </SectionTransition>
       </div>
 
-      <NewCharacterSidebar isOpen={isNewCharacterSidebarOpen} onClose={() => setIsNewCharacterSidebarOpen(false)} />
+      <LatestCharacterSidebar isOpen={isNewCharacterSidebarOpen} onClose={() => setIsNewCharacterSidebarOpen(false)} moduleId={8} />
     </section>
   )
 })

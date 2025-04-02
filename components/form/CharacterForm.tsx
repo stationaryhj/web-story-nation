@@ -96,7 +96,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
           return;
         }}
         saveHashtags={async () => {
-          await saveHashtags();
+        await saveHashtags();
           return;
         }}
         availableTags={availableTags}

@@ -9,6 +9,7 @@ import CharacterRankingSection from './recommend/CharacterRankingSection'
 import AuthorRankingSection from './recommend/AuthorRankingSection'
 import LatestCharactersSection from './recommend/LatestCharactersSection'
 import CreateCharacterSection from './recommend/CreateCharacterSection'
+import EtcCharactersSection from './recommend/EtcCharactersSection'
 
 interface RecommendSectionProps {
   onSearchTrigger?: (query: string) => void
@@ -17,18 +18,20 @@ interface RecommendSectionProps {
 export default function RecommendSection({ onSearchTrigger }: RecommendSectionProps) {
   // 짜릿모드 상태 가져오기
   const { isAdultModeEnabled } = useSettingsStore()
-  const { UpdateRankingTopCharacter, UpdateRankingTopCreater, UpdateLatestCharacters } = useRecommendSectionStoreData()
+  const { initialize } = useRecommendSectionStoreData()
 
   // 짜릿모드 변경 시 데이터 다시 로드
   useEffect(() => {
     // 실시간, 전체
-    UpdateRankingTopCharacter('KR', 4, 4, false)
+    // UpdateRankingTopCharacter('KR', 4, 4, false)
 
     // 주간
-    UpdateRankingTopCreater('KR', 2, false)
+    // UpdateRankingTopCreater('KR', 2, false)
 
     // 일간, 전체
-    UpdateLatestCharacters(1, 4, false)
+    // UpdateLatestCharacters(1, 4, false)
+
+    initialize()
   }, [isAdultModeEnabled])
 
   return (
@@ -41,6 +44,8 @@ export default function RecommendSection({ onSearchTrigger }: RecommendSectionPr
         <AuthorRankingSection />
       </div>
       <LatestCharactersSection />
+      <EtcCharactersSection />
+
       <CreateCharacterSection />
     </div>
   )
