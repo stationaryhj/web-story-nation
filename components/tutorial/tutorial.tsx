@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from 'react'
 // 튜토리얼 단계 설정 인터페이스
 interface TutorialStep {
   id: string
-  text: string
-  textPosition?: 'top' | 'middle' | 'bottom'
+  html: string
+  textPosition?: 'top' | 'bottom' | 'left' | 'right'
 }
 
 // 튜토리얼 설정 인터페이스
@@ -79,15 +79,40 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
   // 설명 텍스트 위치 계산
   const getTextPosition = () => {
     const step = config.steps[currentStep]
+    const padding = 20 // 타겟 요소와의 간격 (픽셀)
+
     switch (step.textPosition) {
       case 'top':
-        return { top: '20%' }
-      case 'middle':
-        return { top: '50%', transform: 'translateY(-50%)' }
+        return {
+          bottom: `${windowHeight - rect.top + padding}px`,
+          left: `${rect.left + rect.width / 2}px`,
+          transform: 'translateX(-50%)',
+        }
       case 'bottom':
-        return { bottom: '20%' }
+        return {
+          top: `${rect.bottom + padding}px`,
+          left: `${rect.left + rect.width / 2}px`,
+          transform: 'translateX(-50%)',
+        }
+      case 'left':
+        return {
+          right: `${windowWidth - rect.left + padding}px`,
+          top: `${rect.top + rect.height / 2}px`,
+          transform: 'translateY(-50%)',
+        }
+      case 'right':
+        return {
+          left: `${rect.right + padding}px`,
+          top: `${rect.top + rect.height / 2}px`,
+          transform: 'translateY(-50%)',
+        }
       default:
-        return { bottom: '20%' }
+        // 기본값은 bottom
+        return {
+          top: `${rect.bottom + padding}px`,
+          left: `${rect.left + rect.width / 2}px`,
+          transform: 'translateX(-50%)',
+        }
     }
   }
 
@@ -133,10 +158,28 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
 
       {/* 설명 텍스트 */}
       <div
-        className="fixed left-1/2 -translate-x-1/2 text-white text-center max-w-[80%] z-[10001]"
-        style={getTextPosition()}
+        className="fixed text-white text-center max-w-[300px] z-[10001]"
+        style={{
+          ...getTextPosition(),
+          borderRadius: '8px',
+        }}
       >
-        <p className="text-lg font-medium mb-2">{config.steps[currentStep].text}</p>
+        <div className="text-lg font-medium" dangerouslySetInnerHTML={{ __html: config.steps[currentStep].html }} />
+      </div>
+
+      {/* 클릭하여 계속하기 텍스트 - 화면 정중앙에 배치 */}
+      <div
+        className="fixed text-white text-center z-[10001]"
+        style={{
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          padding: '10px 20px',
+          borderRadius: '30px',
+          width: 'auto',
+        }}
+      >
         <p className="text-sm text-gray-300">클릭하여 계속하기</p>
       </div>
 

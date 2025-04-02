@@ -37,7 +37,7 @@ import { useNakama } from '@/app/providers/NakamaProviders'
 import { useChatModeStore } from '@/store/useStoreData'
 import BaseSidebar from '@/components/elements/sidebar/BaseSidebar'
 import { chatApi } from '@/services/api/storyNationApi'
-import Tutorial from '@/components/tutorial/tutorial'
+import Tutorial from '@/components/tutorial/Tutorial'
 
 // 메시지 타입 정의
 interface ChatMessage {
@@ -122,19 +122,31 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   // 튜토리얼 관련 상태를 최상위로 이동
   const [showTutorial, setShowTutorial] = useState(true)
 
-  // 튜토리얼 설정을 최상위로 이동
+  // 튜토리얼 설정
   const tutorialConfig = {
     storageKey: 'chat-tutorial-completed',
     steps: [
       {
         id: 'chat-mode-button',
-        text: '채팅 모드를 선택하여 대화의 스타일을 변경할 수 있습니다.',
+        html: `
+          <p>탭하면 <span class="text-yellow-300 font-semibold">채팅모드를 선택</span>할 수 있어요!</p>
+        `,
         textPosition: 'bottom' as const,
       },
       {
         id: 'message-input',
-        text: '여기에 메시지를 입력하고 전송할 수 있습니다.',
-        textPosition: 'bottom' as const,
+        html: `
+          <div class="text-start">
+            <div>
+              <span class="text-yellow-300">탭하면 **</span>가 입력돼요
+            </div>
+            <div>
+              **사이에 글을 입력해 전송하면
+            </div>
+            <div><span class="text-yellow-300">기울임체로 출력</span>될 거에요!</div>
+          </div>
+        `,
+        textPosition: 'top' as const,
       },
     ],
   }
@@ -1166,6 +1178,57 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                 })
               )}
             </div>
+          </div>
+
+          {/* 입력창 영역 - 채팅 영역 내부로 이동 */}
+          <div className="bg-white border-t border-gray-200 p-3 md:p-4">
+            <form onSubmit={handleSendMessage} className="max-w-3xl mx-auto">
+              <div className="flex items-center relative">
+                {/* 상황 설명 모드 토글 버튼 */}
+                <button
+                  id="message-input"
+                  type="button"
+                  onClick={toggleActionMode}
+                  className={`absolute left-3 w-8 h-8 flex items-center justify-center rounded-full transition-colors ${
+                    isActionMode ? 'bg-violet-100 text-violet-600' : 'text-gray-400 hover:text-gray-600'
+                  }`}
+                  title="상황 설명 모드"
+                >
+                  <FontAwesomeIcon icon={faAsterisk} />
+                </button>
+
+                {/* 메시지 입력 필드 */}
+                <input
+                  type="text"
+                  value={message}
+                  onChange={handleActionInput}
+                  placeholder={
+                    isActionMode ? '상황 설명을 입력하세요... (예: *캐릭터가 웃으며*)' : '메시지를 입력하세요...'
+                  }
+                  className={`w-full py-3 px-12 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm md:text-base ${
+                    isWaitingForAI ? 'bg-gray-100 text-gray-500' : ''
+                  }`}
+                  disabled={isWaitingForAI}
+                />
+
+                {/* 전송 버튼 */}
+                <button
+                  type="submit"
+                  className={`absolute right-2 w-9 h-9 flex items-center justify-center rounded-full text-white transition-colors ${
+                    message.trim() && !isWaitingForAI
+                      ? 'bg-primary-500 hover:bg-primary-600'
+                      : 'bg-gray-300 cursor-not-allowed'
+                  }`}
+                  disabled={!message.trim() || isWaitingForAI}
+                >
+                  {isWaitingForAI ? (
+                    <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
+                  ) : (
+                    <FontAwesomeIcon icon={faPaperPlane} />
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </main>
