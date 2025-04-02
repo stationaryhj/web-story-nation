@@ -130,6 +130,14 @@ export default function Header() {
   const themeIcon = mounted ? (isDarkMode ? faSun : faMoon) : null
   const themeText = mounted ? (isDarkMode ? '라이트 모드' : '다크 모드') : '테마 모드'
 
+  const onClickSettingLink = () => {
+    if (isLogin) {
+      router.push('/settings')
+    } else {
+      openModal('login')
+    }
+  }
+
   return (
     <>
       <motion.header
@@ -203,17 +211,17 @@ export default function Header() {
             </div>
 
             {/* 내 정보 버튼 - PC에서만 표시 */}
-            {isLogin && (
-              <Link href="/settings" className="hidden md:block">
-                <motion.button
-                  className="text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 transition-colors"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <FontAwesomeIcon icon={faUser} className="text-xl" />
-                </motion.button>
-              </Link>
-            )}
+
+            <div className="hidden md:block">
+              <motion.button
+                onClick={onClickSettingLink}
+                className="text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 transition-colors"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <FontAwesomeIcon icon={faUser} className="text-xl" />
+              </motion.button>
+            </div>
 
             {/* 장바구니 버튼 */}
             <Link href="/cart">

@@ -10,6 +10,7 @@ import GuestLoginForm from '@/components/form/GuestLoginForm'
 import { toast } from 'react-toastify'
 import { authService } from '@/services/auth'
 import { SpeechBubble } from '@/components/animation/SpeechBubble'
+import { ToastContainer } from 'react-toastify'
 
 interface LoginModalProps {
   isOpen: boolean
@@ -21,6 +22,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login')
   const [showSignup, setShowSignup] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [isNewUserMode, setIsNewUserMode] = useState(false)
   // 이벤트 처리 중인지 추적하는 ref (중복 메시지 처리 방지)
   const processingCallback = useRef(false)
 
@@ -196,54 +198,78 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     onClose()
   }
 
+  const handleNewUserClick = () => {
+    setIsNewUserMode(true)
+  }
+
   return (
     <>
       {/* 로그인 모달 - 회원가입 모달이 표시 중일 때 숨김 */}
       <BaseModal
         isOpen={isOpen && !showSignup}
         onClose={onClose}
-        title="캐릭터와 설레는 대화를 시작하세요!"
+        title={isNewUserMode ? '캐릭터와 설레는 대화를 시작하세요!' : '로그인'}
         size="md"
         animation="fade"
         backdropColor="bg-black/70 backdrop-blur-sm"
       >
         <div className="flex flex-col space-y-6 pb-4">
-          <div className="flex flex-col justify-center items-center">
-            <div className="text-sm text-gray-500">캐릭터부터 시작하는 세계관 공동 창작</div>
-            <div className="text-sm text-gray-500">스토리네이션</div>
-          </div>
-          <div>
-            <SpeechBubble text="3초만에 가입하고 30펜 받으세요" position="center" />
-          </div>
+          {/* 신규 가입 모드일 때만 보여줄 헤더 */}
+          {isNewUserMode && (
+            <>
+              <div className="flex flex-col justify-center items-center">
+                <div className="text-sm text-gray-500">캐릭터부터 시작하는 세계관 공동 창작</div>
+                <div className="text-sm text-gray-500">스토리네이션</div>
+              </div>
+              <div>
+                <SpeechBubble text="3초만에 가입하고 30펜 받으세요" position="center" />
+              </div>
+            </>
+          )}
           <div className="space-y-4">
             <button
-              onClick={() => handleSocialLogin('KAKAO')}
+              onClick={() => handleSocialLogin('GOOGLE')}
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-full bg-yellow-400 py-3 px-4 font-medium text-yellow-900 shadow transition-colors hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex w-full items-center justify-center rounded-full bg-blue-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span>카카오로 시작하기</span>
-            </button>
-            <button
-              onClick={() => handleSocialLogin('NAVER')}
-              disabled={loading}
-              className="flex w-full items-center justify-center rounded-full bg-green-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span>네이버로 시작하기</span>
+              <span>구글로 계정으로 로그인</span>
             </button>
             <button
               onClick={() => handleSocialLogin('APPLE')}
               disabled={loading}
               className="flex w-full items-center justify-center rounded-full bg-black py-3 px-4 font-medium text-white shadow transition-colors hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span>애플로 시작하기</span>
+              <span>애플로 계정으로 로그인</span>
             </button>
             <button
-              onClick={() => handleSocialLogin('GOOGLE')}
+              onClick={() => handleSocialLogin('KAKAO')}
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-full bg-blue-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex w-full items-center justify-center rounded-full bg-yellow-400 py-3 px-4 font-medium text-yellow-900 shadow transition-colors hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span>구글로 시작하기</span>
+              <span>카카오 계정으로 로그인</span>
             </button>
+            <button
+              onClick={() => handleSocialLogin('NAVER')}
+              disabled={loading}
+              className="flex w-full items-center justify-center rounded-full bg-green-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span>네이버 계정으로 로그인</span>
+            </button>
+            {!isNewUserMode ? (
+              <button
+                onClick={handleNewUserClick}
+                className="flex w-full items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 py-3 px-4 font-medium text-gray-700 dark:text-gray-300 shadow transition-colors hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                <span>신규 가입하기</span>
+              </button>
+            ) : (
+              <button
+                onClick={handleSignupClick}
+                className="flex w-full items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 py-3 px-4 font-medium text-gray-700 dark:text-gray-300 shadow transition-colors hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                <span>회원가입</span>
+              </button>
+            )}
           </div>
 
           <div className="relative">
@@ -257,9 +283,12 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
           <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} />
 
-          <div className="text-center text-xs text-gray-500 dark:text-gray-400">
-            <p>계속 진행하면 이용약관 및 개인정보 처리방침에 동의하는 것으로 간주됩니다.</p>
-          </div>
+          {/* 신규 가입 모드일 때만 약관 동의 문구 표시 */}
+          {isNewUserMode && (
+            <div className="text-center text-xs text-gray-500 dark:text-gray-400">
+              <p>계속 진행하면 이용약관 및 개인정보 처리방침에 동의하는 것으로 간주됩니다.</p>
+            </div>
+          )}
         </div>
       </BaseModal>
 

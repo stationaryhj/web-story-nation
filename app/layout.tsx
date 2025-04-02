@@ -12,6 +12,7 @@ import Providers from './providers'
 import DraggableButton from '@/components/elements/button/DraggableButton'
 import MobileGNB from '@/components/common/MobileGNB'
 import { Plus } from 'lucide-react'
+import { ToastPortal } from '@/components/elements/toast/ToastPortal'
 
 // Poppins 폰트 설정
 const poppins = Poppins({
@@ -122,6 +123,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           theme="light"
           style={{ zIndex: 9999 }}
         />
+
+        <ToastPortal />
       </body>
     </html>
   )
