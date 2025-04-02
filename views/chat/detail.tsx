@@ -360,7 +360,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     
     return () => {
       isMountedRef.current = false;
-      setIsExit(true)
       console.log('💀 컴포넌트 실제 언마운트됨 - 채팅방 정리 예정');
       
       // 이미 언마운트된 상태에서 비동기 작업이 완료되면 의미 없음
@@ -423,12 +422,12 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       await chatApi.CloseChat(Number(chrBotChatKey));
 
       
+
       // 페이지 리디렉션
       router.push('/chat-list');
     } catch (error) {
       // 에러가 발생해도 페이지 이동
       router.push('/chat-list');
-
     }
   };
 
@@ -537,7 +536,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     }
   }
 
-
   // 메시지 내용에서 상황 설명(*로 감싸진 텍스트)를 찾아 스타일을 적용하는 함수
   const formatMessageWithSituations = (message: string) => {
     // 정규식으로 *로 감싸진 텍스트 찾기
@@ -631,6 +629,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     )
   }
 
+  // 나머지 UI 부분은 이전과 동일하게 유지
   return (
     <div className="flex flex-col h-screen max-h-screen w-full bg-gray-50">
       {/* 상단 헤더 */}
@@ -641,13 +640,12 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           <button
             onClick={async () => {
               try {
-
                 await cleanupChatRoom();
                 
                 // 채팅 목록 페이지로 이동
                 router.push('/chat-list');
               } catch (error) {
-                console.error('채팅방 나가기 프로세스 중 오류 발생:', error)
+                console.error('채팅방 나가기 프로세스 중 오류 발생:', error);
                 // 에러가 발생해도 페이지 이동
                 router.push('/chat-list');
               }
@@ -1095,9 +1093,132 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
               )}
             </div>
           </div>
+
+          {/* 메시지 입력 */}
+          <div className="bg-white p-4 border-t border-gray-200 shadow-sm">
+            <form onSubmit={handleSendMessage} className="flex items-center max-w-3xl mx-auto">
+              {/* 상황 설명 버튼 (별표 아이콘) */}
+              <button
+                type="button"
+                onClick={toggleActionMode}
+                className={`mr-2 p-2.5 rounded-full transition-colors ${
+                  isActionMode ? 'bg-violet-100 text-violet-600' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                }`}
+                title={isActionMode ? '일반 대화 모드로 전환' : '상황 설명 모드로 전환'}
+                disabled={isWaitingForAI}
+              >
+                <FontAwesomeIcon icon={faAsterisk} className="text-base" />
+              </button>
+
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  value={message}
+                  onChange={isActionMode ? handleActionInput : e => setMessage(e.target.value)}
+                  placeholder={
+                    isWaitingForAI
+                      ? 'AI가 응답 중입니다. 잠시만 기다려주세요...'
+                      : isActionMode
+                        ? '상황 설명을 입력하세요. (예: 캐릭터가 웃으며)'
+                        : '대화를 입력하세요. (예: 안녕! 뭐해?)'
+                  }
+                  className={`w-full py-3 px-4 text-sm sm:text-base bg-gray-100 text-gray-800 rounded-l-xl border-0 focus:outline-none focus:ring-0 ${
+                    isWaitingForAI ? 'bg-gray-200 text-gray-500' : 'hover:bg-gray-200/80'
+                  } transition-all placeholder:text-sm placeholder:text-gray-500`}
+                  disabled={isWaitingForAI}
+                />
+                {isActionMode && !isWaitingForAI && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
+                    <span className="bg-violet-100 px-2 py-0.5 rounded text-violet-600 font-medium">
+                      <FontAwesomeIcon icon={faAsterisk} className="mr-1 text-xs" />
+                      상황 설명 모드
+                    </span>
+                  </div>
+                )}
+                {isWaitingForAI && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="flex items-center space-x-1">
+                      <div
+                        className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce"
+                        style={{ animationDelay: '0ms' }}
+                      ></div>
+                      <div
+                        className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce"
+                        style={{ animationDelay: '150ms' }}
+                      ></div>
+                      <div
+                        className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce"
+                        style={{ animationDelay: '300ms' }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* 전송 버튼 - BaseButton으로 변경 */}
+              <BaseButton
+                type="submit"
+                color={message.trim() && !isWaitingForAI ? 'gradient' : 'secondary'}
+                disabled={!message.trim() || isWaitingForAI}
+                className="rounded-l-none rounded-r-xl py-3 px-4"
+              >
+                <FontAwesomeIcon icon={faPaperPlane} className="text-base" />
+              </BaseButton>
+            </form>
+          </div>
         </div>
       </main>
 
+      {/* 모바일용 이미지 모달을 추가합니다 (return 문 끝에 추가) */}
+      {showImageModal && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex flex-col items-center justify-center p-4">
+          <div className="relative w-full max-w-md mx-auto">
+            {/* 닫기 버튼 */}
+            <button
+              className="absolute top-0 right-0 z-10 bg-black/50 rounded-full p-2 text-white transform translate-x-3 -translate-y-3"
+              onClick={handleCloseImageModal}
+            >
+              <FontAwesomeIcon icon={faArrowLeft} className="text-lg" />
+            </button>
+
+            {/* 이미지 */}
+            <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden">
+              <Image
+                src={character.imageUrl || '/images/character1.jpg'}
+                alt={character.name}
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+
+            {/* 이미지 정보 및 다운로드 버튼 */}
+            <div className="bg-black/50 backdrop-blur-sm text-white p-4 rounded-b-lg">
+              <h3 className="font-bold text-lg mb-1">{character.name}</h3>
+              <div className="flex items-center justify-between">
+                <div className="flex flex-wrap gap-1">
+                  {character.hashtags?.slice(0, 2).map((tag: string, index: number) => (
+                    <span key={index} className="text-xs text-gray-300">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+                <button
+                  className="bg-violet-600 hover:bg-violet-700 text-white py-2 px-4 rounded-full flex items-center text-sm"
+                  onClick={() => {
+                    handleSaveImage()
+                    handleCloseImageModal()
+                  }}
+                >
+                  <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                  저장하기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* 튜토리얼 컴포넌트 */}
       <Tutorial isOpen={showTutorial} onClose={() => setShowTutorial(false)} config={tutorialConfig} />
     </div>

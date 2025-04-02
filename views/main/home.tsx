@@ -8,7 +8,6 @@ import { useState, useEffect } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import SearchBar from '@/components/elements/searchBar/SearchBar'
 import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
-import { useModalStore } from '@/store/useStoreModal'
 import ModalManager from '@/components/modal/ModalManager'
 import CharacterRankingSidebar from '@/components/elements/sidebar/CharacterRankingSidebar'
 import AuthorRankingSidebar from '@/components/elements/sidebar/AuthorRankingSidebar'
@@ -29,7 +28,6 @@ export default function Home() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const { fetchCharacters, characters } = useStoreData()
-  const { openModal, setSelectedCharacter } = useModalStore()
 
   // URL 파라미터에서 현재 탭 가져오기
   const tabParam = searchParams?.get('tab') || 'all'
@@ -65,11 +63,6 @@ export default function Home() {
   const handleSearch = (query: string, option: string = 'character') => {
     // 검색 기능 구현
     console.log('검색어:', query, '검색 옵션:', option)
-  }
-
-  // 태그 선택 처리
-  const handleTagSelect = (tagIds: string[]) => {
-    setSelectedTagIds(tagIds)
   }
 
   return (

@@ -5,7 +5,6 @@ import type {
   LoginResponse,
   CharbotSearchResponse,
   TagRankingListResponse,
-  ApiResponse,
   CharbotChatListResponse,
   OrderIdResponse,
   CoinListResponse,
@@ -21,11 +20,8 @@ import type {
   BankListResponse,
   CharbotTop10NewResponse,
   WriterWithdrawResponse,
-  GetPresignedUrlResponse,
   WithdrawRequestListResponse,
   SaleMonthlyIncomeResponse,
-  CharbotTop10RankingResponse,
-  GetTop10RankingResponse,
 } from '@/types/api'
 
 import { contentApi, settlementApi, createApi, chatApi } from '../api/storyNationApi'
@@ -318,6 +314,7 @@ export const ReqSaveCreateChatBotInProgress = async (payload: {
   example: string
   nsfw: number
   img_url_nsfw: string
+  img_web_url: string
   show_yn: number
   content_show_yn: number
   example_show_yn: number
@@ -335,6 +332,7 @@ export const ReqSaveCreateChatBotInProgress = async (payload: {
       payload.example,
       payload.nsfw,
       payload.img_url_nsfw,
+      payload.img_web_url,
       payload.show_yn,
       payload.content_show_yn,
       payload.example_show_yn,

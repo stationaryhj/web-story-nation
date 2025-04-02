@@ -40,6 +40,7 @@ interface AccountState {
   verifyIdentity: () => Promise<{success: boolean, message: string}>
   updateIntro: (intro: string) => Promise<{success: boolean, message: string}>
   updateUserInfoFromUserInfo2: () => Promise<boolean>
+  isAdult: () => boolean
 }
 
 // 네트워크 에러 타입 정의
@@ -227,6 +228,10 @@ export const useAccountStore = create<AccountState>()(
       loading: false,
       error: null,
       isInitialized: false,
+
+      isAdult: () => {
+        return !!(get().data && (get().data?.minor ?? 0) > 1)
+      },
 
       setWriterInfo: (writerInfo) => {
         set({ writerInfo })

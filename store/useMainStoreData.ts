@@ -3,7 +3,8 @@ import { create } from 'zustand'
 import { contentApi } from '@/services/api'
 import { QueryClient } from '@tanstack/react-query'
 import { Character } from '@/store/useStoreData'
-import { bridgeModuleCreaterToCharacter, bridgeTop10DataToModuleCharacter, bridgeCharacterDataToCharacter } from '@/lib/utils/storyNationUtil'
+import { bridgeModuleCreatorToCharacter, bridgeTop10DataToModuleCharacter, bridgeCharacterDataToCharacter } from '@/lib/utils/storyNationUtil'
+import { useAccountStore } from '@/store/useAccountStore'
 
 // 싱글톤 queryClient 생성 (최초 한 번만 생성)
 const queryClient = new QueryClient({
@@ -75,6 +76,7 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
             title: item.title,
             intro: item.intro,
             img_url: item.img_url,
+            img_web_url: item.img_web_url || item.img_url,
             lv: item.lv,
             tags: item.tags,
             chat_cnt: item.chat_cnt,
@@ -122,7 +124,7 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
             user_key: item.user_key,
             withdraw_pen: item.withdraw_pen
           }));
-          const creaters = bridgeModuleCreaterToCharacter(moduleCreaters);
+          const creaters = bridgeModuleCreatorToCharacter(moduleCreaters);
           return creaters.map(creater => ({
             id: creater.id,
             name: creater.name,
@@ -171,6 +173,7 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
             title: item.title,
             intro: item.intro,
             img_url: item.img_url,
+            img_web_url: item.img_web_url || item.img_url,
             lv: item.lv || 0,
             tags: item.tags || '',
             chat_cnt: item.chat_cnt || 0,
@@ -215,6 +218,7 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
             title: item.title,
             intro: item.intro,
             img_url: item.img_url,
+            img_web_url: item.img_web_url || item.img_url,
             lv: item.lv || 0,
             tags: item.tags || '',
             chat_cnt: item.chat_cnt || 0,
@@ -283,7 +287,7 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
         set({ 
           characters: data,
           rankingCharacters: bridgeTop10DataToModuleCharacter(data?.modules?.module_9) as Character[]  || [],
-          rankingCreaters: bridgeModuleCreaterToCharacter(data?.modules?.module_10) as unknown as Character[] || [],
+          rankingCreaters: bridgeModuleCreatorToCharacter(data?.modules?.module_10) as unknown as Character[] || [],
           modules_1: bridgeTop10DataToModuleCharacter(data?.modules?.module_1) as Character[] || [],
           modules_2: bridgeTop10DataToModuleCharacter(data?.modules?.module_2) as Character[] || [],
           modules_3: bridgeTop10DataToModuleCharacter(data?.modules?.module_3) as Character[] || [],

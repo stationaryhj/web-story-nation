@@ -93,6 +93,7 @@ export interface ModuleCharacterCharacter {
   title: string;
   intro: string;
   img_url: string;
+  img_web_url: string;
   lv: number;
   tags: string;
   chat_cnt: number;
@@ -113,6 +114,7 @@ export interface ModuleCharacter {
   title: string;
   intro: string;
   img_url: string;
+  img_web_url: string;
   lv: number;
   tags: string;
   chat_cnt: number;
@@ -188,6 +190,7 @@ export interface CharbotData {
   chat_cnt: number;
   create_dt: string;
   img_url: string;
+  img_web_url: string;
   intro: string;
   like_cnt: number;
   lv: number;
@@ -221,6 +224,7 @@ export interface ChrbotData {
   gender: string;
   img_url: string;
   img_url_nsfw: string;
+  img_web_url: string;
   intro: string;
   like_cnt: number;
   lv: number;
@@ -265,6 +269,7 @@ export interface CharbotChatData {
   chrbot_chat_key: number;
   fixed: number;
   img_url: string;
+  img_web_url: string;
   last_msg: string;
   nsfw: number;
   title: string;
@@ -333,6 +338,7 @@ export interface CharbotMineData {
   create_dt: string;
   finish_yn: number;
   img_url: string;
+  img_web_url: string;
   intro: string;
   like_cnt: number;
   msg_cnt: number;
@@ -366,6 +372,7 @@ export interface CharbotInprogressData {
   gender: string;
   img_url: string;
   img_url_nsfw: string;
+  img_web_url: string;
   intro: string;
   like_cnt: number;
   msg_cnt: number;
@@ -566,6 +573,7 @@ export interface WorldListDetailChrbot {
   gender: string
   img_url: string
   img_url_nsfw: string
+  img_web_url: string
   like_cnt: number
   lv: number
   msg_cnt: number
