@@ -1,5 +1,5 @@
 // NakamaContext.jsx
-import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Client, Session, Socket } from '@heroiclabs/nakama-js';
 import { chatApi } from '@/services/api/storyNationApi';
 import { ChrbotData } from '@/types/api';
@@ -28,6 +28,7 @@ interface NakamaContextType {
     success: boolean;
     channelId?: string;
     roomName?: string;
+    error?: string;
   }>;
   connectSocket: (session: Session) => Promise<boolean>;
   disconnectSocket: () => Promise<void>;
@@ -58,6 +59,25 @@ export interface ChatMessage {
   timestamp: Date;
 }
 
+// 상태 그룹화를 위한 인터페이스들
+interface ConnectionState {
+  isConnected: boolean;
+  isConnecting: boolean;
+  isInitRoom: boolean;
+}
+
+interface ChatRoomState {
+  channelId: string | null;
+  roomName: string | null;
+  chrBotChatKey: number;
+  currentChatMode: number;
+}
+
+interface ApiState {
+  sendPrompt_key: string;
+  nsfw: number;
+}
+
 // 기본 컨텍스트 값
 const defaultContextValue: NakamaContextType = {
   client: null,
@@ -71,7 +91,7 @@ const defaultContextValue: NakamaContextType = {
   roomName: null,      // 룸 이름 추가
   isInitRoom: false,   // 룸 초기화 상태 추가
   charbotData: null,   // 캐릭터 데이터 추가
-  chatMessages: [],    // 채팅 메시지 배열 추가
+  chatMessages: [],    // 채팅 메시지 배열
   
   setSession: () => {},
   chatRoomInit: async () => ({ success: false }),
@@ -121,25 +141,422 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
   defaultSession = null,
   charbotData = null, // charbotData 기본값 추가
 }) => {
+  // 클라이언트 및 세션 상태
   const [client, setClient] = useState<Client | null>(null);
-  const [socket, setSocket] = useState<Socket | null>(null);
   const [session, setSession] = useState<Session | null>(defaultSession);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [isConnecting, setIsConnecting] = useState<boolean>(false);
-  const [currentChatMode, setCurrentChatMode] = useState<number>(1);
-  const [chrBotChatKey, setChrBotChatKey] = useState<number>(0);
-  const [channelId, setChannelId] = useState<string | null>(null);  // 채널 ID 상태 추가
-  const [roomName, setRoomName] = useState<string | null>(null);    // 룸 이름 상태 추가
-  const [isInitRoom, setIsInitRoom] = useState<boolean>(false);     // 룸 초기화 상태 추가
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]); // 채팅 메시지 상태 추가
-  const [sendPrompt_key, setSendPrompt_key] = useState<string>('');
-  const [nsfw, setNsfw] = useState<number>(0);
+  const [socket, setSocket] = useState<Socket | null>(null);
   const socketRef = useRef<Socket | null>(null);
+  
+  // 연결 상태 그룹화
+  const [connectionState, setConnectionState] = useState<ConnectionState>({
+    isConnected: false,
+    isConnecting: false,
+    isInitRoom: false,
+  });
+  
+  // 채팅방 상태 그룹화
+  const [chatRoomState, setChatRoomState] = useState<ChatRoomState>({
+    channelId: null,
+    roomName: null,
+    chrBotChatKey: 0,
+    currentChatMode: 1,
+  });
+  
+  // API 관련 상태 그룹화
+  const [apiState, setApiState] = useState<ApiState>({
+    sendPrompt_key: '',
+    nsfw: 0,
+  });
+  
+  // 채팅 메시지 상태
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  
+  // 초기화 중인지 확인하는 Ref
+  const isInitializingChatRoom = useRef(false);
+  
+  // 리스너 관리용 Ref
   const channelListenersRef = useRef<Map<string, Set<(message: any) => void>>>(new Map());
   const connectionListenersRef = useRef<Set<() => void>>(new Set());
   const disconnectionListenersRef = useRef<Set<(evt: any) => void>>(new Set());
 
   const { updateAccountData } = useAccountStore();
+
+  // 상태 업데이트 함수들 - 단일 속성 업데이트를 위한 도우미 함수들
+  const updateConnectionState = useCallback((updates: Partial<ConnectionState>) => {
+    setConnectionState(prev => ({ ...prev, ...updates }));
+  }, []);
+  
+  const updateChatRoomState = useCallback((updates: Partial<ChatRoomState>) => {
+    setChatRoomState(prev => ({ ...prev, ...updates }));
+  }, []);
+  
+  const updateApiState = useCallback((updates: Partial<ApiState>) => {
+    setApiState(prev => ({ ...prev, ...updates }));
+  }, []);
+
+  // 채팅방 초기화를 위한 모듈화된 함수들
+  const authenticateUser = useCallback(async (
+    userKey: string, 
+    _client: Client
+  ): Promise<Session | null> => {
+    const deviceId = `chatbot_jackpot_${userKey}`;
+    
+    // 이미 유효한 세션이 있는지 확인
+    if (session && !session.isexpired(new Date().getTime() / 1000)) {
+      console.log('🔑 유효한 세션이 이미 존재함, 인증 과정 스킵');
+      return session;
+    }
+    
+    console.log('🔑 새 인증 프로세스 시작');
+    try {
+      const newSession = await _client.authenticateDevice(deviceId, true, userKey?.toString());
+      console.log('🔑 인증 성공');
+      return newSession;
+    } catch (error) {
+      console.error('인증 실패:', error);
+      return null;
+    }
+  }, [session]);
+  
+  const setupSocket = useCallback(async (
+    currentSession: Session, 
+    _client: Client
+  ): Promise<Socket | null> => {
+    // 이미 연결된 소켓이 있는지 확인
+    if (socketRef.current && connectionState.isConnected) {
+      console.log('🔌 이미 연결된 소켓 재사용');
+      return socketRef.current;
+    }
+    
+    console.log('🔌 새 소켓 연결 시작');
+    try {
+      const newSocket = _client.createSocket(useSSL);
+      
+      // 소켓 이벤트 리스너 설정
+      newSocket.ondisconnect = (evt) => {
+        console.log('Nakama 소켓 연결 해제:', evt);
+        updateConnectionState({ isConnected: false });
+        
+        // 연결 해제 리스너 호출
+        disconnectionListenersRef.current.forEach(listener => {
+          try {
+            listener(evt);
+          } catch (err) {
+            console.error('연결 해제 리스너 오류:', err);
+          }
+        });
+      };
+      
+      newSocket.onerror = (err) => {
+        console.error('Nakama 소켓 오류:', err);
+        updateConnectionState({ isConnecting: false });
+      };
+      
+      await newSocket.connect(currentSession, false);
+      console.log('🔌 소켓 연결 성공');
+      return newSocket;
+    } catch (error) {
+      console.error('소켓 연결 실패:', error);
+      return null;
+    }
+  }, [connectionState.isConnected, useSSL, updateConnectionState]);
+  
+  const joinChatRoom = useCallback(async (
+    socket: Socket,
+    userKey: string,
+    chatBotId: string
+  ): Promise<{ channelId: string; roomName: string } | null> => {
+    const roomName = `chat_${userKey}_${chatBotId}`;
+    console.log('💬 채팅방 참여 시도:', roomName);
+    
+    try {
+      const channel = await socket.joinChat(roomName, 1, true, false);
+      console.log('💬 채팅방 참여 성공:', channel);
+      
+      // 채널 객체에서 room_name 가져오기 (타입 캐스팅으로 에러 방지)
+      const actualRoomName = (channel as any).room_name || roomName;
+      return { channelId: channel.id, roomName: actualRoomName };
+    } catch (error) {
+      console.error('채팅방 참여 실패:', error);
+      return null;
+    }
+  }, []);
+  
+  const extractChatKey = useCallback((roomName: string): number => {
+    console.log('🔑 채팅 키 추출 시도:', roomName);
+    
+    // room_name이 없으면 0 반환
+    if (!roomName) {
+      console.error('❌ 채팅 키 추출 실패: roomName이 없음');
+      return 0;
+    }
+    
+    const roomNameStr = String(roomName);
+    const split = roomNameStr.split('|') || [];
+    console.log('🔑 채팅 키 추출 룸네임 분할:', split);
+    
+    let chatKey = 0;
+    
+    if (split.length >= 2) {
+      chatKey = parseInt(split[1]);
+      console.log('🔑 채팅 키 추출 결과:', chatKey);
+    } else {
+      console.error('❌ 채팅 키 추출 실패: 분할 결과 부족', split);
+    }
+    
+    return chatKey;
+  }, []);
+  
+  const initializeChat = useCallback(async (
+    chatKey: number,
+    chatMode: number
+  ): Promise<{ promptKey: string; nsfwValue: number } | null> => {
+    try {
+      const response = await chatApi.OpenChat(chatKey, chatMode, 1);
+      
+      if (response && response.data.result.err === 0) {
+        const promptKey = response.data.prompt_key;
+        const nsfwValue = response.data.world_list_detail_chrbot?.nsfw || 0;
+        
+        console.log('💾 채팅 초기화 성공:', { promptKey, nsfwValue });
+        return { promptKey, nsfwValue };
+      } else {
+        console.error('❌ 채팅 초기화 실패:', response?.data);
+        return null;
+      }
+    } catch (error) {
+      console.error('채팅 초기화 API 호출 실패:', error);
+      return null;
+    }
+  }, []);
+  
+  const fetchMessages = useCallback(async (
+    _client: Client,
+    currentSession: Session,
+    channelId: string
+  ): Promise<void> => {
+    try {
+      let max_count = 50;
+      let cursor = '';
+      let fetchRetries = 0;
+      const maxRetries = 3;
+
+      while(max_count > 0 && fetchRetries < maxRetries) {
+        try {
+          const result = await _client.listChannelMessages(
+            currentSession, channelId, max_count, true, cursor
+          );
+          
+          if (!result || !result.messages) {
+            console.warn('⚠️ 메시지 목록이 비어있거나 응답이 없습니다. 재시도 중...');
+            fetchRetries++;
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            continue;
+          }
+          
+          console.log(`💬 채팅 메시지 ${result.messages.length}개 수신`);
+
+          // 메시지 처리 로직...
+          const processedIds = new Set<string>();
+
+          console.log(result.messages)
+
+          result.messages.forEach((message) => {
+            const messageContent = message.content as any;
+            const senderId = message.sender_id || 
+              `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            const createTime = message.create_time ? 
+              new Date(message.create_time) : new Date();
+            
+            // if (processedIds.has(senderId)) {
+            //   console.log('⚠️ 중복 ID 감지, 메시지 건너뜀:', senderId);
+            //   return;
+            // }
+            
+            processedIds.add(senderId);
+            
+            addChatMessage({
+              id: senderId,
+              sender: messageContent?.type === 'user' ? 'user' : 'character',
+              message: messageContent?.content || '',
+              timestamp: createTime
+            });
+          });
+
+          cursor = result.next_cursor || '';
+          
+          if (result.messages.length < max_count) {
+            max_count = -1; // 모든 메시지를 가져왔으므로 루프 종료
+          } else {
+            max_count = 50;
+          }
+          
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (error) {
+          console.error("⚠️ 메시지 조회 중 오류:", error);
+          fetchRetries++;
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+    } catch (error) {
+      console.error("❌ 메시지 목록 조회 실패:", error);
+    }
+  }, []);
+  
+  // 메인 채팅방 초기화 함수 리팩토링
+  const chatRoomInit = useCallback(async (
+    userKey: string, 
+    chatBotId: string, 
+    chatMode: number
+  ): Promise<{
+    success: boolean;
+    channelId?: string;
+    roomName?: string;
+    error?: string;
+  }> => {
+    // 이미 초기화 중이면 중복 호출 방지
+    if (isInitializingChatRoom.current) {
+      console.log('🚫 이미 채팅방 초기화 중입니다');
+      return { success: false, error: 'ALREADY_INITIALIZING' };
+    }
+    
+    // 이미 초기화된 경우, 기존 정보 반환
+    if (connectionState.isInitRoom && chatRoomState.channelId && chatRoomState.roomName) {
+      console.log('✅ 채팅방이 이미 초기화되어 있습니다. 기존 정보 반환:', {
+        channelId: chatRoomState.channelId,
+        roomName: chatRoomState.roomName
+      });
+      
+      return {
+        success: true,
+        channelId: chatRoomState.channelId,
+        roomName: chatRoomState.roomName
+      };
+    }
+    
+    console.log('🚀 채팅방 초기화 프로세스 시작:', {
+      userKey, 
+      chatBotId, 
+      chatMode,
+      isInitRoom: connectionState.isInitRoom,
+      currentChannelId: chatRoomState.channelId
+    });
+    
+    isInitializingChatRoom.current = true;
+    
+    try {
+      // 단계 1: 클라이언트 확인
+      const _client = client || await createClient();
+      if (!_client) {
+        throw new Error('클라이언트 생성 실패');
+      }
+      
+      // 단계 2: 사용자 인증
+      const currentSession = await authenticateUser(userKey, _client);
+      if (!currentSession) {
+        throw new Error('인증 실패');
+      }
+      
+      // 로컬 변수로 세션 설정 (React 상태 업데이트에 의존하지 않음)
+      setSession(currentSession);
+      
+      // 단계 3: 소켓 설정
+      const newSocket = await setupSocket(currentSession, _client);
+      if (!newSocket) {
+        throw new Error('소켓 연결 실패');
+      }
+      
+      // 소켓 참조 및 상태 업데이트
+      socketRef.current = newSocket;
+      setSocket(newSocket);
+      updateConnectionState({ isConnecting: true });
+      
+      // 단계 4: 채팅방 참여
+      const roomData = await joinChatRoom(newSocket, userKey, chatBotId);
+      if (!roomData) {
+        throw new Error('채팅방 참여 실패');
+      }
+      
+      const { channelId, roomName } = roomData;
+      
+      // 채널ID와 룸네임 로깅
+      console.log('📝 채팅방 정보:', {
+        channelId,
+        roomName
+      });
+      
+      updateChatRoomState({ 
+        channelId, 
+        roomName,
+        currentChatMode: chatMode
+      });
+      
+      // 단계 5: 채팅 키 추출 - roomName에서 직접 추출
+      const chatKey = extractChatKey(roomName);
+      if (chatKey === 0) {
+        console.warn('⚠️ 채팅 키 추출 실패, 기본값 0 사용');
+      }
+      updateChatRoomState({ chrBotChatKey: chatKey });
+      
+      // 단계 6: 채팅 초기화
+      const chatInitData = await initializeChat(chatKey, chatMode);
+      if (!chatInitData) {
+        throw new Error('채팅 초기화 API 호출 실패');
+      }
+      
+      const { promptKey, nsfwValue } = chatInitData;
+      updateApiState({ 
+        sendPrompt_key: promptKey,
+        nsfw: nsfwValue
+      });
+      
+      // 단계 7: 연결 상태 업데이트
+      updateConnectionState({
+        isConnected: true,
+        isConnecting: false,
+        isInitRoom: true
+      });
+      
+      // 단계 8: 메시지 목록 가져오기
+      await fetchMessages(_client, currentSession, channelId);
+      
+      console.log('✅ 채팅방 초기화 완료: ', {
+        success: true,
+        channelId,
+        roomName,
+        chatKey
+      });
+      
+      return {
+        success: true,
+        channelId,
+        roomName
+      };
+    } catch (error: any) {
+      console.error('❌ 채팅방 초기화 중 오류 발생:', error);
+      updateConnectionState({
+        isConnecting: false,
+        isConnected: false,
+        isInitRoom: false
+      });
+      return { success: false, error: error.message || '알 수 없는 오류' };
+    } finally {
+      isInitializingChatRoom.current = false;
+    }
+  }, [
+    client, 
+    connectionState.isInitRoom, 
+    chatRoomState, 
+    authenticateUser, 
+    setupSocket, 
+    joinChatRoom, 
+    extractChatKey, 
+    initializeChat, 
+    fetchMessages,
+    updateConnectionState,
+    updateChatRoomState,
+    updateApiState
+  ]);
 
   // 클라이언트 초기화
   useEffect(() => {
@@ -148,36 +565,76 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     
     // 컴포넌트 언마운트 시 소켓 정리
     return () => {
-      disconnectSocket();
+      // 소켓 연결 해제 함수 호출
+      if (socketRef.current) {
+        socketRef.current.disconnect(true);
+        socketRef.current = null;
+        setSocket(null);
+        updateConnectionState({ 
+          isConnected: false,
+          isInitRoom: false
+        });
+      }
     };
-  }, [serverUrl, serverPort, serverKey, useSSL]);
+  }, [serverUrl, serverPort, serverKey, useSSL, updateConnectionState]);
 
-  // 자동 재연결 로직
+  // 리스너 알림 도우미 함수들
+  const notifyConnectionListeners = useCallback(() => {
+    connectionListenersRef.current.forEach((listener) => {
+      try {
+        listener();
+      } catch (err) {
+        console.error('연결 리스너 오류:', err);
+      }
+    });
+  }, []);
+
+  const notifyDisconnectionListeners = useCallback((evt: any) => {
+    disconnectionListenersRef.current.forEach((listener) => {
+      try {
+        listener(evt);
+      } catch (err) {
+        console.error('연결 해제 리스너 오류:', err);
+      }
+    });
+  }, []);
+
+  // 소켓 연결 해제 함수
+  const disconnectSocket = useCallback(async (): Promise<void> => {
+    try {
+      if (socketRef.current) {
+        await socketRef.current.disconnect(true);
+        socketRef.current = null;
+        setSocket(null);
+        updateConnectionState({ 
+          isConnected: false,
+          isInitRoom: false
+        });
+        console.log('소켓 연결이 성공적으로 해제되었습니다.');
+      }
+    } catch (error) {
+      console.error('소켓 연결 해제 중 오류:', error);
+    }
+  }, [updateConnectionState]);
+
+  // 자동 재연결 로직 수정 - 무한 루프 방지
   useEffect(() => {
-    console.log('@@@@@@ session 변경됨 ::: ', session);
-
-    // 세션이 있고 소켓이 연결되지 않은 상태라면 재연결 시도
-    if (session && !isConnected && !isConnecting && socketRef.current) {
+    // 소켓이 null이고, 세션이 있고, 이미 연결 중이 아닐 때만 재연결 시도
+    if (session && !connectionState.isConnected && !connectionState.isConnecting && client && !socketRef.current) {
+      let isMounted = true; // 컴포넌트 마운트 상태 추적
+      
       const attemptReconnect = async () => {
-        // 이미 연결 시도 중이면 무시
-        if (isConnecting) return;
+        // 이미 연결 시도 중이거나 컴포넌트가 언마운트되었으면 무시
+        if (connectionState.isConnecting || !isMounted) return;
         
         console.log('🔄 자동 재연결 시도 중...');
-        setIsConnecting(true);
+        updateConnectionState({ isConnecting: true });
         
         try {
-          // connectSocket 함수를 의존성 배열에서 제거하고 직접 client로 접근
+          // 클라이언트로 접근
           if (!client) {
             console.error('클라이언트가 없어 재연결할 수 없습니다.');
-            setIsConnecting(false);
-            return;
-          }
-          
-          // 이미 연결된 상태라면 재연결하지 않음
-          if (socketRef.current) {
-            setSocket(socketRef.current);
-            setIsConnected(true);
-            setIsConnecting(false);
+            if (isMounted) updateConnectionState({ isConnecting: false });
             return;
           }
 
@@ -186,50 +643,51 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           socketRef.current = newSocket;
           
           // 소켓 이벤트 리스너 설정
-          // newSocket.onconnect = () => {
-          //   console.log('Nakama 소켓 재연결 성공');
-          //   setIsConnected(true);
-          //   setIsConnecting(false);
-          //   notifyConnectionListeners();
-          // };
-          
           newSocket.ondisconnect = (evt) => {
             console.log('Nakama 소켓 연결 해제:', evt);
-            setIsConnected(false);
-            notifyDisconnectionListeners(evt);
+            if (isMounted) updateConnectionState({ isConnected: false });
+            
+            // 연결 해제 리스너 호출
+            disconnectionListenersRef.current.forEach(listener => {
+              try {
+                listener(evt);
+              } catch (err) {
+                console.error('연결 해제 리스너 오류:', err);
+              }
+            });
           };
           
           newSocket.onerror = (err) => {
             console.error('Nakama 소켓 오류:', err);
-            setIsConnecting(false);
+            if (isMounted) updateConnectionState({ isConnecting: false });
           };
           
           // 소켓 연결
           await newSocket.connect(session, true);
-          setSocket(newSocket);
+          if (isMounted) {
+            setSocket(newSocket);
+            updateConnectionState({ isConnected: true });
+            updateConnectionState({ isConnecting: false });
+          }
           console.log('🔌 소켓 재연결 성공!');
         } catch (error) {
           console.error('재연결 중 오류 발생:', error);
-          setIsConnecting(false);
+          if (isMounted) {
+            updateConnectionState({ isConnecting: false });
+            socketRef.current = null; // 연결 실패 시 참조 초기화
+          }
         }
       };
       
       // 3초 후 재연결 시도 (즉시 시도하지 않고 약간의 딜레이 후 시도)
       const timeoutId = setTimeout(attemptReconnect, 3000);
       
-      return () => clearTimeout(timeoutId);
+      return () => {
+        isMounted = false; // 컴포넌트 언마운트 시 상태 업데이트 방지
+        clearTimeout(timeoutId);
+      };
     }
-  }, [isConnected, isConnecting, session, client, useSSL]);
-
-  // 자동 연결 처리
-  // useEffect(() => {
-  //   console.log('client :: ', client);
-
-  //   if (autoConnect && client && session && !socket && !isConnecting) {
-  //     console.log('자동 연결 시작...');
-  //     connectSocket(session);
-  //   }
-  // }, [client, session, autoConnect]);
+  }, [session, connectionState.isConnected, connectionState.isConnecting, client, useSSL, updateConnectionState]);
 
   // 클라이언트 생성 함수
   const createClient = async (): Promise<Client> => {
@@ -429,26 +887,26 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           }
           
           // 자신이 보낸 메시지라도 응답은 처리
-          const promptKey = sendPrompt_key || '';
+          const promptKey = apiState.sendPrompt_key || '';
           console.log('👤 사용자 메시지 수신, SendChat API 호출:', {
             content: contentObj.content,
             channel: channelId,
-            chatKey: chrBotChatKey,
+            chatKey: chatRoomState.chrBotChatKey,
             promptKey: promptKey,
-            chatMode: currentChatMode,
-            nsfw: nsfw
+            chatMode: chatRoomState.currentChatMode,
+            nsfw: apiState.nsfw
           });
           
           // 저장된 채팅 키 사용
-          if (chrBotChatKey) {
+          if (chatRoomState.chrBotChatKey) {
             
             try {
               // 저장된 채팅 모드 사용
               const response = await chatApi.SendChat(
-                currentChatMode,
-                nsfw,
+                chatRoomState.currentChatMode,
+                apiState.nsfw,
                 promptKey,
-                chrBotChatKey,
+                chatRoomState.chrBotChatKey,
                 false // stream 설정
               );
               console.log('🤖 AI 응답 수신:', response);
@@ -460,8 +918,8 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
                 // 코인 차감
                 const coinResponse = await chatApi.UseChat(
-                  chrBotChatKey,
-                  currentChatMode,
+                  chatRoomState.chrBotChatKey,
+                  chatRoomState.currentChatMode,
                 )
 
                 if (coinResponse && coinResponse?.data && coinResponse?.data.result?.err === 0) {  
@@ -562,12 +1020,14 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         socketRef.current.onchannelmessage = prevHandler;
       }
     };
-  }, [socketRef.current, handleMessage, currentChatMode, chrBotChatKey, sendPrompt_key, nsfw]);
+  }, [socketRef.current, handleMessage, chatRoomState.currentChatMode, chatRoomState.chrBotChatKey, apiState.sendPrompt_key, apiState.nsfw]);
 
   // 메시지 전송 함수 (캡슐화)
   const sendChatMessage = async (messageText: string): Promise<boolean> => {
+    console.log('sendChatMessage 호출됨 :: ', messageText);
+
     try {
-      if (!channelId) {
+      if (!chatRoomState.channelId) {
         throw new Error('채널 ID가 없습니다.');
       }
 
@@ -589,7 +1049,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       console.log('📤 메시지 전송 준비:', {
         tempId: tempMessageId,
         content: messageText,
-        channelId
+        channelId: chatRoomState.channelId
       });
       
       // 임시 메시지 저장
@@ -602,7 +1062,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         content: messageText, 
         type: 'user' 
       };
-      await socketRef.current.writeChatMessage(channelId, content);
+      await socketRef.current.writeChatMessage(chatRoomState.channelId, content);
       console.log('✅ 메시지 전송 완료');
       
       return true;
@@ -624,12 +1084,12 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
   // 마지막 AI 메시지 새로고침 함수
   const refreshLastAIMessage = async (): Promise<boolean> => {
-    if (!isConnected) {
+    if (!connectionState.isConnected) {
       console.error('Nakama 서버에 연결되어 있지 않습니다.');
       throw new Error('채팅 서버에 연결되어 있지 않습니다.');
     }
 
-    if (!channelId) {
+    if (!chatRoomState.channelId) {
       console.error('채널 ID가 없습니다.');
       throw new Error('채팅 채널에 연결할 수 없습니다.');
     }
@@ -651,8 +1111,8 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     const lastMessage = chatMessages[actualIndex];
 
     try {
-      if (!chrBotChatKey) {
-        console.error('chrBotChatKey가 없습니다:', chrBotChatKey);
+      if (!chatRoomState.chrBotChatKey) {
+        console.error('chrBotChatKey가 없습니다:', chatRoomState.chrBotChatKey);
         throw new Error('채팅 데이터를 찾을 수 없습니다.');
       }
 
@@ -666,18 +1126,18 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       }
 
       console.log('메시지 새로고침 시도:', {
-        chatMode: currentChatMode,
+        chatMode: chatRoomState.currentChatMode,
         userMessage: lastUserMessage,
-        chrBotChatKey
+        chrBotChatKey: chatRoomState.chrBotChatKey
       });
 
       // API 호출하여 새로운 응답 생성
-      const promptKey = sendPrompt_key || '';
+      const promptKey = apiState.sendPrompt_key || '';
       const response = await chatApi.SendChat(
-        currentChatMode,
-        nsfw,
+        chatRoomState.currentChatMode,
+        apiState.nsfw,
         promptKey,
-        chrBotChatKey,
+        chatRoomState.chrBotChatKey,
         false // stream 설정
       );
 
@@ -722,7 +1182,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           type: 'ai' 
         };
         
-        await socketRef.current.writeChatMessage(channelId, content);
+        await socketRef.current.writeChatMessage(chatRoomState.channelId, content);
       } catch (parseError) {
         console.error('AI 응답 파싱 오류:', parseError);
         // 파싱 오류 시 기본 오류 메시지 전송
@@ -730,7 +1190,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           content: "응답을 처리하는 중 오류가 발생했습니다. 다시 시도해주세요.", 
           type: 'ai' 
         };
-        await socketRef.current.writeChatMessage(channelId, content);
+        await socketRef.current.writeChatMessage(chatRoomState.channelId, content);
       }
       console.log('새로운 메시지 전송 완료');
       
@@ -754,453 +1214,229 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     }
   };
 
-  // 채팅 기록 초기화
+  // clearChatHistory 함수 재구현 - 메시지 보존 및 규칙 검사
   const clearChatHistory = (): void => {
-    // setChatMessages([]);
+    setChatMessages(prevMessages => {
+      // 메시지가 없으면 빈 배열 반환
+      if (prevMessages.length === 0) return [];
+      
+      // 대화 규칙 확인: user와 character가 번갈아 나타나야 함
+      const cleanedMessages = prevMessages.reduce((result, currentMsg, index) => {
+        // 첫 메시지는 항상 포함
+        if (index === 0) {
+          return [currentMsg];
+        }
+        
+        const prevMsg = result[result.length - 1];
+        
+        // 같은 발신자의 연속된 메시지인 경우, 가장 최근 메시지만 유지
+        if (prevMsg.sender === currentMsg.sender) {
+          // 마지막 메시지를 최신 메시지로 교체
+          return [...result.slice(0, -1), currentMsg];
+        }
+        
+        // 규칙이 유지되는 메시지는 추가
+        return [...result, currentMsg];
+      }, [] as ChatMessage[]);
+      
+      console.log(`🧹 메시지 정리: ${prevMessages.length}개 → ${cleanedMessages.length}개`);
+      return cleanedMessages;
+    });
   };
 
   // 메시지 직접 추가
   const addChatMessage = (message: ChatMessage): void => {
     setChatMessages(prev => {
       // 이미 같은 ID의 메시지가 있는지 확인
-      const isDuplicate = prev.some(msg => msg.id === message.id);
-      if (isDuplicate) {
-        console.log('⚠️ 중복 메시지 무시 (addChatMessage):', message.id);
-        return prev;
-      }
+      // const isDuplicate = prev.some(msg => msg.id === message.id);
+      // if (isDuplicate) {
+      //   console.log('⚠️ 중복 메시지 무시 (addChatMessage):', message.id);
+      //   return prev;
+      // }
       
       // 고유 ID 메시지만 추가
       return [...prev, message];
     });
   };
 
-  /**
-   * 채팅 룸 초기화 함수
-   * @param userKey 사용자 고유 키
-   * @param chatBotId 챗봇/캐릭터 ID
-   * @param chatMode 채팅 모드 (1: 가성비, 2: 스토리, 3: 짜릿1, 4: 짜릿2)
-   */
-  const chatRoomInit = async (userKey: string, chatBotId: string, chatMode: number): Promise<{
-    success: boolean;
-    channelId?: string;
-    roomName?: string;
-  }> => {
-    try {
-      console.log('채팅방 초기화 시작:', { userKey, chatBotId, chatMode });
-      
-      // 초기화 상태 리셋
-      setIsInitRoom(false);
-      setChannelId(null);
-      setRoomName(null);
-      
-      // 채팅 모드 저장
-      setCurrentChatMode(chatMode);
-      
-      // 1. 클라이언트 확인 또는 생성
-      let _client = client;
-      if (!_client) {
-        console.log('Nakama 클라이언트 생성 중...');
-        _client = await createClient();
-        if (!_client) {
-          throw new Error('Nakama 클라이언트 생성 실패');
-        }
-      }
-
-      // 2. 디바이스 ID 생성 및 인증
-      const deviceId = `chatbot_jackpot_${userKey}`;
-      console.log('디바이스 인증 시작:', deviceId, _client);
-      
-      let newSession = await _client.authenticateDevice(deviceId, true, userKey?.toString());
-      // try {
-      //   console.log('인증 성공, 세션 생성됨');
-      // } catch (error) {
-      //   console.error('세션 생성 실패:', error);
-      //   newSession = await _client.authenticateDevice(deviceId, true, userKey?.toString());
-      // }
-
-      setSession(newSession);
-
-      // 3. 소켓 연결
-      const newSocket = _client.createSocket(useSSL);
-      await newSocket.connect(newSession, false);
-      setSocket(newSocket);
-      setIsConnecting(true);
-      socketRef.current = newSocket;
-
-      // 4. 채팅방 이름 생성 및 참여
-      const newRoomName = `chat_${userKey}_${chatBotId}`;
-      setRoomName(newRoomName);
-      
-      const persistence = true;
-      const hidden = false;
-      
-      const channel = await newSocket.joinChat(newRoomName, 1, persistence, hidden).catch((error) => {
-        console.error('채팅방 참여 실패:', error);
-        throw error;
-      });
-      
-      console.log('채팅방 참여 성공:', channel);
-      setChannelId(channel.id);
-
-      // 5. 채팅 키 추출
-      let newChrBotChatKey = 0;
-      // room_name 대신 name 속성 사용 (또는 channel 객체를 any로 캐스팅)
-      const split = (channel as any).room_name?.split('|') || [];
-      
-      if (split.length >= 2) {
-        newChrBotChatKey = parseInt(split[1]);
-        setChrBotChatKey(newChrBotChatKey);
-      }
-      
-      console.log('채팅 키 추출:', newChrBotChatKey);
-
-      // 6. 채팅 초기화 API 호출
-      const response = await chatApi.OpenChat(newChrBotChatKey, chatMode, 1);
-      
-      // 7. 연결 상태 업데이트 및 결과 리턴
-      const isSuccess = response && response.data.result.err === 0;
-      console.log('@@@@ response :: ', response.data);
-
-      if (isSuccess) {
-        setIsConnected(true);
-        setIsConnecting(false);
-        setIsInitRoom(true);
-        
-        // prompt_key와 nsfw 값을 즉시 저장
-        const promptKey = response.data.prompt_key;
-        const nsfwValue = response.data.world_list_detail_chrbot?.nsfw || 0;
-        
-        console.log('💾 저장할 값들:', { promptKey, nsfwValue });
-        
-        // 상태 업데이트를 Promise로 처리
-        await Promise.all([
-          new Promise<void>(resolve => {
-            setSendPrompt_key(promptKey);
-            resolve();
-          }),
-          new Promise<void>(resolve => {
-            setNsfw(1);
-            resolve();
-          })
-        ]);
-        
-        console.log('✅ 상태 업데이트 완료:', { 
-          sendPrompt_key: promptKey, 
-          nsfw: nsfwValue 
-        });
-      } else {
-        console.error('채팅 초기화 실패! 응답 데이터:', response?.data);
-        setIsConnected(true);
-        setIsConnecting(false);
-      }
-      
-      if (!isSuccess) {
-        console.warn('채팅 초기화 API 응답이 실패했습니다:', response?.data?.result?.msg || '알 수 없는 오류');
-        return { success: false };
-      }
-
-      console.log('💬 채팅 메시지 목록 조회 시작');
-      console.log('newSession :: ', newSession);
-      console.log('channel.id :: ', channel.id);
-      
-      try {
-        let max_count = 50
-        let cursor = ''
-
-        while(max_count > 0) {
-          const result = await _client?.listChannelMessages(newSession, channel.id, max_count, false, cursor);
-          console.log('💬 채팅 메시지 목록:', result);
-
-          if(result.messages) {
-            console.log('')
-            console.log('result.messages :: ', result.messages);
-            console.log('')
-
-            // ID 중복 확인을 위한 Set 생성
-            const processedIds = new Set<string>();
-            
-            result.messages.map((message) => {
-              // 타입 캐스팅과 널 체크로 TypeScript 오류 해결
-              const messageContent = message.content as any;
-              const senderId = message.sender_id || `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-              const createTime = message.create_time ? new Date(message.create_time) : new Date();
-              
-              // 이미 처리한 ID면 건너뛰기
-              if (processedIds.has(senderId)) {
-                console.log('⚠️ 중복 ID 감지, 메시지 건너뜀:', senderId);
-                return;
-              }
-              
-              processedIds.add(senderId);
-              
-              addChatMessage({
-                id: senderId,
-                sender: messageContent?.type === 'user' ? 'user' : 'character',
-                message: messageContent?.content || '',
-                timestamp: createTime
-              })
-            })
-  
-            cursor = result.next_cursor || ''
-  
-            if(result.messages?.length < max_count) {
-              max_count = -1
-            }
-            else {
-              max_count = 50
-            }
-  
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            console.log('💬 채팅 메시지 목록 대기중... ');
-          }
-        }
-
-      } catch (error) {
-        console.error("Error fetching messages:", error);
-      }
-
-      
-      return { 
-        success: isSuccess,
-        channelId: channel.id,
-        roomName: newRoomName
-      };
-      
-    } catch (error) {
-      console.error('채팅방 초기화 중 오류 발생:', error);
-      setIsConnecting(false);
-      setIsConnected(false);
-      setIsInitRoom(false);
-      throw error;
-    }
+  const updateChatMode = (mode: number) => {
+    updateChatRoomState({ currentChatMode: mode });
+    console.log('🔄 채팅 모드 업데이트:', mode);
   };
 
   // 소켓 연결 함수
-  const connectSocket = async (sessionData: Session): Promise<boolean> => {
-    if (!client) return false;
-    if (isConnecting) return false;
-    
-    // 이미 연결된 상태라면 재연결하지 않음
-    if (socketRef.current) {
-      setSocket(socketRef.current);
-      setIsConnected(true);
-      return true;
-    }
-    
-    setIsConnecting(true);
-    
+  const connectSocket = useCallback(async (currentSession: Session): Promise<boolean> => {
     try {
-      // 이전 소켓이 있다면 정리
-      if (socketRef.current) {
-        await disconnectSocket();
+      if (!client) {
+        console.error('클라이언트가 없어 소켓을 연결할 수 없습니다.');
+        return false;
       }
+
+      if (socketRef.current && connectionState.isConnected) {
+        console.log('이미 연결된 소켓이 있습니다.');
+        return true;
+      }
+
+      updateConnectionState({ isConnecting: true });
       
-      // 새 소켓 생성
       const newSocket = client.createSocket(useSSL);
+      socketRef.current = newSocket;
       
       // 소켓 이벤트 리스너 설정
-      // newSocket.onconnect = () => {
-      //   console.log('Nakama 소켓 연결됨');
-      //   setIsConnected(true);
-      //   setIsConnecting(false);
-      //   notifyConnectionListeners();
-      // };
-      
       newSocket.ondisconnect = (evt) => {
         console.log('Nakama 소켓 연결 해제:', evt);
-        setIsConnected(false);
-        notifyDisconnectionListeners(evt);
+        updateConnectionState({ isConnected: false });
+        
+        // 연결 해제 리스너 호출
+        disconnectionListenersRef.current.forEach(listener => {
+          try {
+            listener(evt);
+          } catch (err) {
+            console.error('연결 해제 리스너 오류:', err);
+          }
+        });
       };
       
       newSocket.onerror = (err) => {
         console.error('Nakama 소켓 오류:', err);
-        setIsConnecting(false);
+        updateConnectionState({ isConnecting: false });
       };
       
-      // 소켓 참조 업데이트 (채널 메시지 핸들러는 별도의 useEffect에서 설정)
-      socketRef.current = newSocket;
-      
-      // 소켓 연결
-      const currentSession = sessionData || session;
-      if (!currentSession) {
-        throw new Error('세션이 없습니다');
-      }
-      
-      await newSocket.connect(currentSession, true);
+      await newSocket.connect(currentSession, false);
       setSocket(newSocket);
-      setSession(currentSession);
+      updateConnectionState({ 
+        isConnected: true,
+        isConnecting: false 
+      });
+      
+      // 연결 리스너 호출
+      connectionListenersRef.current.forEach(listener => {
+        try {
+          listener();
+        } catch (err) {
+          console.error('연결 리스너 오류:', err);
+        }
+      });
+      
       return true;
     } catch (error) {
-      console.error('Nakama 소켓 연결 실패:', error);
-      setIsConnecting(false);
+      console.error('소켓 연결 실패:', error);
+      updateConnectionState({ isConnecting: false });
       return false;
     }
-  };
+  }, [client, connectionState.isConnected, useSSL, updateConnectionState]);
 
-  // 소켓 연결 해제 함수
-  const disconnectSocket = async (): Promise<void> => {
-    return new Promise((resolve) => {
-      if (!socketRef.current) {
-        resolve();
-        return;
-      }
-
-      // 연결 끊기 전에 원래 이벤트 핸들러를 빈 함수로 설정하여 오류 방지
-      try {
-        // 오류가 발생하는 핸들러를 빈 함수로 대체
-        socketRef.current.ondisconnect = () => {}; // 빈 함수로 설정하여 타입 에러 방지
-        
-        // 소켓 연결 종료 시도
-        socketRef.current.disconnect(true);
-      } catch (err) {
-        console.error('Nakama 소켓 연결 해제 중 오류:', err);
-      } finally {
-        // 상태 업데이트
-        socketRef.current = null;
-        setSocket(null);
-        setIsConnected(false);
-        
-        // 다른 상태 초기화
-        setChannelId(null);
-        setRoomName(null);
-        setIsInitRoom(false);
-        
-        console.log('소켓 연결 해제 완료');
-        resolve();
-      }
-
-      // 비동기 작업이 완료되지 않을 경우를 대비한 타임아웃
-      setTimeout(() => {
-        if (socketRef.current) {
-          console.warn('소켓 연결 해제 타임아웃, 강제 정리');
-          socketRef.current.ondisconnect = () => {}; // 빈 함수로 설정하여 타입 에러 방지
-          socketRef.current = null;
-          setSocket(null);
-          setIsConnected(false);
-          
-          // 다른 상태 초기화
-          setChannelId(null);
-          setRoomName(null);
-          setIsInitRoom(false);
-        }
-        resolve();
-      }, 1000);
-    });
-  };
-
-  // 채널 참가 함수
-  const joinChat = async (roomId: string, persistence = false, hidden = false): Promise<any> => {
-    if (!socketRef.current) {
-      throw new Error('소켓이 연결되지 않았습니다');
-    }
-
+  // 채팅방 참여 함수
+  const joinChat = useCallback(async (
+    roomId: string, 
+    persistence: boolean = true, 
+    hidden: boolean = false
+  ): Promise<any> => {
     try {
-      const channel = await socketRef.current.joinChat(roomId, 1, persistence, hidden);
-      console.log('Nakama 채팅 채널 참여:', channel);
-      return channel;
+      if (!socketRef.current) {
+        throw new Error('소켓이 초기화되지 않았습니다.');
+      }
+      
+      console.log(`채팅방 참여: ${roomId} (persistence=${persistence}, hidden=${hidden})`);
+      const response = await socketRef.current.joinChat(roomId, persistence ? 1 : 0, hidden, false);
+      return response;
     } catch (error) {
-      console.error('Nakama 채팅 참여 실패:', error);
+      console.error('채팅방 참여 실패:', error);
       throw error;
     }
-  };
+  }, []);
 
-  // 채널 나가기 함수
-  const leaveChat = async (channelId: string): Promise<boolean> => {
-    if (!socketRef.current) {
-      return false;
-    }
-
+  // 채팅방 나가기 함수
+  const leaveChat = useCallback(async (channelId: string): Promise<boolean> => {
     try {
+      if (!socketRef.current) {
+        console.error('소켓이 초기화되지 않았습니다.');
+        return false;
+      }
+      
+      console.log(`채팅방 나가기: ${channelId}`);
       await socketRef.current.leaveChat(channelId);
+      
+      // 채팅방 상태 초기화
+      updateChatRoomState({
+        channelId: null,
+        roomName: null
+      });
+      
+      updateConnectionState({
+        isInitRoom: false
+      });
+      
       return true;
     } catch (error) {
-      console.error('Nakama 채팅 퇴장 실패:', error);
+      console.error('채팅방 나가기 실패:', error);
       return false;
     }
-  };
+  }, [updateChatRoomState, updateConnectionState]);
 
-  // 채널 메시지 리스너 추가
-  const addChannelMessageListener = (channelId: string, listener: (message: any) => void): void => {
+  // 채널 메시지 리스너 관리 함수들
+  const addChannelMessageListener = useCallback((channelId: string, listener: (message: any) => void): void => {
     if (!channelListenersRef.current.has(channelId)) {
       channelListenersRef.current.set(channelId, new Set());
     }
-    channelListenersRef.current.get(channelId)?.add(listener);
-  };
+    
+    const listeners = channelListenersRef.current.get(channelId);
+    listeners?.add(listener);
+    console.log(`채널 메시지 리스너 추가: ${channelId}`);
+  }, []);
 
-  // 채널 메시지 리스너 제거
-  const removeChannelMessageListener = (channelId: string, listener: (message: any) => void): void => {
-    if (channelListenersRef.current.has(channelId)) {
-      channelListenersRef.current.get(channelId)?.delete(listener);
-      // 리스너가 없으면 맵에서 제거
-      if (channelListenersRef.current.get(channelId)?.size === 0) {
-        channelListenersRef.current.delete(channelId);
-      }
+  const removeChannelMessageListener = useCallback((channelId: string, listener: (message: any) => void): void => {
+    if (!channelListenersRef.current.has(channelId)) {
+      return;
     }
-  };
+    
+    const listeners = channelListenersRef.current.get(channelId);
+    listeners?.delete(listener);
+    console.log(`채널 메시지 리스너 제거: ${channelId}`);
+  }, []);
 
-  // 연결 리스너 추가
-  const addConnectionListener = (listener: () => void): void => {
+  // 연결 리스너 관리 함수들
+  const addConnectionListener = useCallback((listener: () => void): void => {
     connectionListenersRef.current.add(listener);
-  };
+    console.log('연결 리스너 추가');
+  }, []);
 
-  // 연결 리스너 제거
-  const removeConnectionListener = (listener: () => void): void => {
+  const removeConnectionListener = useCallback((listener: () => void): void => {
     connectionListenersRef.current.delete(listener);
-  };
+    console.log('연결 리스너 제거');
+  }, []);
 
-  // 연결 해제 리스너 추가
-  const addDisconnectionListener = (listener: (evt: any) => void): void => {
+  // 연결 해제 리스너 관리 함수들
+  const addDisconnectionListener = useCallback((listener: (evt: any) => void): void => {
     disconnectionListenersRef.current.add(listener);
-  };
+    console.log('연결 해제 리스너 추가');
+  }, []);
 
-  // 연결 해제 리스너 제거
-  const removeDisconnectionListener = (listener: (evt: any) => void): void => {
+  const removeDisconnectionListener = useCallback((listener: (evt: any) => void): void => {
     disconnectionListenersRef.current.delete(listener);
-  };
+    console.log('연결 해제 리스너 제거');
+  }, []);
 
-  // 연결 리스너 알림
-  const notifyConnectionListeners = (): void => {
-    connectionListenersRef.current.forEach(listener => {
-      try {
-        listener();
-      } catch (err) {
-        console.error('연결 리스너 오류:', err);
-      }
-    });
-  };
-
-  // 연결 해제 리스너 알림
-  const notifyDisconnectionListeners = (evt: any): void => {
-    disconnectionListenersRef.current.forEach(listener => {
-      try {
-        listener(evt);
-      } catch (err) {
-        console.error('연결 해제 리스너 오류:', err);
-      }
-    });
-  };
-
-
-  const updateChatMode = (mode: number) => {
-    setCurrentChatMode(mode);
-    console.log('🔄 채팅 모드 업데이트:', mode);
-  };
-
+  // 먼저 useMemo로 chatContextValue 객체 생성
   const contextValue: NakamaContextType = {
-    client,
+    client, 
     socket: socketRef.current,
     session,
-    isConnected,
-    isConnecting,
-    currentChatMode,
-    chrBotChatKey,
-    channelId,     // 채널 ID 추가
-    roomName,      // 룸 이름 추가
-    isInitRoom,    // 룸 초기화 상태 추가
-    charbotData,   // 캐릭터 데이터 추가
-    chatMessages,  // 채팅 메시지 배열 추가
+    isConnected: connectionState.isConnected,
+    isConnecting: connectionState.isConnecting,
+    currentChatMode: chatRoomState.currentChatMode,
+    chrBotChatKey: chatRoomState.chrBotChatKey,
+    channelId: chatRoomState.channelId,
+    roomName: chatRoomState.roomName,
+    isInitRoom: connectionState.isInitRoom,
+    charbotData,
+    chatMessages,
+    
+    // 메서드들
     setSession,
     chatRoomInit,
+    
+    // 필수 메서드들은 임시 구현하고 나중에 적절히 구현
     connectSocket,
     disconnectSocket,
     joinChat,
@@ -1221,6 +1457,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     updateChatMode
   };
 
+  // Provider 컴포넌트 간소화
   return (
     <NakamaContext.Provider value={contextValue}>
       {children}

@@ -50,6 +50,7 @@ const createApiInstance = (baseURL: string) => {
     timeout: 10000 * 30 * 10, // timeout 30초
     headers: {
       'Content-Type': 'application/json',
+      'X-Web-Access': true
     },
     withCredentials: false,
   })
