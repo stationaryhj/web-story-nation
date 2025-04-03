@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from 'react'
 // 튜토리얼 단계 설정 인터페이스
 interface TutorialStep {
   id: string
-  text: string
-  textPosition?: 'top' | 'middle' | 'bottom'
+  html: string
+  textPosition?: 'top' | 'bottom' | 'left' | 'right'
 }
 
 // 튜토리얼 설정 인터페이스
@@ -79,15 +79,40 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
   // 설명 텍스트 위치 계산
   const getTextPosition = () => {
     const step = config.steps[currentStep]
+    const padding = 20 // 타겟 요소와의 간격 (픽셀)
+
     switch (step.textPosition) {
       case 'top':
-        return { top: '20%' }
-      case 'middle':
-        return { top: '50%', transform: 'translateY(-50%)' }
+        return {
+          bottom: `${windowHeight - rect.top + padding}px`,
+          left: `${rect.left + rect.width / 2}px`,
+          transform: 'translateX(-50%)',
+        }
       case 'bottom':
-        return { bottom: '20%' }
+        return {
+          top: `${rect.bottom + padding}px`,
+          left: `${rect.left + rect.width / 2}px`,
+          transform: 'translateX(-50%)',
+        }
+      case 'left':
+        return {
+          right: `${windowWidth - rect.left + padding}px`,
+          top: `${rect.top + rect.height / 2}px`,
+          transform: 'translateY(-50%)',
+        }
+      case 'right':
+        return {
+          left: `${rect.right + padding}px`,
+          top: `${rect.top + rect.height / 2}px`,
+          transform: 'translateY(-50%)',
+        }
       default:
-        return { bottom: '20%' }
+        // 기본값은 bottom
+        return {
+          top: `${rect.bottom + padding}px`,
+          left: `${rect.left + rect.width / 2}px`,
+          transform: 'translateX(-50%)',
+        }
     }
   }
 
@@ -112,7 +137,7 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
       {/* 검은색 오버레이 배경 - 클리핑 경로 사용 */}
       <div
         ref={overlayRef}
-        className="fixed inset-0 bg-black/80 z-[9999]"
+        className="fixed inset-0 bg-black/85 z-[9999] backdrop-blur-sm transition-all duration-300"
         style={{
           clipPath: clipPath,
           WebkitClipPath: clipPath,
@@ -122,34 +147,53 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
 
       {/* 타겟 요소 테두리 */}
       <div
-        className="fixed border-2 border-white rounded-lg z-[10000]"
+        className="fixed border-2 border-primary-500 rounded-lg z-[10000] animate-[pulse_2s_ease-in-out_infinite]"
         style={{
           top: rect.top - 4,
           left: rect.left - 4,
           width: rect.width + 8,
           height: rect.height + 8,
+          boxShadow: '0 0 0 2px rgba(99, 102, 241, 0.4), 0 0 15px rgba(99, 102, 241, 0.4)',
         }}
       />
 
       {/* 설명 텍스트 */}
       <div
-        className="fixed left-1/2 -translate-x-1/2 text-white text-center max-w-[80%] z-[10001]"
-        style={getTextPosition()}
+        className="fixed text-white text-center max-w-[300px] z-[10001] p-3 backdrop-blur-sm shadow-lg"
+        style={{
+          ...getTextPosition(),
+          borderRadius: '12px',
+        }}
       >
-        <p className="text-lg font-medium mb-2">{config.steps[currentStep].text}</p>
-        <p className="text-sm text-gray-300">클릭하여 계속하기</p>
+        <div className="text-lg font-medium" dangerouslySetInnerHTML={{ __html: config.steps[currentStep].html }} />
+      </div>
+
+      {/* 클릭하여 계속하기 텍스트 - 화면 정중앙에 배치 */}
+      <div
+        className="fixed text-white text-center z-[10001] animate-pulse"
+        style={{
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          padding: '10px 20px',
+          borderRadius: '30px',
+          width: 'auto',
+        }}
+      >
+        <p className="text-sm font-medium text-white">클릭하여 계속하기</p>
       </div>
 
       {/* 다시보지 않기 체크박스 */}
-      <div className="fixed top-4 right-4 flex items-center gap-2 text-white z-[10001]">
+      <div className="fixed top-4 right-4 flex items-center gap-2 text-white z-[10001] bg-black/60 px-3 py-2 rounded-full backdrop-blur-sm shadow-lg transition-all duration-300 hover:bg-black/70">
         <input
           type="checkbox"
           id="dontShowAgain"
           checked={dontShowAgain}
           onChange={e => setDontShowAgain(e.target.checked)}
-          className="w-4 h-4 rounded border-gray-300 text-primary-500 focus:ring-primary-500"
+          className="w-4 h-4 rounded-md border-gray-300 text-primary-500 focus:ring-primary-500 cursor-pointer accent-primary-500"
         />
-        <label htmlFor="dontShowAgain" className="text-sm">
+        <label htmlFor="dontShowAgain" className="text-sm font-medium cursor-pointer select-none">
           다시 보지 않기
         </label>
       </div>

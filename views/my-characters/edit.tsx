@@ -13,7 +13,17 @@ export default function EditCharacterPage() {
   const characterId = params?.id as string
 
   const router = useRouter()
-  const { activeTab, setActiveTab, formData, resetForm, fetchInProgressData, saveInProgress, isLoadingData, isSaving, error: storeError } = useCreateCharacterData()
+  const {
+    activeTab,
+    setActiveTab,
+    formData,
+    resetForm,
+    fetchInProgressData,
+    saveInProgress,
+    isLoadingData,
+    isSaving,
+    error: storeError,
+  } = useCreateCharacterData()
 
   // 유효성 검사 상태
   const [isFormValid, setIsFormValid] = useState(false)
@@ -67,6 +77,11 @@ export default function EditCharacterPage() {
   const handleSubmit = async () => {
     try {
       // 완료 상태로 저장
+
+      // 기본 설정 부분에서 필수값 미입력 시 저장 불가, 미입력한 부분으로 페이지 이동 및 focus
+      // 기본 설정 부분에서 필수값 미입력 시 저장 불가, 미입력한 부분으로 페이지 이동 및 focus
+      // 기본 설정 부분에서 필수값 미입력 시 저장 불가, 미입력한 부분으로 페이지 이동 및 focus
+
       const saveResult = await saveInProgress(1)
       if (!saveResult) return
 

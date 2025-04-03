@@ -6,15 +6,63 @@ import PageTransition from '@/components/motion/PageTransition'
 import { bridgeCharbotChatDataToChatList } from '@/lib/utils/storyNationUtil'
 import { contentApi, chatApi } from '@/services/api/storyNationApi'
 import { ReqGetChatList } from '@/services/hooks/DataListManager'
-import { faSearch, faSort, faThumbtack, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faSort, faThumbtack, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { FormEvent } from 'react'
 import { useState, useEffect, useCallback } from 'react'
 import DeleteConfirmModal from '@/components/modal/DeleteConfirmModal'
+import { BaseSelectBox } from '@/components/elements/selectbox/BaseSelectBox'
+
+const chatListOptions = [
+  { value: 'latest', label: '최근 대화순' },
+  { value: 'oldest', label: '오래된 대화순' },
+  { value: 'mostChats', label: '대화 많은 순' },
+  { value: 'fewestChats', label: '대화 적은 순' },
+]
+
+// Toast 알림 컴포넌트
+interface ToastProps {
+  message: string
+  isVisible: boolean
+  onClose: () => void
+}
+
+const Toast = ({ message, isVisible, onClose }: ToastProps) => {
+  useEffect(() => {
+    if (isVisible) {
+      const timer = setTimeout(() => {
+        onClose()
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [isVisible, onClose])
+
+  return (
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div
+          className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-secondary-800 dark:bg-dark-secondary-900 text-white px-4 py-3 rounded-lg shadow-lg z-50 flex items-center"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 50 }}
+          transition={{ duration: 0.3 }}
+        >
+          <span className="mr-2">{message}</span>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-full hover:bg-secondary-700 dark:hover:bg-dark-secondary-800 transition-colors"
+          >
+            <FontAwesomeIcon icon={faXmark} className="w-4 h-4" />
+          </button>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
 
 export default function ChatListPage() {
   const router = useRouter()
@@ -25,31 +73,58 @@ export default function ChatListPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
   const [totalPages, setTotalPages] = useState(1)
+  const [selectedOption, setSelectedOption] = useState({ value: 'latest', label: '최근 대화순' })
+
+  // Toast 알림 상태
+  const [toast, setToast] = useState({
+    message: '',
+    isVisible: false,
+  })
+
+  // Toast 표시 함수
+  const showToast = (message: string) => {
+    setToast({
+      message,
+      isVisible: true,
+    })
+  }
+
+  // Toast 닫기 함수
+  const closeToast = () => {
+    setToast(prev => ({
+      ...prev,
+      isVisible: false,
+    }))
+  }
 
   // 채팅 목록 데이터 가져오기
   const { data: chatDataList, isLoading, error, refetch } = ReqGetChatList(itemsPerPage, currentPage)
-  
+
   // 전체 채팅 목록
-  const [chatList, setChatList] = useState<Array<{
-    id: string;
-    characterId: string;
-    name: string;
-    lastMessage: string;
-    time: string;
-    imageUrl: string;
-    fixed: number;
-  }>>([])
+  const [chatList, setChatList] = useState<
+    Array<{
+      id: string
+      characterId: string
+      name: string
+      lastMessage: string
+      time: string
+      imageUrl: string
+      fixed: number
+    }>
+  >([])
 
   // 필터링된 채팅 목록
-  const [filteredChatList, setFilteredChatList] = useState<Array<{
-    id: string;
-    characterId: string;
-    name: string;
-    lastMessage: string;
-    time: string;
-    imageUrl: string;
-    fixed: number;
-  }>>([])
+  const [filteredChatList, setFilteredChatList] = useState<
+    Array<{
+      id: string
+      characterId: string
+      name: string
+      lastMessage: string
+      time: string
+      imageUrl: string
+      fixed: number
+    }>
+  >([])
 
   // 데이터가 변경될 때마다 채팅 목록 업데이트
   useEffect(() => {
@@ -63,19 +138,17 @@ export default function ChatListPage() {
   // 검색어 및 탭 변경 시 필터링 적용
   useEffect(() => {
     let filtered = [...chatList]
-    
+
     // 탭에 따른 필터링
     if (activeTab === 'favorites') {
       filtered = filtered.filter(chat => Number(chat.fixed) > 0)
     }
-    
+
     // 검색어에 따른 필터링
     if (searchQuery.trim()) {
-      filtered = filtered.filter(chat => 
-        chat.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      filtered = filtered.filter(chat => chat.name.toLowerCase().includes(searchQuery.toLowerCase()))
     }
-    
+
     setFilteredChatList(filtered)
   }, [chatList, activeTab, searchQuery])
 
@@ -131,13 +204,51 @@ export default function ChatListPage() {
   const handleTogglePin = async (e: React.MouseEvent, bot_key: number, _fixed: number) => {
     e.stopPropagation() // 버블링 방지
 
-    try {
-      await contentApi.GetChatTopFixed(bot_key, _fixed > 0 ? 0 : 1)
-      // API 호출이 성공하면 목록 다시 불러오기
-      await refetch()
-    } catch (error) {
-      console.error('Failed to update chat fixed status:', error)
+    // 즐겨찾기 추가하려는 경우
+    if (_fixed === 0) {
+      try {
+        // 최신 데이터 가져오기 위해 즐겨찾기 상태 먼저 확인
+        await refetch()
+
+        // 현재 즐겨찾기 개수 정확히 계산
+        const pinnedChatsCount = chatList.filter(chat => Number(chat.fixed) === 1).length
+
+        console.log('현재 즐겨찾기 개수:', pinnedChatsCount)
+
+        // 이미 10개가 즐겨찾기되어 있으면 토스트 메시지 표시하고 함수 종료
+        if (pinnedChatsCount >= 10) {
+          showToast('즐겨찾기는 최대 10개까지만 가능합니다.')
+          return
+        }
+
+        // 즐겨찾기 설정 API 호출
+        await contentApi.GetChatTopFixed(bot_key, 1)
+        // 목록 다시 불러오기
+        await refetch()
+      } catch (error) {
+        console.error('Failed to update chat fixed status:', error)
+        showToast('즐겨찾기 설정 중 오류가 발생했습니다.')
+      }
+    } else {
+      // 즐겨찾기 해제
+      try {
+        await contentApi.GetChatTopFixed(bot_key, 0)
+        await refetch()
+      } catch (error) {
+        console.error('Failed to update chat fixed status:', error)
+        showToast('즐겨찾기 해제 중 오류가 발생했습니다.')
+      }
     }
+  }
+
+  const handleOptionChange = (option: { value: string; label: string }) => {
+    setSelectedOption(option)
+    //   if (query.trim()) {
+    // const filteredResults = MOCK_SEARCH_RESULTS[option.value as keyof typeof MOCK_SEARCH_RESULTS].filter(item =>
+    //   item.name.toLowerCase().includes(query.toLowerCase())
+    // )
+    // setSearchResults(filteredResults)
+    // setShowNoResults(filteredResults.length === 0)
   }
 
   // 페이지네이션 렌더링
@@ -157,13 +268,13 @@ export default function ChatListPage() {
         >
           이전
         </button>
-        
+
         {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
           // 현재 페이지를 중심으로 최대 5개의 페이지 번호를 표시
           let pageNum = currentPage - 2 + i
           if (pageNum < 1) pageNum += 5
           if (pageNum > totalPages) return null
-          
+
           return (
             <button
               key={pageNum}
@@ -178,7 +289,7 @@ export default function ChatListPage() {
             </button>
           )
         })}
-        
+
         <button
           onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages}
@@ -210,33 +321,35 @@ export default function ChatListPage() {
               >
                 <h2 className="text-xl font-bold mb-4 text-secondary-900 dark:text-dark-secondary-700">대화</h2>
 
-                <div className="flex mb-4 border-b border-secondary-100 dark:border-dark-secondary-200">
-                  <button
-                    className={`py-2 px-4 font-medium text-sm ${
-                      activeTab === 'all'
-                        ? 'text-primary-600 dark:text-dark-primary-600 border-b-2 border-primary-500 dark:border-dark-primary-500'
-                        : 'text-secondary-500 dark:text-dark-secondary-500'
-                    }`}
-                    onClick={() => handleTabChange('all')}
-                  >
-                    모든 대화
-                  </button>
-                  <button
-                    className={`py-2 px-4 font-medium text-sm ${
-                      activeTab === 'favorites'
-                        ? 'text-primary-600 dark:text-dark-primary-600 border-b-2 border-primary-500 dark:border-dark-primary-500'
-                        : 'text-secondary-500 dark:text-dark-secondary-500'
-                    }`}
-                    onClick={() => handleTabChange('favorites')}
-                  >
-                    즐겨찾기
-                  </button>
-
-                  <div className="ml-auto">
-                    <button className="p-2 text-secondary-500 dark:text-dark-secondary-500 hover:text-primary-500 dark:hover:text-dark-primary-600">
-                      <FontAwesomeIcon icon={faSort} />
+                <div className="flex md:flex-row pb-4 mb-4 justify-between border-b border-secondary-100 dark:border-dark-secondary-200">
+                  <div className="flex mb-2 md:mb-0">
+                    <button
+                      className={`py-1 px-2 md:py-2 md:px-4 font-medium text-xs md:text-sm ${
+                        activeTab === 'all'
+                          ? 'text-primary-600 dark:text-dark-primary-600 border-b-2 border-primary-500 dark:border-dark-primary-500'
+                          : 'text-secondary-500 dark:text-dark-secondary-500'
+                      }`}
+                      onClick={() => handleTabChange('all')}
+                    >
+                      모든 대화
+                    </button>
+                    <button
+                      className={`py-1 px-2 md:py-2 md:px-4 font-medium text-xs md:text-sm ${
+                        activeTab === 'favorites'
+                          ? 'text-primary-600 dark:text-dark-primary-600 border-b-2 border-primary-500 dark:border-dark-primary-500'
+                          : 'text-secondary-500 dark:text-dark-secondary-500'
+                      }`}
+                      onClick={() => handleTabChange('favorites')}
+                    >
+                      즐겨찾기
                     </button>
                   </div>
+                  <BaseSelectBox
+                    options={chatListOptions}
+                    selectedOption={selectedOption}
+                    onChange={handleOptionChange}
+                    className="w-full md:w-auto"
+                  />
                 </div>
 
                 <form onSubmit={handleSearch} className="mb-4">
@@ -273,7 +386,12 @@ export default function ChatListPage() {
                             onClick={() => router.push(`/chat/${chat.characterId}`)}
                           >
                             <div className="relative w-12 h-12 rounded-full overflow-hidden mr-3">
-                              <Image src={chat.imageUrl} alt={chat.name} fill className="object-cover" />
+                              <Image
+                                src={chat.imageUrl}
+                                alt={chat.name || '캐릭터 이미지'}
+                                fill
+                                className="object-cover"
+                              />
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex justify-between items-center mb-1">
@@ -311,10 +429,10 @@ export default function ChatListPage() {
                       ) : (
                         <div className="py-20 text-center">
                           <p className="text-secondary-500 dark:text-dark-secondary-500 mb-4">
-                            {searchQuery 
-                              ? '검색 결과가 없습니다.' 
-                              : activeTab === 'favorites' 
-                                ? '즐겨찾기한 대화가 없습니다.' 
+                            {searchQuery
+                              ? '검색 결과가 없습니다.'
+                              : activeTab === 'favorites'
+                                ? '즐겨찾기한 대화가 없습니다.'
                                 : '아직 대화를 시작한 캐릭터가 없습니다.'}
                           </p>
                           {!searchQuery && activeTab === 'all' && (
@@ -328,7 +446,7 @@ export default function ChatListPage() {
                         </div>
                       )}
                     </div>
-                    
+
                     {/* 페이지네이션 */}
                     {renderPagination()}
                   </>
@@ -347,6 +465,9 @@ export default function ChatListPage() {
           entityName={chatToDelete?.name}
           onConfirm={handleDeleteConfirm}
         />
+
+        {/* Toast 알림 */}
+        <Toast message={toast.message} isVisible={toast.isVisible} onClose={closeToast} />
       </div>
     </PageTransition>
   )

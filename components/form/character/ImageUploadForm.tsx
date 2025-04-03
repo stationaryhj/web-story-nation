@@ -11,14 +11,15 @@ import { useAccountStore } from '@/store/useAccountStore'
 import { getImageUri } from '@/lib/utils/storyNationUtil'
 import { contentApi } from '@/services/api'
 import { toast } from 'react-toastify'
+import RatingSelect from './RatingSelect'
 
 interface ImageUploadFormProps {
-  formData: any;
-  setFormField: (name: string, value: any) => void;
-  setNormalImage: (path: string) => void;
-  setAdultImage: (path: string) => void;
-  setAdultNormalImage: (path: string) => void;
-  onValidationChange?: (isValid: boolean) => void;
+  formData: any
+  setFormField: (name: string, value: any) => void
+  setNormalImage: (path: string) => void
+  setAdultImage: (path: string) => void
+  setAdultNormalImage: (path: string) => void
+  onValidationChange?: (isValid: boolean) => void
 }
 
 export default function ImageUploadForm({
@@ -27,7 +28,7 @@ export default function ImageUploadForm({
   setNormalImage,
   setAdultImage,
   setAdultNormalImage,
-  onValidationChange
+  onValidationChange,
 }: ImageUploadFormProps) {
   const { isAdult } = useAccountStore()
   const isAdultModeEnabled = isAdult()
@@ -58,35 +59,45 @@ export default function ImageUploadForm({
   }
 
   // 이미지 업로드 핸들러
-  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>, isAdultImage: boolean = false, isNormalImage: boolean = false) => {
+  const handleImageUpload = async (
+    e: ChangeEvent<HTMLInputElement>,
+    isAdultImage: boolean = false,
+    isNormalImage: boolean = false
+  ) => {
     const file = e.target.files?.[0]
-    
+
     if (!file) return
-    
+
     // 파일 크기 확인 (10MB 이하)
     if (file.size > 10 * 1024 * 1024) {
       toast.error('파일 크기는 10MB 이하여야 합니다')
       return
     }
-    
+
     try {
       // 파일 확장자 추출
       const extension = file.name.split('.').pop()?.toLowerCase()
       const contentType = file.type
-      
+
       // 이미지 파일 확인
       if (!contentType.startsWith('image/')) {
         toast.error('이미지 파일만 업로드할 수 있습니다')
         return
       }
-      
+
+      console.log('formdata', formData)
+
+      // if (visibility === 'public') {
+      //   setVisibleWarnigModal(true)
+      // }
+
       // Presigned URL 받아오기
       const presignedResponse = await contentApi.GetPresignedUrl(file.name, `.${extension || 'jpg'}`, 5)
-      
+
       if (presignedResponse.data.result.err !== 0 || !presignedResponse.data.presignedUrl) {
         throw new Error('이미지 업로드를 위한 URL을 받아오지 못했습니다')
       }
-      
+
       const presignedUrl = presignedResponse.data.presignedUrl
       const s3FilePath = presignedResponse.data.path
 
@@ -96,20 +107,20 @@ export default function ImageUploadForm({
       // 이미지 압축
       const reader = new FileReader()
       reader.readAsDataURL(file)
-      
-      reader.onload = async (event) => {
+
+      reader.onload = async event => {
         const img = new window.Image()
         img.src = event.target?.result as string
-        
+
         img.onload = async () => {
           const canvas = document.createElement('canvas')
           const ctx = canvas.getContext('2d')
-          
+
           // 이미지 최대 크기 설정 (가로/세로 최대 1024px)
           const MAX_SIZE = 1024
           let width = img.width
           let height = img.height
-          
+
           if (width > height && width > MAX_SIZE) {
             height = Math.round((height * MAX_SIZE) / width)
             width = MAX_SIZE
@@ -117,26 +128,26 @@ export default function ImageUploadForm({
             width = Math.round((width * MAX_SIZE) / height)
             height = MAX_SIZE
           }
-          
+
           canvas.width = width
           canvas.height = height
           ctx?.drawImage(img, 0, 0, width, height)
-          
+
           // 압축된 이미지를 Blob으로 변환
           const dataUrl = canvas.toDataURL('image/jpeg', 0.8)
-          
+
           // Base64 데이터 URL에서 바이너리 데이터 추출
           const base64Data = dataUrl.split(',')[1]
           const binaryData = atob(base64Data)
           const arrayBuffer = new ArrayBuffer(binaryData.length)
           const uint8Array = new Uint8Array(arrayBuffer)
-          
+
           for (let i = 0; i < binaryData.length; i++) {
             uint8Array[i] = binaryData.charCodeAt(i)
           }
-          
+
           const blob = new Blob([uint8Array], { type: 'image/jpeg' })
-          
+
           // S3에 이미지 업로드
           try {
             await fetch(presignedUrl, {
@@ -147,18 +158,16 @@ export default function ImageUploadForm({
               },
             })
 
-            if(isNormalImage) {
-              if(isAdultImage) {
+            if (isNormalImage) {
+              if (isAdultImage) {
                 setAdultNormalImage(s3FilePath)
+              } else {
+                setNormalImage(s3FilePath)
               }
-              else {
-                setNormalImage(s3FilePath)  
-              }
-            }
-            else {
+            } else {
               setAdultImage(s3FilePath)
             }
-            
+
             toast.success('이미지가 성공적으로 업로드되었습니다')
           } catch (error) {
             console.error('이미지 업로드 중 오류:', error)
@@ -175,41 +184,7 @@ export default function ImageUploadForm({
   return (
     <div className="space-y-6">
       {/* 이용등급 */}
-      <div>
-        <RequiredLabel>
-          <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-            이용등급
-          </label>
-        </RequiredLabel>
-        <div className="mt-2 grid grid-cols-2 gap-4">
-          <button
-            type="button"
-            onClick={() => handleRatingSelect('all')}
-            className={`rounded-lg px-4 py-3 text-center transition-colors ${
-              formData.rating === 'all'
-                ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-            }`}
-          >
-            전체 이용가
-          </button>
-          <button
-            type="button"
-            onClick={() => handleRatingSelect('adult')}
-            disabled={!isAdultModeEnabled}
-            className={`rounded-lg px-4 py-3 text-center transition-colors ${
-              formData.rating === 'adult' && isAdultModeEnabled
-                ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-            } ${!isAdultModeEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            성인 전용
-          </button>
-        </div>
-        {!isAdultModeEnabled && formData.rating === 'adult' && (
-          <p className="mt-2 text-sm text-red-500">성인 인증이 필요합니다.</p>
-        )}
-      </div>
+      <RatingSelect rating={formData.rating} onRatingSelect={handleRatingSelect} />
 
       {/* 이미지 그리드 */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
@@ -228,17 +203,15 @@ export default function ImageUploadForm({
 
             {/* 이미지 업로드 버튼 */}
             <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
-              <input 
-                type="file" 
-                accept="image/*" 
-                onChange={(e) => handleImageUpload(e, false, true)}
-                className="hidden" 
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e => handleImageUpload(e, false, true)}
+                className="hidden"
               />
               <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
                 <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
-                <span className="text-xs sm:text-sm">
-                  {formData.imgUrl ? '이미지 교체' : '이미지 업로드'}
-                </span>
+                <span className="text-xs sm:text-sm">{formData.imgUrl ? '이미지 교체' : '이미지 업로드'}</span>
               </div>
             </label>
           </>
@@ -249,10 +222,14 @@ export default function ImageUploadForm({
           <>
             {/* 기본 이미지 섹션 */}
             <div className="col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5 mt-4 mb-2">
-              <h3 className="text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">기본 이미지 (img_url)</h3>
-              <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">기본 모드에서 표시되는 이미지입니다.</p>
+              <h3 className="text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
+                기본 이미지 (img_url)
+              </h3>
+              <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">
+                기본 모드에서 표시되는 이미지입니다.
+              </p>
             </div>
-            
+
             {/* 기본 이미지 표시 */}
             {formData.imgUrl && (
               <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
@@ -265,12 +242,7 @@ export default function ImageUploadForm({
 
             {/* 기본 이미지 업로드 버튼 */}
             <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
-              <input 
-                type="file" 
-                accept="image/*" 
-                onChange={(e) => handleImageUpload(e, true, true)}
-                className="hidden" 
-              />
+              <input type="file" accept="image/*" onChange={e => handleImageUpload(e, true, true)} className="hidden" />
               <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
                 <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
                 <span className="text-xs sm:text-sm">
@@ -278,16 +250,20 @@ export default function ImageUploadForm({
                 </span>
               </div>
             </label>
-            
+
             {/* 구분선 */}
             <div className="col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5 my-4 border-t border-secondary-200 dark:border-dark-secondary-200/10"></div>
-            
+
             {/* 성인 이미지 섹션 */}
             <div className="col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5 mt-4 mb-2">
-              <h3 className="text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">싸릿 모드 이미지 (img_url_nsfw, img_web_url)</h3>
-              <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">성인 모드에서만 표시되는 이미지입니다.</p>
+              <h3 className="text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
+                싸릿 모드 이미지 (img_url_nsfw, img_web_url)
+              </h3>
+              <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">
+                성인 모드에서만 표시되는 이미지입니다.
+              </p>
             </div>
-            
+
             {/* 성인 이미지 표시 */}
             {formData.imgUrlNsfw && (
               <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
@@ -300,11 +276,11 @@ export default function ImageUploadForm({
 
             {/* 성인 이미지 업로드 버튼 */}
             <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
-              <input 
-                type="file" 
-                accept="image/*" 
-                onChange={(e) => handleImageUpload(e, true, false)}
-                className="hidden" 
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e => handleImageUpload(e, true, false)}
+                className="hidden"
               />
               <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
                 <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
@@ -325,8 +301,8 @@ export default function ImageUploadForm({
           </p>
         </div>
       ) : null}
-      
-      {formData.rating === 'adult' && (!formData.imgUrl && !formData.imgUrlNsfw) ? (
+
+      {formData.rating === 'adult' && !formData.imgUrl && !formData.imgUrlNsfw ? (
         <div className="text-center p-4 bg-secondary-50 dark:bg-dark-secondary-100/5 rounded-lg">
           <p className="text-sm text-secondary-500 dark:text-dark-secondary-500">
             이미지가 없습니다. 이미지를 업로드해주세요.
@@ -366,4 +342,4 @@ export default function ImageUploadForm({
       </div>
     </div>
   )
-} 
+}
