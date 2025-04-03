@@ -4,6 +4,103 @@ import { useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import he from 'he'
 
+// 네이버 로그인 콜백 URL 파싱 함수
+function parseNaverCallback(callbackUrl: string) {
+  console.log('파싱할 URL:', callbackUrl);
+
+  // code 파라미터 추출
+  const codeMatch = callbackUrl.match(/code=([^&]+)/);
+  const code = codeMatch ? codeMatch[1] : null;
+  console.log('추출된 code:', code);
+  
+  // state 파라미터 추출 - code 이후의 &state= 다음 텍스트
+  const stateStart = callbackUrl.indexOf('&state=') + 7; // '&state='.length
+  
+  if (stateStart > 6) { // state 파라미터가 발견된 경우
+    // 원본 state 문자열 (인코딩된 상태)
+    const encodedStateStr = callbackUrl.substring(stateStart);
+    console.log('인코딩된 state:', encodedStateStr);
+    
+    // HTML 엔티티 디코딩 (&quot; -> " 등)
+    let decodedStateStr;
+    try {
+      decodedStateStr = he.decode(encodedStateStr);
+      console.log('HTML 엔티티 디코딩된 state:', decodedStateStr);
+    } catch (error) {
+      console.error('HTML 엔티티 디코딩 실패:', error);
+      decodedStateStr = encodedStateStr;
+    }
+    
+    // URL 디코딩
+    try {
+      decodedStateStr = decodeURIComponent(decodedStateStr);
+      console.log('URL 디코딩된 state:', decodedStateStr);
+    } catch (error) {
+      console.error('URL 디코딩 실패:', error);
+    }
+    // alert(decodedStateStr)
+    // 1. JSON 파싱 시도
+    try {
+      // 잘린 JSON을 복구하려고 시도 (끝에 }가 없는 경우)
+      if (decodedStateStr.includes('{') && !decodedStateStr.includes('}')) {
+        decodedStateStr += '"}}'
+      }
+
+      
+      
+      const stateObj = JSON.parse(decodedStateStr);
+
+      
+      console.log('JSON 파싱 성공:', stateObj);
+      return {
+        code,
+        state: stateObj
+      };
+    } catch (e) {
+      console.error('JSON 파싱 오류:', e);
+      
+      // 2. 정규식으로 개별 필드 추출 시도
+      const providerMatch = decodedStateStr.match(/"provider"[\s]*:[\s]*"([^"]+)"/);
+      const snsauthMatch = decodedStateStr.match(/"snsauth"[\s]*:[\s]*"([^"]+)"/);
+      const clientIdMatch = decodedStateStr.match(/"clientId"[\s]*:[\s]*"([^"]+)"/);
+      const snstypeMatch = decodedStateStr.match(/"snstype"[\s]*:[\s]*(\d+)/);
+      
+      const extractedState = {
+        provider: providerMatch ? providerMatch[1] : 'NAVER',
+        snsauth: snsauthMatch ? snsauthMatch[1] : null,
+        clientId: clientIdMatch ? clientIdMatch[1] : null,
+        snstype: snstypeMatch ? parseInt(snstypeMatch[1]) : 0
+      };
+      
+      console.log('정규식으로 추출된 state:', extractedState);
+      
+      // 추출 실패 시 하드코딩된 값 사용 (마지막 수단)
+      if (!extractedState.snsauth || !extractedState.clientId) {
+        // 로컬 스토리지에서 정보 가져오기 시도
+        try {
+          const savedState = localStorage.getItem('social_login_state');
+          if (savedState) {
+            const savedStateObj = JSON.parse(savedState);
+            extractedState.snsauth = extractedState.snsauth || savedStateObj.snsauth;
+            extractedState.clientId = extractedState.clientId || savedStateObj.clientId;
+            extractedState.snstype = extractedState.snstype || savedStateObj.snstype;
+            console.log('로컬 스토리지에서 복구한 state:', extractedState);
+          }
+        } catch (error) {
+          console.error('로컬 스토리지 복구 실패:', error);
+        }
+      }
+      
+      return {
+        code,
+        state: extractedState
+      };
+    }
+  }
+  
+  return { code, state: null };
+}
+
 export default function CallbackPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -12,7 +109,7 @@ export default function CallbackPage() {
     const processCallback = async () => {
       // 원본 URL 로깅
       console.log('Original URL:', window.location.href)
-      
+
       // 중복 처리 방지 (이미 메시지를 보냈는지 확인)
       if (sessionStorage.getItem('callback_message_sent') === 'true') {
         console.log('이미 메시지가 전송되었습니다. 중복 처리 방지');
@@ -23,8 +120,7 @@ export default function CallbackPage() {
       const code = searchParams?.get('code')
       const error = searchParams?.get('error')
       const errorDescription = searchParams?.get('error_description')
-      const state = searchParams?.get('state')
-
+      
       // 디버깅을 위한 검색 파라미터 전체 로깅
       const allParams: Record<string, string> = {};
       searchParams?.forEach((value, key) => {
@@ -35,43 +131,69 @@ export default function CallbackPage() {
       // 로그인 타입 파악 (state 파라미터에서 추출)
       let loginType = 'UNKNOWN';
       let stateObj = null;
+      let parsedState = null;
       
       try {
-        if (state) {
-          console.log('State 파라미터 원본:', state);
+        // 로컬 스토리지에서 로그인 타입 확인
+        const socialLoginType = localStorage.getItem('social_login_type');
+        
+        if (socialLoginType === 'naver') {
+          // 네이버 로그인인 경우 커스텀 파서 사용
+          const result = parseNaverCallback(window.location.href);
           
-          // 네이버의 경우 HTML entity로 인코딩된 state 값 처리
-          let decodedState = state;
-          
-          // 로컬 스토리지에서 로그인 타입 확인
-          const socialLoginType = localStorage.getItem('social_login_type');
-          
-          // 네이버 로그인인 경우 he 라이브러리로 디코딩 추가 처리
-          if (socialLoginType === 'naver') {
-            try {
-              // HTML entity 디코딩 (예: &quot; -> ")
-              decodedState = he.decode(state);
-              console.log('he로 디코딩된 state:', decodedState);
-            } catch (decodeError) {
-              console.error('he 디코딩 오류:', decodeError);
-            }
-          }
-          
-          // JSON 파싱 시도
-          try {
-            stateObj = JSON.parse(decodedState);
-          } catch (parseError) {
-            // URL 디코딩 후 다시 시도
-            try {
-              stateObj = JSON.parse(decodeURIComponent(decodedState));
-            } catch (e) {
-              console.error('State 파싱 모든 시도 실패');
-            }
-          }
-          
+          parsedState = JSON.stringify(result.state);
+          stateObj = result.state;
+
+          // 네이버는 여기서 리턴 (parsedState)
+          sessionStorage.setItem('callback_message_sent', 'true');
+          window.opener.postMessage(
+            {
+              code,
+              state: parsedState || searchParams?.get('state'), // 파싱된 state 또는 원본 state
+              login_type: loginType
+            },
+            window.location.origin
+          )
+
+          setTimeout(() => {
+            console.log('콜백 창 닫기 시도');
+            // 세션 스토리지 정리
+            sessionStorage.removeItem('callback_message_sent');
+            window.close()
+          }, 5000)
+
+          return
+
+
           if (stateObj) {
-            console.log('파싱된 State:', stateObj);
+            console.log('네이버 파싱된 State:', stateObj);
             loginType = stateObj.provider || 'UNKNOWN';
+          }
+        } else {
+          // 기존 파싱 로직 (다른 소셜 로그인)
+          const state = searchParams?.get('state');
+          
+          if (state) {
+            console.log('State 파라미터 원본:', state);
+            
+            let decodedState = state;
+            
+            // JSON 파싱 시도
+            try {
+              stateObj = JSON.parse(decodedState);
+            } catch (parseError) {
+              // URL 디코딩 후 다시 시도
+              try {
+                stateObj = JSON.parse(decodeURIComponent(decodedState));
+              } catch (e) {
+                console.error('State 파싱 모든 시도 실패');
+              }
+            }
+            
+            if (stateObj) {
+              console.log('파싱된 State:', stateObj);
+              loginType = stateObj.provider || 'UNKNOWN';
+            }
           }
         }
       } catch (e) {
@@ -97,13 +219,13 @@ export default function CallbackPage() {
             window.location.origin
           )
         }
-        // 성공한 경우 - state 파라미터 추가
+        // 성공한 경우 - 파싱된 state 파라미터 추가
         else if (code) {
           console.log('성공 메시지 전송:', { code: code?.substring(0, 5) + '...', login_type: loginType });
           window.opener.postMessage(
             {
               code,
-              state, // state 파라미터 추가
+              state: parsedState || searchParams?.get('state'), // 파싱된 state 또는 원본 state
               login_type: loginType
             },
             window.location.origin

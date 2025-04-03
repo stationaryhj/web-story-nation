@@ -660,7 +660,14 @@ export const contentApi = {
     api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/getnoti')
   },
-  
+
+  // naver/get/token
+  GetNaverToken: async (code: string, state: string): Promise<ApiResponse> => {
+    return api.post('api/naver/get/token', {
+      code,
+      state,
+    })
+  },
 }
 
 // 채팅 API
@@ -1064,5 +1071,6 @@ export const createApi = {
     return api.post('/api/writerinfo')
   }
 }
+
 
 export { setAuthToken, API_URL, CHAT_URL }
