@@ -96,11 +96,22 @@ export default function DetailInfoForm({
 
   // 현재 선택된 입력 필드 (user 또는 character)
   const [activeField, setActiveField] = useState<{ id: string; field: 'user' | 'character' } | null>(null)
-  const [showTutorial, setShowTutorial] = useState(true)
+  const [showTutorial, setShowTutorial] = useState(false)
 
   // 성인 인증 상태 확인
   const { isAdult } = useAccountStore()
   const isAdultModeEnabled = isAdult()
+
+  // 대화 예시가 처음 추가될 때 튜토리얼 표시
+  useEffect(() => {
+    // 대화 예시가 하나 이상 있고, 이전에 없었다면 튜토리얼 표시
+    if (formData.conversationExamples.length === 1) {
+      const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
+      if (!tutorialCompleted) {
+        setShowTutorial(true)
+      }
+    }
+  }, [formData.conversationExamples.length])
 
   // 사용자 및 캐릭터 메시지 상태 관리
   const [userMessages, setUserMessages] = useState<{ [key: string]: string }>({})
@@ -114,14 +125,6 @@ export default function DetailInfoForm({
       onValidationChange(isValid)
     }
   }, [formData, onValidationChange])
-
-  // 대화 예시가 없을 경우 자동으로 하나 생성
-  useEffect(() => {
-    if (!initializedRef.current && formData.conversationExamples.length === 0) {
-      addConversationExample()
-      initializedRef.current = true
-    }
-  }, [formData.conversationExamples.length, addConversationExample])
 
   // 대화 예시 데이터에서 사용자 및 캐릭터 메시지 초기화 (렌더링과 별개로 처리)
   useEffect(() => {
