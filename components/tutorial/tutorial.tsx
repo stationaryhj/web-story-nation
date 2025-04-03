@@ -137,7 +137,7 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
       {/* 검은색 오버레이 배경 - 클리핑 경로 사용 */}
       <div
         ref={overlayRef}
-        className="fixed inset-0 bg-black/80 z-[9999]"
+        className="fixed inset-0 bg-black/85 z-[9999] backdrop-blur-sm transition-all duration-300"
         style={{
           clipPath: clipPath,
           WebkitClipPath: clipPath,
@@ -147,21 +147,24 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
 
       {/* 타겟 요소 테두리 */}
       <div
-        className="fixed border-2 border-white rounded-lg z-[10000]"
+        className="fixed border-2 border-primary-500 rounded-lg z-[10000] animate-[pulse_2s_ease-in-out_infinite]"
         style={{
           top: rect.top - 4,
           left: rect.left - 4,
           width: rect.width + 8,
           height: rect.height + 8,
+          boxShadow: '0 0 0 2px rgba(99, 102, 241, 0.4), 0 0 15px rgba(99, 102, 241, 0.4)',
         }}
       />
 
       {/* 설명 텍스트 */}
       <div
-        className="fixed text-white text-center max-w-[300px] z-[10001]"
+        className="fixed text-white text-center max-w-[300px] z-[10001] bg-black/80 p-3 backdrop-blur-sm shadow-lg"
         style={{
           ...getTextPosition(),
-          borderRadius: '8px',
+          borderRadius: '12px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         }}
       >
         <div className="text-lg font-medium" dangerouslySetInnerHTML={{ __html: config.steps[currentStep].html }} />
@@ -169,7 +172,7 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
 
       {/* 클릭하여 계속하기 텍스트 - 화면 정중앙에 배치 */}
       <div
-        className="fixed text-white text-center z-[10001]"
+        className="fixed text-white text-center z-[10001] animate-pulse"
         style={{
           top: '50%',
           left: '50%',
@@ -178,21 +181,23 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
           padding: '10px 20px',
           borderRadius: '30px',
           width: 'auto',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',
+          backdropFilter: 'blur(4px)',
         }}
       >
-        <p className="text-sm text-gray-300">클릭하여 계속하기</p>
+        <p className="text-sm font-medium text-primary-300">클릭하여 계속하기</p>
       </div>
 
       {/* 다시보지 않기 체크박스 */}
-      <div className="fixed top-4 right-4 flex items-center gap-2 text-white z-[10001]">
+      <div className="fixed top-4 right-4 flex items-center gap-2 text-white z-[10001] bg-black/60 px-3 py-2 rounded-full backdrop-blur-sm shadow-lg transition-all duration-300 hover:bg-black/70">
         <input
           type="checkbox"
           id="dontShowAgain"
           checked={dontShowAgain}
           onChange={e => setDontShowAgain(e.target.checked)}
-          className="w-4 h-4 rounded border-gray-300 text-primary-500 focus:ring-primary-500"
+          className="w-4 h-4 rounded-md border-gray-300 text-primary-500 focus:ring-primary-500 cursor-pointer accent-primary-500"
         />
-        <label htmlFor="dontShowAgain" className="text-sm">
+        <label htmlFor="dontShowAgain" className="text-sm font-medium cursor-pointer select-none">
           다시 보지 않기
         </label>
       </div>

@@ -11,17 +11,18 @@ import { useModalStore } from '@/store/useStoreModal'
 import { Tag } from '@/store/useCreateCharacterData'
 import ConfirmActionModal from '../../modal/ConfirmActionModal'
 import { toast } from 'react-toastify'
+import RatingSelect from './RatingSelect'
 
 interface BasicInfoFormProps {
-  formData: any;
-  setFormField: (name: string, value: any) => void;
-  addHashtag: (tag: string) => Promise<void>;
-  removeHashtag: (tag: string) => Promise<void>;
-  fetchTagList: () => Promise<void>;
-  saveHashtags: () => Promise<void>;
-  availableTags: Tag[];
-  isLoadingTags: boolean;
-  onValidationChange?: (isValid: boolean) => void;
+  formData: any
+  setFormField: (name: string, value: any) => void
+  addHashtag: (tag: string) => Promise<void>
+  removeHashtag: (tag: string) => Promise<void>
+  fetchTagList: () => Promise<void>
+  saveHashtags: () => Promise<void>
+  availableTags: Tag[]
+  isLoadingTags: boolean
+  onValidationChange?: (isValid: boolean) => void
 }
 
 export default function BasicInfoForm({
@@ -33,7 +34,7 @@ export default function BasicInfoForm({
   saveHashtags,
   availableTags,
   isLoadingTags,
-  onValidationChange
+  onValidationChange,
 }: BasicInfoFormProps) {
   const [visibleWarnigModal, setVisibleWarnigModal] = useState(false)
   const { isAdult } = useAccountStore()
@@ -41,34 +42,30 @@ export default function BasicInfoForm({
 
   // 태그 데이터 로드
   useEffect(() => {
-    fetchTagList();
-  }, [fetchTagList]);
+    fetchTagList()
+  }, [fetchTagList])
 
   // 그룹별로 태그 정리하기
   const allAvailableTags = useMemo(() => {
     // 모든 그룹의 태그를 하나의 배열로 합치기
-    const allTags = [...availableTags];
-    
+    const allTags = [...availableTags]
+
     // 정렬 (그룹 순서로 정렬, 같은 그룹 내에서는 sort 값으로 정렬)
     allTags.sort((a, b) => {
       if (a.group !== b.group) {
-        return a.group - b.group;
+        return a.group - b.group
       }
-      return a.sort - b.sort;
-    });
-    
-    return allTags;
-  }, [availableTags]);
+      return a.sort - b.sort
+    })
+
+    return allTags
+  }, [availableTags])
 
   // 유효성 검사
   useEffect(() => {
     if (onValidationChange) {
       // 기본 정보 탭은 필수 입력 항목이 많음
-      const isValid = !!(
-        formData.name?.trim() &&
-        formData.bio?.trim() &&
-        formData.firstMessage?.trim()
-      )
+      const isValid = !!(formData.name?.trim() && formData.bio?.trim() && formData.firstMessage?.trim())
       onValidationChange(isValid)
     }
   }, [formData, onValidationChange])
@@ -111,23 +108,23 @@ export default function BasicInfoForm({
     try {
       if (formData.hashtags.includes(tag)) {
         // 태그 제거
-        await removeHashtag(tag);
+        await removeHashtag(tag)
       } else {
         // 태그 추가 (최대 7개 제한)
         if (formData.hashtags.length < 7) {
-          await addHashtag(tag);
+          await addHashtag(tag)
         } else {
           toast.error('최대 7개의 태그만 선택할 수 있습니다.')
-          return;
+          return
         }
       }
-      
+
       // 태그 변경 후 API 호출하여 저장
       if (formData.world_list_detail_chrbot_key) {
-        await saveHashtags();
+        await saveHashtags()
       }
     } catch (error) {
-      console.error('태그 처리 중 오류:', error);
+      console.error('태그 처리 중 오류:', error)
     }
   }
 
@@ -153,41 +150,8 @@ export default function BasicInfoForm({
         {/* 기본 설정 */}
         <div className="space-y-6">
           {/* 이용등급 */}
-          <div>
-            <RequiredLabel>
-              <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-                이용등급
-              </label>
-            </RequiredLabel>
-            <div className="mt-2 grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                onClick={() => handleRatingSelect('all')}
-                className={`rounded-lg px-4 py-3 text-center transition-colors ${
-                  formData.rating === 'all'
-                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-                }`}
-              >
-                전체 이용가
-              </button>
-              <button
-                type="button"
-                onClick={() => handleRatingSelect('adult')}
-                disabled={!isAdultModeEnabled}
-                className={`rounded-lg px-4 py-3 text-center transition-colors ${
-                  formData.rating === 'adult'
-                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-                } ${!isAdultModeEnabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                성인 전용
-              </button>
-            </div>
-            {!isAdultModeEnabled && formData.rating === 'adult' && (
-              <p className="mt-2 text-sm text-red-500">성인 인증이 필요합니다.</p>
-            )}
-          </div>
+          <RatingSelect rating={formData.rating} onRatingSelect={handleRatingSelect} />
+
           {/* 이름 */}
           <div>
             <RequiredLabel>
@@ -209,9 +173,7 @@ export default function BasicInfoForm({
           {/* 성별 */}
           <div>
             <RequiredLabel>
-              <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-                성별
-              </label>
+              <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">성별</label>
             </RequiredLabel>
             <div className="mt-2 grid grid-cols-3 gap-4">
               <button
@@ -294,9 +256,7 @@ export default function BasicInfoForm({
                   한줄 소개
                 </label>
               </RequiredLabel>
-              <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-                {formData.bio.length}/80
-              </span>
+              <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">{formData.bio.length}/80</span>
             </div>
             <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2">
               내 캐릭터를 간단히 소개해 보세요!
@@ -416,4 +376,4 @@ export default function BasicInfoForm({
       </div>
     </>
   )
-} 
+}

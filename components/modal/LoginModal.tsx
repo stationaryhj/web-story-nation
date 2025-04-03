@@ -222,7 +222,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 <div className="text-sm text-gray-500">스토리네이션</div>
               </div>
               <div>
-                <SpeechBubble text="3초만에 가입하고 30펜 받으세요" position="center" />
+                <SpeechBubble text="3초만에 가입하고 30펜 받으세요!" position="center" />
               </div>
             </>
           )}

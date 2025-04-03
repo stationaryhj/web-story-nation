@@ -36,6 +36,7 @@ export default function Card({
   const { openModal, setSelectedCharacter } = useModalStore()
   const [imageError, setImageError] = React.useState(false)
   const router = useRouter()
+
   // 카드 클릭 기본 핸들러 - 캐릭터 모달 열기
   const defaultCardClick = () => {
     setSelectedCharacter(character)
@@ -97,7 +98,7 @@ export default function Card({
 
             <Image
               src={imageUrl}
-              alt={name}
+              alt={`${name} 캐릭터 이미지`}
               fill
               sizes="(max-width: 640px) 25vw, 128px"
               className="object-cover"
@@ -109,7 +110,7 @@ export default function Card({
 
             {/* 댓글 수 표시 - 이미지 우측 하단으로 이동 */}
             <div className="absolute bottom-2 right-2 flex items-center gap-[5px] text-white text-xs z-10">
-              <Image src="/images/comment_white.svg" alt="댓글" width={17} height={17} />
+              <Image src="/images/comment_white.svg" alt="댓글 아이콘" width={17} height={17} />
               <span className="text-[15px]">{commentCount}</span>
             </div>
           </div>
@@ -122,7 +123,7 @@ export default function Card({
             <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 my-1.5">{description}</p>
 
             <div className="flex flex-wrap gap-1 my-1.5">
-              {hashtags.slice(0, 2).map((tag, index) => (
+              {hashtags?.slice(0, 2).map((tag, index) => (
                 <span
                   key={`${character.id}-tag-${tag}-${index}`}
                   className="text-xs text-primary-500 dark:text-dark-primary-600 bg-primary-50 dark:bg-dark-primary-100/10 px-1.5 py-0.5 rounded-full"
@@ -137,7 +138,7 @@ export default function Card({
                 {creator?.profileImageUrl ? (
                   <Image
                     src={creator.profileImageUrl}
-                    alt={creator.nickname}
+                    alt={`${creator.nickname} 프로필 이미지`}
                     width={20}
                     height={20}
                     className="object-cover"
@@ -178,7 +179,7 @@ export default function Card({
 
             <Image
               src={imageUrl}
-              alt={name}
+              alt={`${name} 캐릭터 이미지`}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
               className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -196,7 +197,7 @@ export default function Card({
 
             {/* 댓글 수 표시 - 이미지 우측 하단으로 이동 */}
             <div className="absolute bottom-2 right-2 flex md:bottom-4 md:right-4 items-center gap-[5px] text-white z-10">
-              <Image src="/images/comment_black.svg" alt="댓글" width={22} height={22} />
+              <Image src="/images/comment_black.svg" alt="댓글 아이콘" width={22} height={22} />
               <span className="text-[20px]">{commentCount}</span>
             </div>
           </div>
@@ -207,7 +208,7 @@ export default function Card({
             </h3>
 
             <div className="mb-2 flex flex-wrap gap-1">
-              {hashtags.slice(0, 3).map((tag, index) => (
+              {hashtags?.slice(0, 3).map((tag, index) => (
                 <span
                   key={`${character.id}-tag-${tag}-${index}`}
                   className="text-xs text-primary-500 dark:text-dark-primary-600 bg-primary-50 dark:bg-dark-primary-100/10 px-2 py-0.5 rounded-full"
@@ -225,7 +226,7 @@ export default function Card({
                 {creator?.profileImageUrl ? (
                   <Image
                     src={creator.profileImageUrl}
-                    alt={creator.nickname}
+                    alt={`${creator.nickname} 프로필 이미지`}
                     width={20}
                     height={20}
                     className="object-cover"

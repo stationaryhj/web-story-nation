@@ -25,7 +25,6 @@ import type {
   ChangePersonaNameResponse,
   ViewTermsResponse,
   CharbotTop10NewResponse,
-  CharbotTop10RankingResponse,
   SendFeedbackResponse,
   CharbotLikeResponse,
   WriterInfoResponse,
@@ -297,11 +296,12 @@ export const contentApi = {
   GetTop10Ranking: async (
     countryCode: string,
     ranking_type: number,
-    gender: number
-  ): Promise<ApiResponse<GetTop10RankingResponse>> => {
+    gender: number,
+    module_type: number
+  ): Promise<ApiResponse> => {
     return api.post('/api/charbot/rcmnd/ranking/top10', {
       countryCode,
-      module_type: 2,
+      module_type,
       ranking_type,
       gender,
     })
@@ -660,7 +660,14 @@ export const contentApi = {
     api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/getnoti')
   },
-  
+
+  // naver/get/token
+  GetNaverToken: async (code: string, state: string): Promise<ApiResponse> => {
+    return api.post('api/naver/get/token', {
+      code,
+      state,
+    })
+  },
 }
 
 // 채팅 API
@@ -1064,5 +1071,6 @@ export const createApi = {
     return api.post('/api/writerinfo')
   }
 }
+
 
 export { setAuthToken, API_URL, CHAT_URL }

@@ -10,6 +10,99 @@ import { contentApi } from '@/services/api';
 import { OAuthResponse } from '@/types/login';
 import he from 'he';
 
+// 네이버 콜백 URL 파싱 함수
+function parseNaverCallback(callbackUrl: string) {
+  console.log('파싱할 URL:', callbackUrl);
+
+  // code 파라미터 추출
+  const codeMatch = callbackUrl.match(/code=([^&]+)/);
+  const code = codeMatch ? codeMatch[1] : null;
+  console.log('추출된 code:', code);
+  
+  // state 파라미터 추출 - code 이후의 &state= 다음 텍스트
+  const stateStart = callbackUrl.indexOf('&state=') + 7; // '&state='.length
+  
+  if (stateStart > 6) { // state 파라미터가 발견된 경우
+    // 원본 state 문자열 (인코딩된 상태)
+    const encodedStateStr = callbackUrl.substring(stateStart);
+    console.log('인코딩된 state:', encodedStateStr);
+    
+    // HTML 엔티티 디코딩 (&quot; -> " 등)
+    let decodedStateStr;
+    try {
+      decodedStateStr = he.decode(encodedStateStr);
+      console.log('HTML 엔티티 디코딩된 state:', decodedStateStr);
+    } catch (error) {
+      console.error('HTML 엔티티 디코딩 실패:', error);
+      decodedStateStr = encodedStateStr;
+    }
+    
+    // URL 디코딩
+    try {
+      decodedStateStr = decodeURIComponent(decodedStateStr);
+      console.log('URL 디코딩된 state:', decodedStateStr);
+    } catch (error) {
+      console.error('URL 디코딩 실패:', error);
+    }
+    
+    // 1. JSON 파싱 시도
+    try {
+      // 잘린 JSON을 복구하려고 시도 (끝에 }가 없는 경우)
+      if (decodedStateStr.includes('{') && !decodedStateStr.includes('}')) {
+        decodedStateStr += '"}}'
+      }
+      
+      const stateObj = JSON.parse(decodedStateStr);
+      console.log('JSON 파싱 성공:', stateObj);
+      return {
+        code,
+        state: stateObj
+      };
+    } catch (e) {
+      console.error('JSON 파싱 오류:', e);
+      
+      // 2. 정규식으로 개별 필드 추출 시도
+      const providerMatch = decodedStateStr.match(/"provider"[\s]*:[\s]*"([^"]+)"/);
+      const snsauthMatch = decodedStateStr.match(/"snsauth"[\s]*:[\s]*"([^"]+)"/);
+      const clientIdMatch = decodedStateStr.match(/"clientId"[\s]*:[\s]*"([^"]+)"/);
+      const snstypeMatch = decodedStateStr.match(/"snstype"[\s]*:[\s]*(\d+)/);
+      
+      const extractedState = {
+        provider: providerMatch ? providerMatch[1] : 'NAVER',
+        snsauth: snsauthMatch ? snsauthMatch[1] : null,
+        clientId: clientIdMatch ? clientIdMatch[1] : null,
+        snstype: snstypeMatch ? parseInt(snstypeMatch[1]) : 0
+      };
+      
+      console.log('정규식으로 추출된 state:', extractedState);
+      
+      // 추출 실패 시 하드코딩된 값 사용 (마지막 수단)
+      if (!extractedState.snsauth || !extractedState.clientId) {
+        // 로컬 스토리지에서 정보 가져오기 시도
+        try {
+          const savedState = localStorage.getItem('social_login_state');
+          if (savedState) {
+            const savedStateObj = JSON.parse(savedState);
+            extractedState.snsauth = extractedState.snsauth || savedStateObj.snsauth;
+            extractedState.clientId = extractedState.clientId || savedStateObj.clientId;
+            extractedState.snstype = extractedState.snstype || savedStateObj.snstype;
+            console.log('로컬 스토리지에서 복구한 state:', extractedState);
+          }
+        } catch (error) {
+          console.error('로컬 스토리지 복구 실패:', error);
+        }
+      }
+      
+      return {
+        code,
+        state: extractedState
+      };
+    }
+  }
+  
+  return { code, state: null };
+}
+
 // 네이버 인증 서비스
 export class NaverAuthService extends BaseAuthService {
   constructor() {
@@ -84,6 +177,8 @@ export class NaverAuthService extends BaseAuthService {
 
   // 콜백 처리
   async handleCallback(params: CallbackParams): Promise<LoginResult> {
+    console.log('네이버 콜백 처리 시작 ::', params);
+
     // 중복 호출 방지를 위한 처리 상태 확인
     const callbackProcessing = localStorage.getItem('naver_callback_processing');
     if (callbackProcessing === 'true') {
@@ -98,7 +193,7 @@ export class NaverAuthService extends BaseAuthService {
     localStorage.setItem('naver_callback_processing', 'true');
     
     try {
-      console.log('네이버 콜백 처리 시작 ::', params);
+      console.log('네이버 콜백 처리 시작 - 상세 ::', params);
       
       // 타임아웃 클리어
       const timeoutId = localStorage.getItem('naver_login_timeout');
@@ -112,35 +207,109 @@ export class NaverAuthService extends BaseAuthService {
       if (!savedState) {
         throw new Error('저장된 로그인 정보가 없습니다. 다시 로그인해주세요.');
       }
+
+      // 파싱된 상태 정보 추출
+      let stateInfo: any = null;
       
-      // callback에서 전달된 state가 HTML entity로 인코딩되어 있는 경우 처리
-      let state = params.state;
-      if (state && state.includes('&quot;')) {
+      // 1. params.state에서 파싱 시도
+      try {
+        if (typeof params.state === 'string') {
+          // state 값이 잘렸는지 확인
+          const isTruncated = 
+            params.state.includes('{') && 
+            !params.state.includes('}') && 
+            params.state.includes('&quot;');
+          
+          if (isTruncated) {
+            console.log('잘린 state 문자열 감지');
+            
+            // HTML 엔티티 디코딩
+            const decodedState = he.decode(params.state);
+            console.log('디코딩된 state:', decodedState);
+            
+            // 필드 추출
+            const providerMatch = decodedState.match(/"provider"[\s]*:[\s]*"([^"]+)"/);
+            const snsauthMatch = decodedState.match(/"snsauth"[\s]*:[\s]*"([^"]+)"/);
+            const clientIdMatch = decodedState.match(/"clientId"[\s]*:[\s]*"([^"]+)"/);
+            const snstypeMatch = decodedState.match(/"snstype"[\s]*:[\s]*(\d+)/);
+            
+            stateInfo = {
+              provider: providerMatch ? providerMatch[1] : 'NAVER',
+              snsauth: snsauthMatch ? snsauthMatch[1] : null,
+              clientId: clientIdMatch ? clientIdMatch[1] : null,
+              snstype: snstypeMatch ? parseInt(snstypeMatch[1]) : null
+            };
+            
+            console.log('정규식으로 추출된 stateInfo:', stateInfo);
+          } else {
+            // 정상적인 state 문자열 파싱 시도
+            stateInfo = JSON.parse(params.state);
+            console.log('정상 파싱된 stateInfo:', stateInfo);
+          }
+        } else if (params.state && typeof params.state === 'object') {
+          // 이미 객체인 경우 그대로 사용
+          stateInfo = params.state;
+          console.log('객체 형태의 stateInfo:', stateInfo);
+        }
+      } catch (e) {
+        console.error('state 파싱 실패:', e);
+      }
+      
+      // 2. params.state에서 파싱에 실패한 경우 localStorage에서 복구
+      if (!stateInfo || !stateInfo.snsauth || !stateInfo.clientId) {
+        console.log('localStorage에서 state 복구 시도');
         try {
-          // HTML entity 디코딩 (예: &quot; -> ")
-          state = he.decode(state);
-          console.log('he로 디코딩된 state:', state);
-        } catch (decodeError) {
-          console.error('he 디코딩 오류:', decodeError);
+          stateInfo = JSON.parse(savedState);
+          console.log('localStorage에서 복구된 stateInfo:', stateInfo);
+        } catch (e) {
+          console.error('localStorage 파싱 실패:', e);
+          throw new Error('저장된 로그인 정보 형식이 올바르지 않습니다.');
         }
       }
       
-      // 상태 정보 파싱
-      const { clientId, snsauth, snstype } = JSON.parse(savedState);
+      // 필수 정보 확인
+      const { clientId, snsauth, snstype } = stateInfo;
       
-      console.log('네이버 OAuth 정보:', { snsauth, snstype });
-      
-      // 백엔드 API를 통해 액세스 토큰 획득
-      const tokenResponse = await this.getAccessToken(params.code, clientId);
-      const accessToken = tokenResponse.access_token;
-      
-      // 토큰 검증
-      const isValid = await this.verifyNaverToken(accessToken);
-      if (!isValid) {
-        throw new Error('네이버 액세스 토큰 검증 실패');
+      if (!clientId || !snsauth || snstype === undefined) {
+        throw new Error('필수 로그인 정보가 없습니다. 다시 로그인해주세요.');
       }
       
-      console.log('네이버 액세스 토큰 획득 및 검증 성공');
+      console.log('네이버 OAuth 정보:', { snsauth, snstype });
+
+      console.log('params.code :: ', params.code)
+      console.log('stateInfo :: ', JSON.stringify(stateInfo))
+      
+      // 백엔드 API를 통해 액세스 토큰 획득
+      const tokenResponse = await contentApi.GetNaverToken(params.code || '', JSON.stringify(stateInfo));
+      
+      // 응답 유효성 검사
+      if (!tokenResponse.data || tokenResponse.data.result?.err !== 0) {
+        console.error('네이버 토큰 요청 실패:', tokenResponse.data);
+        throw new Error('네이버 인증 처리 중 오류가 발생했습니다.');
+      }
+      
+      // response 필드는 문자열로 된 JSON이므로 파싱 필요
+      let accessToken;
+      try {
+        const responseData = JSON.parse(tokenResponse.data.response);
+        accessToken = responseData.access_token;
+        
+        if (!accessToken) {
+          throw new Error('액세스 토큰이 없습니다');
+        }
+      } catch (error) {
+        console.error('네이버 토큰 응답 파싱 실패:', error);
+        console.error('원본 응답:', tokenResponse.data.response);
+        throw new Error('네이버 인증 응답을 처리할 수 없습니다.');
+      }
+      
+      console.log('네이버 액세스 토큰 획득 성공');
+      
+      // 토큰 검증 (주석 해제 여부는 개발자 판단에 맡김)
+    //   const isValid = await this.verifyNaverToken(accessToken);
+    //   if (!isValid) {
+    //     throw new Error('네이버 액세스 토큰 검증 실패');
+    //   }
       
       // 로그인 처리
       const response = await contentApi.loginDcheckV2(snsauth, snstype, accessToken);

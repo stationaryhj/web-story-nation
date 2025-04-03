@@ -38,7 +38,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
     fetchTagList,
     saveHashtags,
     availableTags,
-    isLoadingTags
+    isLoadingTags,
   } = useCreateCharacterData()
 
   // 최초 마운트시에만 태그 데이터 로드
@@ -52,11 +52,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
   useEffect(() => {
     if (mode === 'basic' && onValidationChange) {
       // 기본 정보 탭은 필수 입력 항목이 많음
-      const isValid = !!(
-        formData.name?.trim() &&
-        formData.bio?.trim() &&
-        formData.firstMessage?.trim()
-      )
+      const isValid = !!(formData.name?.trim() && formData.bio?.trim() && formData.firstMessage?.trim())
       onValidationChange(isValid)
     } else if (mode === 'detail' && onValidationChange) {
       // 상세 정보 탭은 bioDetail만 필수
@@ -69,35 +65,33 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
   }, [formData, mode, onValidationChange])
 
   // 최초 대화 예시가 없는 경우 자동으로 하나만 생성합니다
-  useEffect(() => {
-    if (mode === 'detail' && formData.conversationExamples.length === 0) {
-      addConversationExample()
-    }
-  }, [mode, formData.conversationExamples.length, addConversationExample])
-
-
+  // useEffect(() => {
+  //   if (mode === 'detail' && formData.conversationExamples.length === 0) {
+  //     addConversationExample()
+  //   }
+  // }, [mode, formData.conversationExamples.length, addConversationExample])
 
   // 컴포넌트 모드에 따라 다른 컴포넌트 렌더링
   if (mode === 'basic') {
     return (
-      <BasicInfoForm 
+      <BasicInfoForm
         formData={formData}
         setFormField={setFormField}
         addHashtag={async (tag: string) => {
-          await addHashtag(tag);
-          return;
+          await addHashtag(tag)
+          return
         }}
         removeHashtag={async (tag: string) => {
-          await removeHashtag(tag);
-          return;
+          await removeHashtag(tag)
+          return
         }}
         fetchTagList={async () => {
           // BasicInfoForm에서는 fetchTagList를 직접 호출하지 않도록 빈 함수로 처리
-          return;
+          return
         }}
         saveHashtags={async () => {
-          await saveHashtags();
-          return;
+          await saveHashtags()
+          return
         }}
         availableTags={availableTags}
         isLoadingTags={isLoadingTags}
@@ -108,7 +102,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
 
   if (mode === 'detail') {
     return (
-      <DetailInfoForm 
+      <DetailInfoForm
         formData={formData}
         setFormField={setFormField}
         addConversationExample={addConversationExample}
@@ -123,7 +117,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
 
   if (mode === 'image') {
     return (
-      <ImageUploadForm 
+      <ImageUploadForm
         formData={formData}
         setFormField={setFormField}
         setNormalImage={setNormalImage}
