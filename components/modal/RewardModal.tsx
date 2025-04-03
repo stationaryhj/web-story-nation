@@ -23,7 +23,7 @@ export default function RewardModal({ isOpen, onClose, isAfterSignup = false }: 
   useEffect(() => {
     if (isOpen) {
       UpdateFreePen().then((isSuccess) => {
-        // setIsGetFreePen(isSuccess)
+        setIsGetFreePen(isSuccess)
       })
     }
   }, [isOpen, UpdateFreePen])
