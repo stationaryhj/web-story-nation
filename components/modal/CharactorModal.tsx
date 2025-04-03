@@ -1,7 +1,8 @@
 'use client'
 
 import { useModalStore } from '@/store/useStoreModal'
-import { faComment, faHeart, faTimes, faShieldHalved, faMessage } from '@fortawesome/free-solid-svg-icons'
+import { faComment, faHeart, faTimes, faShieldHalved, faMessage, faUser } from '@fortawesome/free-solid-svg-icons'
+import { Siren } from 'lucide-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -13,6 +14,7 @@ import { Character } from '@/store/useStoreData'
 import { contentApi } from '@/services/api/storyNationApi'
 import { CharbotLikeResponse } from '@/types/api'
 import { useAccountStore } from '@/store/useStoreData'
+import ReportModal from './ReportModal'
 
 // 목업 데이터
 const mockFirstMessage = {
@@ -31,6 +33,8 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   const { selectedCharacter, setSelectedCharacter, openModal } = useModalStore()
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const { isLogin } = useAccountStore()
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false)
+  const [reportSubmitted, setReportSubmitted] = useState(false)
 
   const {
     data: chatBotData,
@@ -66,11 +70,11 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   // 대화 시작 버튼 클릭 시 채팅 페이지로 이동
   const handleStartChat = () => {
     if (selectedCharacter && selectedCharacter.id) {
-      if(!isLogin) {
+      if (!isLogin) {
         openModal('login')
         return
       }
-      
+
       handleClose()
       const chatId = String(selectedCharacter.id).trim()
       if (chatId) {
@@ -87,6 +91,31 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
     }
   }
 
+  const handleReport = () => {
+    if (!isLogin) {
+      openModal('login')
+      return
+    }
+    setIsReportModalOpen(true)
+  }
+
+  const handleReportSubmit = async (reportData: any) => {
+    try {
+      // 여기에 실제 신고 API 호출 로직 구현
+      console.log('Report submitted:', reportData)
+      // 성공 시 상태 업데이트
+      setReportSubmitted(true)
+      // 신고 모달 닫기 (또는 유지할 수도 있음)
+      setTimeout(() => {
+        setIsReportModalOpen(false)
+        // 일정 시간 후 submitted 상태 초기화
+        setTimeout(() => setReportSubmitted(false), 500)
+      }, 2000)
+    } catch (error) {
+      console.error('Error submitting report:', error)
+    }
+  }
+
   if (!selectedCharacter) return null
 
   return (
@@ -98,18 +127,220 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
       showCloseButton={false}
       hideHeader={true}
     >
-      {/* 본문 */}
-      <div className="flex flex-col h-[calc(90vh-80px)]">
-        {/* 상단: 캐릭터 이미지 섹션 */}
-        <div className="w-full h-[40vh] relative bg-gradient-to-b from-primary-100 to-primary-50 dark:from-dark-primary-900 dark:to-dark-primary-800">
-          {/* 닫기 버튼 */}
+      {/* 모달 헤더 추가 */}
+      <div className="flex items-center justify-between border-b border-secondary-100 dark:border-dark-secondary-800 pb-4 px-4">
+        <h1 className="text-xl font-bold text-secondary-900 dark:text-dark-secondary-100">
+          {selectedCharacter.name || '이름 없음'}
+        </h1>
+        <div className="flex items-center gap-2">
           <button
-            onClick={handleClose}
-            className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-black/30 text-white hover:bg-black/50 transition-colors flex items-center justify-center"
+            onClick={handleReport}
+            className="w-9 h-9 rounded-full bg-secondary-100 dark:bg-dark-secondary-800 text-secondary-500 dark:text-dark-secondary-400 hover:bg-secondary-200 dark:hover:bg-dark-secondary-700 transition-colors flex items-center justify-center"
           >
-            <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
+            <Siren className="h-4 w-4" />
           </button>
+          <div>
+            <button
+              onClick={handleClose}
+              className="w-9 h-9 rounded-full bg-secondary-100 dark:bg-dark-secondary-800 text-secondary-500 dark:text-dark-secondary-400 hover:bg-secondary-200 dark:hover:bg-dark-secondary-700 transition-colors flex items-center justify-center"
+            >
+              <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col md:flex-row h-[calc(90vh-130px)] p-5 gap-8">
+        {/* PC 레이아웃 - 좌측: 이미지 & 우측: 상세 설명 */}
+        {/* 좌측: 캐릭터 이미지와 기본 정보 (PC 레이아웃) */}
+        <div className="hidden md:block md:w-[40%] md:relative ">
+          {/* 이미지 컨테이너 */}
+          <div className="h-full flex flex-col items-start">
+            {/* 이미지 영역 */}
+            <div className="h-full max-h-[650px] relative mb-6 w-full flex items-center justify-center">
+              {selectedCharacter.imageUrl && (
+                <>
+                  <div
+                    className={`absolute inset-0 flex items-center justify-center bg-secondary-100 dark:bg-dark-secondary-800 transition-opacity duration-300 ${isImageLoaded ? 'opacity-0' : 'opacity-100'}`}
+                  >
+                    <div className="w-10 h-10 rounded-full border-2 border-primary-500 border-t-transparent animate-spin"></div>
+                  </div>
+                  <div className="relative w-full h-full rounded-xl overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-primary-100/50 to-transparent dark:from-primary-900/20 dark:to-transparent rounded-2xl opacity-70 z-0"></div>
+                    <Image
+                      src={selectedCharacter.imageUrl}
+                      alt={selectedCharacter.name || '캐릭터 이미지'}
+                      fill
+                      priority
+                      style={{ objectFit: 'fill' }}
+                      className="transition-opacity duration-300 z-10 opacity-100"
+                      onLoadingComplete={() => setIsImageLoaded(true)}
+                    />
+                  </div>
+                  {/* 19세 이상 뱃지 */}
+                  {selectedCharacter.isAdult && (
+                    <div className="absolute top-3 left-3 z-20 bg-red-500 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center shadow-md backdrop-blur-sm">
+                      <FontAwesomeIcon icon={faShieldHalved} className="mr-1.5 h-3.5 w-3.5" />
+                      19+
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+            {/* 좋아요 & 댓글 수 */}
+            <div className="flex justify-end items-end w-full mb-6 gap-6">
+              <div
+                className="flex items-center space-x-2 cursor-pointer transition-colors hover:text-red-600"
+                onClick={handleLike}
+              >
+                <FontAwesomeIcon icon={faHeart} className="h-5 w-5 text-red-500" />
+                <span className="text-secondary-700 dark:text-dark-secondary-300">
+                  {selectedCharacter.likeCount || 0}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <FontAwesomeIcon icon={faMessage} className="h-5 w-5 text-primary-500" />
+                <span className="text-secondary-700 dark:text-dark-secondary-300">
+                  {selectedCharacter.commentCount || 0}
+                </span>
+              </div>
+            </div>
 
+            {/* 해시태그 */}
+            <div className="flex flex-wrap justify-start gap-2 mb-4">
+              {selectedCharacter.hashtags?.slice(0, 7).map((tag: string, index: number) => (
+                <span
+                  key={`tag-${index}`}
+                  className="rounded-full bg-primary-50 px-3 py-1 text-sm text-primary-700 dark:bg-dark-primary-900 dark:text-dark-primary-300"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            {/* 간략한 캐릭터 설명 */}
+            <div className="w-full mt-4 bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-dark-primary-900/70 dark:to-dark-secondary-900/70 rounded-lg border border-secondary-100 dark:border-dark-secondary-800/30 overflow-hidden">
+              <div className="p-4 backdrop-blur-sm">
+                <h3 className="text-base font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-secondary-700 dark:from-dark-primary-300 dark:to-dark-secondary-300">
+                    캐릭터 소개
+                  </span>
+                </h3>
+                <p className="text-secondary-800 dark:text-dark-secondary-200 text-sm leading-relaxed pl-3">
+                  {selectedCharacter.description || '캐릭터에 대한 간략한 설명이 없습니다.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 우측: 캐릭터 상세 설명 및 대화 예시 */}
+        <div className="hidden md:flex md:flex-col md:w-[60%] md:overflow-y-auto md:order-2">
+          {/* 첫 번째 섹션: 캐릭터 소개 */}
+          <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm mb-5 border border-secondary-100 dark:border-dark-secondary-800/30">
+            <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
+              <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
+              상세 설명
+            </h3>
+            <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed">
+              {selectedCharacter.detailDescription || selectedCharacter.description || '설명이 없습니다.'}
+            </p>
+          </div>
+
+          {/* 두 번째 섹션: 대화 예시 */}
+          <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm mb-5 border border-secondary-100 dark:border-dark-secondary-800/30">
+            <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
+              <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
+              대화 예시
+            </h3>
+            <div className="space-y-3">
+              <div className="flex items-start space-x-2">
+                <div className="w-8 h-8 rounded-full bg-secondary-100 dark:bg-dark-secondary-700 flex items-center justify-center flex-shrink-0 text-secondary-500">
+                  <FontAwesomeIcon icon={faUser} className="w-4 h-4" />
+                </div>
+                <div className="p-3 bg-secondary-50 dark:bg-dark-secondary-800/50 rounded-lg text-sm">
+                  안녕하세요, 처음 뵙겠습니다. 당신에 대해 알고 싶어요.
+                </div>
+              </div>
+              <div className="flex items-start justify-end space-x-2">
+                <div className="p-3 bg-primary-50 dark:bg-dark-primary-900/30 rounded-lg text-sm text-end">
+                  {selectedCharacter?.first_talk?.slice(0, 150) || '응답이 없습니다.'}
+                  {selectedCharacter?.first_talk && selectedCharacter.first_talk.length > 150 && '...'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 세 번째 섹션: 첫 메시지 */}
+          <div className="h-full bg-white dark:from-dark-secondary-800/50 dark:to-dark-primary-900/30 rounded-lg p-5 shadow-sm border border-secondary-100 dark:border-dark-secondary-800/30">
+            <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 flex items-center">
+              <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>첫 메시지
+            </h3>
+            <div className="flex flex-col justify-between h-full">
+              <div className="p-4 flex flex-col justify-between bg-white/80 dark:bg-dark-secondary-900/50 rounded-lg h-full">
+                <div>
+                  {mockFirstMessage.situation && (
+                    <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mb-2 italic">
+                      {mockFirstMessage.situation}
+                    </p>
+                  )}
+                  <div className="flex items-start mb-6">
+                    <div className="relative flex-shrink-0 mr-3">
+                      {/* 캐릭터 프로필 이미지 */}
+                      <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-200 dark:border-primary-800 shadow-sm">
+                        {selectedCharacter.imageUrl ? (
+                          <Image
+                            src={selectedCharacter.imageUrl}
+                            alt={selectedCharacter.name || '캐릭터'}
+                            width={40}
+                            height={40}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
+                            <FontAwesomeIcon icon={faUser} className="text-primary-500 dark:text-primary-400" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 온라인 상태 표시 (녹색 점) */}
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-dark-background"></div>
+                    </div>
+
+                    {/* 말풍선 */}
+                    <div className="relative max-w-[85%]">
+                      {/* 캐릭터 이름 */}
+                      <div className="text-xs font-medium text-primary-600 dark:text-primary-400 mb-1">
+                        {selectedCharacter.name || '캐릭터'}
+                      </div>
+
+                      {/* 말풍선 내용 */}
+                      <div className="bg-primary-50 dark:bg-primary-900/30 text-secondary-800 dark:text-secondary-200 p-3 rounded-lg rounded-tl-none shadow-sm border border-primary-100 dark:border-primary-800/50">
+                        <p className="text-sm leading-relaxed">
+                          {selectedCharacter?.first_talk || '첫 메시지가 없습니다.'}
+                        </p>
+                      </div>
+
+                      {/* 시간 표시 */}
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <button
+                    onClick={handleStartChat}
+                    className="w-full flex items-center justify-center rounded-lg bg-primary-500 px-6 py-4 font-medium text-white transition-all hover:bg-primary-600 dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600"
+                  >
+                    <FontAwesomeIcon icon={faComment} className="mr-2" />
+                    대화 시작하기
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 모바일 레이아웃 */}
+        {/* 상단: 이미지 섹션 */}
+        <div className="md:hidden w-full h-[40vh] relative bg-gradient-to-b from-primary-100 to-primary-50 dark:from-dark-primary-900 dark:to-dark-primary-800">
           {selectedCharacter.imageUrl && (
             <>
               <div
@@ -119,16 +350,17 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
               </div>
               <Image
                 src={selectedCharacter.imageUrl}
-                alt={selectedCharacter.name || '캐릭터'}
+                alt={selectedCharacter.name || '캐릭터 이미지'}
                 fill
                 priority
-                className={`object-contain transition-opacity duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                style={{ objectFit: 'fill' }}
+                className={`transition-opacity duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
                 onLoadingComplete={() => setIsImageLoaded(true)}
               />
               {/* 19세 이상 뱃지 */}
               {selectedCharacter.isAdult && (
-                <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium flex items-center">
-                  <FontAwesomeIcon icon={faShieldHalved} className="mr-1 h-3 w-3" />
+                <div className="absolute top-3 left-3 z-10 bg-red-500 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center shadow-md">
+                  <FontAwesomeIcon icon={faShieldHalved} className="mr-1.5 h-3.5 w-3.5" />
                   19+
                 </div>
               )}
@@ -136,16 +368,11 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
           )}
         </div>
 
-        {/* 하단: 캐릭터 정보 및 설명 */}
-        <div className="flex-1 overflow-y-auto p-4">
-          {/* 캐릭터 이름 */}
-          <h2 className="text-xl font-bold text-secondary-900 dark:text-dark-secondary-100 mb-4">
-            {selectedCharacter.name || '이름 없음'}
-          </h2>
-
+        {/* 하단: 캐릭터 정보 및 콘텐츠 */}
+        <div className="md:hidden flex-1 overflow-y-auto p-4">
           {/* 좋아요 & 댓글 수 */}
-          <div className="flex items-center space-x-4 mb-4">
-            <div className="flex items-center space-x-2" onClick={handleLike}>
+          <div className="flex items-center space-x-4 mb-3">
+            <div className="flex items-center space-x-2 cursor-pointer" onClick={handleLike}>
               <FontAwesomeIcon icon={faHeart} className="h-5 w-5 text-red-500" />
               <span className="text-secondary-700 dark:text-dark-secondary-300">
                 {selectedCharacter.likeCount || 0}
@@ -161,10 +388,10 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
 
           {/* 해시태그 */}
           <div className="flex flex-wrap gap-2 mb-4">
-            {selectedCharacter.hashtags?.slice(0, 7).map((tag: string, index: number) => (
+            {selectedCharacter.hashtags?.slice(0, 5).map((tag: string, index: number) => (
               <span
                 key={`tag-${index}`}
-                className="rounded-full bg-primary-50 px-3 py-1 text-sm text-primary-700 dark:bg-dark-primary-900 dark:text-dark-primary-300"
+                className="rounded-full bg-primary-50 px-2.5 py-0.5 text-xs text-primary-700 dark:bg-dark-primary-900 dark:text-dark-primary-300"
               >
                 {tag}
               </span>
@@ -172,36 +399,51 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
           </div>
 
           {/* 캐릭터 소개 */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-2">캐릭터 소개</h3>
-            <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm">
-              {selectedCharacter.detailDescription || selectedCharacter.description || '설명이 없습니다.'}
-            </p>
+          <div className="mb-4 w-full bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-dark-primary-900/70 dark:to-dark-secondary-900/70 rounded-lg border border-secondary-100 dark:border-dark-secondary-800/30 overflow-hidden">
+            <div className="p-4 backdrop-blur-sm">
+              <h3 className="text-base font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
+                <span className="w-1.5 h-5 bg-primary-500 dark:bg-dark-primary-400 rounded-full mr-2 inline-block"></span>
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-secondary-700 dark:from-dark-primary-300 dark:to-dark-secondary-300">
+                  캐릭터 소개
+                </span>
+              </h3>
+              <p className="text-secondary-800 dark:text-dark-secondary-200 text-sm leading-relaxed pl-3 border-l-2 border-primary-200 dark:border-dark-primary-700">
+                {selectedCharacter.detailDescription || selectedCharacter.description || '설명이 없습니다.'}
+              </p>
+            </div>
           </div>
 
           {/* 첫 메시지 미리보기 */}
-          <div className="flex flex-col justify-between md:min-h-[600px] sm:min-h-[300px] mb-8 bg-secondary-50 dark:bg-dark-secondary-800 rounded-lg p-4">
-            <div>
-              <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-4">첫 메시지</h3>
-              <div className="p-4">
+          <div className="mb-4 bg-secondary-50 dark:bg-dark-secondary-800 rounded-lg p-4">
+            <h3 className="text-base font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-2 flex items-center">
+              <span className="w-1.5 h-4 bg-primary-500 rounded-full mr-2 inline-block"></span>첫 메시지
+            </h3>
+            <div className="p-3 bg-white/80 dark:bg-dark-secondary-900/50 rounded-lg">
+              {mockFirstMessage.situation && (
                 <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mb-2">
                   {mockFirstMessage.situation}
                 </p>
-                <p className="text-secondary-700 dark:text-dark-secondary-300">{selectedCharacter?.first_talk}</p>
-              </div>
+              )}
+              <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm">{selectedCharacter?.first_talk}</p>
             </div>
           </div>
 
           {/* 대화 시작 버튼 */}
           <button
             onClick={handleStartChat}
-            className="w-full flex items-center justify-center rounded-lg bg-primary-500 px-6 py-4 font-medium text-white transition-colors hover:bg-primary-600 dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600"
+            className="w-full flex items-center justify-center rounded-lg bg-primary-500 px-6 py-3.5 font-medium text-white transition-colors hover:bg-primary-600 dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600 shadow-sm"
           >
             <FontAwesomeIcon icon={faComment} className="mr-2" />
             대화 시작하기
           </button>
         </div>
       </div>
+      <ReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        onSubmit={handleReportSubmit}
+        submitted={reportSubmitted}
+      />
     </BaseModal>
   )
 }

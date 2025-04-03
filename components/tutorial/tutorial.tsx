@@ -179,8 +179,6 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
           padding: '10px 20px',
           borderRadius: '30px',
           width: 'auto',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)',
-          backdropFilter: 'blur(4px)',
         }}
       >
         <p className="text-sm font-medium text-white">클릭하여 계속하기</p>
