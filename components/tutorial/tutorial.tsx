@@ -159,12 +159,10 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
 
       {/* 설명 텍스트 */}
       <div
-        className="fixed text-white text-center max-w-[300px] z-[10001] bg-black/80 p-3 backdrop-blur-sm shadow-lg"
+        className="fixed text-white text-center max-w-[300px] z-[10001] p-3 backdrop-blur-sm shadow-lg"
         style={{
           ...getTextPosition(),
           borderRadius: '12px',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         }}
       >
         <div className="text-lg font-medium" dangerouslySetInnerHTML={{ __html: config.steps[currentStep].html }} />
@@ -185,7 +183,7 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
           backdropFilter: 'blur(4px)',
         }}
       >
-        <p className="text-sm font-medium text-primary-300">클릭하여 계속하기</p>
+        <p className="text-sm font-medium text-white">클릭하여 계속하기</p>
       </div>
 
       {/* 다시보지 않기 체크박스 */}

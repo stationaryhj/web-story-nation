@@ -43,14 +43,14 @@ const createCharacterScenario = {
     {
       id: 'user-message-container',
       html: `
-              <p>이곳에서 유저<span class="text-yellow-300 font-semibold">대화 예시</span>를 입력하고 수정할 수 있어요!</p>
+              <p>이곳에서 유저<span class="text-yellow-300 font-semibold"> 대화 예시</span>를 입력하고 수정할 수 있어요!</p>
             `,
       textPosition: 'top' as const,
     },
     {
       id: 'character-message-container',
       html: `
-              <p>이곳에서 캐릭터<span class="text-yellow-300 font-semibold">대화 예시</span>를 입력하고 수정할 수 있어요!</p>
+              <p>이곳에서 캐릭터<span class="text-yellow-300 font-semibold"> 대화 예시</span>를 입력하고 수정할 수 있어요!</p>
             `,
       textPosition: 'top' as const,
     },
