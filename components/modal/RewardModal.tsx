@@ -2,9 +2,11 @@
 
 import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPen } from '@fortawesome/free-solid-svg-icons'
+import { faPen, faClock } from '@fortawesome/free-solid-svg-icons'
 import BaseModal from './BaseModal'
 import { BaseButton } from '@/components/elements/button/BaseButton'
+import { useAccountStore } from '@/store/useAccountStore'
+import { useState, useEffect } from 'react'
 
 interface RewardModalProps {
   isOpen: boolean
@@ -14,6 +16,58 @@ interface RewardModalProps {
 
 export default function RewardModal({ isOpen, onClose, isAfterSignup = false }: RewardModalProps) {
   const router = useRouter()
+  const { UpdateFreePen, data } = useAccountStore()
+  const [isGetFreePen, setIsGetFreePen] = useState(false)
+  const [remainingTime, setRemainingTime] = useState('00:00:00')
+
+  useEffect(() => {
+    if (isOpen) {
+      UpdateFreePen().then((isSuccess) => {
+        // setIsGetFreePen(isSuccess)
+      })
+    }
+  }, [isOpen, UpdateFreePen])
+
+  // 남은 시간 계산 로직
+  useEffect(() => {
+    if (!isGetFreePen) {
+      const calculateRemainingTime = () => {
+        const targetDate = new Date(data?.coin_free_dt || '')
+        const now = new Date()
+        
+        // 시간 차이 계산 (밀리초)
+        let diff = targetDate.getTime() - now.getTime()
+        
+        // 시간이 이미 지났으면 0으로 설정
+        if (diff < 0) {
+          setRemainingTime('00:00:00')
+          return
+        }
+        
+        // 시간, 분, 초 계산
+        const hours = Math.floor(diff / (1000 * 60 * 60))
+        diff -= hours * (1000 * 60 * 60)
+        
+        const mins = Math.floor(diff / (1000 * 60))
+        diff -= mins * (1000 * 60)
+        
+        const secs = Math.floor(diff / 1000)
+        
+        // 형식에 맞게 포맷팅
+        setRemainingTime(
+          `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+        )
+      }
+      
+      // 최초 계산
+      calculateRemainingTime()
+      
+      // 1초마다 업데이트
+      const timer = setInterval(calculateRemainingTime, 1000)
+      
+      return () => clearInterval(timer)
+    }
+  }, [isGetFreePen, data?.coin_free_dt])
 
   const handleConfirm = () => {
     onClose()
@@ -37,40 +91,63 @@ export default function RewardModal({ isOpen, onClose, isAfterSignup = false }: 
       footerContent={
         <div className="flex justify-center w-full">
           <BaseButton color="gradient" className="w-full" onClick={handleConfirm}>
-            확인
+            {isGetFreePen ? '확인' : '출석 체크 완료'}
           </BaseButton>
         </div>
       }
     >
       <div className="flex flex-col items-center py-6 space-y-6">
-        {/* 제목 */}
+        {/* 제목 - isGetFreePen에 따라 다른 제목 표시 */}
         <h1 className="text-2xl font-bold text-center text-gray-800 dark:text-white">
-          보상 지급!
-          <br />
-          30펜을 지급해 드렸어요
-        </h1>
-
-        {/* 펜 아이콘 */}
-        <div className="w-24 h-24 flex items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900">
-          <FontAwesomeIcon icon={faPen} className="h-12 w-12 text-primary-500 dark:text-primary-400" />
-        </div>
-
-        {/* 안내 메시지 */}
-        <p className="text-center text-gray-600 dark:text-gray-300">
-          {isAfterSignup ? (
+          {isGetFreePen ? (
             <>
-              스토리네이션에 오신 것을 환영합니다!
+              보상 지급!
               <br />
-              지급된 펜으로 캐릭터를 만들어보세요.
+              30펜을 지급해 드렸어요
             </>
           ) : (
             <>
-              소중한 의견 감사합니다!
-              <br />
-              지급된 펜으로 더 많은 이야기를 만들어보세요.
+              출석체크!
             </>
           )}
-        </p>
+        </h1>
+
+        {/* 아이콘 - isGetFreePen에 따라 다른 아이콘 표시 */}
+        <div className="w-24 h-24 flex items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900">
+          {isGetFreePen ? (
+            <FontAwesomeIcon icon={faPen} className="h-12 w-12 text-primary-500 dark:text-primary-400" />
+          ) : (
+            <FontAwesomeIcon icon={faClock} className="h-12 w-12 text-primary-500 dark:text-primary-400" />
+          )}
+        </div>
+
+        {/* 안내 메시지 - isGetFreePen에 따라 다른 메시지 표시 */}
+        <div className="text-center text-gray-600 dark:text-gray-300">
+          {isGetFreePen ? (
+            <p>
+              {isAfterSignup ? (
+                <>
+                  스토리네이션에 오신 것을 환영합니다!
+                  <br />
+                  지급된 펜으로 캐릭터를 만들어보세요.
+                </>
+              ) : (
+                <>
+                  소중한 의견 감사합니다!
+                  <br />
+                  지급된 펜으로 더 많은 이야기를 만들어보세요.
+                </>
+              )}
+            </p>
+          ) : (
+            <>
+              <p className="mb-2">다음 출석까지</p>
+              <p className="text-2xl font-mono font-bold text-primary-600 dark:text-primary-400">
+                {remainingTime}
+              </p>
+            </>
+          )}
+        </div>
       </div>
     </BaseModal>
   )

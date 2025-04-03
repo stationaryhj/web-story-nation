@@ -40,6 +40,9 @@ import type {
   GetTop10RankingResponse,
   GetTop10RankingCreaterResponse,
   GetSearchResponse,
+  NicknmChangeResponse,
+  ChatFreePenResponse,
+  UserInfoResponse,
 } from '../../types/api'
 
 // API 기본 설정
@@ -181,11 +184,10 @@ export const contentApi = {
    * @param access_token 토큰 ( Login 후 정보에 들어있음음 )
    * login 후 정보를 저장하기때문에 현재는 사용안함
    */
-  userinfo: async (access_token: string): Promise<ApiResponse> => {
+  userinfo: async (access_token: string): Promise<ApiResponse<UserInfoResponse>> => {
     const _access_token = `Bearer ${access_token}`
     api.defaults.headers.common['Authorization'] = _access_token
     return api.get('/api/userinfo')
-    // return api.post('/api/myuserinfo')
   },
 
 
@@ -639,7 +641,7 @@ export const contentApi = {
   },
 
   // 닉네임 변경
-  NicknmChange: async (nick_nm: string): Promise<ApiResponse> => {
+  NicknmChange: async (nick_nm: string): Promise<ApiResponse<NicknmChangeResponse>> => {
     const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
     api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/nicknmchange', {
@@ -932,9 +934,9 @@ export const settlementApi = {
   },
 
   /**
-   * 무료 펜 사용
+   * 출석 보상
    */
-  UseFreePen: async (): Promise<ApiResponse> => {
+  UseFreePen: async (): Promise<ApiResponse<ChatFreePenResponse>> => {
     const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
     api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/charbot/chat/freepen')

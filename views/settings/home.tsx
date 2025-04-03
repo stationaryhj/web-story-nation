@@ -56,7 +56,7 @@ export default function SettingsForm() {
   const [showDuplicateCheckModal, setShowDuplicateCheckModal] = useState(false)
 
   const { settings, updateProfile, updateBankAccount, setLanguage, uploadProfileImage } = useSettingsStore()
-  const { data: userInfo, writerInfo, fetchWriterInfo, logout } = useAccountStore()
+  const { data: userInfo, writerInfo, fetchWriterInfo, logout, getCoinSum } = useAccountStore()
   const { openModal } = useModalStore()
   const { bankList, getBankList } = useBankStore()
 
@@ -87,12 +87,18 @@ export default function SettingsForm() {
   const [showBankList, setShowBankList] = useState(false)
   const bankDropdownRef = useRef<HTMLDivElement>(null)
 
+  
+
+
   // 은행 리스트 가져오기
   useEffect(() => {
     getBankList().catch(error => {
       console.error('은행 리스트를 가져오는 중 오류 발생:', error)
     })
   }, [getBankList])
+
+  
+
 
   // 닉네임이 원래 닉네임과 같은지 확인
   useEffect(() => {
@@ -139,6 +145,7 @@ export default function SettingsForm() {
     }
   }, [])
 
+
   // 닉네임 중복 체크 핸들러
   const handleDuplicateCheck = async () => {
     try {
@@ -173,7 +180,7 @@ export default function SettingsForm() {
   const handleNicknameSave = async () => {
     try {
       // 펜 잔액 확인 (임시로 100펜 이상 있다고 가정)
-      const hasEnoughPens = true // 실제로는 펜 잔액 확인 로직 필요
+      const hasEnoughPens = getCoinSum() >= 100 // 실제로는 펜 잔액 확인 로직 필요
 
       if (!hasEnoughPens) {
         toast.error('닉네임을 수정할 펜이 부족합니다.')
@@ -181,8 +188,9 @@ export default function SettingsForm() {
       }
 
       // API 호출 및 펜 차감 로직
-
-      if (true) {
+      const isSuccess = await useAccountStore.getState().editNickname(profile.nickname)
+      
+      if (isSuccess) {
         setOriginalNickname(profile.nickname)
         setIsNicknameVerified(true)
         setIsNicknameChanged(false)

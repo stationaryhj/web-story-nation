@@ -44,6 +44,31 @@ export interface LoginResponse {
   result: ApiResult;
 }
 
+// UserInfo Response
+export interface UserInfoResponse {
+  user_key: number;
+  cm_user_key: number | null;
+  nick_nm: string;
+  snsaccesstoken: string | null;
+  user_property: string | null;
+  writerchk: number;
+  lv: number;
+  exp: number | null;
+  coin_user: number;
+  coin_free: number;
+  coin_register: number;
+  coin_free_dt: string | null;
+  ink_user: number;
+  energy_user: number;
+  minor: number;
+  di: string;
+  parental_chk: number;
+  user_block_type: number;
+  persona: string;
+  persona_gender: number;
+  result: ApiResult;
+}
+
 
 // Charbot Top 10 List
 export type CharbotTop10Response = {
@@ -749,6 +774,21 @@ export interface Register4Response {
 export interface GetSearchResponse {
   chrbotList: CharbotSearchData;
   result: ApiResult;
+}
+
+
+export interface NicknmChangeResponse {
+  result: ApiResult;
+  nick_nm: string;
+  coin_user: number;
+}
+
+// ChatFreePen Response
+export interface ChatFreePenResponse {
+  result: ApiResult;
+  coin_free: number;
+  coin_register: number;
+  coin_free_dt: string;
 }
 
 // API Result

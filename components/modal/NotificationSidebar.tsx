@@ -8,35 +8,121 @@ import { useModalStore } from '@/store/useStoreModal'
 import BaseSidebar from '@/components/elements/sidebar/BaseSidebar'
 import { useNotificationStoreData } from '@/store/useNotificationStoreData'
 import Portal from '@/components/portal/Portal'
+import { useAccountStore } from '@/store/useAccountStore'
 
 // 알림 타입 정의
 type NotificationType = 'info' | 'success' | 'warning' | 'error'
+// 활성화 탭 타입 정의
+type ActiveTabType = 'notification' | 'announcement'
 
-export default function NotificationSidebar() {
-  const { isOpen, modalType, closeModal } = useModalStore()
+// 공지사항 목록 컴포넌트
+const AnnouncementTab = () => {
+  const { announcements, loadMoreAnnouncements, announcementPagination, isLoading } = useNotificationStoreData()
+
+  // 날짜 포맷팅 함수
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(date)
+  }
+
+  // 스크롤 이벤트 처리 함수 (무한 스크롤)
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    // 스크롤이 90% 이상 내려갔고, 더 불러올 데이터가 있을 때
+    if (scrollTop + clientHeight >= scrollHeight * 0.9 && announcementPagination.hasMore && !isLoading) {
+      loadMoreAnnouncements();
+    }
+  };
+
+  // 공지사항이 없는 경우
+  if (announcements.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-secondary-500 dark:text-dark-secondary-400 p-6">
+        <FontAwesomeIcon icon={faCheckCircle} className="text-3xl mb-2" />
+        <p className="text-center">등록된 공지사항이 없습니다.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex-1 overflow-y-auto" onScroll={handleScroll}>
+      <ul>
+        {announcements.map(item => (
+          <motion.li
+            key={item.id}
+            initial={{ opacity: 0.8 }}
+            animate={{ opacity: 1 }}
+            className="border-b border-secondary-100 dark:border-dark-secondary-800"
+          >
+            <div className="p-4 relative">
+              {/* 중요 공지사항 표시 */}
+              {item.isImportant && (
+                <div className="absolute left-0 top-0 w-1 h-full bg-red-500 dark:bg-red-600"></div>
+              )}
+              <div className="flex justify-between items-start">
+                <div className="ml-0.5 flex-1">
+                  {/* 중요 표시 */}
+                  {item.isImportant && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 inline-block mb-1">
+                      중요
+                    </span>
+                  )}
+                  {/* 제목 */}
+                  <h3 className="text-sm font-medium text-secondary-900 dark:text-dark-secondary-200">
+                    {item.title}
+                  </h3>
+                  {/* 메시지 내용 */}
+                  <p className="text-sm text-secondary-600 dark:text-dark-secondary-400 mt-1">{item.message}</p>
+                  {/* 날짜 */}
+                  <p className="text-xs text-secondary-400 dark:text-dark-secondary-500 mt-1">
+                    {formatDate(item.date)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </motion.li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+// 알림 목록 컴포넌트
+const NotificationTab = () => {
   const {
     notifications,
-    isLoading,
-    error,
-    initialize,
     markAsRead,
     markAllAsRead,
     deleteNotification,
     deleteAllNotifications,
-    loadMore,
-    pagination,
   } = useNotificationStoreData()
+  const { isLogin } = useAccountStore()
+  const { openModal } = useModalStore()
 
-  // 모달이 열릴 때 데이터 로드
-  useEffect(() => {
-    if (isOpen && modalType === 'notification') {
-      initialize()
-    }
-  }, [isOpen, modalType, initialize])
-
-  // 모달이 열려있고, 타입이 notification인 경우에만 렌더링
-  if (!isOpen || modalType !== 'notification') {
-    return null
+  // 로그인되지 않은 경우 로그인 유도 메시지 표시
+  if (!isLogin) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-6">
+        <div className="text-center space-y-4">
+          <FontAwesomeIcon 
+            icon={faCheckCircle} 
+            className="text-4xl text-secondary-400 dark:text-dark-secondary-500 mb-2" 
+          />
+          <p className="text-secondary-700 dark:text-dark-secondary-300 text-base">
+            알림 기능을 이용하려면 로그인이 필요합니다.
+          </p>
+          <button
+            onClick={() => openModal('login')}
+            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors"
+          >
+            로그인하기
+          </button>
+        </div>
+      </div>
+    )
   }
 
   // 읽지 않은 알림 개수
@@ -77,76 +163,8 @@ export default function NotificationSidebar() {
     }
   }
 
-  // 헤더에 표시할 추가 요소 (알림 개수 및 관리 버튼)
-  const headerExtra = (
-    <div className="flex items-center">
-      {unreadCount > 0 && (
-        <span className="text-sm font-medium text-primary-600 dark:text-dark-primary-400 mr-4">
-          {unreadCount}개 안 읽음
-        </span>
-      )}
-    </div>
-  )
-
-  if (isLoading) {
-    const loadingContent = (
-      <AnimatePresence>
-        <motion.div
-          className="fixed inset-0 bg-black/50 z-[999]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={closeModal}
-        />
-        <motion.div
-          className="fixed top-0 right-0 h-full min-w-[600px] bg-white dark:bg-dark-background-light shadow-xl z-[999] overflow-hidden flex flex-col"
-          initial={{ x: '100%' }}
-          animate={{ x: 0 }}
-          exit={{ x: '100%' }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        >
-          <div className="flex items-center justify-center h-full">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-          </div>
-        </motion.div>
-      </AnimatePresence>
-    )
-    return <Portal>{loadingContent}</Portal>
-  }
-
-  if (error) {
-    const errorContent = (
-      <AnimatePresence>
-        <motion.div
-          className="fixed inset-0 bg-black/50 z-[999]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={closeModal}
-        />
-        <motion.div
-          className="fixed top-0 right-0 h-full min-w-[600px] bg-white dark:bg-dark-background-light shadow-xl z-[999] overflow-hidden flex flex-col"
-          initial={{ x: '100%' }}
-          animate={{ x: 0 }}
-          exit={{ x: '100%' }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        >
-          <div className="flex items-center justify-center h-full text-red-500">
-            <p>알림을 불러오는데 실패했습니다.</p>
-          </div>
-        </motion.div>
-      </AnimatePresence>
-    )
-    return <Portal>{errorContent}</Portal>
-  }
-
   return (
-    <BaseSidebar
-      isOpen={isOpen && modalType === 'notification'}
-      onClose={closeModal}
-      title="알림"
-      headerExtra={headerExtra}
-    >
+    <>
       {/* 알림 관리 버튼 */}
       <div className="flex justify-end space-x-2 p-2 border-b border-secondary-100 dark:border-dark-secondary-800">
         <button
@@ -236,6 +254,179 @@ export default function NotificationSidebar() {
           </ul>
         )}
       </div>
+    </>
+  )
+}
+
+export default function NotificationSidebar() {
+  const { isOpen, modalType, closeModal } = useModalStore()
+  const { 
+    notifications, 
+    hasNewNotification,
+    isLoading, 
+    error, 
+    initialize,
+    deleteAllNotifications
+  } = useNotificationStoreData()
+  const { isLogin } = useAccountStore()
+  const [activeTab, setActiveTab] = useState<ActiveTabType>('notification')
+
+  // 모달이 열릴 때 데이터 로드 및 로그인 상태 확인
+  useEffect(() => {
+    if (isOpen && modalType === 'notification') {
+      // 로그인 상태에 따라 처리
+      if (isLogin) {
+        initialize() // 알림과 공지사항 모두 불러오기
+      } else {
+        // 로그인되지 않은 경우 알림 데이터 삭제
+        deleteAllNotifications()
+        // 공지사항만 불러오기
+        initialize()
+      }
+    }
+  }, [isOpen, modalType, initialize, isLogin, deleteAllNotifications])
+
+  // 로그인 상태가 변경될 때도 처리
+  useEffect(() => {
+    if (!isLogin) {
+      // 로그아웃된 경우 알림 데이터 삭제
+      deleteAllNotifications()
+    }
+  }, [isLogin, deleteAllNotifications])
+
+  // 모달이 열려있고, 타입이 notification인 경우에만 렌더링
+  if (!isOpen || modalType !== 'notification') {
+    return null
+  }
+
+  // 읽지 않은 알림 개수
+  const unreadCount = notifications.filter(item => !item.isRead).length
+
+  // 헤더에 표시할 제목
+  const sidebarTitle = activeTab === 'notification' ? '알림' : '공지사항'
+
+  // 헤더에 표시할 추가 요소 (알림 개수)
+  const headerExtra = activeTab === 'notification' && unreadCount > 0 ? (
+    <div className="flex items-center">
+      <span className="text-sm font-medium text-primary-600 dark:text-dark-primary-400">
+        {unreadCount}개 안 읽음
+      </span>
+    </div>
+  ) : null
+
+  if (isLoading) {
+    const loadingContent = (
+      <AnimatePresence>
+        <motion.div
+          className="fixed inset-0 bg-black/50 z-[999]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={closeModal}
+        />
+        <motion.div
+          className="fixed top-0 right-0 h-full min-w-[600px] bg-white dark:bg-dark-background-light shadow-xl z-[999] overflow-hidden flex flex-col"
+          initial={{ x: '100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '100%' }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        >
+          <div className="flex items-center justify-center h-full">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    )
+    return <Portal>{loadingContent}</Portal>
+  }
+
+  if (error) {
+    const errorContent = (
+      <AnimatePresence>
+        <motion.div
+          className="fixed inset-0 bg-black/50 z-[999]"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={closeModal}
+        />
+        <motion.div
+          className="fixed top-0 right-0 h-full min-w-[600px] bg-white dark:bg-dark-background-light shadow-xl z-[999] overflow-hidden flex flex-col"
+          initial={{ x: '100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '100%' }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        >
+          <div className="flex items-center justify-center h-full text-red-500">
+            <p>알림을 불러오는데 실패했습니다.</p>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+    )
+    return <Portal>{errorContent}</Portal>
+  }
+
+  return (
+    <BaseSidebar
+      isOpen={isOpen && modalType === 'notification'}
+      onClose={closeModal}
+      title={sidebarTitle}
+      headerExtra={headerExtra}
+    >
+      {/* 탭 메뉴 */}
+      <div className="flex border-b border-secondary-100 dark:border-dark-secondary-800">
+        <button
+          className={`flex-1 py-3 text-sm font-medium transition-colors relative ${
+            activeTab === 'notification'
+              ? 'text-primary-600 dark:text-dark-primary-400'
+              : 'text-secondary-500 dark:text-dark-secondary-400 hover:text-secondary-700 dark:hover:text-dark-secondary-300'
+          }`}
+          onClick={() => setActiveTab('notification')}
+        >
+          알림
+          {(unreadCount > 0 || hasNewNotification) && (
+            <span className="ml-1 px-1.5 py-0.5 text-xs font-medium rounded-full bg-primary-500 text-white">
+              {unreadCount > 0 ? unreadCount : '새 알림'}
+            </span>
+          )}
+          {activeTab === 'notification' && (
+            <motion.div
+              className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 dark:bg-dark-primary-500"
+              layoutId="tab-indicator"
+            />
+          )}
+        </button>
+        <button
+          className={`flex-1 py-3 text-sm font-medium transition-colors relative ${
+            activeTab === 'announcement'
+              ? 'text-primary-600 dark:text-dark-primary-400'
+              : 'text-secondary-500 dark:text-dark-secondary-400 hover:text-secondary-700 dark:hover:text-dark-secondary-300'
+          }`}
+          onClick={() => setActiveTab('announcement')}
+        >
+          공지사항
+          {activeTab === 'announcement' && (
+            <motion.div
+              className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 dark:bg-dark-primary-500"
+              layoutId="tab-indicator"
+            />
+          )}
+        </button>
+      </div>
+
+      {/* 탭 내용 */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+          className="flex flex-col flex-1"
+        >
+          {activeTab === 'notification' ? <NotificationTab /> : <AnnouncementTab />}
+        </motion.div>
+      </AnimatePresence>
     </BaseSidebar>
   )
 }

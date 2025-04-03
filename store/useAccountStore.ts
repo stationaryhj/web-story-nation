@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware'
 import { LoginResponse, WriterInfoData } from '@/types/api'
 import { OAuthProvider, OAuthResponse, OAuthUserInfo } from '@/types/login'
 import { OAUTH_PROVIDERS } from '@/types/login'
-import { contentApi, createApi } from '@/services/api'
+import { contentApi, createApi, settlementApi } from '@/services/api'
 import axios from 'axios'
 import { authService } from '@/services/auth'
 
@@ -32,6 +32,7 @@ interface AccountState {
   setError: (error: string | null) => void
   initialize: () => Promise<void>
   updateAccountData: (coin_free: number, coin_free_dt: number | string, coin_register: number, coin_user: number) => void
+  updateNicknameAndCoin: (nick_nm: string, coin_user: number) => void
   setPersona: (persona: string, persona_gender: number) => void
   setWriterInfo: (writerInfo: WriterInfoData | null) => void
   fetchWriterInfo: () => Promise<void>
@@ -40,7 +41,12 @@ interface AccountState {
   verifyIdentity: () => Promise<{success: boolean, message: string}>
   updateIntro: (intro: string) => Promise<{success: boolean, message: string}>
   updateUserInfoFromUserInfo2: () => Promise<boolean>
+  updateUserInfoFromUserInfo: () => Promise<boolean>
   isAdult: () => boolean
+
+  editNickname: (nick_nm: string) => Promise<boolean>
+  getCoinSum: () => number
+  UpdateFreePen: () => Promise<boolean>
 }
 
 // 네트워크 에러 타입 정의
@@ -229,6 +235,33 @@ export const useAccountStore = create<AccountState>()(
       error: null,
       isInitialized: false,
 
+      UpdateFreePen: async () => {
+        const response = await settlementApi.UseFreePen()
+        if (response.data && response.data.result && response.data.result.err === 0) {
+          // update free pen
+          const coin_user = get().data?.coin_user || 0
+          get().updateAccountData(response.data.coin_free, response.data.coin_free_dt, response.data.coin_register, coin_user)
+          return true
+        }
+        return false
+      },
+
+      editNickname: async (nick_nm: string) => {
+        // check nickname
+        const responseCheck = await contentApi.NicknmCheck(nick_nm)
+        if (responseCheck.data.result.err !== 0) {
+          return false
+        }
+
+        const response = await contentApi.NicknmChange(nick_nm)
+        if (response.data && response.data.result && response.data.result.err === 0) {
+          // update nickname and coin
+          get().updateNicknameAndCoin(nick_nm, response.data.coin_user)
+          return true
+        }
+        return false
+      },
+
       isAdult: () => {
         return !!(get().data && (get().data?.minor ?? 0) > 1)
       },
@@ -330,19 +363,62 @@ export const useAccountStore = create<AccountState>()(
         }
       },
 
+      updateUserInfoFromUserInfo: async () => {
+        try {
+          const userInfoResponse = await contentApi.userinfo(get().data?.access_token || '')
+          
+          if (userInfoResponse && userInfoResponse.data) {
+            const currentData = get().data
+            if (currentData) {
+              // UserInfoResponse 타입에 맞게 필드 업데이트
+              // intro, profile_url, image_url 속성은 옵셔널하게 처리
+              set({
+                data: {
+                  ...currentData,
+                  nick_nm: userInfoResponse.data.nick_nm || currentData.nick_nm,
+                  coin_user: userInfoResponse.data.coin_user || currentData.coin_user,
+                  coin_free: userInfoResponse.data.coin_free || currentData.coin_free,
+                  coin_register: userInfoResponse.data.coin_register || currentData.coin_register,
+                  coin_free_dt: userInfoResponse.data.coin_free_dt?.toString() || currentData.coin_free_dt,
+                  lv: userInfoResponse.data.lv || currentData.lv,
+                  exp: userInfoResponse.data.exp || currentData.exp,
+                  ink_user: userInfoResponse.data.ink_user || currentData.ink_user,
+                  energy_user: userInfoResponse.data.energy_user || currentData.energy_user,
+                  minor: userInfoResponse.data.minor || currentData.minor,
+                  persona: userInfoResponse.data.persona || currentData.persona,
+                  persona_gender: userInfoResponse.data.persona_gender || currentData.persona_gender,
+                  // 타입에 없는 속성은 타입 단언 또는 옵셔널 체이닝으로 처리
+                  intro: (userInfoResponse.data as any).intro || currentData.intro,
+                  profile_url: (userInfoResponse.data as any).profile_url || currentData.profile_url,
+                  image_url: (userInfoResponse.data as any).image_url || currentData.image_url
+                }
+              })
+            }
+            return true
+          }
+          return false
+        } catch (error) {
+          console.error('userinfo 업데이트 중 오류 발생:', error)
+          return false
+        }
+      },
+
+
       updateUserInfoFromUserInfo2: async () => {
         try {
           const userInfoResponse = await contentApi.userinfo2(get().data?.access_token || '')
           
-          if (userInfoResponse) {
+          if (userInfoResponse && userInfoResponse.data) {
             const currentData = get().data
             if (currentData) {
+              // 사용 가능한 모든 필드를 업데이트
               set({
                 data: {
                   ...currentData,
-                  intro: userInfoResponse.data.intro,
-                  profile_url: userInfoResponse.data.profile_url,
-                  image_url: userInfoResponse.data.image_url
+                  // 타입에 없는 속성은 타입 단언 또는 옵셔널 체이닝으로 처리
+                  intro: userInfoResponse.data.intro || currentData.intro,
+                  profile_url: userInfoResponse.data.profile_url || currentData.profile_url,
+                  image_url: userInfoResponse.data.image_url || currentData.image_url
                 }
               })
             }
@@ -824,6 +900,10 @@ export const useAccountStore = create<AccountState>()(
                     window.removeEventListener('message', messageHandler);
                     URL.revokeObjectURL(dataUrl);
                     if (!popup.closed) popup.close();
+
+                    // 본인인증 성공 정보 변경
+                    await get().updateUserInfoFromUserInfo()
+
                     resolve({ 
                       success: true, 
                       message: '본인인증이 성공적으로 완료되었습니다.' 
@@ -920,6 +1000,24 @@ export const useAccountStore = create<AccountState>()(
           console.error('한줄 소개 업데이트 중 오류 발생:', error)
           return { success: false, message: '한줄 소개 저장 중 오류가 발생했습니다.' }
         }
+      },
+
+      updateNicknameAndCoin: (nick_nm: string, coin_user: number) => {
+        set((state) => {
+          if (!state.data) return state
+          return {
+            ...state,
+            data: {
+              ...state.data,
+              nick_nm,
+              coin_user,
+            }
+          }
+        })
+      },
+
+      getCoinSum: () => {
+        return (get().data?.coin_free ?? 0) + (get().data?.coin_user ?? 0) + (get().data?.coin_register ?? 0)
       },
     }),
     {
