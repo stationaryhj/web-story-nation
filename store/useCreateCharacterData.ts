@@ -58,6 +58,7 @@ export interface CharacterFormData {
 
   // API 호환성 속성
   world_list_detail_chrbot_key?: string
+  finishYn?: number
 
   // 추가 속성을 위한 인덱스 시그니처
   [key: string]: any
@@ -128,6 +129,7 @@ const defaultFormData: CharacterFormData = {
   imgUrl: '',
   imgUrlNsfw: '',
   imgWebUrl: '',
+  finishYn: 0,
 }
 
 // CreateCharacterStore 생성
@@ -377,6 +379,8 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         const imgUrlNsfw = characterData.img_url_nsfw || ''
         const imgWebUrl = characterData.img_web_url || ''
 
+        const finishYn = characterData.finish_yn || 0
+
         // 한 번에 적절한 필드에만 설정
         set(state => ({
           formData: {
@@ -388,6 +392,7 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
             img_url: undefined,
             img_url_nsfw: undefined,
             img_web_url: undefined,
+            finishYn: finishYn,
           },
         }))
       }
@@ -432,7 +437,17 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
 
       const { formData } = get()
 
-      console.log('formData :: ', formData)
+      // 대화 예시 형식화 - title과 text를 포함하는 포맷으로 변경
+      const formattedExamples = formData.conversationExamples && formData.conversationExamples.length > 0
+        ? formData.conversationExamples.map(example => {
+            // title이 있으면 "Title: 제목" 형태로, 없으면 빈칸으로
+            const titleText = example.title ? `Title: ${example.title}\n` : '';
+            // 본문 텍스트 (기존과 동일)
+            const contentText = example.text;
+            // title + 본문 텍스트 조합
+            return `${titleText}${contentText}`;
+          }).join('\n\n')
+        : '';
 
       // 폼 데이터에서 API 요청에 필요한 데이터 추출
       const payload = {
@@ -447,11 +462,8 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         intro: formData.bio || '',
         first_talk: formData.firstMessage || '',
         content: formData.bioDetail || '',
-        // 대화 예시 - 없는 경우 빈 문자열 전달
-        example:
-          formData.conversationExamples && formData.conversationExamples.length > 0
-            ? formData.conversationExamples.map(example => example.text).join('\n\n')
-            : '',
+        // 대화 예시 - title과 text를 포함한 형식으로 변경
+        example: formattedExamples,
         // 성인 등급 설정
         nsfw: formData.rating === 'adult' ? 1 : 0,
         // 게시범위 (공개=1, 비공개=0)
@@ -465,7 +477,7 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
               ? 1
               : 0
             : 0,
-        finish_yn: finishYn,
+        finish_yn: formData.finishYn ? formData.finishYn : finishYn,
       }
 
       console.log('저장할 데이터:', payload)

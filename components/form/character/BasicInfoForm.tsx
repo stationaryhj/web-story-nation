@@ -42,7 +42,7 @@ export default function BasicInfoForm({
   const [customTagInput, setCustomTagInput] = useState('')
   const { isAdult } = useAccountStore()
   const isAdultModeEnabled = isAdult()
-
+  
   // 태그 데이터 로드
   useEffect(() => {
     fetchTagList()
@@ -91,6 +91,11 @@ export default function BasicInfoForm({
 
   // 게시 범위 선택 핸들러
   const handleVisibilitySelect = (visibility: 'public' | 'private') => {
+    // 이미 공개된 캐릭터라면 비공개로 변경 불가능
+    if(formData.finishYn === 1) {
+      return
+    }
+
     setFormField('visibility', visibility)
   }
 

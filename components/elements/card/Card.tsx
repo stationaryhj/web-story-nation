@@ -2,10 +2,9 @@
 'use client'
 
 import { CardTransition } from '@/components/motion/PageTransition'
-import { getImageUri } from '@/lib/utils/storyNationUtil'
 import type { Character } from '@/store/useStoreData'
 import { useModalStore } from '@/store/useStoreModal'
-import { faComment, faFire, faPencilAlt, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faPencilAlt, faTrash, faLock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import React from 'react'
@@ -37,6 +36,9 @@ export default function Card({
   const [imageError, setImageError] = React.useState(false)
   const router = useRouter()
 
+  const isTemp = character.finish_yn == 0
+  const isLocked = character.show_yn == 0
+
   // 카드 클릭 기본 핸들러 - 캐릭터 모달 열기
   const defaultCardClick = () => {
     setSelectedCharacter(character)
@@ -45,6 +47,7 @@ export default function Card({
 
   // 실제 카드 클릭 핸들러
   const handleCardClick = () => {
+    
     if (onCardClick) {
       onCardClick(character)
     } else {
@@ -104,6 +107,18 @@ export default function Card({
               className="object-cover"
               onError={handleImageError}
             />
+
+            {isTemp && (
+              <div className="absolute top-3 left-3 bg-red-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                임시저장
+              </div>
+            )}
+
+            {isLocked && (
+              <div className="absolute top-3 left-3 bg-red-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                <FontAwesomeIcon icon={faLock} className="mr-1" />
+              </div>
+            )}
 
             {/* 그라데이션 오버레이 */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent"></div>
@@ -192,6 +207,18 @@ export default function Card({
             {isAdult && (
               <div className="absolute top-3 right-3 bg-red-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
                 성인인증
+              </div>
+            )}
+
+            {isTemp && (
+              <div className="absolute top-3 left-3 bg-red-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                임시저장
+              </div>
+            )}
+
+            {isLocked && (
+              <div className="absolute bottom-4 left-4 bg-red-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                <FontAwesomeIcon icon={faLock} />
               </div>
             )}
 
