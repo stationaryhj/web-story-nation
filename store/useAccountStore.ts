@@ -32,6 +32,7 @@ interface AccountState {
   setError: (error: string | null) => void
   initialize: () => Promise<void>
   updateAccountData: (coin_free: number, coin_free_dt: number | string, coin_register: number, coin_user: number) => void
+  updateNicknameAndCoin: (nick_nm: string, coin_user: number) => void
   setPersona: (persona: string, persona_gender: number) => void
   setWriterInfo: (writerInfo: WriterInfoData | null) => void
   fetchWriterInfo: () => Promise<void>
@@ -41,6 +42,9 @@ interface AccountState {
   updateIntro: (intro: string) => Promise<{success: boolean, message: string}>
   updateUserInfoFromUserInfo2: () => Promise<boolean>
   isAdult: () => boolean
+
+  editNickname: (nick_nm: string) => Promise<boolean>
+  getCoinSum: () => number
 }
 
 // 네트워크 에러 타입 정의
@@ -228,6 +232,22 @@ export const useAccountStore = create<AccountState>()(
       loading: false,
       error: null,
       isInitialized: false,
+
+      editNickname: async (nick_nm: string) => {
+        // check nickname
+        const responseCheck = await contentApi.NicknmCheck(nick_nm)
+        if (responseCheck.data.result.err !== 0) {
+          return false
+        }
+
+        const response = await contentApi.NicknmChange(nick_nm)
+        if (response.data && response.data.result && response.data.result.err === 0) {
+          // update nickname and coin
+          get().updateNicknameAndCoin(nick_nm, response.data.coin_user)
+          return true
+        }
+        return false
+      },
 
       isAdult: () => {
         return !!(get().data && (get().data?.minor ?? 0) > 1)
@@ -920,6 +940,24 @@ export const useAccountStore = create<AccountState>()(
           console.error('한줄 소개 업데이트 중 오류 발생:', error)
           return { success: false, message: '한줄 소개 저장 중 오류가 발생했습니다.' }
         }
+      },
+
+      updateNicknameAndCoin: (nick_nm: string, coin_user: number) => {
+        set((state) => {
+          if (!state.data) return state
+          return {
+            ...state,
+            data: {
+              ...state.data,
+              nick_nm,
+              coin_user,
+            }
+          }
+        })
+      },
+
+      getCoinSum: () => {
+        return (get().data?.coin_free ?? 0) + (get().data?.coin_user ?? 0) + (get().data?.coin_register ?? 0)
       },
     }),
     {

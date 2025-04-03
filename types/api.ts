@@ -751,6 +751,13 @@ export interface GetSearchResponse {
   result: ApiResult;
 }
 
+
+export interface NicknmChangeResponse {
+  result: ApiResult;
+  nick_nm: string;
+  coin_user: number;
+}
+
 // API Result
 export type ApiResult = {
   err: number;
