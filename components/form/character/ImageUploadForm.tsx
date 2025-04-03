@@ -85,6 +85,12 @@ export default function ImageUploadForm({
         return
       }
 
+      console.log('formdata', formData)
+
+      // if (visibility === 'public') {
+      //   setVisibleWarnigModal(true)
+      // }
+
       // Presigned URL 받아오기
       const presignedResponse = await contentApi.GetPresignedUrl(file.name, `.${extension || 'jpg'}`, 5)
 

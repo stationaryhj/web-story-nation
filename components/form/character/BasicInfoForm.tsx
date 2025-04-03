@@ -89,9 +89,6 @@ export default function BasicInfoForm({
   // 게시 범위 선택 핸들러
   const handleVisibilitySelect = (visibility: 'public' | 'private') => {
     setFormField('visibility', visibility)
-    if (visibility === 'public') {
-      setVisibleWarnigModal(true)
-    }
   }
 
   // 이용등급 선택 핸들러
@@ -214,11 +211,18 @@ export default function BasicInfoForm({
 
           {/* 게시 범위 */}
           <div>
-            <RequiredLabel>
-              <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-                게시 범위
-              </label>
-            </RequiredLabel>
+            <div className="flex flex-col gap-2">
+              <div>
+                <RequiredLabel>
+                  <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
+                    게시 범위
+                  </label>
+                </RequiredLabel>
+              </div>
+              <div>
+                <p className="text-md dark:text-dark-secondary-500 mb-2">생성 가능한 비공개 캐릭터 0 / 3</p>
+              </div>
+            </div>
             <div className="mt-2 grid grid-cols-2 gap-4">
               <button
                 type="button"
@@ -242,6 +246,45 @@ export default function BasicInfoForm({
               >
                 공개
               </button>
+            </div>
+
+            {/* 게시 범위 설명 */}
+            <div className="mt-4 rounded-lg bg-secondary-50 p-4 dark:bg-dark-secondary-800/10">
+              <h4 className="text-md font-bold text-secondary-800 dark:text-dark-secondary-200 mb-2 ">
+                게시 범위에 따라 무엇이 달라지나요?
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h5 className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-1">공개</h5>
+                  <ul className="text-xs space-y-1 text-secondary-600 dark:text-dark-secondary-400">
+                    <li className="flex items-start">
+                      <span className="text-primary-500 mr-1 mt-0.5">•</span>
+                      <span>모든 유저가 캐릭터와 대화할 수 있어요.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-red-500 mr-1 mt-0.5">•</span>
+                      <span>생성한 공개 캐릭터는 비공개로 바꿀 수 없어요.</span>
+                    </li>
+                  </ul>
+                </div>
+                <div>
+                  <h5 className="text-sm font-medium text-primary-600 dark:text-primary-400 mb-1">비공개</h5>
+                  <ul className="text-xs space-y-1 text-secondary-600 dark:text-dark-secondary-400">
+                    <li className="flex items-start">
+                      <span className="text-primary-500 mr-1 mt-0.5">•</span>
+                      <span>나만 캐릭터와 대화할 수 있어요.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-primary-500 mr-1 mt-0.5">•</span>
+                      <span>캐릭터가 검색되지 않아요.</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-primary-500 mr-1 mt-0.5">•</span>
+                      <span>최대 3개만 보유할 수 있어요.</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
 
