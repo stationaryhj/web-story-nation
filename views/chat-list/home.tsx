@@ -15,6 +15,14 @@ import { useRouter } from 'next/navigation'
 import type { FormEvent } from 'react'
 import { useState, useEffect, useCallback } from 'react'
 import DeleteConfirmModal from '@/components/modal/DeleteConfirmModal'
+import { BaseSelectBox } from '@/components/elements/selectbox/BaseSelectBox'
+
+const chatListOptions = [
+  { value: 'latest', label: '최근 대화순' },
+  { value: 'oldest', label: '오래된 대화순' },
+  { value: 'mostChats', label: '대화 많은 순' },
+  { value: 'fewestChats', label: '대화 적은 순' },
+]
 
 export default function ChatListPage() {
   const router = useRouter()
@@ -25,31 +33,36 @@ export default function ChatListPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
   const [totalPages, setTotalPages] = useState(1)
+  const [selectedOption, setSelectedOption] = useState({ value: 'latest', label: '최근 대화순' })
 
   // 채팅 목록 데이터 가져오기
   const { data: chatDataList, isLoading, error, refetch } = ReqGetChatList(itemsPerPage, currentPage)
-  
+
   // 전체 채팅 목록
-  const [chatList, setChatList] = useState<Array<{
-    id: string;
-    characterId: string;
-    name: string;
-    lastMessage: string;
-    time: string;
-    imageUrl: string;
-    fixed: number;
-  }>>([])
+  const [chatList, setChatList] = useState<
+    Array<{
+      id: string
+      characterId: string
+      name: string
+      lastMessage: string
+      time: string
+      imageUrl: string
+      fixed: number
+    }>
+  >([])
 
   // 필터링된 채팅 목록
-  const [filteredChatList, setFilteredChatList] = useState<Array<{
-    id: string;
-    characterId: string;
-    name: string;
-    lastMessage: string;
-    time: string;
-    imageUrl: string;
-    fixed: number;
-  }>>([])
+  const [filteredChatList, setFilteredChatList] = useState<
+    Array<{
+      id: string
+      characterId: string
+      name: string
+      lastMessage: string
+      time: string
+      imageUrl: string
+      fixed: number
+    }>
+  >([])
 
   // 데이터가 변경될 때마다 채팅 목록 업데이트
   useEffect(() => {
@@ -63,19 +76,17 @@ export default function ChatListPage() {
   // 검색어 및 탭 변경 시 필터링 적용
   useEffect(() => {
     let filtered = [...chatList]
-    
+
     // 탭에 따른 필터링
     if (activeTab === 'favorites') {
       filtered = filtered.filter(chat => Number(chat.fixed) > 0)
     }
-    
+
     // 검색어에 따른 필터링
     if (searchQuery.trim()) {
-      filtered = filtered.filter(chat => 
-        chat.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      filtered = filtered.filter(chat => chat.name.toLowerCase().includes(searchQuery.toLowerCase()))
     }
-    
+
     setFilteredChatList(filtered)
   }, [chatList, activeTab, searchQuery])
 
@@ -140,6 +151,16 @@ export default function ChatListPage() {
     }
   }
 
+  const handleOptionChange = (option: { value: string; label: string }) => {
+    setSelectedOption(option)
+    //   if (query.trim()) {
+    // const filteredResults = MOCK_SEARCH_RESULTS[option.value as keyof typeof MOCK_SEARCH_RESULTS].filter(item =>
+    //   item.name.toLowerCase().includes(query.toLowerCase())
+    // )
+    // setSearchResults(filteredResults)
+    // setShowNoResults(filteredResults.length === 0)
+  }
+
   // 페이지네이션 렌더링
   const renderPagination = () => {
     if (totalPages <= 1) return null
@@ -157,13 +178,13 @@ export default function ChatListPage() {
         >
           이전
         </button>
-        
+
         {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
           // 현재 페이지를 중심으로 최대 5개의 페이지 번호를 표시
           let pageNum = currentPage - 2 + i
           if (pageNum < 1) pageNum += 5
           if (pageNum > totalPages) return null
-          
+
           return (
             <button
               key={pageNum}
@@ -178,7 +199,7 @@ export default function ChatListPage() {
             </button>
           )
         })}
-        
+
         <button
           onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages}
@@ -210,33 +231,35 @@ export default function ChatListPage() {
               >
                 <h2 className="text-xl font-bold mb-4 text-secondary-900 dark:text-dark-secondary-700">대화</h2>
 
-                <div className="flex mb-4 border-b border-secondary-100 dark:border-dark-secondary-200">
-                  <button
-                    className={`py-2 px-4 font-medium text-sm ${
-                      activeTab === 'all'
-                        ? 'text-primary-600 dark:text-dark-primary-600 border-b-2 border-primary-500 dark:border-dark-primary-500'
-                        : 'text-secondary-500 dark:text-dark-secondary-500'
-                    }`}
-                    onClick={() => handleTabChange('all')}
-                  >
-                    모든 대화
-                  </button>
-                  <button
-                    className={`py-2 px-4 font-medium text-sm ${
-                      activeTab === 'favorites'
-                        ? 'text-primary-600 dark:text-dark-primary-600 border-b-2 border-primary-500 dark:border-dark-primary-500'
-                        : 'text-secondary-500 dark:text-dark-secondary-500'
-                    }`}
-                    onClick={() => handleTabChange('favorites')}
-                  >
-                    즐겨찾기
-                  </button>
-
-                  <div className="ml-auto">
-                    <button className="p-2 text-secondary-500 dark:text-dark-secondary-500 hover:text-primary-500 dark:hover:text-dark-primary-600">
-                      <FontAwesomeIcon icon={faSort} />
+                <div className="flex md:flex-row pb-4 mb-4 justify-between border-b border-secondary-100 dark:border-dark-secondary-200">
+                  <div className="flex mb-2 md:mb-0">
+                    <button
+                      className={`py-1 px-2 md:py-2 md:px-4 font-medium text-xs md:text-sm ${
+                        activeTab === 'all'
+                          ? 'text-primary-600 dark:text-dark-primary-600 border-b-2 border-primary-500 dark:border-dark-primary-500'
+                          : 'text-secondary-500 dark:text-dark-secondary-500'
+                      }`}
+                      onClick={() => handleTabChange('all')}
+                    >
+                      모든 대화
+                    </button>
+                    <button
+                      className={`py-1 px-2 md:py-2 md:px-4 font-medium text-xs md:text-sm ${
+                        activeTab === 'favorites'
+                          ? 'text-primary-600 dark:text-dark-primary-600 border-b-2 border-primary-500 dark:border-dark-primary-500'
+                          : 'text-secondary-500 dark:text-dark-secondary-500'
+                      }`}
+                      onClick={() => handleTabChange('favorites')}
+                    >
+                      즐겨찾기
                     </button>
                   </div>
+                  <BaseSelectBox
+                    options={chatListOptions}
+                    selectedOption={selectedOption}
+                    onChange={handleOptionChange}
+                    className="w-full md:w-auto"
+                  />
                 </div>
 
                 <form onSubmit={handleSearch} className="mb-4">
@@ -311,10 +334,10 @@ export default function ChatListPage() {
                       ) : (
                         <div className="py-20 text-center">
                           <p className="text-secondary-500 dark:text-dark-secondary-500 mb-4">
-                            {searchQuery 
-                              ? '검색 결과가 없습니다.' 
-                              : activeTab === 'favorites' 
-                                ? '즐겨찾기한 대화가 없습니다.' 
+                            {searchQuery
+                              ? '검색 결과가 없습니다.'
+                              : activeTab === 'favorites'
+                                ? '즐겨찾기한 대화가 없습니다.'
                                 : '아직 대화를 시작한 캐릭터가 없습니다.'}
                           </p>
                           {!searchQuery && activeTab === 'all' && (
@@ -328,7 +351,7 @@ export default function ChatListPage() {
                         </div>
                       )}
                     </div>
-                    
+
                     {/* 페이지네이션 */}
                     {renderPagination()}
                   </>

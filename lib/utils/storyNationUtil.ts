@@ -1,6 +1,17 @@
-import { CharbotChatData, ModuleCreater, CharbotChatListData, CharbotMineData, ChatModeData, ChrbotData, InquiryData, LoginResponse, ModuleCharacter, IncomeData } from '@/types/api';
-import { ChatMode } from '@/components/modal/ChatModeModal';
-import { useAccountStore } from '@/store/useAccountStore';
+import {
+  CharbotChatData,
+  ModuleCreater,
+  CharbotChatListData,
+  CharbotMineData,
+  ChatModeData,
+  ChrbotData,
+  InquiryData,
+  LoginResponse,
+  ModuleCharacter,
+  IncomeData,
+} from '@/types/api'
+import { ChatMode } from '@/components/modal/ChatModeModal'
+import { useAccountStore } from '@/store/useAccountStore'
 
 /**
   get image Uri
@@ -107,7 +118,6 @@ export function bridgeModuleCreatorToCharacter(dataList: Array<ModuleCreater>) {
 
   return creaters
 }
-
 
 export function bridgeCharbotGetListMineDataToCharacter(dataList: Array<CharbotMineData>) {
   const characters = dataList?.map(item => ({
@@ -226,7 +236,7 @@ export function bridgeLoginDataToUserInfo(data: LoginResponse | null) {
     getBalance: (): number => {
       return Number(data.coin_free) + Number(data.coin_free_dt) + Number(data.coin_register)
     },
-  };
+  }
 }
 
 /**
@@ -245,13 +255,14 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
     hashtags: data.tags ? data.tags.split(',') : [],
     bioDetail: data.content || '',
     detailVisibility: data.content_show_yn === 1 ? 'public' : 'private',
-    conversationExamples: data.example ? 
-      data.example.split('\n\n').map((text: string, index: number) => ({
-        id: index.toString(),
-        text,
-        isEditing: false,
-        visibility: data.example_show_yn === 1 ? 'public' : 'private',
-      })) : [],
+    conversationExamples: data.example
+      ? data.example.split('\n\n').map((text: string, index: number) => ({
+          id: index.toString(),
+          text,
+          isEditing: false,
+          visibility: data.example_show_yn === 1 ? 'public' : 'private',
+        }))
+      : [],
     imageUrl: data.img_url || '',
     isAdult: data.nsfw === 1,
     createDate: data.create_dt || '',
@@ -281,10 +292,9 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
     tags: data.tags,
     sort: data.sort,
     countryCode: data.countryCode,
-    world_key: data.world_key
-  };
+    world_key: data.world_key,
+  }
 }
-
 
 export function bridgeChatModeDataToChatMode(data: ChatModeData, customData: ChatMode) {
   return {
@@ -292,10 +302,9 @@ export function bridgeChatModeDataToChatMode(data: ChatModeData, customData: Cha
     id: data.chat_mode,
     penCost: data.coin,
     discount: data.discount,
-    original_coin: data.original_coin
+    original_coin: data.original_coin,
   }
 }
-
 
 export function bridgeInquiryDataToNotification(data: InquiryData) {
   return {
@@ -315,20 +324,19 @@ export function bridgeInquiryDataToNotification(data: InquiryData) {
  * @returns 수익 내역 UI에 표시할 데이터 배열
  */
 export function bridgeIncomeDataToEarningItems(data: Array<IncomeData>, lastIndex: number | 1) {
-  
   // 데이터가 없거나 배열이 아닌 경우 빈 배열 반환
   if (!data || !Array.isArray(data)) {
     console.warn('Invalid income data:', data)
     return []
   }
-  
+
   return data.map((item, index) => ({
-    id: index + 1 + (lastIndex * 50), // 고유 ID 생성
+    id: index + 1 + lastIndex * 50, // 고유 ID 생성
     date: item.create_dt, // 날짜 형식 그대로 사용
     description: item.content, // 내용 (예: 캐릭터 채팅)
     amount: parseFloat(item.pen), // pen 값을 숫자로 변환하고 10000을 곱해 펜 단위로 표시
     cnt: item.cnt, // 횟수 정보 추가
-    title: item.title // 제목 정보 추가
+    title: item.title, // 제목 정보 추가
   }))
 }
 
@@ -336,15 +344,18 @@ export function bridgeIncomeDataToEarningItems(data: Array<IncomeData>, lastInde
 export const bridgeWithdrawDataToWithdrawItems = (data: any[], page: number = 1) => {
   return data.map((item, index) => ({
     id: item.withdraw_request_key,
-    date: new Date(item.create_dt).toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).replace(/\. /g, '.').replace('.', ''),
+    date: new Date(item.create_dt)
+      .toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+      .replace(/\. /g, '.')
+      .replace('.', ''),
     amount: item.pen,
-    status: '완료' // API에서 상태 정보가 없어서 기본값으로 '완료' 설정
+    status: '완료', // API에서 상태 정보가 없어서 기본값으로 '완료' 설정
   }))
 }
 
