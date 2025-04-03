@@ -65,6 +65,7 @@ interface DetailInfoFormProps {
   removeConversationExample: (id: string) => void
   setConversationExampleEditMode: (id: string, isEditing: boolean) => void
   setConversationExampleVisibility: (id: string, visibility: 'public' | 'private') => void
+  setConversationExampleTitle: (id: string, title: string) => void
   onValidationChange?: (isValid: boolean) => void
 }
 
@@ -78,6 +79,13 @@ interface ChatExample {
   isEditing: boolean
 }
 
+// 대화 예시에 title 프로퍼티가 존재하도록 TypeScript 인터페이스 타입을 지정
+// 참고: 실제 ConversationExample 타입은 다른 파일에 정의되어 있으므로
+// 여기서는 타입 확장(Type Assertion)으로 처리합니다
+type EnhancedConversationExample = ConversationExample & {
+  title?: string
+}
+
 export default function DetailInfoForm({
   formData,
   setFormField,
@@ -86,6 +94,7 @@ export default function DetailInfoForm({
   removeConversationExample,
   setConversationExampleEditMode,
   setConversationExampleVisibility,
+  setConversationExampleTitle,
   onValidationChange,
 }: DetailInfoFormProps) {
   // 대화 예시 관련 ref 추가
@@ -98,17 +107,21 @@ export default function DetailInfoForm({
   const [activeField, setActiveField] = useState<{ id: string; field: 'user' | 'character' } | null>(null)
   const [showTutorial, setShowTutorial] = useState(false)
 
+  // 튜토리얼이 이미 표시된 적이 있는지 추적
+  const tutorialShownRef = useRef(false)
+
   // 성인 인증 상태 확인
   const { isAdult } = useAccountStore()
   const isAdultModeEnabled = isAdult()
 
   // 대화 예시가 처음 추가될 때 튜토리얼 표시
   useEffect(() => {
-    // 대화 예시가 하나 이상 있고, 이전에 없었다면 튜토리얼 표시
-    if (formData.conversationExamples.length === 1) {
+    // 대화 예시가 하나 이상 있고, 이전에 튜토리얼이 표시된 적이 없다면 표시
+    if (formData.conversationExamples.length === 1 && !tutorialShownRef.current) {
       const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
       if (!tutorialCompleted) {
         setShowTutorial(true)
+        tutorialShownRef.current = true
       }
     }
   }, [formData.conversationExamples.length])
@@ -154,9 +167,20 @@ export default function DetailInfoForm({
     }
   }, [formData.conversationExamples])
 
-  // 게시 범위 선택 핸들러
+  // 게시 범위 선택 핸들러 (상세 설명용)
   const handleVisibilitySelect = (visibility: 'public' | 'private') => {
     setFormField('visibility', visibility)
+  }
+
+  // 대화 예시 공개 여부 선택 핸들러
+  const handleExamplesVisibilitySelect = (visibility: 'public' | 'private') => {
+    // 대화 예시 전체의 공개 여부를 설정
+    setFormField('examplesVisibility', visibility)
+
+    // 모든 대화 예시에 동일한 가시성 설정
+    formData.conversationExamples.forEach((example: ConversationExample) => {
+      setConversationExampleVisibility(example.id, visibility)
+    })
   }
 
   // 이용등급 선택 핸들러
@@ -318,9 +342,11 @@ export default function DetailInfoForm({
     }
   }
 
-  // 대화 예시 가시성 변경 핸들러
-  const handleExampleVisibilityChange = (id: string, visibility: 'public' | 'private') => {
-    setConversationExampleVisibility(id, visibility)
+  // 대화 예시 제목 변경 핸들러
+  const handleExampleTitleChange = (id: string, title: string) => {
+    if (title.length <= 25) {
+      setConversationExampleTitle(id, title)
+    }
   }
 
   // 텍스트 길이 표시 형식
@@ -366,7 +392,7 @@ export default function DetailInfoForm({
             </span>
           </div>
 
-          {/* 공개/비공개 선택 버튼 */}
+          {/* 상세 설명 공개/비공개 선택 버튼 */}
           <div id="visibility-buttons" className="grid grid-cols-2 gap-4 w-full sm:w-1/2 md:w-1/3 mb-4">
             <button
               type="button"
@@ -377,7 +403,7 @@ export default function DetailInfoForm({
                   : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
               }`}
             >
-              비공개
+              상세 설명 비공개
             </button>
             <button
               type="button"
@@ -388,7 +414,7 @@ export default function DetailInfoForm({
                   : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
               }`}
             >
-              공개
+              상세 설명 공개
             </button>
           </div>
 
@@ -418,37 +444,32 @@ export default function DetailInfoForm({
                   캐릭터의 말투가 채팅에 반영될 거에요!
                 </p>
               </div>
+            </div>
 
-              {/* 특수 태그 버튼들 */}
-              <div className="flex flex-wrap sm:flex-nowrap space-x-0 sm:space-x-2 space-y-2 sm:space-y-0">
-                <button
-                  id="context-info-button"
-                  type="button"
-                  onClick={handleContextInfoClick}
-                  className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center mr-2 sm:mr-0 mb-2 sm:mb-0 w-auto"
-                  title="상황 설명 추가"
-                >
-                  상황 설명 추가(*)
-                </button>
-                <button
-                  id="character-name-button"
-                  type="button"
-                  onClick={handleCharacterNameClick}
-                  className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center mr-2 sm:mr-0 mb-2 sm:mb-0 w-auto"
-                  title="캐릭터 이름 추가"
-                >
-                  캐릭터 이름
-                </button>
-                <button
-                  id="user-name-button"
-                  type="button"
-                  onClick={handleUserNameClick}
-                  className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center w-auto"
-                  title="유저 이름 추가"
-                >
-                  유저 이름
-                </button>
-              </div>
+            {/* 대화 예시 공개/비공개 선택 버튼 */}
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 w-full sm:w-1/2 md:w-1/3 mt-4">
+              <button
+                type="button"
+                onClick={() => handleExamplesVisibilitySelect('private')}
+                className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-center text-xs sm:text-sm transition-colors ${
+                  formData.examplesVisibility === 'private'
+                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                }`}
+              >
+                대화 예시 비공개
+              </button>
+              <button
+                type="button"
+                onClick={() => handleExamplesVisibilitySelect('public')}
+                className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-center text-xs sm:text-sm transition-colors ${
+                  formData.examplesVisibility === 'public'
+                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                }`}
+              >
+                대화 예시 공개
+              </button>
             </div>
           </div>
 
@@ -473,7 +494,7 @@ export default function DetailInfoForm({
                 대화 예시가 없습니다. 아래 버튼을 클릭하여 추가해주세요.
               </div>
             ) : (
-              formData.conversationExamples.map((example: ConversationExample, index: number) => (
+              formData.conversationExamples.map((example: EnhancedConversationExample, index: number) => (
                 <div
                   key={example.id}
                   className="relative bg-secondary-50 dark:bg-dark-secondary-800/5 p-3 sm:p-4 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10"
@@ -483,6 +504,36 @@ export default function DetailInfoForm({
                       대화 예시 {index + 1}
                     </h4>
                     <div className="flex space-x-1 sm:space-x-2">
+                      {/* 특수 태그 버튼들 */}
+                      <div className="flex flex-wrap sm:flex-nowrap space-x-0 sm:space-x-2 space-y-2 sm:space-y-0">
+                        <button
+                          id="context-info-button"
+                          type="button"
+                          onClick={handleContextInfoClick}
+                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center mr-2 sm:mr-0 mb-2 sm:mb-0 w-auto"
+                          title="상황 설명 추가"
+                        >
+                          상황 설명 추가(*)
+                        </button>
+                        <button
+                          id="character-name-button"
+                          type="button"
+                          onClick={handleCharacterNameClick}
+                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center mr-2 sm:mr-0 mb-2 sm:mb-0 w-auto"
+                          title="캐릭터 이름 추가"
+                        >
+                          캐릭터 이름
+                        </button>
+                        <button
+                          id="user-name-button"
+                          type="button"
+                          onClick={handleUserNameClick}
+                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center w-auto"
+                          title="유저 이름 추가"
+                        >
+                          유저 이름
+                        </button>
+                      </div>
                       <button
                         id="delete-chat-example"
                         type="button"
@@ -495,30 +546,25 @@ export default function DetailInfoForm({
                     </div>
                   </div>
 
-                  {/* 공개/비공개 선택 버튼 */}
-                  <div className="grid grid-cols-2 gap-2 sm:gap-4 w-full sm:w-1/2 md:w-1/3 mb-3 sm:mb-4">
-                    <button
-                      type="button"
-                      onClick={() => handleExampleVisibilityChange(example.id, 'private')}
-                      className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-center text-xs sm:text-sm transition-colors ${
-                        example.visibility === 'private'
-                          ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                          : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-                      }`}
-                    >
-                      비공개
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleExampleVisibilityChange(example.id, 'public')}
-                      className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-center text-xs sm:text-sm transition-colors ${
-                        example.visibility === 'public'
-                          ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                          : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-                      }`}
-                    >
-                      공개
-                    </button>
+                  {/* 대화 예시 제목 입력 필드 */}
+                  <div className="mb-3 sm:mb-4">
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="block text-xs font-medium text-secondary-700 dark:text-dark-secondary-400">
+                        대화 예시 제목
+                      </label>
+                      <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
+                        {formatTextLength((example.title || '').length, 25)}
+                      </span>
+                    </div>
+                    <input
+                      type="text"
+                      id={`example-title-${example.id}`}
+                      value={example.title || ''}
+                      onChange={e => handleExampleTitleChange(example.id, e.target.value)}
+                      placeholder="대화 예시 제목을 입력하세요"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 text-sm"
+                      maxLength={25}
+                    />
                   </div>
 
                   {/* 사용자 메시지 */}
