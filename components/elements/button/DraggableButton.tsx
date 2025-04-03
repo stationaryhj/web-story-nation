@@ -256,7 +256,7 @@ export default function DraggableButton({
     {
       id: 'pen',
       icon: <Pen size={20} color="white" />,
-      label: '리워드 받기',
+      label: '출석체크',
       color: 'bg-primary-500',
       onClick: () => setRewardModalOpen(true),
       position: { x: 0, y: -BUTTON_DISTANCE * 2 },

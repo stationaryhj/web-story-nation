@@ -22,6 +22,7 @@ import type {
   WriterWithdrawResponse,
   WithdrawRequestListResponse,
   SaleMonthlyIncomeResponse,
+  ChatFreePenResponse,
 } from '@/types/api'
 
 import { contentApi, settlementApi, createApi, chatApi } from '../api/storyNationApi'
@@ -421,3 +422,15 @@ export const GetMonthlyIncome = (type: number) => {
   return { data, isLoading, error, refetch }
 }
 
+
+export const ChatFreepen = () => {
+  const { data, isLoading, error, refetch } = useQuery<ChatFreePenResponse>({
+    queryKey: ['chatFreePen'],
+    queryFn: async () => {
+      const response = await settlementApi.UseFreePen()
+      return response.data as ChatFreePenResponse
+    },
+  })
+
+  return { data, isLoading, error, refetch }
+}
