@@ -97,6 +97,7 @@ export default function DetailInfoForm({
   setConversationExampleTitle,
   onValidationChange,
 }: DetailInfoFormProps) {
+
   // 대화 예시 관련 ref 추가
   const exampleRefs = useRef<{ [key: string]: HTMLTextAreaElement }>({})
 
@@ -129,6 +130,7 @@ export default function DetailInfoForm({
   // 사용자 및 캐릭터 메시지 상태 관리
   const [userMessages, setUserMessages] = useState<{ [key: string]: string }>({})
   const [characterMessages, setCharacterMessages] = useState<{ [key: string]: string }>({})
+  const [titles, setTitles] = useState<{ [key: string]: string }>({})
 
   // 유효성 검사
   useEffect(() => {
@@ -158,12 +160,18 @@ export default function DetailInfoForm({
           newCharacterMessages[example.id] = characterMsg
           messagesUpdated = true
         }
+
+        if (!titles[example.id]) {
+          titles[example.id] = example.title
+          messagesUpdated = true
+        }
       }
     })
 
     if (messagesUpdated) {
       setUserMessages(newUserMessages)
       setCharacterMessages(newCharacterMessages)
+      setTitles(titles)
     }
   }, [formData.conversationExamples])
 
@@ -259,6 +267,12 @@ export default function DetailInfoForm({
     }
   }
 
+  // 대화 예시 제목 변경 핸들러
+  const handleExampleTitleChange = (id: string, title: string) => {
+    setTitles(prev => ({ ...prev, [id]: title }))
+    setConversationExampleTitle(id, title)
+  }
+  
   // 대화 예시 텍스트 변경 핸들러 (사용자 메시지)
   const handleUserMessageChange = (id: string, message: string) => {
     setUserMessages(prev => ({ ...prev, [id]: message }))
@@ -339,13 +353,6 @@ export default function DetailInfoForm({
         delete newMessages[id]
         return newMessages
       })
-    }
-  }
-
-  // 대화 예시 제목 변경 핸들러
-  const handleExampleTitleChange = (id: string, title: string) => {
-    if (title.length <= 25) {
-      setConversationExampleTitle(id, title)
     }
   }
 
@@ -501,7 +508,6 @@ export default function DetailInfoForm({
                 >
                   <div className="flex justify-between items-center mb-3 sm:mb-4">
                     <h4 className="text-xs sm:text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-                      대화 예시 {index + 1}
                     </h4>
                     <div className="flex space-x-1 sm:space-x-2">
                       {/* 특수 태그 버튼들 */}
@@ -553,13 +559,13 @@ export default function DetailInfoForm({
                         대화 예시 제목
                       </label>
                       <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-                        {formatTextLength((example.title || '').length, 25)}
+                        {formatTextLength((titles[example.id] || '').length, 25)}
                       </span>
                     </div>
                     <input
                       type="text"
                       id={`example-title-${example.id}`}
-                      value={example.title || ''}
+                      value={titles[example.id] || ''}
                       onChange={e => handleExampleTitleChange(example.id, e.target.value)}
                       placeholder="대화 예시 제목을 입력하세요"
                       className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 text-sm"

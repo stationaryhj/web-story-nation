@@ -137,6 +137,7 @@ export function bridgeCharbotGetListMineDataToCharacter(dataList: Array<CharbotM
     },
     category: 'unspecified',
     finish_yn: item.finish_yn,
+    show_yn: item.show_yn,
   }))
 
   return characters
@@ -245,54 +246,57 @@ export function bridgeLoginDataToUserInfo(data: LoginResponse | null) {
  * @returns Character 타입으로 변환된 데이터
  */
 export function bridgeCharacterInProgressToCharacter(data: any) {
+  // 대화 예시를 파싱하는 함수
+  const parseConversationExamples = (exampleText: string) => {
+    // 대화 예시가 없으면 빈 배열 반환
+    if (!exampleText) return [];
+    
+    // 대화 예시들을 분리 (빈 줄 두 개로 구분)
+    const examples = exampleText.split('\n\n').filter(ex => ex.trim() !== '');
+    
+    return examples.map((example, index) => {
+      // Title 포맷 확인: "Title: 제목\n내용" 형태로 되어 있는지 확인
+      const titleMatch = example.match(/^Title:\s*(.+?)\n([\s\S]*)$/);
+      let title = '';
+      let text = example;
+      
+      if (titleMatch) {
+        // Title이 있는 경우, title과 text 분리
+        title = titleMatch[1].trim();
+        text = titleMatch[2].trim();
+      }
+
+      // ConversationExample 객체 생성
+      return {
+        id: `example-${index}-${Math.random().toString(36).substring(2, 11)}`,
+        title,
+        text,
+        visibility: data.example_show_yn === 1 ? 'public' : 'private',
+        isEditing: false
+      };
+    });
+  };
+
   return {
     id: data.world_list_detail_chrbot_key?.toString() || '',
     name: data.title || '',
-    gender: getCategory(Number(data.gender)),
-    visibility: data.show_yn === 1 ? 'public' : 'private',
+    gender: getCategory(Number(data.gender)) || 'unspecified',
     bio: data.intro || '',
     firstMessage: data.first_talk || '',
-    hashtags: data.tags ? data.tags.split(',') : [],
     bioDetail: data.content || '',
-    detailVisibility: data.content_show_yn === 1 ? 'public' : 'private',
-    conversationExamples: data.example
-      ? data.example.split('\n\n').map((text: string, index: number) => ({
-          id: index.toString(),
-          text,
-          isEditing: false,
-          visibility: data.example_show_yn === 1 ? 'public' : 'private',
-        }))
-      : [],
-    imageUrl: data.img_url || '',
-    isAdult: data.nsfw === 1,
-    createDate: data.create_dt || '',
-    world_list_detail_chrbot_key: data.world_list_detail_chrbot_key,
-    world_list_detail_key: data.world_list_detail_key,
-    user_key: data.user_key,
-    intro: data.intro,
-    first_talk: data.first_talk,
-    content: data.content,
-    example: data.example,
-    nsfw: data.nsfw,
-    img_url: data.img_url,
-    img_url_nsfw: data.img_url_nsfw,
-    img_web_url: data.img_web_url,
-    show_yn: data.show_yn,
-    content_show_yn: data.content_show_yn,
-    example_show_yn: data.example_show_yn,
-    finish_yn: data.finish_yn,
-    delete_yn: data.delete_yn,
-    block_type: data.block_type,
-    comment_cnt: data.comment_cnt,
-    like_cnt: data.like_cnt,
-    chat_cnt: data.chat_cnt,
-    msg_cnt: data.msg_cnt,
-    create_dt: data.create_dt,
-    update_dt: data.update_dt,
-    tags: data.tags,
-    sort: data.sort,
-    countryCode: data.countryCode,
-    world_key: data.world_key,
+    // 대화 예시 파싱
+    conversationExamples: parseConversationExamples(data.example || ''),
+    // 태그 처리
+    hashtags: data.tags ? data.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag !== '') : [],
+    // 이미지 URL
+    img_url: data.img_url || '',
+    img_url_nsfw: data.img_url_nsfw || '',
+    img_web_url: data.img_web_url || '',
+    // 가시성 및 등급
+    visibility: data.show_yn === 1 ? 'public' : 'private',
+    rating: data.nsfw === 1 ? 'adult' : 'all',
+    // 추가 데이터
+    finish_yn: data.finish_yn || 0,
   }
 }
 

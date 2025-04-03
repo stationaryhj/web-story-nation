@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useState } from 'react'
-import { faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import type { ChangeEvent } from 'react'
 
@@ -14,15 +14,16 @@ import { toast } from 'react-toastify'
 import RatingSelect from './RatingSelect'
 
 interface BasicInfoFormProps {
-  formData: any
-  setFormField: (name: string, value: any) => void
-  addHashtag: (tag: string) => Promise<void>
-  removeHashtag: (tag: string) => Promise<void>
-  fetchTagList: () => Promise<void>
-  saveHashtags: () => Promise<void>
-  availableTags: Tag[]
-  isLoadingTags: boolean
-  onValidationChange?: (isValid: boolean) => void
+  formData: any;
+  setFormField: (name: string, value: any) => void;
+  addHashtag: (tag: string) => Promise<boolean>;
+  removeHashtag: (tag: string) => Promise<boolean>;
+  addCustomTag: (tag: string) => Promise<boolean>;
+  fetchTagList: () => Promise<void>;
+  saveHashtags: () => Promise<boolean>;
+  availableTags: Tag[];
+  isLoadingTags: boolean;
+  onValidationChange?: (isValid: boolean) => void;
 }
 
 export default function BasicInfoForm({
@@ -30,6 +31,7 @@ export default function BasicInfoForm({
   setFormField,
   addHashtag,
   removeHashtag,
+  addCustomTag,
   fetchTagList,
   saveHashtags,
   availableTags,
@@ -37,9 +39,10 @@ export default function BasicInfoForm({
   onValidationChange,
 }: BasicInfoFormProps) {
   const [visibleWarnigModal, setVisibleWarnigModal] = useState(false)
+  const [customTagInput, setCustomTagInput] = useState('')
   const { isAdult } = useAccountStore()
   const isAdultModeEnabled = isAdult()
-
+  
   // 태그 데이터 로드
   useEffect(() => {
     fetchTagList()
@@ -88,6 +91,11 @@ export default function BasicInfoForm({
 
   // 게시 범위 선택 핸들러
   const handleVisibilitySelect = (visibility: 'public' | 'private') => {
+    // 이미 공개된 캐릭터라면 비공개로 변경 불가능
+    if(formData.finishYn === 1) {
+      return
+    }
+
     setFormField('visibility', visibility)
   }
 
@@ -122,6 +130,31 @@ export default function BasicInfoForm({
       }
     } catch (error) {
       console.error('태그 처리 중 오류:', error)
+    }
+  }
+
+  // 사용자 정의 태그 추가 핸들러
+  const handleAddCustomTag = async () => {
+    if (customTagInput.trim()) {
+      const success = await addCustomTag(customTagInput.trim())
+      if (success) {
+        setCustomTagInput('') // 성공 시 입력 필드 초기화
+      }
+    } else {
+      toast.error('태그를 입력해주세요')
+    }
+  }
+
+  // 커스텀 태그 입력 핸들러
+  const handleCustomTagInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setCustomTagInput(e.target.value)
+  }
+
+  // Enter 키 핸들러
+  const handleCustomTagKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleAddCustomTag()
     }
   }
 
@@ -387,6 +420,7 @@ export default function BasicInfoForm({
                 )}
               </div>
             </div>
+            
             <div className="flex flex-wrap gap-2 mt-3">
               {isLoadingTags ? (
                 <div className="w-full py-4 text-center text-secondary-500 dark:text-dark-secondary-400">
@@ -413,6 +447,30 @@ export default function BasicInfoForm({
                   사용 가능한 태그가 없습니다.
                 </div>
               )}
+            </div>
+
+            {/* 사용자 정의 태그 입력 */}
+            <div className="mt-3 flex border-t border-secondary-200 dark:border-dark-secondary-200/10 pt-3">
+              <input
+                type="text"
+                value={customTagInput}
+                onChange={handleCustomTagInputChange}
+                onKeyPress={handleCustomTagKeyPress}
+                placeholder="직접 태그 입력"
+                className="flex-1 px-4 py-2 rounded-l-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-1 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400"
+                maxLength={20}
+              />
+              <button
+                type="button"
+                onClick={handleAddCustomTag}
+                disabled={formData.hashtags.length >= 7}
+                className={`px-4 py-2 rounded-r-lg bg-primary-500 text-white dark:bg-dark-primary-500 flex items-center justify-center ${
+                  formData.hashtags.length >= 7 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-600 dark:hover:bg-dark-primary-600'
+                }`}
+              >
+                <FontAwesomeIcon icon={faPlus} className="mr-1" />
+                추가
+              </button>
             </div>
           </div>
         </div>

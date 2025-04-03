@@ -16,6 +16,12 @@ import { CharbotLikeResponse } from '@/types/api'
 import { useAccountStore } from '@/store/useStoreData'
 import ReportModal from './ReportModal'
 
+interface ExampleData {
+  title: string
+  User: string;
+  Character: string;
+}
+
 // 목업 데이터
 const mockFirstMessage = {
   situation: '어두운 밤, 비가 내리는 거리에서',
@@ -36,12 +42,63 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [reportSubmitted, setReportSubmitted] = useState(false)
 
+
+
   const {
     data: chatBotData,
     isLoading: chatBotLoading,
     error: chatBotError,
     refetch,
   } = ReqGetChatBot(Number(selectedCharacter?.id))
+
+  const bridgeExampleData = (exampleData: string) => {
+    try {
+      if (!exampleData) return [];
+      
+      // 예시 데이터를 더블 개행으로 분리
+      const exampleDataArray = exampleData.split('\n\n').filter(Boolean);
+      
+      // 빈 배열 체크
+      if (!exampleDataArray.length) return [];
+      
+      return exampleDataArray.map(item => {
+        const lines = item.split('\n').filter(Boolean);
+        let title = '', user = '', character = '';
+        
+        // 각 줄을 순회하며 데이터 형식 확인
+        lines.forEach(line => {
+          if (line.startsWith('Title: ')) {
+            title = line.replace('Title: ', '');
+          } else if (line.startsWith('User: ')) {
+            user = line.replace('User: ', '');
+          } else if (line.startsWith('Character: ')) {
+            character = line.replace('Character: ', '');
+          }
+        });
+        
+        // 값이 없을 경우 기본값 설정
+        return {
+          title: title || '제목 없음',
+          User: user || '',
+          Character: character || ''
+        };
+      });
+    } catch (error) {
+      console.error('대화 예시 파싱 에러:', error);
+      return []; // 에러 발생 시 빈 배열 반환
+    }
+  }
+
+
+  
+  const exampleDatas = chatBotData?.chrbot?.example ? bridgeExampleData(chatBotData.chrbot.example) : []
+  const isExampleShow = chatBotData?.chrbot?.example_show_yn
+
+  const content = chatBotData?.chrbot?.content
+  const isContentShow = chatBotData?.chrbot?.content_show_yn
+
+  const first_talk = chatBotData?.chrbot?.first_talk
+  console.log(chatBotData)
 
   useEffect(() => {
     if (chatBotData) {
@@ -103,6 +160,17 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
     try {
       // 여기에 실제 신고 API 호출 로직 구현
       console.log('Report submitted:', reportData)
+      
+      const response = await contentApi.ReportChatBot(
+        10,
+        Number(selectedCharacter?.id),
+        67,
+        reportData,
+        "KR")
+      const responseData = response.data
+
+      console.log('responseData : ', responseData)
+
       // 성공 시 상태 업데이트
       setReportSubmitted(true)
       // 신고 모달 닫기 (또는 유지할 수도 있음)
@@ -234,41 +302,52 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
         </div>
 
         {/* 우측: 캐릭터 상세 설명 및 대화 예시 */}
+        
         <div className="hidden md:flex md:flex-col md:w-[60%] md:overflow-y-auto md:order-2">
-          {/* 첫 번째 섹션: 캐릭터 소개 */}
+        {/* 첫 번째 섹션: 캐릭터 소개 */}
+        {isContentShow == 1 && (
           <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm mb-5 border border-secondary-100 dark:border-dark-secondary-800/30">
             <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
               <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
               상세 설명
             </h3>
             <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed">
-              {selectedCharacter.detailDescription || selectedCharacter.description || '설명이 없습니다.'}
+              {content || '설명이 없습니다.'}
             </p>
           </div>
-
-          {/* 두 번째 섹션: 대화 예시 */}
-          <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm mb-5 border border-secondary-100 dark:border-dark-secondary-800/30">
-            <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
-              <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
-              대화 예시
-            </h3>
-            <div className="space-y-3">
-              <div className="flex items-start space-x-2">
-                <div className="w-8 h-8 rounded-full bg-secondary-100 dark:bg-dark-secondary-700 flex items-center justify-center flex-shrink-0 text-secondary-500">
-                  <FontAwesomeIcon icon={faUser} className="w-4 h-4" />
+        )
+          
+        }
+          {isExampleShow == 1 && exampleDatas.map((data, index) => {
+            return(
+            <div>
+            {/* 두 번째 섹션: 대화 예시 */}
+              <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm mb-5 border border-secondary-100 dark:border-dark-secondary-800/30">
+                <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
+                  <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
+                  {data.title}
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-2">
+                    <div className="w-8 h-8 rounded-full bg-secondary-100 dark:bg-dark-secondary-700 flex items-center justify-center flex-shrink-0 text-secondary-500">
+                      <FontAwesomeIcon icon={faUser} className="w-4 h-4" />
+                    </div>
+                    <div className="p-3 bg-secondary-50 dark:bg-dark-secondary-800/50 rounded-lg text-sm">
+                      {data.Character}
+                    </div>
+                  </div>
+                  <div className="flex items-start justify-end space-x-2">
+                    <div className="p-3 bg-primary-50 dark:bg-dark-primary-900/30 rounded-lg text-sm text-end">
+                      {/* {selectedCharacter?.first_talk?.slice(0, 150) || '응답이 없습니다.'}
+                      {selectedCharacter?.first_talk && selectedCharacter.first_talk.length > 150 && '...'} */}
+                      {data.User}
+                    </div>
+                  </div>
                 </div>
-                <div className="p-3 bg-secondary-50 dark:bg-dark-secondary-800/50 rounded-lg text-sm">
-                  안녕하세요, 처음 뵙겠습니다. 당신에 대해 알고 싶어요.
                 </div>
               </div>
-              <div className="flex items-start justify-end space-x-2">
-                <div className="p-3 bg-primary-50 dark:bg-dark-primary-900/30 rounded-lg text-sm text-end">
-                  {selectedCharacter?.first_talk?.slice(0, 150) || '응답이 없습니다.'}
-                  {selectedCharacter?.first_talk && selectedCharacter.first_talk.length > 150 && '...'}
-                </div>
-              </div>
-            </div>
-          </div>
+            )
+          })}
 
           {/* 세 번째 섹션: 첫 메시지 */}
           <div className="h-full bg-white dark:from-dark-secondary-800/50 dark:to-dark-primary-900/30 rounded-lg p-5 shadow-sm border border-secondary-100 dark:border-dark-secondary-800/30">

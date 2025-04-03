@@ -38,10 +38,6 @@ export default function ImageUploadForm({
   const imgNormalWeb = getImageUri(formData.imgWebUrl)
   const imgNsfw = getImageUri(formData.imgUrlNsfw)
 
-  console.log(imgNormal)
-  console.log(imgNormalWeb)
-  console.log(imgNsfw)
-
   // 유효성 검사
   useEffect(() => {
     if (onValidationChange) {
@@ -85,8 +81,6 @@ export default function ImageUploadForm({
         return
       }
 
-      console.log('formdata', formData)
-
       // if (visibility === 'public') {
       //   setVisibleWarnigModal(true)
       // }
@@ -100,9 +94,6 @@ export default function ImageUploadForm({
 
       const presignedUrl = presignedResponse.data.presignedUrl
       const s3FilePath = presignedResponse.data.path
-
-      console.log('presignedUrl :: ', presignedUrl)
-      console.log('s3FilePath :: ', s3FilePath)
 
       // 이미지 압축
       const reader = new FileReader()
