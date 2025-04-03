@@ -37,7 +37,7 @@ import { useNakama } from '@/app/providers/NakamaProviders'
 import { useChatModeStore } from '@/store/useStoreData'
 import BaseSidebar from '@/components/elements/sidebar/BaseSidebar'
 import { chatApi } from '@/services/api/storyNationApi'
-import Tutorial from '@/components/tutorial/tutorial'
+import Tutorial from '@/components/tutorial/Tutorial'
 
 // 메시지 타입 정의
 interface ChatMessage {
@@ -122,19 +122,31 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   // 튜토리얼 관련 상태를 최상위로 이동
   const [showTutorial, setShowTutorial] = useState(true)
 
-  // 튜토리얼 설정을 최상위로 이동
+  // 튜토리얼 설정
   const tutorialConfig = {
     storageKey: 'chat-tutorial-completed',
     steps: [
       {
         id: 'chat-mode-button',
-        text: '채팅 모드를 선택하여 대화의 스타일을 변경할 수 있습니다.',
+        html: `
+          <p>탭하면 <span class="text-yellow-300 font-semibold">채팅모드를 선택</span>할 수 있어요!</p>
+        `,
         textPosition: 'bottom' as const,
       },
       {
         id: 'message-input',
-        text: '여기에 메시지를 입력하고 전송할 수 있습니다.',
-        textPosition: 'bottom' as const,
+        html: `
+          <div class="text-start">
+            <div>
+              <span class="text-yellow-300">탭하면 **</span>가 입력돼요
+            </div>
+            <div>
+              **사이에 글을 입력해 전송하면
+            </div>
+            <div><span class="text-yellow-300">기울임체로 출력</span>될 거에요!</div>
+          </div>
+        `,
+        textPosition: 'top' as const,
       },
     ],
   }
@@ -187,10 +199,10 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 나가기 플래그
   const [isExit, setIsExit] = useState(false)
-  
+
   // 마운트 상태 추적용 ref
-  const isMountedRef = useRef(true);
-  
+  const isMountedRef = useRef(true)
+
   // 모바일 환경 감지
   useEffect(() => {
     const checkIsMobile = () => {
@@ -207,175 +219,169 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   useEffect(() => {
     if (chatMessages.length > 0) {
       const lastMsg = chatMessages[chatMessages.length - 1]
-      
+
       // 마지막 메시지 발신자에 따라 AI 응답 대기 상태 업데이트
       // 임시 메시지는 제외하고 실제 메시지만 고려
       if (!lastMsg.id.startsWith('temp_')) {
-        setIsWaitingForAI(lastMsg.sender === 'user');
+        setIsWaitingForAI(lastMsg.sender === 'user')
       }
     }
-  }, [chatMessages]); // 의존성 배열에 chatMessages만 포함
+  }, [chatMessages]) // 의존성 배열에 chatMessages만 포함
 
   // 연결 상태 변화 로깅 - 타이머 클리어 추가
   useEffect(() => {
-    let timer: NodeJS.Timeout;
-    
+    let timer: NodeJS.Timeout
+
     if (isConnected) {
-      setShowConnectedStatus(true);
+      setShowConnectedStatus(true)
       timer = setTimeout(() => {
-        setShowConnectedStatus(false);
-      }, 3000);
+        setShowConnectedStatus(false)
+      }, 3000)
     } else {
-      setShowConnectedStatus(false);
+      setShowConnectedStatus(false)
     }
-    
+
     return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [isConnected]);
+      if (timer) clearTimeout(timer)
+    }
+  }, [isConnected])
 
   // 서버 상태와 채널 ID에 따른 UI 처리 - 의존성 단순화
   useEffect(() => {
     if (!isConnected && !isConnecting && isInitRoom) {
       // 초기화는 됐지만 연결이 끊어진 경우
-      setError('채팅 서버와의 연결이 끊어졌습니다.');
+      setError('채팅 서버와의 연결이 끊어졌습니다.')
     } else if (isConnected && !channelId && isInitRoom) {
       // 연결은 됐지만 채널 ID가 없는 경우
-      setError('채팅 채널 연결에 문제가 발생했습니다.');
+      setError('채팅 채널 연결에 문제가 발생했습니다.')
     } else if (isConnected && channelId) {
       // 정상 상태일 때 에러 초기화
-      setError(null);
+      setError(null)
     }
-  }, [isConnected, isConnecting, channelId, isInitRoom]);
+  }, [isConnected, isConnecting, channelId, isInitRoom])
 
   // 채팅방 정리 및 연결 종료를 위한 공통 함수 최적화
   const cleanupChatRoom = useCallback(async () => {
     try {
-      setIsLoading(true);
-      
+      setIsLoading(true)
+
       // 1. 채팅방에서 나가기
       if (channelId) {
         try {
-          await leaveChat(channelId);
+          await leaveChat(channelId)
         } catch (error) {
-          console.error('채팅방 나가기 중 오류:', error);
+          console.error('채팅방 나가기 중 오류:', error)
           // 오류가 발생해도 계속 진행
         }
       }
-      
+
       // 2. 소켓 연결 종료
       try {
-        await disconnectSocket();
+        await disconnectSocket()
       } catch (error) {
-        console.error('소켓 연결 종료 중 오류:', error);
+        console.error('소켓 연결 종료 중 오류:', error)
         // 오류가 발생해도 계속 진행
       }
-      
+
       // 3. 상태 정리 (clearChatHistory 호출 제거)
-      hasInitialized.current = false;
-      
-      return true;
+      hasInitialized.current = false
+
+      return true
     } catch (error) {
-      console.error('채팅방 정리 중 오류 발생:', error);
-      return false;
+      console.error('채팅방 정리 중 오류 발생:', error)
+      return false
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, [channelId, leaveChat, disconnectSocket]);
+  }, [channelId, leaveChat, disconnectSocket])
 
   // 채팅방 초기화 메서드 - useCallback으로 변경
   const initializeChatRoom = useCallback(async () => {
     // 이미 초기화 중이거나 초기화가 완료된 경우 또는 필요한 데이터가 없는 경우
     if (!character?.id || !accountData?.user_key) {
-      console.log('⚠️ 초기화에 필요한 데이터가 없습니다.');
-      return;
-    }
-    
-    if (hasInitialized.current) {
-      console.log('⚠️ 이미 초기화 요청을 진행했습니다.');
-      return;
-    }
-    
-    // 이미 초기화된 상태인지 확인
-    if (isInitRoom && channelId) {
-      console.log('✅ 채팅방이 이미 초기화되어 있습니다.');
-      return;
+      console.log('⚠️ 초기화에 필요한 데이터가 없습니다.')
+      return
     }
 
-    if(isExit) return;
-    
+    if (hasInitialized.current) {
+      console.log('⚠️ 이미 초기화 요청을 진행했습니다.')
+      return
+    }
+
+    // 이미 초기화된 상태인지 확인
+    if (isInitRoom && channelId) {
+      console.log('✅ 채팅방이 이미 초기화되어 있습니다.')
+      return
+    }
+
+    if (isExit) return
+
     try {
-      setIsLoading(true);
-      setError(null);
-      hasInitialized.current = true;
-      
+      setIsLoading(true)
+      setError(null)
+      hasInitialized.current = true
+
       // 사용 가능한 채팅 모드 중 첫번째 선택 (또는 기본값 2번)
-      const selectedModeId = chatMode && chatMode.length > 0 ? chatMode[0].chat_mode : 2;
-      
-      console.log('💬 채팅방 초기화 시작 - ID:', character.id, '모드:', selectedModeId);
-      
+      const selectedModeId = chatMode && chatMode.length > 0 ? chatMode[0].chat_mode : 2
+
+      console.log('💬 채팅방 초기화 시작 - ID:', character.id, '모드:', selectedModeId)
+
       // 채팅방 초기화 (Nakama 서버 연결 및 인증, 채팅방 참여까지 모두 수행)
-      const result = await chatRoomInit(
-        accountData.user_key.toString(),
-        characterId,
-        selectedModeId
-      );
-      
+      const result = await chatRoomInit(accountData.user_key.toString(), characterId, selectedModeId)
+
       if (!result.success) {
         if (result.error === 'ALREADY_INITIALIZING') {
-          console.log('⚠️ 이미 초기화 중입니다. 대기...');
+          console.log('⚠️ 이미 초기화 중입니다. 대기...')
           // 3초 후 초기화 상태 리셋 (이미 진행 중인 초기화 작업이 실패했을 경우 대비)
           setTimeout(() => {
             if (!isConnected || !channelId) {
-              console.log('🔄 초기화 시간 초과, 상태 리셋');
-              hasInitialized.current = false;
+              console.log('🔄 초기화 시간 초과, 상태 리셋')
+              hasInitialized.current = false
             }
-          }, 3000);
-          return;
+          }, 3000)
+          return
         }
-        
-        console.error('❌ 채팅방 초기화 실패:', result.error);
-        throw new Error(result.error || '채팅방 초기화에 실패했습니다. 다시 시도해주세요.');
+
+        console.error('❌ 채팅방 초기화 실패:', result.error)
+        throw new Error(result.error || '채팅방 초기화에 실패했습니다. 다시 시도해주세요.')
       }
-      
+
       // 현재 모드 설정 업데이트
-      setCurrentModeId(selectedModeId);
-      console.log('✅ 채팅방 초기화 완료:', result);
+      setCurrentModeId(selectedModeId)
+      console.log('✅ 채팅방 초기화 완료:', result)
     } catch (error) {
-      console.error('채팅방 초기화 실패:', error);
-      setError('채팅방을 초기화하는 중 오류가 발생했습니다. 다시 시도해주세요.');
-      hasInitialized.current = false;
+      console.error('채팅방 초기화 실패:', error)
+      setError('채팅방을 초기화하는 중 오류가 발생했습니다. 다시 시도해주세요.')
+      hasInitialized.current = false
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, [character?.id, accountData?.user_key, characterId, chatRoomInit, chatMode, isConnected, channelId, isInitRoom]);
+  }, [character?.id, accountData?.user_key, characterId, chatRoomInit, chatMode, isConnected, channelId, isInitRoom])
 
   // 실제 언마운트 시에만 정리하기 위한 로직
   useEffect(() => {
+    if (isExit) return
 
-    if(isExit) return;
+    isMountedRef.current = true
+    console.log('🌱 컴포넌트 마운트됨')
 
-    isMountedRef.current = true;
-    console.log('🌱 컴포넌트 마운트됨');
-    
     return () => {
-      isMountedRef.current = false;
-      console.log('💀 컴포넌트 실제 언마운트됨 - 채팅방 정리 예정');
-      
+      isMountedRef.current = false
+      console.log('💀 컴포넌트 실제 언마운트됨 - 채팅방 정리 예정')
+
       // 이미 언마운트된 상태에서 비동기 작업이 완료되면 의미 없음
       // 약간의 지연을 두어 불필요한 정리를 방지
       setTimeout(() => {
         // 실제 언마운트 상태인 경우에만 정리 수행
         if (!isMountedRef.current) {
-          console.log('🧹 채팅방 정리 실행');
-          cleanupChatRoom()
-            .catch(err => console.error('채팅방 정리 중 오류:', err));
+          console.log('🧹 채팅방 정리 실행')
+          cleanupChatRoom().catch(err => console.error('채팅방 정리 중 오류:', err))
         } else {
-          console.log('⚠️ 채팅방 정리가 취소됨 - 컴포넌트가 다시 마운트됨');
+          console.log('⚠️ 채팅방 정리가 취소됨 - 컴포넌트가 다시 마운트됨')
         }
-      }, 100);
-    };
-  }, [cleanupChatRoom]);  // cleanupChatRoom 의존성 추가
+      }, 100)
+    }
+  }, [cleanupChatRoom]) // cleanupChatRoom 의존성 추가
 
   // 채팅방 초기화 로직 - 채팅방 초기화만 담당
   useEffect(() => {
@@ -384,52 +390,49 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       console.log('✅ 채팅방이 이미 초기화된 상태입니다:', {
         isInitRoom,
         channelId,
-        hasInitialized: hasInitialized.current
-      });
-      hasInitialized.current = true;
-      return;
+        hasInitialized: hasInitialized.current,
+      })
+      hasInitialized.current = true
+      return
     }
-    
+
     // 이미 초기화되었거나 필요한 데이터가 없으면 중단
     if (hasInitialized.current || !character?.id || !accountData?.user_key) {
       console.log('⏭️ 채팅방 초기화 로직 건너뜀', {
         hasInitialized: hasInitialized.current,
         hasCharacterId: !!character?.id,
-        hasUserKey: !!accountData?.user_key
-      });
-      return;
+        hasUserKey: !!accountData?.user_key,
+      })
+      return
     }
-    
+
     // 이 시점에 도달하면 실제로 초기화 필요
-    console.log('🚀 채팅방 초기화 로직 시작');
+    console.log('🚀 채팅방 초기화 로직 시작')
     initializeChatRoom().then(() => {
-      console.log('✅ initializeChatRoom 함수 완료');
-    });
-  }, [character?.id, accountData?.user_key, isInitRoom, channelId, initializeChatRoom]);
+      console.log('✅ initializeChatRoom 함수 완료')
+    })
+  }, [character?.id, accountData?.user_key, isInitRoom, channelId, initializeChatRoom])
 
   // 채팅방 삭제 함수
   const handleDeleteChat = async () => {
     try {
       setIsExit(true)
 
-      await cleanupChatRoom();
+      await cleanupChatRoom()
 
-      
       // 모달 닫기
-      closeModal();
+      closeModal()
 
       // 채팅방 삭제
-      await chatApi.CloseChat(Number(chrBotChatKey));
-
-      
+      await chatApi.CloseChat(Number(chrBotChatKey))
 
       // 페이지 리디렉션
-      router.push('/chat-list');
+      router.push('/chat-list')
     } catch (error) {
       // 에러가 발생해도 페이지 이동
-      router.push('/chat-list');
+      router.push('/chat-list')
     }
-  };
+  }
 
   // 메시지 전송 처리 (Provider의 메서드 사용)
   const handleSendMessage = async (e: FormEvent) => {
@@ -640,14 +643,14 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           <button
             onClick={async () => {
               try {
-                await cleanupChatRoom();
-                
+                await cleanupChatRoom()
+
                 // 채팅 목록 페이지로 이동
-                router.push('/chat-list');
+                router.push('/chat-list')
               } catch (error) {
-                console.error('채팅방 나가기 프로세스 중 오류 발생:', error);
+                console.error('채팅방 나가기 프로세스 중 오류 발생:', error)
                 // 에러가 발생해도 페이지 이동
-                router.push('/chat-list');
+                router.push('/chat-list')
               }
             }}
             className="mr-3"
@@ -1099,6 +1102,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             <form onSubmit={handleSendMessage} className="flex items-center max-w-3xl mx-auto">
               {/* 상황 설명 버튼 (별표 아이콘) */}
               <button
+                id="message-input"
                 type="button"
                 onClick={toggleActionMode}
                 className={`mr-2 p-2.5 rounded-full transition-colors ${
@@ -1218,7 +1222,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           </div>
         </div>
       )}
-      
+
       {/* 튜토리얼 컴포넌트 */}
       <Tutorial isOpen={showTutorial} onClose={() => setShowTutorial(false)} config={tutorialConfig} />
     </div>

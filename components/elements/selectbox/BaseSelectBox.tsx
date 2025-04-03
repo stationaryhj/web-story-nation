@@ -67,39 +67,40 @@ export const BaseSelectBox = <T extends string | number>({
     <div
       ref={selectRef}
       className={cn(
-        'relative inline-block w-full text-left',
-        isSidebar ? 'max-w-[200px]' : 'max-w-[90px] sm:max-w-[90px] md:max-w-[120px]',
         containerClassName,
-        className
+        className,
+        'relative inline-block w-fit max-w-[150px] md:max-w-[220px] text-left'
       )}
     >
       {label && <label className="block text-sm text-secondary-700 dark:text-dark-secondary-300 mb-2">{label}</label>}
       <div
         className={cn(
-          'cursor-pointer flex items-center justify-between py-2 px-3 text-[11px] md:py-3 md:px-4 md:text-base text-gray-800 focus:outline-none',
+          'cursor-pointer flex items-center justify-between py-2 px-3 text-[11px] md:py-3 md:px-4 md:text-base text-gray-800 focus:outline-none w-full',
           sideRound ? 'rounded-l-xl rounded-r-none' : 'rounded-xl',
           isSidebar
-            ? 'bg-white hover:bg-gray-50 focus:border-primary-500 border border-gray-200 w-full'
+            ? 'bg-white hover:bg-gray-50 focus:border-primary-500 border border-gray-200'
             : 'bg-white hover:bg-gray-50 border border-gray-200',
           selectClassName
         )}
         onClick={toggleDropdown}
       >
-        <span className="mr-2 truncate">{selectedOption.label || placeholder}</span>
+        <span className="mr-2 whitespace-nowrap overflow-hidden text-ellipsis">
+          {selectedOption.label || placeholder}
+        </span>
         <FontAwesomeIcon
           icon={faChevronDown}
-          className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+          className={`transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
         />
       </div>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-full origin-top-right rounded-lg bg-white shadow-lg focus:outline-none">
+        <div className="absolute z-50 mt-1 w-fit min-w-full max-w-[150px] md:max-w-[220px] origin-top-right rounded-lg bg-white shadow-lg focus:outline-none">
           <div className="py-1 max-h-60 overflow-y-auto">
             {options.map(option => (
               <div
                 key={option.value.toString()}
                 className={cn(
-                  'block py-2 px-3 text-[11px] md:py-3 md:px-4 md:text-base cursor-pointer hover:bg-gray-100',
+                  'block py-2 px-3 text-[11px] md:py-3 md:px-4 md:text-base cursor-pointer hover:bg-gray-100 whitespace-nowrap overflow-hidden text-ellipsis',
                   selectedOption.value === option.value ? 'bg-violet-50 text-violet-700 font-medium' : 'text-gray-700',
                   optionClassName
                 )}
