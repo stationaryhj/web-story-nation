@@ -40,6 +40,7 @@ import type {
   GetTop10RankingResponse,
   GetTop10RankingCreaterResponse,
   GetSearchResponse,
+  NicknmChangeResponse,
 } from '../../types/api'
 
 // API 기본 설정
@@ -639,7 +640,7 @@ export const contentApi = {
   },
 
   // 닉네임 변경
-  NicknmChange: async (nick_nm: string): Promise<ApiResponse> => {
+  NicknmChange: async (nick_nm: string): Promise<ApiResponse<NicknmChangeResponse>> => {
     const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
     api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/nicknmchange', {
