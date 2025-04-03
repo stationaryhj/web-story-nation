@@ -84,20 +84,24 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         formData={formData}
         setFormField={setFormField}
         addHashtag={async (tag: string) => {
-          await addHashtag(tag);
-          return;
+          const result = await addHashtag(tag);
+          return result;
         }}
         removeHashtag={async (tag: string) => {
-          await removeHashtag(tag);
-          return;
+          const result = await removeHashtag(tag);
+          return result;
+        }}
+        addCustomTag={async (tag: string) => {
+          const result = await useCreateCharacterData.getState().addCustomTag(tag);
+          return result;
         }}
         fetchTagList={async () => {
           // BasicInfoForm에서는 fetchTagList를 직접 호출하지 않도록 빈 함수로 처리
           return;
         }}
         saveHashtags={async () => {
-        await saveHashtags();
-          return;
+          const result = await saveHashtags();
+          return result;
         }}
         availableTags={availableTags}
         isLoadingTags={isLoadingTags}

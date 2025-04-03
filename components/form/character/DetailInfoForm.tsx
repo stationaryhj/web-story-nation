@@ -48,9 +48,17 @@ export default function DetailInfoForm({
     }
   }, [formData.conversationExamples.length, addConversationExample])
 
-  // 게시 범위 선택 핸들러
+  // 게시 범위 선택 핸들러 (상세 설명 섹션용)
   const handleVisibilitySelect = (visibility: 'public' | 'private') => {
     setFormField('visibility', visibility)
+  }
+
+  // 대화 예시 가시성 변경 핸들러 (모든 대화 예시에 적용)
+  const handleExampleVisibilityChange = (visibility: 'public' | 'private') => {
+    // 모든 대화 예시의 가시성을 변경
+    formData.conversationExamples.forEach((example: ConversationExample) => {
+      setConversationExampleVisibility(example.id, visibility);
+    });
   }
 
   // 상세 설명 입력 변경 핸들러
@@ -128,11 +136,6 @@ export default function DetailInfoForm({
     }
   }
 
-  // 대화 예시 가시성 변경 핸들러
-  const handleExampleVisibilityChange = (id: string, visibility: 'public' | 'private') => {
-    setConversationExampleVisibility(id, visibility)
-  }
-
   // 텍스트 길이 표시 형식
   const formatTextLength = (current: number, max: number) => {
     return `(${current}/${max})`
@@ -197,13 +200,41 @@ export default function DetailInfoForm({
       {/* 대화 예시 섹션 */}
       <div>
         <div className="mb-4">
-          <div>
-            <h3 className="text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-              대화 예시(최대 3개)
-            </h3>
-            <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-              캐릭터의 말투가 채팅에 반영될 거에요!
-            </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
+                대화 예시(최대 3개)
+              </h3>
+              <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">
+                캐릭터의 말투가 채팅에 반영될 거에요!
+              </p>
+            </div>
+          </div>
+          
+          {/* 통합된 공개/비공개 선택 버튼 */}
+          <div className="grid grid-cols-2 gap-4 w-full sm:w-1/2 md:w-1/3 mt-3">
+            <button
+              type="button"
+              onClick={() => handleExampleVisibilityChange('private')}
+              className={`w-full px-3 py-2 rounded-lg text-center text-sm transition-colors ${
+                formData.conversationExamples.length > 0 && formData.conversationExamples[0].visibility === 'private'
+                  ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                  : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+              }`}
+            >
+              비공개
+            </button>
+            <button
+              type="button"
+              onClick={() => handleExampleVisibilityChange('public')}
+              className={`w-full px-3 py-2 rounded-lg text-center text-sm transition-colors ${
+                formData.conversationExamples.length > 0 && formData.conversationExamples[0].visibility === 'public'
+                  ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                  : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+              }`}
+            >
+              공개
+            </button>
           </div>
         </div>
 
@@ -218,32 +249,6 @@ export default function DetailInfoForm({
                 <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
                   {formatTextLength(example.text.length, 1500)}
                 </span>
-              </div>
-
-              {/* 공개/비공개 선택 버튼 */}
-              <div className="grid grid-cols-2 gap-4 w-full sm:w-1/2 md:w-1/3 mb-4">
-                <button
-                  type="button"
-                  onClick={() => handleExampleVisibilityChange(example.id, 'private')}
-                  className={`w-full px-3 py-2 rounded-lg text-center text-sm transition-colors ${
-                    example.visibility === 'private'
-                      ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                      : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-                  }`}
-                >
-                  비공개
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleExampleVisibilityChange(example.id, 'public')}
-                  className={`w-full px-3 py-2 rounded-lg text-center text-sm transition-colors ${
-                    example.visibility === 'public'
-                      ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                      : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-                  }`}
-                >
-                  공개
-                </button>
               </div>
 
               <div className="relative">

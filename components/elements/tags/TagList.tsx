@@ -25,19 +25,19 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
-  const [selectedTags, setSelectedTags] = useState<string[]>(searchParams.get('tags')?.split('&') || [])
+  const [selectedTags, setSelectedTags] = useState<string[]>(searchParams?.get('tags')?.split('&') || [])
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
   const [scrollLeft, setScrollLeft] = useState(0)
   const [mouseMoved, setMouseMoved] = useState(false)
   const [moveDistance, setMoveDistance] = useState(0)
-  const currentTab = searchParams.get('tab')
+  const currentTab = searchParams?.get('tab')
   const prevTabRef = useRef<string | null>(currentTab)
 
   // URL 파라미터가 변경될 때 태그 선택 상태 업데이트
   useEffect(() => {
-    const currentTagsParam = searchParams.get('tags')
+    const currentTagsParam = searchParams?.get('tags')
 
     // 탭이 변경되었는지 확인
     if (currentTab !== prevTabRef.current) {
@@ -53,7 +53,7 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
       if (currentTagsParam) {
         // URL에서 태그 파라미터 제거
         startTransition(() => {
-          const params = new URLSearchParams(searchParams.toString())
+          const params = new URLSearchParams(searchParams?.toString() || '')
           params.delete('tags')
           const newUrl = `${pathname}?${params.toString()}`
           router.push(newUrl, { scroll: false })
@@ -85,10 +85,10 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
   const updateUrlParams = useCallback(
     (tagIds: string[]) => {
       startTransition(() => {
-        const params = new URLSearchParams(searchParams.toString())
+        const params = new URLSearchParams(searchParams?.toString() || '')
 
         // 탭 파라미터 유지
-        const tabParam = searchParams.get('tab')
+        const tabParam = searchParams?.get('tab')
         if (tabParam) {
           params.set('tab', tabParam)
         }

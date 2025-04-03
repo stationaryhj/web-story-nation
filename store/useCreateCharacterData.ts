@@ -87,6 +87,7 @@ interface CreateCharacterStore {
   setFormField: <K extends keyof CharacterFormData>(field: K, value: CharacterFormData[K]) => void
   addHashtag: (tag: string) => Promise<boolean>
   removeHashtag: (tag: string) => Promise<boolean>
+  addCustomTag: (tag: string) => Promise<boolean>
   
   // 대화 예시 관련 함수들
   addConversationExample: () => void
@@ -170,6 +171,48 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
       return true
     } catch (error) {
       console.error('태그 저장 실패:', error)
+      toast.error('태그 저장에 실패했습니다. 다시 시도해주세요.')
+      set({ error })
+      return false
+    } finally {
+      set({ isSavingTags: false })
+    }
+  },
+  
+  // 사용자 정의 태그 추가 함수
+  addCustomTag: async (tag) => {
+    try {
+      set({ isSavingTags: true })
+      
+      const { formData } = get()
+      
+      // 빈 태그 체크
+      if (!tag.trim()) {
+        toast.error('태그를 입력해주세요.')
+        return false
+      }
+      
+      // 최대 개수에 도달한 경우만 체크 (중복 체크 제거)
+      if (formData.hashtags.length >= 7) {
+        toast.error('태그 개수가 최대에 도달했습니다.')
+        return false
+      }
+      
+      set((state) => ({
+        formData: {
+          ...state.formData,
+          hashtags: [...state.formData.hashtags, tag],
+        },
+      }))
+      
+      // 태그 저장 API 호출 (캐릭터 ID가 있는 경우)
+      if (formData.world_list_detail_chrbot_key) {
+        await get().saveHashtags()
+      }
+      
+      return true
+    } catch (error) {
+      console.error('사용자 정의 태그 저장 실패:', error)
       toast.error('태그 저장에 실패했습니다. 다시 시도해주세요.')
       set({ error })
       return false
@@ -428,6 +471,16 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
       // 새로 생성된 ID가 있으면 저장
       if (response.data?.world_list_detail_chrbot_key) {
         get().setFormField('world_list_detail_chrbot_key', response.data.world_list_detail_chrbot_key.toString())
+      }
+      
+      // 기본 정보 저장 후 태그 정보도 함께 저장
+      if (formData.hashtags.length > 0) {
+        try {
+          await get().saveHashtags()
+        } catch (tagError) {
+          console.error('태그 저장 실패:', tagError)
+          // 태그 저장 실패는 전체 성공 여부에 영향을 주지 않음
+        }
       }
       
       return true
