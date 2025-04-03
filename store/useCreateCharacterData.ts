@@ -23,6 +23,7 @@ export interface CharacterImage {
 export interface ConversationExample {
   id: string
   text: string
+  title: string
   isEditing?: boolean
   visibility: CharacterVisibility
 }
@@ -94,6 +95,7 @@ interface CreateCharacterStore {
   removeConversationExample: (id: string) => void
   setConversationExampleEditMode: (id: string, isEditing: boolean) => void
   setConversationExampleVisibility: (id: string, visibility: CharacterVisibility) => void
+  setConversationExampleTitle: (id: string, title: string) => void
 
   // 이미지 관련 함수들
   setNormalImage: (path: string) => void
@@ -214,6 +216,7 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
       const newExample: ConversationExample = {
         id: generateId(),
         text: '',
+        title: '',
         isEditing: true,
         visibility: 'private',
       }
@@ -257,6 +260,14 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         conversationExamples: state.formData.conversationExamples.map(ex =>
           ex.id === id ? { ...ex, visibility } : ex
         ),
+      },
+    })),
+
+  setConversationExampleTitle: (id, title) =>
+    set(state => ({
+      formData: {
+        ...state.formData,
+        conversationExamples: state.formData.conversationExamples.map(ex => (ex.id === id ? { ...ex, title } : ex)),
       },
     })),
 

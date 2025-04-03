@@ -32,6 +32,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
     removeConversationExample,
     setConversationExampleEditMode,
     setConversationExampleVisibility,
+    setConversationExampleTitle,
     setNormalImage,
     setAdultImage,
     setAdultNormalImage,
@@ -110,6 +111,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         removeConversationExample={removeConversationExample}
         setConversationExampleEditMode={setConversationExampleEditMode}
         setConversationExampleVisibility={setConversationExampleVisibility}
+        setConversationExampleTitle={setConversationExampleTitle}
         onValidationChange={onValidationChange}
       />
     )
