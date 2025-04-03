@@ -2,6 +2,8 @@ import { useState } from 'react'
 import BaseModal from './BaseModal'
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { contentApi } from '@/services/api/storyNationApi'
+import { useAccountStore } from '@/store/useAccountStore'
 
 interface DeleteAccountModalProps {
   isOpen: boolean
@@ -14,15 +16,26 @@ export default function DeleteAccountModal({ isOpen, onClose, userNickname }: De
   const [isDeleted, setIsDeleted] = useState(false)
   const [error, setError] = useState('')
 
-  const handleDelete = () => {
+  const { logout } = useAccountStore()
+
+  const handleDelete = async () => {
     if (inputNickname !== userNickname) {
       setError('닉네임이 일치하지 않습니다.')
       return
     }
 
-    // 실제 API 호출 대신 상태 변경
-    setIsDeleted(true)
-    setError('')
+    
+    // api
+    const response = await contentApi.Signout()
+    console.log('response :: ', response)
+
+    if (response.data.result.err === 0) {
+      // 실제 API 호출 대신 상태 변경
+      logout()
+
+      setIsDeleted(true)
+      setError('')
+    }
   }
 
   const handleConfirmDeletion = () => {
