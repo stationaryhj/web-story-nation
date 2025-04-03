@@ -7,7 +7,7 @@ import type { ChangeEvent } from 'react'
 import { ConversationExample } from '@/store/useCreateCharacterData'
 import { useAccountStore } from '@/store/useAccountStore'
 import RatingSelect from './RatingSelect'
-import Tutorial from '@/components/tutorial/Tutorial'
+import Tutorial from '@/components/tutorial/tutorial'
 
 const createCharacterScenario = {
   storageKey: 'detail-info-tutorial-completed',

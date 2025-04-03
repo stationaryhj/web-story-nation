@@ -37,7 +37,7 @@ import { useNakama } from '@/app/providers/NakamaProviders'
 import { useChatModeStore } from '@/store/useStoreData'
 import BaseSidebar from '@/components/elements/sidebar/BaseSidebar'
 import { chatApi } from '@/services/api/storyNationApi'
-import Tutorial from '@/components/tutorial/Tutorial'
+import Tutorial from '@/components/tutorial/tutorial'
 
 // 메시지 타입 정의
 interface ChatMessage {
