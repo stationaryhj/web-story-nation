@@ -32,7 +32,7 @@ export default function MyEarningsView() {
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
-  
+
   const { data: userInfo, writerInfo, fetchWriterInfo } = useAccountStore()
   const { openModal } = useModalStore()
 
@@ -65,7 +65,6 @@ export default function MyEarningsView() {
       status: string
     }>
   >([])
-
 
   // 정산 관련 상태
   const [requestAmount, setRequestAmount] = useState(1500) // 요청 금액 (펜 단위, 최소 1500펜)
@@ -221,7 +220,7 @@ export default function MyEarningsView() {
     if (response.data.result.err === 0) {
       toast.success('출금 요청이 접수되었습니다.')
 
-        // 출금 요청 상태 갱신
+      // 출금 요청 상태 갱신
       writerWithdrawStatusRefetch()
       withdrawRequestListRefetch()
     } else {
@@ -286,13 +285,7 @@ export default function MyEarningsView() {
               {formatPen(availableAmount)}
               <FontAwesomeIcon icon={faPen} className="ml-2 text-violet-700" />
             </div>
-            <div className="flex justify-between items-center mb-4">
-              <div className="text-sm text-gray-500">출금 가능 펜</div>
-              <div className="text-lg font-semibold text-gray-800 flex items-center">
-                {formatPen(availableAmount)}
-                <FontAwesomeIcon icon={faPen} className="ml-1 text-gray-500" />
-              </div>
-            </div>
+
             <div className="mt-4">
               <BaseButton
                 onClick={handleWithdrawRequest}
@@ -303,9 +296,7 @@ export default function MyEarningsView() {
                 <FontAwesomeIcon icon={faMoneyBillWave} className="mr-2" />
                 출금 신청하기
               </BaseButton>
-              {!withdrawAllow &&(
-                <p className="text-sm text-red-500 mt-2">* 최소 1500펜 이상부터 출금 가능합니다.</p>
-              )}
+              {!withdrawAllow && <p className="text-sm text-red-500 mt-2">* 최소 1500펜 이상부터 출금 가능합니다.</p>}
             </div>
           </div>
 
