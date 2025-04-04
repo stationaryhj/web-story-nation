@@ -78,20 +78,17 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         formData={formData}
         setFormField={setFormField}
         addHashtag={async (tag: string) => {
-          await addHashtag(tag)
-          return
+          return await addHashtag(tag)
         }}
         removeHashtag={async (tag: string) => {
-          await removeHashtag(tag)
-          return
+          return await removeHashtag(tag)
         }}
-        fetchTagList={async () => {
-          // BasicInfoForm에서는 fetchTagList를 직접 호출하지 않도록 빈 함수로 처리
-          return
+        addCustomTag={async (tag: string) => {
+          return await addHashtag(tag)
         }}
+        fetchTagList={fetchTagList}
         saveHashtags={async () => {
-          await saveHashtags()
-          return
+          return await saveHashtags()
         }}
         availableTags={availableTags}
         isLoadingTags={isLoadingTags}
@@ -110,6 +107,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         removeConversationExample={removeConversationExample}
         setConversationExampleEditMode={setConversationExampleEditMode}
         setConversationExampleVisibility={setConversationExampleVisibility}
+        setConversationExampleTitle={setFormField}
         onValidationChange={onValidationChange}
       />
     )
