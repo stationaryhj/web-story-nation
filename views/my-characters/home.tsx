@@ -23,7 +23,7 @@ export default function MyCharacterPage() {
 
   const myNickName = useAccountStore.getState().data?.nick_nm
 
-  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 10)
+  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 20)
 
   useEffect(() => {
     if (inProgressData?.result.err === 4) {
@@ -31,7 +31,7 @@ export default function MyCharacterPage() {
     }
   }, [inProgressData?.result.err])
 
-  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 20)
+  
 
 
   const myCharacters = bridgeCharbotGetListMineDataToCharacter(inProgressData?.chrbotList.data || []).map(char => ({
