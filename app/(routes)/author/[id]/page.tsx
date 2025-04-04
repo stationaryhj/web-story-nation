@@ -11,9 +11,9 @@ interface PageProps {
 
 export default function Page({ params }: PageProps) {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <Header />
       <AuthorDetailPage params={params} />
-    </>
+    </div>
   )
 }

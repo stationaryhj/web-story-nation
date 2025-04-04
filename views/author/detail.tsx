@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Siren } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import CardGrid from '@/components/elements/card/CardGrid'
 import ReportModal from '@/components/modal/ReportModal'
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 
 interface AuthorDetailPageProps {
   params: {
@@ -18,6 +19,11 @@ export default function AuthorDetailPage({ params }: AuthorDetailPageProps) {
   const router = useRouter()
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+
+  // 컴포넌트가 마운트될 때 스크롤을 맨 위로 이동
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   // 임시 데이터 - API 연동 시 실제 데이터로 교체
   const writerData = {
@@ -49,10 +55,6 @@ export default function AuthorDetailPage({ params }: AuthorDetailPageProps) {
       })),
   }
 
-  const handleClose = () => {
-    router.back()
-  }
-
   const handleSubmitReport = async (reason: string, description: string) => {
     try {
       // TODO: API 연동
@@ -72,9 +74,21 @@ export default function AuthorDetailPage({ params }: AuthorDetailPageProps) {
   }
 
   return (
-    <div className="min-h-screen">
+    <main className="flex-1">
       {/* 메인 컨텐츠 */}
       <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              router.back()
+            }}
+            className="mr-3"
+            aria-label="뒤로 가기"
+          >
+            <FontAwesomeIcon icon={faArrowLeft} className="text-gray-600" />
+          </button>
+          <h1 className="text-xl font-bold text-gray-600">작가정보</h1>
+        </div>
         <div className="flex flex-col gap-8">
           {/* 작가 프로필 섹션 */}
           <div>
@@ -118,6 +132,6 @@ export default function AuthorDetailPage({ params }: AuthorDetailPageProps) {
         submitted={isSubmitted}
         reportType="writer"
       />
-    </div>
+    </main>
   )
 }
