@@ -20,8 +20,7 @@ export default function MyCharacterPage() {
   const [characterToDelete, setCharacterToDelete] = useState<Character | null>(null)
 
   const myNickName = useAccountStore.getState().data?.nick_nm
-  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 10)
-  console.log(inProgressData)
+  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 20)
 
   const myCharacters = bridgeCharbotGetListMineDataToCharacter(inProgressData?.chrbotList.data || []).map(char => ({
     ...char,

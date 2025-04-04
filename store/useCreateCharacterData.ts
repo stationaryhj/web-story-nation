@@ -59,7 +59,7 @@ export interface CharacterFormData {
   // API 호환성 속성
   world_list_detail_chrbot_key?: string
   finishYn?: number
-
+  isVisibilityLock?: boolean
   // 추가 속성을 위한 인덱스 시그니처
   [key: string]: any
 }
@@ -83,6 +83,7 @@ interface CreateCharacterStore {
 
   // 에러 상태
   error: any
+
 
   // 함수들
   setActiveTab: (tab: 'basic' | 'detail' | 'image') => void
@@ -130,6 +131,7 @@ const defaultFormData: CharacterFormData = {
   imgUrlNsfw: '',
   imgWebUrl: '',
   finishYn: 0,
+  isVisibilityLock: false,
 }
 
 // CreateCharacterStore 생성
@@ -449,6 +451,9 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
           }).join('\n\n')
         : '';
 
+
+      const isLock = (formData.finishYn === 1 && formData.visibility === 'public')
+      
       // 폼 데이터에서 API 요청에 필요한 데이터 추출
       const payload = {
         world_list_detail_chrbot_key: formData.world_list_detail_chrbot_key || '',
@@ -478,9 +483,9 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
               : 0
             : 0,
         finish_yn: formData.finishYn ? formData.finishYn : finishYn,
+        isVisibilityLock: isLock
       }
 
-      console.log('저장할 데이터:', payload)
 
       // API 호출
       const response = await createApi.SaveInProgress(
@@ -509,6 +514,8 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
       if (response.data?.world_list_detail_chrbot_key) {
         get().setFormField('world_list_detail_chrbot_key', response.data.world_list_detail_chrbot_key.toString())
       }
+
+      get().setFormField('isVisibilityLock', isLock)
       
       // 기본 정보 저장 후 태그 정보도 함께 저장
       if (formData.hashtags.length > 0) {

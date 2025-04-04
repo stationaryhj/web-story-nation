@@ -1,7 +1,7 @@
 'use client'
 
 import { useModalStore } from '@/store/useStoreModal'
-import { faComment, faHeart, faTimes, faShieldHalved, faMessage, faUser } from '@fortawesome/free-solid-svg-icons'
+import { faComment, faHeart, faTimes, faShieldHalved, faMessage, faUser, faPlus, faUserEdit } from '@fortawesome/free-solid-svg-icons'
 import { Siren } from 'lucide-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
@@ -15,12 +15,6 @@ import { contentApi } from '@/services/api/storyNationApi'
 import { CharbotLikeResponse } from '@/types/api'
 import { useAccountStore } from '@/store/useStoreData'
 import ReportModal from './ReportModal'
-
-interface ExampleData {
-  title: string
-  User: string;
-  Character: string;
-}
 
 // 목업 데이터
 const mockFirstMessage = {
@@ -36,13 +30,13 @@ interface CharactorModalProps {
 
 export default function CharactorModal({ isOpen, onClose }: CharactorModalProps) {
   const router = useRouter()
-  const { selectedCharacter, setSelectedCharacter, openModal } = useModalStore()
+  const { selectedCharacter, setSelectedCharacter, openModal, modalProps } = useModalStore()
   const [isImageLoaded, setIsImageLoaded] = useState(false)
   const { isLogin } = useAccountStore()
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [reportSubmitted, setReportSubmitted] = useState(false)
 
-
+  const variant = modalProps?.variant || 'default'
 
   const {
     data: chatBotData,
@@ -96,9 +90,6 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
 
   const content = chatBotData?.chrbot?.content
   const isContentShow = chatBotData?.chrbot?.content_show_yn
-
-  const first_talk = chatBotData?.chrbot?.first_talk
-  console.log(chatBotData)
 
   useEffect(() => {
     if (chatBotData) {
@@ -184,6 +175,11 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
     }
   }
 
+  const handleCreateCharacter = async () => {
+    router.push(`/my-characters/edit/${selectedCharacter?.id}`)
+    onClose()
+  }
+
   if (!selectedCharacter) return null
 
   return (
@@ -201,12 +197,21 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
           {selectedCharacter.name || '이름 없음'}
         </h1>
         <div className="flex items-center gap-2">
-          <button
-            onClick={handleReport}
-            className="w-9 h-9 rounded-full bg-secondary-100 dark:bg-dark-secondary-800 text-secondary-500 dark:text-dark-secondary-400 hover:bg-secondary-200 dark:hover:bg-dark-secondary-700 transition-colors flex items-center justify-center"
-          >
-            <Siren className="h-4 w-4" />
-          </button>
+          {variant === 'default' ? (
+            <button
+              onClick={handleReport}
+              className="w-9 h-9 rounded-full bg-secondary-100 dark:bg-dark-secondary-800 text-secondary-500 dark:text-dark-secondary-400 hover:bg-secondary-200 dark:hover:bg-dark-secondary-700 transition-colors flex items-center justify-center"
+            >
+              <Siren className="h-4 w-4" />
+            </button>
+          ) : (
+            <button
+              onClick={handleCreateCharacter}
+              className="w-9 h-9 rounded-full bg-secondary-100 dark:bg-dark-secondary-800 text-secondary-500 dark:text-dark-secondary-400 hover:bg-secondary-200 dark:hover:bg-dark-secondary-700 transition-colors flex items-center justify-center"
+            >
+              <FontAwesomeIcon icon={faUserEdit} className="h-4 w-4" />
+            </button>
+          )}
           <div>
             <button
               onClick={handleClose}
