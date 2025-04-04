@@ -70,6 +70,7 @@ export default function MyEarningsView() {
   const [requestAmount, setRequestAmount] = useState(1500) // 요청 금액 (펜 단위, 최소 1500펜)
   const [accountNo1, setAccountNo1] = useState('')
   const [accountNo2, setAccountNo2] = useState('')
+  const [name, setName] = useState('')
 
   // 이번달 수익
   const thisMonthEarnings = monthlyIncomeV1?.monthlyIncome || 0
@@ -214,8 +215,8 @@ export default function MyEarningsView() {
     const resno1 = accountNo1.length > 0 ? Buffer.from(accountNo1).toString('base64') : ''
     const resno2 = accountNo2.length > 0 ? Buffer.from(accountNo2).toString('base64') : ''
 
-    // 출금 요청
-    const response = await settlementApi.WithdrawRequest(requestAmount, 0, userInfo?.nick_nm || '', resno1, resno2)
+    // 출금 요청 ( 실명으로 보내야함 )
+    const response = await settlementApi.WithdrawRequest(requestAmount, 0, name, resno1, resno2)
 
     if (response.data.result.err === 0) {
       toast.success('출금 요청이 접수되었습니다.')
@@ -244,10 +245,17 @@ export default function MyEarningsView() {
   const handleAccountNo2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAccountNo2(e.target.value)
   }
+
+  // 실명 변경 핸들러
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value)
+  }
+
   // 금액 포맷 함수 - 펜 단위로 변경
   const formatPen = (amount: number) => {
     return amount.toLocaleString('ko-KR')
   }
+  
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
@@ -435,10 +443,12 @@ export default function MyEarningsView() {
         requestAmount={requestAmount}
         accountNo1={accountNo1}
         accountNo2={accountNo2}
+        name={name}
         onRequestAmountChange={handleRequestAmountChange}
         onConfirm={handleConfirmWithdraw}
         onAccountNo1Change={handleAccountNo1Change}
         onAccountNo2Change={handleAccountNo2Change}
+        onNameChange={handleNameChange}
       />
 
       {/* react-toastify 컨테이너 */}

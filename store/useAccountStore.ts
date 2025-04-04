@@ -47,6 +47,7 @@ interface AccountState {
   editNickname: (nick_nm: string) => Promise<boolean>
   getCoinSum: () => number
   UpdateFreePen: () => Promise<boolean>
+  uploadProfileImage: (imageUrl: string) => void
 }
 
 // 네트워크 에러 타입 정의
@@ -1014,6 +1015,20 @@ export const useAccountStore = create<AccountState>()(
             }
           }
         })
+      },
+
+      uploadProfileImage: async (imageUrl: string) => {
+        const response = await contentApi.myprofileupdate(imageUrl)
+
+        if(response.data.result.err === 0) {
+          set((state) => {
+            if (!state.data) return state
+            return {
+            ...state,
+              data: { ...state.data, profile_url: imageUrl }
+            }
+          })
+        }
       },
 
       getCoinSum: () => {

@@ -297,6 +297,9 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
     rating: data.nsfw === 1 ? 'adult' : 'all',
     // 추가 데이터
     finish_yn: data.finish_yn || 0,
+
+    // 공개 + 공개 일시에 비공개로 변경 불가능
+    isVisibilityLock: (data.finish_yn === 1 && data.show_yn === 1 )? true : false,
   }
 }
 
