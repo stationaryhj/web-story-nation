@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react'
 import BaseModal from './BaseModal'
 import { BaseButton } from '../elements/button/BaseButton'
 
-
 interface BankAccount {
   bank: string
   accountNumber: string
@@ -138,24 +137,26 @@ const WithdrawModal = ({
             <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400 mb-2">
               주민등록번호
             </label>
-            <div className="flex items-center">
-              <input
-                type="text"
-                value={accountNo1}
-                onChange={onAccountNo1Change}
-                maxLength={6}
-                placeholder="앞 6자리"
-                className="w-[100px] md:w-[120px] rounded-lg border border-secondary-200 px-3 py-2 text-secondary-900 placeholder-secondary-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500"
-              />
+            <div className="flex items-center w-full">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  value={accountNo1}
+                  onChange={onAccountNo1Change}
+                  maxLength={6}
+                  placeholder="앞 6자리"
+                  className="w-full rounded-lg border border-secondary-200 px-3 py-2 text-secondary-900 placeholder-secondary-400 focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500"
+                />
+              </div>
               <span className="mx-2 text-secondary-500 dark:text-dark-secondary-400 font-medium">-</span>
-              <div className="relative flex-1">
+              <div className="flex-1">
                 <input
                   type="password"
                   value={accountNo2}
                   onChange={onAccountNo2Change}
                   maxLength={7}
                   placeholder="뒤 7자리"
-                  className="w-[110px] md:w-[130px] rounded-lg border border-secondary-200 px-3 py-2 text-secondary-900 placeholder-secondary-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500"
+                  className="w-full rounded-lg border border-secondary-200 px-3 py-2 text-secondary-900 placeholder-secondary-400 focus:border-primary-500 focus:outline-none focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500"
                 />
               </div>
             </div>
