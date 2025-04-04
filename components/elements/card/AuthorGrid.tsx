@@ -13,6 +13,7 @@ import type { Swiper as SwiperType } from 'swiper'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
+import { useRouter } from 'next/navigation'
 
 // 작가 타입 정의
 interface Author {
@@ -57,11 +58,12 @@ export default function AuthorGrid({
   error = null,
   isSidebar = false,
   onAuthorClick,
-  useSwiper = true, // 기본적으로 Swiper 사용
+  useSwiper = true,
   variant = 'default',
   className = '',
   sectionId = '',
 }: AuthorGridProps) {
+  const router = useRouter()
   const [authors, setAuthors] = useState<Array<Author>>(customData)
   const [localLoading, setLocalLoading] = useState(isLoading)
   const [reachedEnd, setReachedEnd] = useState(false)
@@ -70,6 +72,8 @@ export default function AuthorGrid({
 
   // 스와이퍼 사용 여부 결정 - 항상 props의 useSwiper 값을 따름
   const shouldUseSwiper = useSwiper
+  // PC에서 8개 이하일 때는 네비게이션 버튼 숨김
+  const shouldShowNavigation = authors.length > 8
 
   useEffect(() => {
     setAuthors(customData)
@@ -78,9 +82,7 @@ export default function AuthorGrid({
 
   // 작가 클릭 핸들러
   const handleAuthorClick = (author: Author) => {
-    if (onAuthorClick) {
-      onAuthorClick(author)
-    }
+    router.push(`/author/1`)
   }
 
   // 스와이프 끝에 도달했을 때 핸들러
@@ -125,7 +127,7 @@ export default function AuthorGrid({
     return Array(cardsPerRow)
       .fill(0)
       .map((_, index) => (
-        <SwiperSlide key={`skeleton-${index}`}>
+        <SwiperSlide key={`skeleton-${Date.now()}-${index}`}>
           <div className="h-24 bg-secondary-100 dark:bg-dark-secondary-800 rounded-xl animate-pulse"></div>
         </SwiperSlide>
       ))
@@ -134,7 +136,7 @@ export default function AuthorGrid({
   // 작가 카드 렌더링
   const renderAuthorCards = () => {
     return authors.map((author, index) => (
-      <SwiperSlide key={author.id}>
+      <SwiperSlide key={`author-${author.id}`}>
         <AuthorCard
           author={author}
           index={index}
@@ -187,46 +189,54 @@ export default function AuthorGrid({
 
       {shouldUseSwiper ? (
         <div className="relative swiper-container-wrapper" id={sectionId}>
-          <button
-            type="button"
-            className={`swiper-button-prev navigation-button navigation-prev-button author-grid-prev-button absolute left-[-20px] z-[9999] flex items-center justify-center ${
-              reachedBeginning ? 'swiper-button-disabled' : ''
-            }`}
-            onClick={e => {
-              e.preventDefault()
-              e.stopPropagation()
-              if (swiperRef.current && !reachedBeginning) {
-                swiperRef.current.slidePrev()
-              }
-            }}
-            aria-label="이전"
-            disabled={reachedBeginning}
-          ></button>
-          <button
-            type="button"
-            className={`swiper-button-next navigation-button navigation-next-button author-grid-next-button absolute right-[-20px] z-[9999] flex items-center justify-center ${
-              reachedEnd ? 'swiper-button-disabled' : ''
-            }`}
-            onClick={e => {
-              e.preventDefault()
-              e.stopPropagation()
-              if (swiperRef.current && !reachedEnd) {
-                swiperRef.current.slideNext()
-              }
-            }}
-            aria-label="다음"
-            disabled={reachedEnd}
-          ></button>
+          {shouldShowNavigation && (
+            <>
+              <button
+                type="button"
+                className={`swiper-button-prev navigation-button navigation-prev-button author-grid-prev-button absolute left-[-20px] z-[9999] flex items-center justify-center ${
+                  reachedBeginning ? 'swiper-button-disabled' : ''
+                }`}
+                onClick={e => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  if (swiperRef.current && !reachedBeginning) {
+                    swiperRef.current.slidePrev()
+                  }
+                }}
+                aria-label="이전"
+                disabled={reachedBeginning}
+              ></button>
+              <button
+                type="button"
+                className={`swiper-button-next navigation-button navigation-next-button author-grid-next-button absolute right-[-20px] z-[9999] flex items-center justify-center ${
+                  reachedEnd ? 'swiper-button-disabled' : ''
+                }`}
+                onClick={e => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  if (swiperRef.current && !reachedEnd) {
+                    swiperRef.current.slideNext()
+                  }
+                }}
+                aria-label="다음"
+                disabled={reachedEnd}
+              ></button>
+            </>
+          )}
           <Swiper
             modules={[Navigation]}
             spaceBetween={16}
             loop={false}
             slidesPerGroup={1}
-            navigation={{
-              nextEl: `#${sectionId} .author-grid-next-button`,
-              prevEl: `#${sectionId} .author-grid-prev-button`,
-              enabled: true,
-            }}
+            navigation={
+              shouldShowNavigation
+                ? {
+                    nextEl: `#${sectionId} .author-grid-next-button`,
+                    prevEl: `#${sectionId} .author-grid-prev-button`,
+                    enabled: true,
+                  }
+                : false
+            }
             breakpoints={{
               320: { slidesPerView: 3 },
               640: { slidesPerView: 3 },
@@ -243,11 +253,13 @@ export default function AuthorGrid({
               setReachedEnd(swiper.isEnd)
 
               // 스와이퍼 초기화 후 버튼 재연결
-              setTimeout(() => {
-                if (swiper && swiper.navigation) {
-                  swiper.navigation.update()
-                }
-              }, 100)
+              if (shouldShowNavigation) {
+                setTimeout(() => {
+                  if (swiper && swiper.navigation) {
+                    swiper.navigation.update()
+                  }
+                }, 100)
+              }
             }}
             className="custom-swiper author-grid-swiper"
           >

@@ -148,7 +148,7 @@ export default function ShopRecharge() {
 
   // OrderId 가져오기 (재사용 가능한 함수로 분리)
   const fetchOrderId = useCallback(async (coinKey: number) => {
-    console.log('@@@@@@ ::: coinKey ::: ', coinKey);
+    console.log('@@@@@@ ::: coinKey ::: ', coinKey)
     try {
       const response = await settlementApi.GetOrderId(coinKey.toString())
       return response.data as OrderIdResponse
@@ -387,8 +387,12 @@ export default function ShopRecharge() {
                           </div>
                           <div className="aspect-square relative bg-gray-100 dark:bg-dark-background-accent rounded-lg flex items-center justify-center">
                             <div className="text-center text-gray-500 dark:text-gray-400 text-xs sm:text-sm">
-                              <FontAwesomeIcon icon={faPen} className="h-8 w-8 sm:h-10 sm:w-10 mb-1 sm:mb-2" />
-                              <p>이미지</p>
+                              <Image
+                                src={`/images/pen/coin_${coin.cnt}.png`}
+                                alt={`${coin.cnt}개 펜 이미지`}
+                                fill
+                                className="object-contain"
+                              />
                             </div>
                           </div>
                         </div>

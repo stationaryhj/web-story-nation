@@ -82,7 +82,7 @@ export default function ChatModeModal({ isOpen, onClose, currentModeId, onSelect
       isOpen={isOpen}
       onClose={onClose}
       title="채팅 모드 선택"
-      size="md"
+      size="lg"
       contentClassName="p-0"
       bodyClassName="p-0"
     >
@@ -90,18 +90,18 @@ export default function ChatModeModal({ isOpen, onClose, currentModeId, onSelect
         <p className="px-4 sm:px-6 pb-4 text-secondary-600 text-sm dark:text-dark-secondary-400 border-b border-secondary-100 dark:border-dark-secondary-800">
           원하는 채팅 모드를 선택하세요. 각 모드는 대화 품질과 특성이 다르며, 소모되는 펜 개수가 다릅니다.
         </p>
-        <ul className="mt-2">
+        <ul className="divide-y divide-secondary-100 dark:divide-dark-secondary-800">
           {chatModes
             .filter(mode => mode.isShow)
             .map(mode => (
               <li
                 key={mode.id}
-                className={`px-4 sm:px-6 py-3 sm:py-4 cursor-pointer border-b border-secondary-100 dark:border-dark-secondary-800 last:border-0 hover:bg-secondary-50 dark:hover:bg-dark-secondary-800/30 ${
+                className={`px-4 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-secondary-50 dark:hover:bg-dark-secondary-800/30 ${
                   currentModeId === mode.id ? 'bg-primary-50 dark:bg-dark-primary-900/30' : ''
                 }`}
                 onClick={() => onSelectMode(mode)}
               >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
                   <div className="flex-1">
                     <div className="flex items-center">
                       <span
@@ -129,7 +129,7 @@ export default function ChatModeModal({ isOpen, onClose, currentModeId, onSelect
                         />
                       )}
                     </div>
-                    <p className="text-xs sm:text-sm text-secondary-600 dark:text-dark-secondary-400 mt-1">
+                    <p className="mt-1 text-xs sm:text-sm text-secondary-600 dark:text-dark-secondary-400">
                       {mode.description}
                     </p>
                     <div className="mt-1 sm:mt-2 text-[10px] sm:text-xs text-secondary-500 dark:text-dark-secondary-500">

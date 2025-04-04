@@ -47,7 +47,6 @@ export default function Card({
 
   // 실제 카드 클릭 핸들러
   const handleCardClick = () => {
-    
     if (onCardClick) {
       onCardClick(character)
     } else {
@@ -109,7 +108,7 @@ export default function Card({
             />
 
             {isTemp && (
-              <div className="absolute top-3 left-3 bg-red-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+              <div className="absolute top-3 left-3 bg-black/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
                 임시저장
               </div>
             )}
@@ -117,6 +116,7 @@ export default function Card({
             {isLocked && (
               <div className="absolute top-3 left-3 bg-red-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
                 <FontAwesomeIcon icon={faLock} className="mr-1" />
+                <div>비공개</div>
               </div>
             )}
 
@@ -211,14 +211,15 @@ export default function Card({
             )}
 
             {isTemp && (
-              <div className="absolute top-3 left-3 bg-red-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+              <div className="absolute top-3 left-3 bg-black/60 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
                 임시저장
               </div>
             )}
 
             {isLocked && (
-              <div className="absolute bottom-4 left-4 bg-red-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+              <div className="absolute bottom-4 left-4 bg-orange-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
                 <FontAwesomeIcon icon={faLock} />
+                <span className="ml-1 font-black">비공개</span>
               </div>
             )}
 

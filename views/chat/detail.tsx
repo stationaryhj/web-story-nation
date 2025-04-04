@@ -37,7 +37,8 @@ import { useNakama } from '@/app/providers/NakamaProviders'
 import { useChatModeStore } from '@/store/useStoreData'
 import BaseSidebar from '@/components/elements/sidebar/BaseSidebar'
 import { chatApi } from '@/services/api/storyNationApi'
-import Tutorial from '@/components/tutorial/tutorial'
+import Tutorial from '@/components/tutorial/Tutorial'
+import ResetChatModal from '@/components/modal/ResetChatModal'
 
 // 메시지 타입 정의
 interface ChatMessage {
@@ -202,6 +203,12 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 마운트 상태 추적용 ref
   const isMountedRef = useRef(true)
+
+  // 채팅 초기화 모달 상태
+  const [showResetChatModal, setShowResetChatModal] = useState(false)
+
+  // 채팅 컨테이너 ref
+  const chatContainerRef = useRef<HTMLDivElement>(null)
 
   // 모바일 환경 감지
   useEffect(() => {
@@ -464,6 +471,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
       // 메시지 전송 후 AI 응답 대기 상태로 변경
       setIsWaitingForAI(true)
+
+      // 스크롤을 최하단으로 이동
+      setTimeout(scrollToBottom, 100)
     } catch (error) {
       console.error('메시지 전송 중 오류:', error)
       setError('메시지 전송에 실패했습니다. 다시 시도해주세요.')
@@ -480,6 +490,26 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   const handleModeSelect = (mode: ChatMode) => {
     // 이전 모드와 다른 경우에만 처리
     if (currentModeId !== mode.id) {
+      // 재화(펜) 부족 여부 확인
+      const requiredPens = mode.penCost
+      const availablePens = (accountData?.coin_free || 0) + (accountData?.coin_user || 0)
+
+      if (availablePens < requiredPens) {
+        // 재화 부족 시 모달 표시
+        openModal('confirmAction', {
+          title: '펜 부족',
+          description: `이 모드를 사용하려면 ${requiredPens}개의 펜이 필요합니다. 현재 보유한 펜: ${availablePens}개`,
+          onConfirm: () => {
+            // 충전 페이지로 이동하는 로직 추가 가능
+            router.push('/charge')
+          },
+          confirmText: '충전하기',
+          cancelText: '취소',
+          confirmButtonClass: 'bg-primary-500 hover:bg-primary-600 text-white',
+        })
+        return
+      }
+
       setCurrentModeId(mode.id)
       updateChatMode(mode.id)
     }
@@ -517,28 +547,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     newMessages.forEach(msg => addChatMessage(msg))
   }
 
-  // 상황 설명 모드 토글
-  const [isActionMode, setIsActionMode] = useState(false)
-  const toggleActionMode = () => {
-    setIsActionMode(!isActionMode)
-
-    // 상황 설명 모드가 활성화되면 입력 필드에 별표 자동 추가
-    if (!isActionMode && message.trim() === '') {
-      setMessage('*')
-    }
-  }
-
-  // 상황 설명 모드 입력 처리 함수
-  const handleActionInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value
-    setMessage(inputValue)
-
-    // 입력 값이 별표로 시작하는지 확인하고, 별표가 올바르게 닫혔는지 체크
-    if (isActionMode && !inputValue.startsWith('*')) {
-      setMessage(`*${inputValue}`)
-    }
-  }
-
   // 메시지 내용에서 상황 설명(*로 감싸진 텍스트)를 찾아 스타일을 적용하는 함수
   const formatMessageWithSituations = (message: string) => {
     // 정규식으로 *로 감싸진 텍스트 찾기
@@ -549,7 +557,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         // 상황 설명 부분 (기울임체, 회색, 얇은 폰트)
         const content = part.slice(1, -1) // 별표 제거
         return (
-          <span key={index} className="italic text-gray-500 font-light">
+          <span key={index} className="italic text-gray-400 font-medium">
             {content}
           </span>
         )
@@ -600,6 +608,34 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   const handleCloseImageModal = () => {
     setShowImageModal(false)
   }
+
+  // 채팅 초기화 모달 열기
+  const handleOpenResetChatModal = () => {
+    setShowResetChatModal(true)
+  }
+
+  // 채팅 초기화 모달 닫기
+  const handleCloseResetChatModal = () => {
+    setShowResetChatModal(false)
+  }
+
+  // 채팅 초기화 확인
+  const handleConfirmResetChat = () => {
+    // 여기에 채팅 초기화 로직 추가 (현재는 기능 연결 없음)
+    handleCloseResetChatModal()
+  }
+
+  // 스크롤을 최하단으로 이동하는 함수
+  const scrollToBottom = useCallback(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
+    }
+  }, [])
+
+  // 메시지가 추가될 때마다 스크롤을 최하단으로 이동
+  useEffect(() => {
+    scrollToBottom()
+  }, [chatMessages, scrollToBottom])
 
   // 로딩 상태 표시
   if (isLoading) {
@@ -763,6 +799,14 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           >
             <FontAwesomeIcon icon={faEllipsisV} />
           </button>
+
+          {/* 채팅 새로고침 버튼 - PC에서만 표시 */}
+          <div
+            className="hidden md:flex w-9 h-9 rounded-full bg-blue-50 items-center justify-center text-blue-500 cursor-pointer hover:bg-blue-100 transition-colors"
+            onClick={handleOpenResetChatModal}
+          >
+            <FontAwesomeIcon icon={faSync} />
+          </div>
 
           {/* 채팅방 삭제 버튼 - PC에서만 표시 */}
           <div
@@ -1013,7 +1057,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           )}
 
           {/* 채팅 내용 */}
-          <div className="flex-1 overflow-y-auto p-4 md:p-6">
+          <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 md:p-6">
             <div className="flex flex-col space-y-12 max-w-3xl mx-auto">
               {chatMessages.length === 0 ? (
                 <div className="text-center text-gray-500 py-10">
@@ -1053,7 +1097,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                         animate={{ scale: 1 }}
                         className={`inline-block max-w-[85%] rounded-2xl px-4 py-3 sm:px-5 sm:py-4 shadow-sm ${
                           chat.sender === 'user'
-                            ? 'bg-primary-500 text-white rounded-tr-none'
+                            ? 'bg-primary-500 text-white font-medium rounded-tr-none'
                             : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none'
                         }`}
                         style={{ wordBreak: 'break-word', overflow: 'hidden' }}
@@ -1062,7 +1106,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                           {formatMessageWithSituations(chat.message)}
                         </p>
                         <p
-                          className={`text-xs mt-2 text-right ${chat.sender === 'user' ? 'text-violet-200' : 'text-gray-500'}`}
+                          className={`text-xs mt-2 text-right ${chat.sender === 'user' ? 'text-white/80' : 'text-gray-500'}`}
                         >
                           {formatTime(chat.timestamp)}
                         </p>
@@ -1102,13 +1146,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             <form onSubmit={handleSendMessage} className="flex items-center max-w-3xl mx-auto">
               {/* 상황 설명 버튼 (별표 아이콘) */}
               <button
-                id="message-input"
                 type="button"
-                onClick={toggleActionMode}
-                className={`mr-2 p-2.5 rounded-full transition-colors ${
-                  isActionMode ? 'bg-violet-100 text-violet-600' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                }`}
-                title={isActionMode ? '일반 대화 모드로 전환' : '상황 설명 모드로 전환'}
+                onClick={() => setMessage(prevMessage => prevMessage + '**')}
+                className="w-12 h-12 flex items-center justify-center rounded-full transition-colors bg-gray-100 text-gray-500 hover:bg-gray-200 mr-2"
                 disabled={isWaitingForAI}
               >
                 <FontAwesomeIcon icon={faAsterisk} className="text-base" />
@@ -1118,27 +1158,17 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                 <input
                   type="text"
                   value={message}
-                  onChange={isActionMode ? handleActionInput : e => setMessage(e.target.value)}
+                  onChange={e => setMessage(e.target.value)}
                   placeholder={
                     isWaitingForAI
                       ? 'AI가 응답 중입니다. 잠시만 기다려주세요...'
-                      : isActionMode
-                        ? '상황 설명을 입력하세요. (예: 캐릭터가 웃으며)'
-                        : '대화를 입력하세요. (예: 안녕! 뭐해?)'
+                      : '대화를 입력하세요. (예: 안녕! 뭐해?)'
                   }
-                  className={`w-full py-3 px-4 text-sm sm:text-base bg-gray-100 text-gray-800 rounded-l-xl border-0 focus:outline-none focus:ring-0 ${
+                  className={`w-full h-12 px-4 text-sm sm:text-base bg-gray-100 text-gray-800 rounded-l-xl border-0 focus:outline-none focus:ring-0 ${
                     isWaitingForAI ? 'bg-gray-200 text-gray-500' : 'hover:bg-gray-200/80'
                   } transition-all placeholder:text-sm placeholder:text-gray-500`}
                   disabled={isWaitingForAI}
                 />
-                {isActionMode && !isWaitingForAI && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs text-gray-500">
-                    <span className="bg-violet-100 px-2 py-0.5 rounded text-violet-600 font-medium">
-                      <FontAwesomeIcon icon={faAsterisk} className="mr-1 text-xs" />
-                      상황 설명 모드
-                    </span>
-                  </div>
-                )}
                 {isWaitingForAI && (
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                     <div className="flex items-center space-x-1">
@@ -1164,7 +1194,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                 type="submit"
                 color={message.trim() && !isWaitingForAI ? 'gradient' : 'secondary'}
                 disabled={!message.trim() || isWaitingForAI}
-                className="rounded-l-none rounded-r-xl py-3 px-4"
+                className="rounded-l-none rounded-r-xl h-12 px-4 flex items-center justify-center"
               >
                 <FontAwesomeIcon icon={faPaperPlane} className="text-base" />
               </BaseButton>
@@ -1225,6 +1255,13 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
       {/* 튜토리얼 컴포넌트 */}
       <Tutorial isOpen={showTutorial} onClose={() => setShowTutorial(false)} config={tutorialConfig} />
+
+      {/* 채팅 초기화 모달 */}
+      <ResetChatModal
+        isOpen={showResetChatModal}
+        onClose={handleCloseResetChatModal}
+        onConfirm={handleConfirmResetChat}
+      />
     </div>
   )
 }

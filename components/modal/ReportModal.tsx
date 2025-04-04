@@ -4,26 +4,26 @@ import { useState } from 'react'
 import BaseModal from './BaseModal'
 
 // 신고 사유 목록
-const REPORT_REASONS = [
-  '불쾌감을 주는 내용',
-  '스팸 또는 광고성 내용',
-  '욕설/비하',
-  '성적인 내용',
-  '폭력적인 내용',
-  '기타',
-]
+const REPORT_REASONS = {
+  writer: ['불쾌감을 주는 프로필/소개글', '부적절한 프로필 이미지', '사칭/사기 의심', '스팸/도배', '욕설/비하', '기타'],
+  character: ['불쾌감을 주는 내용', '스팸 또는 광고성 내용', '욕설/비하', '성적인 내용', '폭력적인 내용', '기타'],
+} as const
 
 interface ReportModalContentProps {
   onSubmit: (reason: string, description: string) => void
   onClose: () => void
   submitted: boolean
+  reportType: 'writer' | 'character'
 }
 
 // 신고 모달 내용 컴포넌트
-function ReportModalContent({ onSubmit, onClose, submitted }: ReportModalContentProps) {
+function ReportModalContent({ onSubmit, onClose, submitted, reportType }: ReportModalContentProps) {
   const [selectedReason, setSelectedReason] = useState<string | null>(null)
   const [description, setDescription] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const reasons = REPORT_REASONS[reportType]
+  const reportTypeText = reportType === 'writer' ? '작가' : '캐릭터'
 
   if (submitted) {
     return (
@@ -59,9 +59,8 @@ function ReportModalContent({ onSubmit, onClose, submitted }: ReportModalContent
       <div className="p-6">
         <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 mb-6">
           <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-            스토리네이션은 모든 사용자의 즐거운 창작 활동 및 콘텐츠 소비를 바랍니다. 스토리네이션 운영정책에 위배된다고
-            생각되는 콘텐츠는 아래 제시된 사유 선택 후 신고해주시기 바랍니다. 신고된 콘텐츠는 관리자가 확인한 후
-            스토리네이션 운영정책에 따라 적절한 조치를 취할 예정입니다.
+            {reportTypeText} 신고는 스토리네이션 운영정책에 따라 처리됩니다. 신고된 {reportTypeText}는 관리자 검토 후
+            운영정책에 따라 적절한 조치가 취해질 예정입니다. 신중한 신고 부탁드립니다.
           </p>
         </div>
 
@@ -79,7 +78,7 @@ function ReportModalContent({ onSubmit, onClose, submitted }: ReportModalContent
             사유 선택
           </h3>
           <div className="space-y-2">
-            {REPORT_REASONS.map(reason => (
+            {reasons.map(reason => (
               <div
                 key={reason}
                 className={`border rounded-lg overflow-hidden transition-all duration-200 ${
@@ -176,19 +175,20 @@ interface ReportModalProps {
   onClose: () => void
   onSubmit: (reason: string, description: string) => void
   submitted: boolean
+  reportType: 'writer' | 'character'
 }
 
-export default function ReportModal({ isOpen, onClose, onSubmit, submitted }: ReportModalProps) {
+export default function ReportModal({ isOpen, onClose, onSubmit, submitted, reportType }: ReportModalProps) {
   return (
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title={submitted ? undefined : '신고하기'}
+      title={submitted ? undefined : `${reportType === 'writer' ? '작가' : '캐릭터'} 신고하기`}
       size="md"
       backdropColor="bg-black/60"
       animation="scale"
     >
-      <ReportModalContent onSubmit={onSubmit} onClose={onClose} submitted={submitted} />
+      <ReportModalContent onSubmit={onSubmit} onClose={onClose} submitted={submitted} reportType={reportType} />
     </BaseModal>
   )
 }

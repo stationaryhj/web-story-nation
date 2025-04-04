@@ -32,7 +32,6 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
     removeConversationExample,
     setConversationExampleEditMode,
     setConversationExampleVisibility,
-    setConversationExampleTitle,
     setNormalImage,
     setAdultImage,
     setAdultNormalImage,
@@ -79,24 +78,20 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         formData={formData}
         setFormField={setFormField}
         addHashtag={async (tag: string) => {
-          const result = await addHashtag(tag);
-          return result;
+          await addHashtag(tag)
+          return
         }}
         removeHashtag={async (tag: string) => {
-          const result = await removeHashtag(tag);
-          return result;
-        }}
-        addCustomTag={async (tag: string) => {
-          const result = await useCreateCharacterData.getState().addCustomTag(tag);
-          return result;
+          await removeHashtag(tag)
+          return
         }}
         fetchTagList={async () => {
           // BasicInfoForm에서는 fetchTagList를 직접 호출하지 않도록 빈 함수로 처리
           return
         }}
         saveHashtags={async () => {
-          const result = await saveHashtags();
-          return result;
+          await saveHashtags()
+          return
         }}
         availableTags={availableTags}
         isLoadingTags={isLoadingTags}
@@ -115,7 +110,6 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         removeConversationExample={removeConversationExample}
         setConversationExampleEditMode={setConversationExampleEditMode}
         setConversationExampleVisibility={setConversationExampleVisibility}
-        setConversationExampleTitle={setConversationExampleTitle}
         onValidationChange={onValidationChange}
       />
     )

@@ -124,17 +124,12 @@ export default function CardGrid({
     */
   }, [fetchCategoryCharacters, categoryId, customData, isAdultModeEnabled])
 
-  useEffect(() => {
-    // console.log('characters', characters)
-  }, [characters])
-
   // 카드 클릭 핸들러
   const handleCardClick = (character: Character) => {
     if (variant !== 'my-character') {
       setSelectedCharacter(character)
       openModal('character')
-    }
-    else {
+    } else {
       if (character.finish_yn === 1) {
         setSelectedCharacter(character)
         openModal('character', { variant: 'my-character' })
