@@ -8,20 +8,27 @@ import { useAccountStore } from '@/store/useStoreData'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createApi } from '@/services/api/storyNationApi'
 import { CharbotInprogressResponse } from '@/types/api'
 import { GetCreateChatBotListMine } from '@/services/hooks/DataListManager'
 import { bridgeCharbotGetListMineDataToCharacter } from '@/lib/utils/storyNationUtil'
+import LimitCharacterModal from '@/components/modal/LimitCharacterModal'
 
 export default function MyCharacterPage() {
   const router = useRouter()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [isLimitModalOpen, setIsLimitModalOpen] = useState(false)
   const [characterToDelete, setCharacterToDelete] = useState<Character | null>(null)
 
   const myNickName = useAccountStore.getState().data?.nick_nm
-  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 30)
-  console.log(inProgressData)
+  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 10)
+
+  useEffect(() => {
+    if (inProgressData?.result.err === 4) {
+      setIsLimitModalOpen(true)
+    }
+  }, [inProgressData?.result.err])
 
   const myCharacters = bridgeCharbotGetListMineDataToCharacter(inProgressData?.chrbotList.data || []).map(char => ({
     ...char,
@@ -34,8 +41,6 @@ export default function MyCharacterPage() {
     },
     category: (char.category || 'unspecified') as 'unspecified' | 'male' | 'female',
   }))
-
-  console.log('myCharacters', myCharacters)
 
   // 캐릭터 카드 클릭 처리
   const handleCardClick = (character: Character) => {
@@ -77,6 +82,10 @@ export default function MyCharacterPage() {
     if (data?.chrbot && data?.result.err === 0) {
       router.push(`/my-characters/edit/${data.chrbot.world_list_detail_chrbot_key}`)
     }
+
+    if (data?.result.err === 4) {
+      setIsLimitModalOpen(true)
+    }
   }
 
   return (
@@ -94,11 +103,11 @@ export default function MyCharacterPage() {
         </div>
 
         {myCharacters.length === 0 ? (
-          <div className="bg-white dark:bg-dark-background-light rounded-xl p-8 text-center">
-            <p className="text-secondary-500 dark:text-dark-secondary-500 mb-4">아직 생성한 캐릭터가 없습니다.</p>
+          <div className="flex flex-col items-center justify-center space-y-4 py-12">
             <button
-              onClick={handleCreateCharacter}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
+              type="button"
+              className="flex items-center space-x-2 rounded-lg bg-primary-500 px-6 py-3 text-white transition-colors hover:bg-primary-600 dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600"
+              onClick={() => router.push('/my-characters/edit/')}
             >
               <FontAwesomeIcon icon={faPlus} />
               <span>첫 캐릭터 만들기</span>
@@ -111,7 +120,6 @@ export default function MyCharacterPage() {
             onEdit={handleEditClick}
             onDelete={handleDeleteClick}
             useSwiper={false}
-            // onCardClick={handleCardClick}
           />
         )}
 
@@ -122,6 +130,8 @@ export default function MyCharacterPage() {
           entityName={characterToDelete?.name}
           onConfirm={confirmDelete}
         />
+
+        <LimitCharacterModal isOpen={isLimitModalOpen} onClose={() => setIsLimitModalOpen(false)} />
       </div>
     </SectionTransition>
   )
