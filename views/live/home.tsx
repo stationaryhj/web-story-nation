@@ -126,11 +126,11 @@ export default function LiveChatPage() {
   }
 
   // 신고 제출 처리
-  const handleSubmitReport = (reason: string) => {
+  const handleSubmitReport = (reason: string, description: string) => {
     if (!reason) return
 
     // 여기에 신고 제출 로직 추가
-    console.log('신고 제출:', { reportedUser, reason })
+    console.log('신고 제출:', { reportedUser, reason, description })
     setSubmitted(true)
 
     // 3초 후 모달 닫기
@@ -299,7 +299,6 @@ export default function LiveChatPage() {
       <ReportModal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
-        userName={reportedUser}
         onSubmit={handleSubmitReport}
         submitted={submitted}
       />
