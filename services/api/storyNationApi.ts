@@ -930,6 +930,7 @@ export const settlementApi = {
       user_nm,
       resno1,
       resno2,
+      encryption : 1,
     })
   },
 
