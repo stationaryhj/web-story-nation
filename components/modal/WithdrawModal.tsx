@@ -19,7 +19,11 @@ interface WithdrawModalProps {
   bankAccount: BankAccount
   availableAmount: number
   requestAmount: number
+  accountNo1: string
+  accountNo2: string
   onRequestAmountChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onAccountNo1Change: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onAccountNo2Change: (e: React.ChangeEvent<HTMLInputElement>) => void
   onConfirm: () => void
 }
 
@@ -29,7 +33,11 @@ const WithdrawModal = ({
   bankAccount,
   availableAmount,
   requestAmount,
+  accountNo1,
+  accountNo2,
   onRequestAmountChange,
+  onAccountNo1Change,
+  onAccountNo2Change,
   onConfirm,
 }: WithdrawModalProps) => {
   // 모바일 상태 추가
@@ -123,6 +131,38 @@ const WithdrawModal = ({
               </div>
             </div>
             <p className="text-xs text-gray-500 mt-1">최소 1500펜부터 출금 가능합니다.</p>
+          </div>
+
+          {/* 주민등록번호 */}
+          <div className="py-4 mb-4">
+            <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400 mb-2">
+              주민등록번호
+            </label>
+            <div className="flex items-center">
+              <input
+                type="text"
+                value={accountNo1}
+                onChange={onAccountNo1Change}
+                maxLength={6}
+                placeholder="앞 6자리"
+                className="w-[100px] md:w-[120px] rounded-lg border border-secondary-200 px-3 py-2 text-secondary-900 placeholder-secondary-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500"
+              />
+              <span className="mx-2 text-secondary-500 dark:text-dark-secondary-400 font-medium">-</span>
+              <div className="relative flex-1">
+                <input
+                  type="password"
+                  value={accountNo2}
+                  onChange={onAccountNo2Change}
+                  maxLength={7}
+                  placeholder="뒤 7자리"
+                  className="w-[110px] md:w-[130px] rounded-lg border border-secondary-200 px-3 py-2 text-secondary-900 placeholder-secondary-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500"
+                />
+              </div>
+            </div>
+
+            <div className="text-xs text-secondary-500 dark:text-dark-secondary-500 mt-1">
+              개인정보는 안전하게 보호됩니다
+            </div>
           </div>
         </div>
 

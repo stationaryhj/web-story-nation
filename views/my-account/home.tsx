@@ -2,16 +2,12 @@
 
 import {
   faArrowLeft,
-  faChevronRight,
   faCreditCard,
   faMoneyBillWave,
   faCalendarAlt,
   faBuildingColumns,
-  faPencilAlt,
-  faCheck,
   faPen,
   faInfoCircle,
-  faCoins,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useRouter } from 'next/navigation'
@@ -36,36 +32,21 @@ export default function MyEarningsView() {
   // 페이지네이션 상태
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
-  const [profile, setProfile] = useState({
-    bank: '',
-    accountNumber: '',
-    accountHolder: '',
-  })
-
+  
   const { data: userInfo, writerInfo, fetchWriterInfo } = useAccountStore()
   const { openModal } = useModalStore()
 
   // 월별 수익 내역 ( 1: 이번달, 2: 지난달 )
-  const {
-    data: monthlyIncomeV1,
-    isLoading: monthlyIncomeV1Loading,
-    error: monthlyIncomeV1Error,
-    refetch: monthlyIncomeV1Refetch,
-  } = GetMonthlyIncome(2)
+  const { data: monthlyIncomeV1 } = GetMonthlyIncome(2)
 
   // 수익 내역
-  const {
-    data: settlementListData,
-    isLoading: settlementListLoading,
-    error: settlementListError,
-    refetch: settlementListRefetch,
-  } = GetSettlementList(1, currentPage, 50)
+  const { data: settlementListData, isLoading: settlementListLoading } = GetSettlementList(1, currentPage, 50)
+
+  // 출금 상태
+  const { data: writerWithdrawStatus, refetch: writerWithdrawStatusRefetch } = GetWriterWithdrawStatus()
 
   // 수익 내역 데이터 처리
   const [earningItems, setEarningItems] = useState<Array<any>>([])
-
-  // 출금 상태
-  const { data: writerWithdrawStatus } = GetWriterWithdrawStatus()
 
   // 출금 내역
   const {
@@ -85,13 +66,20 @@ export default function MyEarningsView() {
     }>
   >([])
 
+
   // 정산 관련 상태
-  const [totalEarnings, setTotalEarnings] = useState(userInfo?.coin_user || 0) // 총 수익 (펜 단위)
-  const [thisMonthEarnings, setThisMonthEarnings] = useState(monthlyIncomeV1?.monthlyIncome || 0) // 이번달 수익 (펜 단위)
-  const [lastMonthEarnings, setLastMonthEarnings] = useState(35000) // 지난달 수익 (펜 단위)
-  const [totalPayouts, setTotalPayouts] = useState(withdrawRequestList?.sum_price || 0) // 총 정산액 (펜 단위)
-  const [availableAmount, setAvailableAmount] = useState(writerWithdrawStatus?.withdraw_pen || 0) // 정산 가능 금액 (펜 단위)
   const [requestAmount, setRequestAmount] = useState(1500) // 요청 금액 (펜 단위, 최소 1500펜)
+  const [accountNo1, setAccountNo1] = useState('')
+  const [accountNo2, setAccountNo2] = useState('')
+
+  // 이번달 수익
+  const thisMonthEarnings = monthlyIncomeV1?.monthlyIncome || 0
+
+  // 출금 가능 금액
+  const availableAmount = writerWithdrawStatus?.withdraw_pen || 0
+
+  // 출금 신청 가능여부
+  const withdrawAllow = writerWithdrawStatus?.allow == 1 && availableAmount > 1500
 
   // 무한 스크롤을 위한 관찰자 ref
   const observerRef = useRef<IntersectionObserver | null>(null)
@@ -223,10 +211,19 @@ export default function MyEarningsView() {
       return
     }
 
-    const response = await settlementApi.WithdrawRequest(requestAmount, 0, userInfo?.nick_nm || '', '', '')
+    // encryption=1이면 resno1, resno2를 base64 암호화
+    const resno1 = accountNo1.length > 0 ? Buffer.from(accountNo1).toString('base64') : ''
+    const resno2 = accountNo2.length > 0 ? Buffer.from(accountNo2).toString('base64') : ''
+
+    // 출금 요청
+    const response = await settlementApi.WithdrawRequest(requestAmount, 0, userInfo?.nick_nm || '', resno1, resno2)
 
     if (response.data.result.err === 0) {
       toast.success('출금 요청이 접수되었습니다.')
+
+        // 출금 요청 상태 갱신
+      writerWithdrawStatusRefetch()
+      withdrawRequestListRefetch()
     } else {
       toast.error('출금 요청에 실패했습니다.')
     }
@@ -240,6 +237,14 @@ export default function MyEarningsView() {
     setRequestAmount(value)
   }
 
+  // 주민등록번호 변경 핸들러
+  const handleAccountNo1Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAccountNo1(e.target.value)
+  }
+
+  const handleAccountNo2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAccountNo2(e.target.value)
+  }
   // 금액 포맷 함수 - 펜 단위로 변경
   const formatPen = (amount: number) => {
     return amount.toLocaleString('ko-KR')
@@ -278,7 +283,7 @@ export default function MyEarningsView() {
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <h2 className="text-lg font-semibold mb-4">쌓은 펜</h2>
             <div className="text-3xl font-bold text-violet-700 mb-4 flex items-center">
-              {formatPen(totalEarnings)}
+              {formatPen(availableAmount)}
               <FontAwesomeIcon icon={faPen} className="ml-2 text-violet-700" />
             </div>
             <div className="flex justify-between items-center mb-4">
@@ -293,12 +298,12 @@ export default function MyEarningsView() {
                 onClick={handleWithdrawRequest}
                 color="gradient"
                 className="w-full py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 !text-white hover:from-violet-700 hover:to-fuchsia-700 !border-transparent"
-                disabled={availableAmount < 1500}
+                disabled={!withdrawAllow}
               >
                 <FontAwesomeIcon icon={faMoneyBillWave} className="mr-2" />
                 출금 신청하기
               </BaseButton>
-              {availableAmount < 1500 && (
+              {!withdrawAllow &&(
                 <p className="text-sm text-red-500 mt-2">* 최소 1500펜 이상부터 출금 가능합니다.</p>
               )}
             </div>
@@ -437,8 +442,12 @@ export default function MyEarningsView() {
         bankAccount={bankAccount}
         availableAmount={availableAmount}
         requestAmount={requestAmount}
+        accountNo1={accountNo1}
+        accountNo2={accountNo2}
         onRequestAmountChange={handleRequestAmountChange}
         onConfirm={handleConfirmWithdraw}
+        onAccountNo1Change={handleAccountNo1Change}
+        onAccountNo2Change={handleAccountNo2Change}
       />
 
       {/* react-toastify 컨테이너 */}
