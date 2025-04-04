@@ -104,11 +104,11 @@ export default function BaseModal({
 
   // 모달 크기에 따른 클래스 설정
   const sizeClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
-    xl: 'max-w-xl',
-    full: 'max-w-[1300px] mx-4',
+    sm: 'w-[375px] min-w-[375px] max-w-[375px]',
+    md: 'w-[375px] min-w-[375px] max-w-[375px]',
+    lg: 'w-full min-w-[375px] max-w-lg',
+    xl: 'w-full min-w-[375px] max-w-xl',
+    full: 'w-full min-w-[375px] max-w-[1300px] mx-4',
   }
 
   // 모달 위치에 따른 클래스 설정
@@ -157,7 +157,7 @@ export default function BaseModal({
     <AnimatePresence onExitComplete={onAnimationComplete}>
       {isOpen && (
         <Portal>
-          <div className={`fixed inset-0 z-[100] flex ${positionClasses[position]}`}>
+          <div className={`fixed inset-0 z-[100] flex min-w-[375px] ${positionClasses[position]}`}>
             {/* 백드롭 */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -173,7 +173,7 @@ export default function BaseModal({
               {...getAnimationProps()}
               className={`relative z-[101] max-h-[95vh] overflow-auto rounded-xl bg-white shadow-lg dark:bg-dark-background-light ${sizeClasses[size]} ${className}`}
               onClick={handleModalClick}
-              style={style}
+              style={{ ...style, minWidth: '375px' }}
             >
               {/* 모달 헤더 - 닫기 버튼만 포함 */}
               {!hideHeader && showCloseButton && (

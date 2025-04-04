@@ -20,7 +20,7 @@ export default function MyCharacterPage() {
   const [characterToDelete, setCharacterToDelete] = useState<Character | null>(null)
 
   const myNickName = useAccountStore.getState().data?.nick_nm
-  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 10)
+  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 30)
   console.log(inProgressData)
 
   const myCharacters = bridgeCharbotGetListMineDataToCharacter(inProgressData?.chrbotList.data || []).map(char => ({
@@ -35,9 +35,11 @@ export default function MyCharacterPage() {
     category: (char.category || 'unspecified') as 'unspecified' | 'male' | 'female',
   }))
 
+  console.log('myCharacters', myCharacters)
+
   // 캐릭터 카드 클릭 처리
   const handleCardClick = (character: Character) => {
-    if(character.finish_yn === 1) {
+    if (character.finish_yn === 1) {
       router.push(`/chat/${character.id}`)
     }
   }
