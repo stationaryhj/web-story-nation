@@ -91,7 +91,7 @@ export default function BasicInfoForm({
 
   // 게시 범위 선택 핸들러
   const handleVisibilitySelect = (visibility: 'public' | 'private') => {
-    
+
     // 이미 공개된 캐릭터라면 비공개로 변경 불가능
     if(formData.isVisibilityLock) {
       toast.error('공개된 캐릭터는 비공개로 전환할 수 없어요!')
@@ -239,7 +239,7 @@ export default function BasicInfoForm({
                     : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
                 }`}
               >
-                미정
+                알 수 없음
               </button>
             </div>
           </div>
