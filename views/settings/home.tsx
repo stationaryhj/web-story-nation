@@ -2,8 +2,6 @@
 
 import {
   faArrowLeft,
-  faCheck,
-  faChevronDown,
   faChevronRight,
   faCircleUser,
   faImage,
@@ -19,10 +17,10 @@ import 'react-toastify/dist/ReactToastify.css'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import { useSettingsStore } from '@/store/useStoreSettings'
 import { contentApi } from '@/services/api/storyNationApi'
-import { useModalStore } from '@/store/useStoreModal'
 import { useBankStore } from '@/store/useGlobalStore'
 import DeleteAccountModal from '@/components/modal/DeleteAccountModal'
 import DuplicateCheckModal from '@/components/modal/DuplicateCheckModal'
+import { getImageUri } from '@/lib/utils/storyNationUtil'
 
 const getPlatform = (sns_type: number) => {
   switch (sns_type) {
@@ -48,30 +46,28 @@ const getPlatform = (sns_type: number) => {
 export default function SettingsForm() {
   const router = useRouter()
   const [isEdited, setIsEdited] = useState(false)
-  const [isNicknameVerified, setIsNicknameVerified] = useState(true)
   const [isNicknameChanged, setIsNicknameChanged] = useState(false)
   const [originalNickname, setOriginalNickname] = useState('')
-  const [activeTab, setActiveTab] = useState<'support' | 'terms' | 'privacy' | 'paid' | 'policy'>('support')
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showDuplicateCheckModal, setShowDuplicateCheckModal] = useState(false)
 
-  const { settings, updateProfile, updateBankAccount, setLanguage, uploadProfileImage } = useSettingsStore()
-  const { data: userInfo, writerInfo, fetchWriterInfo, logout, getCoinSum } = useAccountStore()
-  const { openModal } = useModalStore()
-  const { bankList, getBankList } = useBankStore()
+  const { settings } = useSettingsStore()
+  const { data: userInfo, writerInfo, fetchWriterInfo, logout, getCoinSum, uploadProfileImage } = useAccountStore()
+  const { getBankList } = useBankStore()
 
   // 사용자 정보 상태
   const [profile, setProfile] = useState({
     nickname: userInfo?.nick_nm || '',
-    email: '',
     platform: getPlatform(Number(userInfo?.sns_type)) || '',
-    bank: settings.bankAccount.bank || '',
-    accountNumber: settings.bankAccount.accountNumber || '',
-    accountHolder: settings.bankAccount.accountHolder || '',
-    language: settings.language || 'ko',
-    profileImage: (userInfo?.image_url ?? '') + (userInfo?.profile_url ?? '') || null,
     minor: userInfo?.minor || 0,
     intro: userInfo?.intro || '',
+
+    email: writerInfo?.email || '',
+    bank: writerInfo?.bank_nm || '',
+    accountNumber: writerInfo?.account_no || '',
+    accountHolder: writerInfo?.user_nm || '',
+
+    language: settings.language || 'ko',
   })
 
   // 페르소나 설정
@@ -82,12 +78,7 @@ export default function SettingsForm() {
 
   // 이미지 업로드를 위한 참조
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  // 은행 목록 드롭다운
-  const [showBankList, setShowBankList] = useState(false)
-  const bankDropdownRef = useRef<HTMLDivElement>(null)
-
-  
+  const profileImage = getImageUri(userInfo?.profile_url) || null
 
 
   // 은행 리스트 가져오기
@@ -124,26 +115,12 @@ export default function SettingsForm() {
   // 닉네임 변경 감지
   useEffect(() => {
     if (profile.nickname === originalNickname) {
-      setIsNicknameVerified(true)
+      // setIsNicknameVerified(true)
       setIsNicknameChanged(false)
     } else {
       setIsNicknameChanged(true)
     }
   }, [profile.nickname, originalNickname])
-
-  // 은행 드롭다운 외부 클릭 감지
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (bankDropdownRef.current && !bankDropdownRef.current.contains(event.target as Node)) {
-        setShowBankList(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
 
 
   // 닉네임 중복 체크 핸들러
@@ -154,10 +131,10 @@ export default function SettingsForm() {
 
       if (isAvailable) {
         setShowDuplicateCheckModal(true)
-        setIsNicknameVerified(true)
+        // setIsNicknameVerified(true)
       } else {
         toast.error('사용할 수 없는 닉네임입니다.')
-        setIsNicknameVerified(false)
+        // setIsNicknameVerified(false)
       }
     } catch (error) {
       console.error('닉네임 중복 확인 중 오류:', error)
@@ -172,7 +149,7 @@ export default function SettingsForm() {
       nickname: originalNickname,
     }))
     setIsNicknameChanged(false)
-    setIsNicknameVerified(false)
+    // setIsNicknameVerified(false)
     setShowDuplicateCheckModal(false)
   }
 
@@ -192,7 +169,7 @@ export default function SettingsForm() {
       
       if (isSuccess) {
         setOriginalNickname(profile.nickname)
-        setIsNicknameVerified(true)
+        // setIsNicknameVerified(true)
         setIsNicknameChanged(false)
         toast.success('닉네임이 성공적으로 저장되었습니다.')
       } else {
@@ -292,15 +269,94 @@ export default function SettingsForm() {
     }
   }
 
+  // 이미지를 아마존에 업로드
+  const handleImageUpS3 = async (file: File, reader: FileReader) => {
+    const extension = file.name.split('.').pop()?.toLowerCase()
+    const contentType = file.type
+
+    if (!contentType.startsWith('image/')) {
+      toast.error('이미지 파일만 업로드할 수 있습니다')
+      return
+    }
+
+    const presignedResponse = await contentApi.GetPresignedUrl(file.name, `.${extension || 'jpg'}`, 5)
+    if (presignedResponse.data.result.err !== 0 || !presignedResponse.data.presignedUrl) {
+      throw new Error('이미지 업로드를 위한 URL을 받아오지 못했습니다')
+    }
+
+    const presignedUrl = presignedResponse.data.presignedUrl
+    const s3FilePath = presignedResponse.data.path
+
+    // upload
+    const img = new window.Image()
+    img.src = reader.result as string
+
+    img.onload = async () => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+
+      // 이미지 최대 크기 설정 (가로/세로 최대 1024px)
+      const MAX_SIZE = 1024
+      let width = img.width
+      let height = img.height
+
+      if (width > height && width > MAX_SIZE) {
+        height = Math.round((height * MAX_SIZE) / width)
+        width = MAX_SIZE
+      } else if (height > MAX_SIZE) {
+        width = Math.round((width * MAX_SIZE) / height)
+        height = MAX_SIZE
+      }
+
+      canvas.width = width
+      canvas.height = height
+      ctx?.drawImage(img, 0, 0, width, height)
+
+      // 압축된 이미지를 Blob으로 변환
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8)
+
+      // Base64 데이터 URL에서 바이너리 데이터 추출
+      const base64Data = dataUrl.split(',')[1]
+      const binaryData = atob(base64Data)
+      const arrayBuffer = new ArrayBuffer(binaryData.length)
+      const uint8Array = new Uint8Array(arrayBuffer)
+
+      for (let i = 0; i < binaryData.length; i++) {
+        uint8Array[i] = binaryData.charCodeAt(i)
+      }
+
+      const blob = new Blob([uint8Array], { type: 'image/jpeg' })
+
+      // S3에 이미지 업로드
+      try {
+        await fetch(presignedUrl, {
+          method: 'PUT',
+          body: blob,
+          headers: {
+            'Content-Type': 'image/jpeg',
+          },
+        })
+
+        uploadProfileImage(s3FilePath)
+        toast.success('이미지가 성공적으로 업로드되었습니다')
+      } catch (error) {
+        console.error('이미지 업로드 중 오류:', error)
+        toast.error('이미지 업로드 중 오류가 발생했습니다')
+      }
+    }
+  }
+
   // 이미지 업로드 핸들러
-  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       const reader = new FileReader()
-      reader.onloadend = () => {
-        const imageUrl = reader.result as string
-        setProfile(prev => ({ ...prev, profileImage: imageUrl }))
-        uploadProfileImage(imageUrl)
+      reader.onloadend = async () => {
+        // upload
+        await handleImageUpS3(file, reader);
+
+        // const imageUrl = reader.result as string
+        // setProfile(prev => ({ ...prev, profileImage: imageUrl }))
         setIsEdited(true)
       }
       reader.readAsDataURL(file)
@@ -309,7 +365,6 @@ export default function SettingsForm() {
 
   // 이미지 삭제 핸들러
   const handleDeleteImage = () => {
-    setProfile(prev => ({ ...prev, profileImage: null }))
     uploadProfileImage('')
     setIsEdited(true)
   }
@@ -340,7 +395,6 @@ export default function SettingsForm() {
 
   // 탭 변경 핸들러
   const handleTabChange = (tab: 'support' | 'terms' | 'privacy' | 'paid' | 'policy') => {
-    setActiveTab(tab)
 
     // 각 탭에 따라 다른 페이지로 이동
     switch (tab) {
@@ -362,31 +416,6 @@ export default function SettingsForm() {
     }
   }
 
-  // 은행 선택 핸들러
-  const handleBankSelect = (bank: string) => {
-    setProfile(prev => ({ ...prev, bank }))
-    setShowBankList(false)
-    setIsEdited(true)
-  }
-
-  // 이메일 저장 핸들러
-  const handleSaveEmail = async () => {
-    try {
-      // useAccountStore의 updateWriterEmail 함수 사용
-      const { updateWriterEmail } = useAccountStore.getState()
-
-      const result = await updateWriterEmail(profile.email)
-
-      if (result.success) {
-        toast.success(result.message)
-      } else {
-        toast.error(result.message)
-      }
-    } catch (error) {
-      console.error('이메일 저장 중 오류 발생:', error)
-      toast.error('이메일 저장 중 오류가 발생했습니다.')
-    }
-  }
 
   // 본인 인증 핸들러
   const handleAdultVerification = async () => {
@@ -447,9 +476,9 @@ export default function SettingsForm() {
             <div className="flex flex-col items-center">
               <div className="relative mb-4">
                 <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-                  {profile.profileImage ? (
+                  {profileImage ? (
                     <Image
-                      src={profile.profileImage}
+                      src={profileImage}
                       alt="프로필"
                       width={96}
                       height={96}
@@ -466,7 +495,7 @@ export default function SettingsForm() {
                   >
                     <FontAwesomeIcon icon={faImage} className="text-sm" />
                   </button>
-                  {profile.profileImage && (
+                  {profileImage && (
                     <button
                       onClick={handleDeleteImage}
                       className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shadow-md hover:bg-red-600"
