@@ -10,8 +10,7 @@ interface ToggleSwitchProps {
 }
 
 export default function ToggleSwitch({ label = '짜릿모드', className = '' }: ToggleSwitchProps) {
-  const { isAdultModeEnabled, toggleAdultMode, isLoggedIn } = useSettingsStore()
-  const { openModal } = useModalStore()
+  const { isAdultModeEnabled, toggleAdultMode } = useSettingsStore()
   const [mounted, setMounted] = useState(false)
 
   // hydration 오류 방지를 위한 마운트 체크

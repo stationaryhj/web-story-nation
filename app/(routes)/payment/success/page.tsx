@@ -20,9 +20,9 @@ function PaymentSuccessContent() {
   const [error, setError] = useState<string | null>(null);
   const { updateAccountData, data: accountData } = useAccountStore()
 
-  const paymentKey = searchParams.get('paymentKey');
-  const orderId = searchParams.get('orderId');
-  const amount = searchParams.get('amount');
+  const paymentKey = searchParams?.get('paymentKey');
+  const orderId = searchParams?.get('orderId');
+  const amount = searchParams?.get('amount');
 
   useEffect(() => {
     if (!paymentKey || !orderId || !amount) {

@@ -21,7 +21,7 @@ export default function TermsPage() {
 
   // URL 쿼리에서 탭 파라미터 읽기
   useEffect(() => {
-    const tabParam = searchParams.get('tab')
+    const tabParam = searchParams?.get('tab')
     if (tabParam && ['terms', 'privacy', 'paid', 'policy'].includes(tabParam)) {
       setActiveTab(tabParam as 'terms' | 'privacy' | 'paid' | 'policy')
     }

@@ -19,7 +19,7 @@ export default function NavigationTabs({ onCategoryChange, onSearch, className =
   const searchParams = useSearchParams()
 
   // URL 파라미터에서 현재 탭 가져오기
-  const tabParam = searchParams.get('tab')
+  const tabParam = searchParams?.get('tab')
 
   // 초기 상태 설정
   const initialTabId = tabParam || 'all'
@@ -27,7 +27,7 @@ export default function NavigationTabs({ onCategoryChange, onSearch, className =
 
   // URL 파라미터 업데이트
   const updateUrlParams = (tabId: string) => {
-    const params = new URLSearchParams(searchParams.toString())
+    const params = new URLSearchParams(searchParams?.toString() || '')
 
     if (tabId !== 'all') {
       params.set('tab', tabId)
@@ -36,7 +36,7 @@ export default function NavigationTabs({ onCategoryChange, onSearch, className =
     }
 
     // 태그 파라미터는 유지
-    const tagsParam = searchParams.get('tags')
+    const tagsParam = searchParams?.get('tags')
     if (tagsParam) {
       params.set('tags', tagsParam)
     }
