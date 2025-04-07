@@ -150,6 +150,8 @@ export default function ImageUploadForm({
               },
             })
 
+            console.log(isNormalImage , isAdultImage)
+
             if (isNormalImage) {
               if (isAdultImage) {
                 setAdultNormalImage(s3FilePath)
@@ -173,9 +175,23 @@ export default function ImageUploadForm({
     }
   }
 
+  // 전체 이용가 이미지 삭제
   const handleImageDelete = () => {
     console.log('click delete')
+    setNormalImage('')
   }
+
+  // 성인 노멀 이미지 삭제
+  const handleImageDeleteAdultNormal = () => {
+    setAdultNormalImage('')
+  }
+
+  // 성인 이미지 삭제
+  const handleImageDeleteAdult = () => {
+    setAdultImage('')
+  }
+
+
   return (
     <div className="space-y-6">
       {/* 이용등급 */}
@@ -187,17 +203,21 @@ export default function ImageUploadForm({
         {formData.rating === 'all' && (
           <>
             {/* 현재 이미지 표시 */}
-            {formData.imgUrl && (
+            {formData.imgUrl ? (
               <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
                 <Image src={imgNormal} alt="캐릭터 일반 이미지" fill className="object-cover" />
                 <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
                   전체이용가 이미지
                 </div>
+                <div
+                  className="absolute top-1 right-1 cursor-pointer hover:text-red-500 transition-colors duration-200"
+                  onClick={() => handleImageDelete()}
+                >
+                  <Trash2 />
+                </div>
               </div>
-            )}
-
-            {/* 이미지 업로드 버튼 */}
-            <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
+            ) : (
+              <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
               <input
                 type="file"
                 accept="image/*"
@@ -209,6 +229,7 @@ export default function ImageUploadForm({
                 <span className="text-xs sm:text-sm">{formData.imgUrl ? '이미지 교체' : '이미지 업로드'}</span>
               </div>
             </label>
+            )}
           </>
         )}
 
@@ -226,7 +247,7 @@ export default function ImageUploadForm({
             </div>
 
             {/* 기본 이미지 표시 */}
-            {formData.imgUrl && (
+            {formData.imgWebUrl ? (
               <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
                 <Image src={imgNormalWeb} alt="캐릭터 기본 이미지" fill className="object-cover" />
                 <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
@@ -234,15 +255,13 @@ export default function ImageUploadForm({
                 </div>
                 <div
                   className="absolute top-1 right-1 cursor-pointer hover:text-red-500 transition-colors duration-200"
-                  onClick={() => handleImageDelete()}
+                  onClick={() => handleImageDeleteAdultNormal()}
                 >
                   <Trash2 />
                 </div>
               </div>
-            )}
-
-            {/* 기본 이미지 업로드 버튼 */}
-            <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
+            ) : (
+              <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
               <input type="file" accept="image/*" onChange={e => handleImageUpload(e, true, true)} className="hidden" />
               <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
                 <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
@@ -251,6 +270,8 @@ export default function ImageUploadForm({
                 </span>
               </div>
             </label>
+            )}
+
 
             {/* 구분선 */}
             <div className="col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5 my-4 border-t border-secondary-200 dark:border-dark-secondary-200/10"></div>
@@ -266,7 +287,7 @@ export default function ImageUploadForm({
             </div>
 
             {/* 성인 이미지 표시 */}
-            {formData.imgUrlNsfw && (
+            {formData.imgUrlNsfw ? (
               <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
                 <Image src={imgNsfw} alt="캐릭터 성인 이미지" fill className="object-cover" />
                 <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
@@ -274,15 +295,13 @@ export default function ImageUploadForm({
                 </div>
                 <div
                   className="absolute top-1 right-1 cursor-pointer hover:text-red-500 transition-colors duration-200"
-                  onClick={() => handleImageDelete()}
+                  onClick={() => handleImageDeleteAdult()}
                 >
                   <Trash2 />
                 </div>
               </div>
-            )}
-
-            {/* 성인 이미지 업로드 버튼 */}
-            <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
+            ) : (
+              <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
               <input
                 type="file"
                 accept="image/*"
@@ -296,6 +315,23 @@ export default function ImageUploadForm({
                 </span>
               </div>
             </label>
+            )}
+
+            {/* 성인 이미지 업로드 버튼 */}
+            {/* <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e => handleImageUpload(e, true, false)}
+                className="hidden"
+              />
+              <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
+                <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
+                <span className="text-xs sm:text-sm">
+                  {formData.imgUrlNsfw ? '짜릿 모드 이미지 교체' : '짜릿 모드 이미지 업로드'}
+                </span>
+              </div>
+            </label> */}
           </>
         )}
       </div>
