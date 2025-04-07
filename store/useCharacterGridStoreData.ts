@@ -1,7 +1,5 @@
-import { ModuleCharacter } from '@/types/api'
 import { create } from 'zustand'
 import { contentApi } from '@/services/api'
-import { QueryClient } from '@tanstack/react-query'
 import { Character } from '@/store/useStoreData'
 import { CATEGORIES } from '@/services/hooks/DataListManager'
 import { bridgeCharacterDataToCharacter } from '@/lib/utils/storyNationUtil'
@@ -14,141 +12,123 @@ interface Tag {
   sort: number;
 }
 
-// 싱글톤 queryClient 생성 (최초 한 번만 생성)
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5분 동안 데이터를 신선하게 유지
-      gcTime: 1000 * 60 * 30, // 30분 동안 데이터 캐싱 (이전의 cacheTime)
-      retry: 1, // 실패시 1번 재시도
-      refetchOnWindowFocus: false, // 윈도우 포커스시 자동 리페치 비활성화
-    },
-  },
-})
+// 필터 인터페이스
+interface Filter {
+  order: number; // 1: 인기순(기본값), 2: 최신순
+  nsfw: number; // 1: 짜릿모드 가능, 2: 전체 이용가(기본값), 3: 이용등급 전체
+}
 
-//   그 외 남자, 여자, 성별모름
-interface MainStoreCharacterGridStoreData {
-  // 캐릭터 데이터 관련
-  characters: Array<Character> | [];
-  moduleCharacters: Array<ModuleCharacter> | [];
+// 상태 인터페이스
+interface CharacterGridState {
+  // 기본 데이터
+  characters: Character[];
+  tags: Tag[];
+  
+  // 필터 및 카테고리 설정
   currentCategory: string;
   currentTags: string[];
+  filter: Filter;
+  
+  // 페이지네이션
   pagination: {
     page: number;
     total: number;
     hasMore: boolean;
   };
-  filter: {
-    order: number; // 1: 인기순(기본값), 2: 최신순
-    nsfw: number; // 1: 짜릿모드 가능, 2: 전체 이용가(기본값), 3: 이용등급 전체
-  };
   
-  // 태그 데이터 관련
-  tags: Array<Tag>;
+  // 로딩 상태
+  isLoading: boolean;
   isTagsLoading: boolean;
+  error: Error | null;
   tagsError: Error | null;
   
-  isLoading: boolean;
-  error: Error | null;
-  
-  initialize: (categoryId: string, tags?: string[]) => Promise<void>;
-  invalidateData: () => Promise<void>;
-  updateFilter: (filter: { order?: number; nsfw?: number }) => void;
-  loadMore: () => Promise<void>;
-  loadTags: (categoryId: number) => Promise<void>;
+  // 데이터 없음 플래그
+  isEmpty: boolean;
 }
 
-export const useCharacterGridStoreData = create<MainStoreCharacterGridStoreData>((set, get) => ({
-  // 캐릭터 데이터 초기값
+// 액션 인터페이스
+interface CharacterGridActions {
+  // 초기화 및 데이터 로드
+  changeCategory: (categoryId: string) => Promise<void>;
+  updateFilter: (newFilter: Partial<Filter>) => Promise<void>;
+  updateTags: (tagIds: string[]) => Promise<void>;
+  loadMore: () => Promise<void>;
+  reset: () => void;
+}
+
+// 전체 스토어 타입
+type CharacterGridStore = CharacterGridState & CharacterGridActions;
+
+export const useCharacterGridStoreData = create<CharacterGridStore>((set, get) => ({
+  // 기본 데이터
   characters: [],
-  moduleCharacters: [],
+  tags: [],
+  
+  // 필터 및 카테고리 설정
   currentCategory: 'all',
   currentTags: [],
-  pagination: {
-    page: 1,
-    total: 0,
-    hasMore: false
-  },
   filter: {
     order: 1, // 인기순
     nsfw: 2, // 전체 이용가
   },
   
-  // 태그 데이터 초기값
-  tags: [],
+  // 페이지네이션
+  pagination: {
+    page: 1,
+    total: 0,
+    hasMore: false,
+  },
+  
+  // 로딩 상태
+  isLoading: false,
   isTagsLoading: false,
+  error: null,
   tagsError: null,
   
-  isLoading: false,
-  error: null,
+  // 데이터 없음 플래그
+  isEmpty: false,
+  
+  /**
+   * 카테고리 변경 및 데이터 초기화
+   */
+  changeCategory: async (categoryId: string) => {
+    // 이미 같은 카테고리면 아무것도 하지 않음
+    if (get().currentCategory === categoryId) return;
 
-  // 태그 데이터 로드 메서드
-  loadTags: async (categoryId: number) => {
-    set({ isTagsLoading: true, tagsError: null });
-    
-    try {
-      // React Query를 통해 태그 데이터 요청
-      const data = await queryClient.fetchQuery({
-        queryKey: ['tagRanking', categoryId],
-        queryFn: async () => {
-          const response = await contentApi.GetTagRankingList(categoryId);
-          return response?.data;
-        },
-        staleTime: 1000 * 60 * 10 // 10분
-      });
-      
-      if (data && data.charbot_tag) {
-        set({ tags: data.charbot_tag, isTagsLoading: false });
-      } else {
-        set({ 
-          isTagsLoading: false, 
-          tagsError: new Error('태그 데이터가 없습니다'), 
-          tags: [] 
-        });
-      }
-    } catch (error) {
-      console.error("태그 데이터 로딩 중 오류 발생:", error);
-      set({ isTagsLoading: false, tagsError: error as Error });
-    }
-  },
-
-  // 초기 데이터 불러오기
-  initialize: async (categoryId, tags = []) => {
-    // 초기화 및 로딩 상태 설정
-    set({ 
-      isLoading: true, 
+    // 상태 초기화 및 로딩 시작
+    set({
+      isLoading: true,
       error: null,
       currentCategory: categoryId,
-      currentTags: tags,
+      currentTags: [], // 카테고리 변경 시 태그 초기화
       pagination: {
         page: 1,
         total: 0,
         hasMore: false
       },
-      characters: []
+      characters: [], // 캐릭터 목록 초기화
+      isEmpty: false, // 데이터 없음 상태 초기화
     });
     
+    // 병렬로 태그 데이터 로드 시작 (별도 함수로 분리)
+    const categoryIdNum = CATEGORIES.find(cat => cat.id === categoryId)?.type || 1
+    loadTagsForCategory(Number(categoryIdNum));
+    
     try {
-      const { filter, currentTags } = get();
+      // 캐릭터 데이터 로드
+      const { filter } = get();
+      const response = await contentApi.GetList(
+        categoryId === 'all' ? 'recommend' : categoryIdNum.toString(),
+        '', // 태그 초기화 (빈 문자열)
+        filter.nsfw,
+        filter.order,
+        1, // 페이지 1로 초기화
+        10 // 한 번에 가져올 아이템 수
+      );
       
-      // React Query를 통해 데이터 요청
-      const data = await queryClient.fetchQuery({
-        queryKey: ['characterGrid', categoryId, filter.nsfw, filter.order, tags.join(',')],
-        queryFn: async () => {
-          const response = await contentApi.GetList(
-            categoryId === 'all' ? 'recommend' : CATEGORIES.find(cat => cat.id === categoryId)?.type || '1',
-            tags.join(','),
-            filter.nsfw,
-            filter.order,
-            1, // 페이지
-            10 // 한 번에 가져올 아이템 수
-          );
-          return response?.data;
-        },
-        staleTime: 1000 * 60 * 5 // 5분
-      });
+      const data = response?.data;
       
-      if (data?.chrbotList?.data) {
+      if (data?.chrbotList?.data && data.chrbotList.data.length > 0) {
         // ModuleCharacter 형식으로 변환
         const moduleData = data.chrbotList.data.map(item => ({
           world_list_detail_chrbot_key: item.world_list_detail_chrbot_key,
@@ -171,64 +151,234 @@ export const useCharacterGridStoreData = create<MainStoreCharacterGridStoreData>
         // Character 형식으로 변환
         const newCharacters = bridgeCharacterDataToCharacter(moduleData);
         
-        // Zustand 스토어 업데이트
-        set({ 
-          moduleCharacters: moduleData,
+        // 상태 업데이트
+        set({
           characters: newCharacters,
           pagination: {
             page: 1,
             total: data.chrbotList.total || 0,
             hasMore: data.chrbotList.current_page < data.chrbotList.last_page
           },
-          isLoading: false
+          isLoading: false,
+          isEmpty: false
         });
       } else {
-        set({ 
-          isLoading: false, 
-          error: new Error('데이터가 없습니다'),
-          characters: []
+        // 데이터가 없는 경우
+        set({
+          characters: [],
+          pagination: {
+            page: 1,
+            total: 0,
+            hasMore: false
+          },
+          isLoading: false,
+          isEmpty: true
         });
       }
     } catch (error) {
-      console.error("캐릭터 그리드 데이터 로딩 중 오류 발생:", error);
-      set({ isLoading: false, error: error as Error });
+      console.error("카테고리 변경 후 데이터 로드 중 오류 발생:", error);
+      set({
+        isLoading: false,
+        error: error as Error,
+        isEmpty: true
+      });
     }
   },
   
-  // 데이터를 무효화하고 다시 가져오는 함수
-  invalidateData: async () => {
-    const { currentCategory, currentTags, filter } = get();
-    const categoryIdNumber = Number(CATEGORIES.find(cat => cat.id === currentCategory)?.type || 0);
+  /**
+   * 필터 업데이트 (정렬, NSFW 등)
+   */
+  updateFilter: async (newFilter: Partial<Filter>) => {
+    // 현재 필터와 새 필터 병합
+    const updatedFilter = { ...get().filter, ...newFilter };
     
-    // 캐릭터 데이터 무효화
-    await queryClient.invalidateQueries({ 
-      queryKey: ['characterGrid', currentCategory, filter.nsfw, filter.order, currentTags.join(',')]
+    // 변경이 없으면 아무것도 하지 않음
+    if (JSON.stringify(updatedFilter) === JSON.stringify(get().filter)) {
+      return;
+    }
+    
+    // 필터 업데이트 및 로딩 시작
+    set({
+      filter: updatedFilter,
+      isLoading: true,
+      error: null,
+      pagination: {
+        page: 1, // 페이지 1로 초기화
+        total: 0,
+        hasMore: false
+      },
+      characters: [], // 캐릭터 목록 초기화
+      isEmpty: false, // 데이터 없음 상태 초기화
     });
     
-    // 태그 데이터 무효화
-    await queryClient.invalidateQueries({ 
-      queryKey: ['tagRanking', categoryIdNumber]
-    });
-    
-    // 데이터 다시 로드
-    get().initialize(currentCategory, currentTags);
+    try {
+      const { currentCategory, currentTags } = get();
+      const response = await contentApi.GetList(
+        currentCategory === 'all' ? 'recommend' : CATEGORIES.find(cat => cat.id === currentCategory)?.type || '1',
+        currentTags.join(','),
+        updatedFilter.nsfw,
+        updatedFilter.order,
+        1, // 페이지 1로 초기화
+        10 // 한 번에 가져올 아이템 수
+      );
+      
+      const data = response?.data;
+      
+      if (data?.chrbotList?.data && data.chrbotList.data.length > 0) {
+        // ModuleCharacter 형식으로 변환
+        const moduleData = data.chrbotList.data.map(item => ({
+          world_list_detail_chrbot_key: item.world_list_detail_chrbot_key,
+          title: item.title,
+          intro: item.intro,
+          img_url: item.img_url,
+          img_web_url: item.img_web_url || item.img_url,
+          lv: item.lv,
+          tags: item.tags,
+          chat_cnt: item.chat_cnt,
+          msg_cnt: item.msg_cnt,
+          like_cnt: item.like_cnt,
+          create_dt: item.create_dt,
+          nick_nm: item.nick_nm,
+          nsfw: item.nsfw,
+          module_id: 0,
+          sort: 0,
+        }));
+        
+        // Character 형식으로 변환
+        const newCharacters = bridgeCharacterDataToCharacter(moduleData);
+        
+        // 상태 업데이트
+        set({
+          characters: newCharacters,
+          pagination: {
+            page: 1,
+            total: data.chrbotList.total || 0,
+            hasMore: data.chrbotList.current_page < data.chrbotList.last_page
+          },
+          isLoading: false,
+          isEmpty: false
+        });
+      } else {
+        // 데이터가 없는 경우
+        set({
+          characters: [],
+          pagination: {
+            page: 1,
+            total: 0,
+            hasMore: false
+          },
+          isLoading: false,
+          isEmpty: true
+        });
+      }
+    } catch (error) {
+      console.error("필터 변경 후 데이터 로드 중 오류 발생:", error);
+      set({
+        isLoading: false,
+        error: error as Error,
+        isEmpty: true
+      });
+    }
   },
   
-  // 필터 업데이트
-  updateFilter: (filterUpdate) => {
-    const currentFilter = get().filter;
-    set({ 
-      filter: { ...currentFilter, ...filterUpdate } 
+  /**
+   * 태그 업데이트
+   */
+  updateTags: async (tagIds: string[]) => {
+    // 이미 같은 태그 선택이면 아무것도 하지 않음
+    if (JSON.stringify(get().currentTags) === JSON.stringify(tagIds)) {
+      return;
+    }
+    
+    // 태그 업데이트 및 로딩 시작
+    set({
+      currentTags: tagIds,
+      isLoading: true,
+      error: null,
+      pagination: {
+        page: 1, // 페이지 1로 초기화
+        total: 0,
+        hasMore: false
+      },
+      characters: [], // 캐릭터 목록 초기화
+      isEmpty: false, // 데이터 없음 상태 초기화
     });
-    // 필터 변경 시 데이터 다시 로드
-    setTimeout(() => {
-      get().invalidateData();
-    }, 0);
+    
+    try {
+      const { currentCategory, filter } = get();
+      const response = await contentApi.GetList(
+        currentCategory === 'all' ? 'recommend' : CATEGORIES.find(cat => cat.id === currentCategory)?.type || '1',
+        tagIds.join(','),
+        filter.nsfw,
+        filter.order,
+        1, // 페이지 1로 초기화
+        10 // 한 번에 가져올 아이템 수
+      );
+      
+      const data = response?.data;
+      
+      if (data?.chrbotList?.data && data.chrbotList.data.length > 0) {
+        // ModuleCharacter 형식으로 변환
+        const moduleData = data.chrbotList.data.map(item => ({
+          world_list_detail_chrbot_key: item.world_list_detail_chrbot_key,
+          title: item.title,
+          intro: item.intro,
+          img_url: item.img_url,
+          img_web_url: item.img_web_url || item.img_url,
+          lv: item.lv,
+          tags: item.tags,
+          chat_cnt: item.chat_cnt,
+          msg_cnt: item.msg_cnt,
+          like_cnt: item.like_cnt,
+          create_dt: item.create_dt,
+          nick_nm: item.nick_nm,
+          nsfw: item.nsfw,
+          module_id: 0,
+          sort: 0,
+        }));
+        
+        // Character 형식으로 변환
+        const newCharacters = bridgeCharacterDataToCharacter(moduleData);
+        
+        // 상태 업데이트
+        set({
+          characters: newCharacters,
+          pagination: {
+            page: 1,
+            total: data.chrbotList.total || 0,
+            hasMore: data.chrbotList.current_page < data.chrbotList.last_page
+          },
+          isLoading: false,
+          isEmpty: false
+        });
+      } else {
+        // 데이터가 없는 경우
+        set({
+          characters: [],
+          pagination: {
+            page: 1,
+            total: 0,
+            hasMore: false
+          },
+          isLoading: false,
+          isEmpty: true
+        });
+      }
+    } catch (error) {
+      console.error("태그 변경 후 데이터 로드 중 오류 발생:", error);
+      set({
+        isLoading: false,
+        error: error as Error,
+        isEmpty: true
+      });
+    }
   },
   
-  // 더 많은 데이터 로드 (페이지네이션)
+  /**
+   * 추가 데이터 로드 (페이지네이션)
+   */
   loadMore: async () => {
-    const { isLoading, pagination, filter, currentCategory, currentTags, characters, moduleCharacters } = get();
+    const { isLoading, pagination, filter, currentCategory, currentTags, characters } = get();
     
     // 이미 로딩 중이거나 더 로드할 데이터가 없으면 리턴
     if (isLoading || !pagination.hasMore) return;
@@ -248,7 +398,7 @@ export const useCharacterGridStoreData = create<MainStoreCharacterGridStoreData>
       
       const data = response?.data;
       
-      if (data?.chrbotList?.data) {
+      if (data?.chrbotList?.data && data.chrbotList.data.length > 0) {
         // ModuleCharacter 형식으로 변환
         const newModuleData = data.chrbotList.data.map(item => ({
           world_list_detail_chrbot_key: item.world_list_detail_chrbot_key,
@@ -273,7 +423,6 @@ export const useCharacterGridStoreData = create<MainStoreCharacterGridStoreData>
         
         // 기존 데이터와 병합
         set({
-          moduleCharacters: [...moduleCharacters, ...newModuleData],
           characters: [...characters, ...newCharacters],
           pagination: {
             page: nextPage,
@@ -283,14 +432,85 @@ export const useCharacterGridStoreData = create<MainStoreCharacterGridStoreData>
           isLoading: false
         });
       } else {
-        set({ isLoading: false });
+        set({ 
+          isLoading: false,
+          pagination: {
+            ...pagination,
+            hasMore: false
+          }
+        });
       }
     } catch (error) {
       console.error("추가 데이터 로딩 중 오류 발생:", error);
-      set({ isLoading: false, error: error as Error });
+      set({ 
+        isLoading: false, 
+        error: error as Error,
+        pagination: {
+          ...pagination,
+          hasMore: false
+        }
+      });
     }
+  },
+  
+  /**
+   * 상태 초기화
+   */
+  reset: () => {
+    set({
+      characters: [],
+      currentCategory: 'all',
+      currentTags: [],
+      pagination: {
+        page: 1,
+        total: 0,
+        hasMore: false
+      },
+      filter: {
+        order: 1, // 인기순
+        nsfw: 2, // 전체 이용가
+      },
+      isLoading: false,
+      error: null,
+      isEmpty: false
+    });
   }
-}))
+}));
+
+/**
+ * 카테고리에 따른 태그 데이터 로드 (내부 함수)
+ */
+async function loadTagsForCategory(categoryId: number) {
+  // 태그 로딩 상태 설정
+  useCharacterGridStoreData.setState({ isTagsLoading: true, tagsError: null });
+
+  console.log('categoryID : ' , categoryId)
+  
+  try {
+    // 태그 데이터 요청
+    const response = await contentApi.GetTagRankingList(categoryId);
+    const data = response?.data;
+    
+    if (data && data.charbot_tag) {
+      useCharacterGridStoreData.setState({ 
+        tags: data.charbot_tag, 
+        isTagsLoading: false 
+      });
+    } else {
+      useCharacterGridStoreData.setState({ 
+        isTagsLoading: false, 
+        tagsError: new Error('태그 데이터가 없습니다'), 
+        tags: [] 
+      });
+    }
+  } catch (error) {
+    console.error("태그 데이터 로딩 중 오류 발생:", error);
+    useCharacterGridStoreData.setState({ 
+      isTagsLoading: false, 
+      tagsError: error as Error 
+    });
+  }
+}
 
 
 

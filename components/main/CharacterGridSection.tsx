@@ -6,6 +6,7 @@ import FilterControls from '@/components/elements/filters/FilterControls'
 import { CategoryId, CATEGORIES } from '@/services/hooks/DataListManager'
 import { useEffect, useRef } from 'react'
 import { useCharacterGridStoreData } from '@/store/useCharacterGridStoreData'
+import Link from 'next/link'
 
 interface CharacterGridSectionProps {
   categoryId: CategoryId
@@ -18,147 +19,144 @@ export default function CharacterGridSection({
   selectedTags = [],
   onSearchTrigger,
 }: CharacterGridSectionProps) {
-  // 짜릿모드 상태 가져오기
-  // const { isAdultModeEnabled } = useSettingsStore()
-
-  // 태그 변경 추적을 위한 ref
-  const isTagChanging = useRef(false);
-  const prevTagsRef = useRef<string[]>([]);
-
+  // 초기화 완료 체크를 위한 ref
+  const isInitialized = useRef(false);
+  
   // 캐릭터 그리드 스토어 가져오기
-  const { characters, filter, isLoading, error, initialize, updateFilter, loadMore, invalidateData, loadTags } =
-    useCharacterGridStoreData()
+  const { 
+    characters, 
+    isLoading, 
+    isEmpty,
+    error, 
+    changeCategory, 
+    updateTags 
+  } = useCharacterGridStoreData()
 
   // 카테고리 정보 가져오기
   const categoryInfo = CATEGORIES.find(cat => cat.id === categoryId)
   const categoryName = categoryInfo?.name || '캐릭터'
-  const categoryIdNumber = Number(categoryInfo?.type || 0)
 
-  // 컴포넌트 초기 마운트나 카테고리 변경 시에만 초기화
+  // 컴포넌트 마운트 시 초기화
   useEffect(() => {
     if (categoryId === 'all') return // all 카테고리는 처리하지 않음
-
-    console.log('CharacterGridSection - 카테고리 변경으로 초기 데이터 로드:', categoryId, selectedTags)
-    prevTagsRef.current = [...selectedTags]; // 태그 복사하여 저장
-    initialize(categoryId, selectedTags)
-  }, [categoryId]); // selectedTags 의존성 제거
-
-  // 태그 변경 시 재초기화 (selectedTags prop이 변경될 때)
-  useEffect(() => {
-    if (categoryId === 'all') return
     
-    // 처음 로드 시에는 건너뜀 (카테고리 변경 useEffect에서 처리)
-    if (prevTagsRef.current.length === 0 && selectedTags.length === 0) return;
-    
-    // 태그가 실제로 변경되었는지 확인
-    if (JSON.stringify(prevTagsRef.current) !== JSON.stringify(selectedTags)) {
-      console.log('CharacterGridSection - 선택된 태그 변경으로 데이터 재로드:', selectedTags);
-      prevTagsRef.current = [...selectedTags]; // 태그 업데이트
-      initialize(categoryId, selectedTags);
-    }
-  }, [selectedTags, categoryId, initialize]);
-
-  // 태그 데이터 로드 (카테고리 변경 시에만)
-  useEffect(() => {
-    if (categoryId === 'all') return
-    
-    console.log('CharacterGridSection - 태그 데이터 로드:', categoryIdNumber);
-    loadTags(categoryIdNumber);
-  }, [categoryId, categoryIdNumber, loadTags]);
-
-  // 필터 변경 핸들러
-  const handleOrderChange = (newOrder: number) => {
-    updateFilter({ order: newOrder })
-  }
-
-  const handleNsfwChange = (newNsfw: number) => {
-    updateFilter({ nsfw: newNsfw })
-  }
-
-  // 태그 변경 핸들러 (FilterControls에서 태그 선택 시)
-  const handleTagsChange = (tags: string[]) => {
-    // 이미 태그 변경 중이면 무한루프 방지를 위해 리턴
-    if (isTagChanging.current) return;
-    
-    // 실제로 태그가 변경되었는지 확인
-    if (JSON.stringify(tags) !== JSON.stringify(prevTagsRef.current)) {
-      console.log('CharacterGridSection - handleTagsChange에서 태그 변경:', tags);
-      isTagChanging.current = true; // 태그 변경 플래그 설정
+    if (!isInitialized.current) {
       
-      // 태그 복사하여 저장
-      prevTagsRef.current = [...tags];
+      // 카테고리 변경 (태그가 있는 경우 추가 처리)
+      changeCategory(categoryId).then(() => {
+        if (selectedTags && selectedTags.length > 0) {
+          updateTags(selectedTags);
+        }
+      });
       
-      // 직접 initialize 호출 (loadTags는 호출하지 않도록 변경)
-      try {
-        initialize(categoryId, tags);
-      } finally {
-        // 비동기 상황에서도 플래그를 해제하기 위해 setTimeout 사용
-        setTimeout(() => {
-          isTagChanging.current = false;
-        }, 0);
-      }
+      isInitialized.current = true;
     }
-  }
+  }, [categoryId, changeCategory, selectedTags, updateTags]);
+  
+  // 카테고리 변경 시 데이터 초기화
+  useEffect(() => {
+    if (categoryId === 'all') return // all 카테고리는 처리하지 않음
+    
+    if (isInitialized.current) {
+      // 카테고리만 변경하고 태그는 초기화
+      changeCategory(categoryId);
+    }
+  }, [categoryId, changeCategory]);
+
+  // 선택된 태그가 변경될 때 처리
+  useEffect(() => {
+    if (categoryId === 'all') return // all 카테고리는 처리하지 않음
+    
+    if (isInitialized.current) {
+      updateTags(selectedTags);
+    }
+  }, [selectedTags, updateTags, categoryId]);
 
   if (categoryId === 'all') {
     return null // all 카테고리는 RecommendSection에서 처리
   }
 
+  // 로딩 상태
   if (isLoading && characters.length === 0) {
     return (
       <SectionTransition className="py-12 bg-white dark:bg-dark-background-light">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-6">Loading {categoryName} data...</h2>
+          <h2 className="text-2xl font-bold mb-6">{categoryName}</h2>
+          {/* 필터 컨트롤은 항상 보여줌 */}
+          <FilterControls categoryId={categoryId} />
+          <div className="mt-16 flex justify-center items-center flex-col">
+            {/* 로딩 인디케이터 */}
+            <div className="relative w-20 h-20 mb-6">
+              <div className="absolute top-0 left-0 w-full h-full border-4 border-gray-200 dark:border-gray-700 rounded-full"></div>
+              <div className="absolute top-0 left-0 w-full h-full border-4 border-primary-500 rounded-full animate-spin border-t-transparent"></div>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 text-center">
+              데이터를 불러오는 중입니다...
+            </p>
+          </div>
         </div>
       </SectionTransition>
     )
   }
 
+  // 에러 상태
   if (error && characters.length === 0) {
     return (
       <SectionTransition className="py-12 bg-white dark:bg-dark-background-light">
-        <div className="container mx-auto px-4 text-red-500">
-          <h2 className="text-2xl font-bold mb-6">Error loading {categoryName}</h2>
-          <p>{error.message}</p>
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl font-bold mb-6">{categoryName}</h2>
+          <FilterControls categoryId={categoryId} />
+          <div className="mt-8 py-12 text-center">
+            <p className="text-red-500 mb-4">에러가 발생했습니다: {error.message}</p>
+            <button 
+              onClick={() => changeCategory(categoryId)}
+              className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition"
+            >
+              다시 시도
+            </button>
+          </div>
         </div>
       </SectionTransition>
     )
   }
 
   // 데이터가 없는 경우
-  if (characters.length === 0 && !isLoading) {
+  if ((isEmpty || characters.length === 0) && !isLoading) {
     return (
       <SectionTransition className="py-12 bg-white dark:bg-dark-background-light">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold mb-6">{categoryName}</h2>
-          <FilterControls
-            categoryId={categoryIdNumber}
-            initialOrder={filter.order}
-            initialNsfw={filter.nsfw}
-            onOrderChange={handleOrderChange}
-            onNsfwChange={handleNsfwChange}
-            onTagsChange={handleTagsChange}
-          />
-          <p className="mt-8 text-center text-gray-500 dark:text-dark-secondary-400">
-            {selectedTags.length > 0 ? '선택한 태그에 해당하는 캐릭터가 없습니다.' : '데이터가 없습니다.'}
-          </p>
+          <FilterControls categoryId={categoryId} />
+          <div className="mt-12 py-12 text-center">
+            <div className="max-w-md mx-auto">
+              <h3 className="text-xl font-semibold mb-2">
+                {selectedTags.length > 0 
+                  ? '선택한 태그에 해당하는 캐릭터가 없어요' 
+                  : '검색된 캐릭터가 없어요'}
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
+                {selectedTags.length > 0 
+                  ? '다른 태그를 선택하거나 직접 캐릭터를 만들어보세요!'
+                  : '나만의 캐릭터를 직접 만들어보세요!'}
+              </p>
+              <Link href="/my-characters/create">
+                <button className="px-6 py-3 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition shadow-md">
+                  캐릭터 만들기
+                </button>
+              </Link>
+            </div>
+          </div>
         </div>
       </SectionTransition>
     )
   }
 
+  // 정상 데이터 표시
   return (
     <SectionTransition className="py-12 bg-white dark:bg-dark-background-light">
       <div className="container mx-auto px-4">
-        {/* 공통 필터 컴포넌트 적용 */}
-        <FilterControls
-          categoryId={categoryIdNumber}
-          initialOrder={filter.order}
-          initialNsfw={filter.nsfw}
-          onOrderChange={handleOrderChange}
-          onNsfwChange={handleNsfwChange}
-          onTagsChange={handleTagsChange}
-        />
+        {/* 필터 컨트롤 */}
+        <FilterControls categoryId={categoryId} />
 
         {/* 카드 그리드 */}
         <CardGrid categoryId={categoryId} customData={characters} useSwiper={false} />
@@ -167,9 +165,9 @@ export default function CharacterGridSection({
         {characters.length > 0 && (
           <div className="mt-8 flex justify-center">
             <button
-              onClick={loadMore}
+              onClick={() => useCharacterGridStoreData.getState().loadMore()}
               disabled={isLoading}
-              className={`px-6 py-2 rounded-full text-white bg-primary-500 hover:bg-primary-600 ${
+              className={`px-6 py-2 rounded-full text-white bg-primary-500 hover:bg-primary-600 transition ${
                 isLoading ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >

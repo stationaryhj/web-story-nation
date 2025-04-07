@@ -74,7 +74,7 @@ interface MainStoreData {
     rankingCharacters: Array<Character> | [];
 
     // 작가 랭킹
-    rankingCreaters: Array<Character> | [];
+    rankingCreaters: Array<any> | [];
 
     // 최신 캐릭터
     latestCharacters: Array<Character> | [];
@@ -183,6 +183,7 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
             user_key: item.user_key,
             withdraw_pen: item.withdraw_pen
           }));
+
           const creaters = bridgeModuleCreatorToCharacter(moduleCreaters);
           return creaters.map(creater => ({
             id: creater.id,

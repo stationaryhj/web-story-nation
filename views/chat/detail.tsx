@@ -40,13 +40,6 @@ import { chatApi } from '@/services/api/storyNationApi'
 import Tutorial from '@/components/tutorial/Tutorial'
 import ResetChatModal from '@/components/modal/ResetChatModal'
 
-// 메시지 타입 정의
-interface ChatMessage {
-  id: string
-  sender: 'user' | 'character'
-  message: string
-  timestamp: Date
-}
 
 interface ChatDetailClientProps {
   characterId: string
@@ -115,10 +108,14 @@ const customChatModes: ChatMode[] = [
 export default function ChatDetailClient({ characterId, charbotData }: ChatDetailClientProps) {
   const router = useRouter()
 
-  const { data: accountData } = useAccountStore(state => ({
+  const { data: accountData, userIsAdult } = useAccountStore(state => ({
     isLogin: state.isLogin,
     data: state.data,
+    userIsAdult: state.isAdult() ? 1 : 0,
   }))
+
+  // 주석 해제
+  const first_talk = charbotData?.first_talk
 
   // 튜토리얼 관련 상태를 최상위로 이동
   const [showTutorial, setShowTutorial] = useState(true)
@@ -165,11 +162,14 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     isInitRoom,
     // 새로운 메시지 관련 필드와 메서드들
     chatMessages,
+
     sendChatMessage,
     refreshLastAIMessage,
     clearChatHistory,
     addChatMessage,
     updateChatMode,
+    updatePromptKey,
+    deleteChatMessage,
   } = nakamaContext
 
   const [message, setMessage] = useState('')
@@ -318,6 +318,17 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     // 이미 초기화된 상태인지 확인
     if (isInitRoom && channelId) {
       console.log('✅ 채팅방이 이미 초기화되어 있습니다.')
+      
+      // 채팅방이 초기화되어 있고 메시지가 없으면 first_talk 추가
+      if (chatMessages.length === 0 && first_talk) {
+        addChatMessage({
+          id: 'first-message',
+          sender: 'character',
+          message: first_talk,
+          timestamp: new Date()
+        });
+      }
+      
       return
     }
 
@@ -519,7 +530,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   }
 
   // 마지막 AI 응답 새로고침 함수 (Provider의 메서드 사용)
-  const handleRefreshLastAIMessage = async () => {
+  const handleRefreshLastAIMessage = async (chat: any) => {
+    console.log('chat :: ' , chat)
+    
     try {
       // Provider의 메서드를 사용하여 마지막 AI 메시지 새로고침
       await refreshLastAIMessage()
@@ -530,21 +543,8 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   }
 
   // 마지막 AI 응답 삭제 함수
-  const handleDeleteLastAIMessage = () => {
-    // 마지막 AI 메시지 찾기
-    const lastAIMessageIndex = [...chatMessages].reverse().findIndex(msg => msg.sender === 'character')
-
-    if (lastAIMessageIndex === -1) {
-      return
-    }
-
-    const actualIndex = chatMessages.length - 1 - lastAIMessageIndex
-
-    // Provider의 메서드를 사용하여 메시지 목록 업데이트
-    const newMessages = [...chatMessages]
-    newMessages.splice(actualIndex, 1)
-    clearChatHistory()
-    newMessages.forEach(msg => addChatMessage(msg))
+  const handleDeleteLastAIMessage = async (chat: any) => {
+    await deleteChatMessage(chat)
   }
 
   // 메시지 내용에서 상황 설명(*로 감싸진 텍스트)를 찾아 스타일을 적용하는 함수
@@ -620,9 +620,32 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   }
 
   // 채팅 초기화 확인
-  const handleConfirmResetChat = () => {
-    // 여기에 채팅 초기화 로직 추가 (현재는 기능 연결 없음)
-    handleCloseResetChatModal()
+  const handleConfirmResetChat = async () => {
+    const responseData = await chatApi.InitChat(Number(chrBotChatKey), currentModeId, userIsAdult)
+    console.log('💬 채팅 초기화 응답:', responseData.data)
+
+    if(responseData?.data?.result?.err === 0) {
+      await clearChatHistory()
+
+      updatePromptKey(responseData.data.prompt_key)
+      
+      // 캐릭터의 첫 대화 메시지 추가
+      if (first_talk) {
+        addChatMessage({
+          id: 'first-message',
+          sender: 'character',
+          message: first_talk,
+          timestamp: new Date()
+        });
+      }
+
+      // 채팅 초기화 성공
+      handleCloseResetChatModal()
+    } else {
+      // 채팅 초기화 실패
+      console.error('채팅 초기화 실패:', responseData.data.result.msg)
+      handleCloseResetChatModal()
+    }
   }
 
   // 스크롤을 최하단으로 이동하는 함수
@@ -636,6 +659,18 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   useEffect(() => {
     scrollToBottom()
   }, [chatMessages, scrollToBottom])
+
+  // 메시지가 없고 채팅방이 초기화되었을 때 first_talk 표시
+  useEffect(() => {
+    if (isInitRoom && channelId && chatMessages.length === 0 && first_talk) {
+      addChatMessage({
+        id: 'first-message',
+        sender: 'character',
+        message: first_talk,
+        timestamp: new Date()
+      });
+    }
+  }, [isInitRoom, channelId, chatMessages.length, first_talk, addChatMessage]);
 
   // 로딩 상태 표시
   if (isLoading) {
@@ -1065,11 +1100,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                 </div>
               ) : (
                 chatMessages.map((chat, index) => {
-                  const isLastAiMessage =
-                    chat.sender === 'character' &&
-                    chat.id === chatMessages.filter(msg => msg.sender === 'character').slice(-1)[0]?.id &&
-                    chat.id !== '1'
-
                   return (
                     <motion.div
                       key={index}
@@ -1112,10 +1142,31 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                         </p>
                       </motion.div>
 
-                      {/* 마지막 AI 메시지인 경우 새로고침/삭제 버튼 표시 */}
-                      {isLastAiMessage && (
+                      {chat.sender === 'character' && chat.id !== 'first-message' &&(
                         <div className="flex ml-2 items-center justify-start max-w-[85%] mt-2">
                           {/* 새로고침 버튼 */}
+                          <button
+                          onClick={() => handleRefreshLastAIMessage(chat)}
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-500 hover:text-violet-600 hover:bg-violet-100 transition-colors mr-1.5 shadow-sm"
+                          title="응답 새로고침"
+                        >
+                          <FontAwesomeIcon icon={faSync} className="text-sm sm:text-base" />
+                        </button>
+
+                        {/* 삭제 버튼 */}
+                        <button
+                          onClick={() => handleDeleteLastAIMessage(chat)}
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-100 transition-colors shadow-sm"
+                          title="응답 삭제"
+                        >
+                          <FontAwesomeIcon icon={faTrashAlt} className="text-sm sm:text-base" />
+                        </button>
+                      </div>
+                      )}
+
+                      {/* 마지막 AI 메시지인 경우 새로고침/삭제 버튼 표시 */}
+                      {/* {isLastAiMessage && (
+                        <div className="flex ml-2 items-center justify-start max-w-[85%] mt-2">
                           <button
                             onClick={handleRefreshLastAIMessage}
                             className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-500 hover:text-violet-600 hover:bg-violet-100 transition-colors mr-1.5 shadow-sm"
@@ -1124,16 +1175,15 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                             <FontAwesomeIcon icon={faSync} className="text-sm sm:text-base" />
                           </button>
 
-                          {/* 삭제 버튼 */}
                           <button
-                            onClick={handleDeleteLastAIMessage}
+                            onClick={() => handleDeleteLastAIMessage(chat)}
                             className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-100 transition-colors shadow-sm"
                             title="응답 삭제"
                           >
                             <FontAwesomeIcon icon={faTrashAlt} className="text-sm sm:text-base" />
                           </button>
                         </div>
-                      )}
+                      )} */}
                     </motion.div>
                   )
                 })

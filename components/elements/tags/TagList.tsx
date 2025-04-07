@@ -1,9 +1,8 @@
 'use client'
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useState, useEffect, useRef, useTransition, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronDown, faChevronUp, faRotate } from '@fortawesome/free-solid-svg-icons'
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons'
 
 interface Tag {
   c_chrbot_tag_key: number
@@ -13,100 +12,37 @@ interface Tag {
 }
 
 interface TagListProps {
-  categoryId: string | number
+  categoryId?: string | number // categoryId를 선택적으로 변경
   tags: Tag[]
   isLoading?: boolean
   onTagSelect?: (tagIds: string[]) => void
   expanded?: boolean
+  selectedTags?: string[]
 }
 
-export default function TagList({ categoryId, tags, isLoading = false, onTagSelect, expanded = false }: TagListProps) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const [isPending, startTransition] = useTransition()
-  const [selectedTags, setSelectedTags] = useState<string[]>(searchParams?.get('tags')?.split('&') || [])
+export default function TagList({ 
+  tags, 
+  isLoading = false, 
+  onTagSelect, 
+  expanded = false,
+  selectedTags: propSelectedTags = []
+}: TagListProps) {
+  // 내부 상태 대신 prop에서 가져온 selectedTags 사용
+  const [selectedTags, setSelectedTags] = useState<string[]>(propSelectedTags)
+  
+  // propSelectedTags가 변경될 때마다 내부 상태 업데이트
+  useEffect(() => {
+    if (propSelectedTags) {
+      setSelectedTags(propSelectedTags);
+    }
+  }, [propSelectedTags]);
+  
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
   const [scrollLeft, setScrollLeft] = useState(0)
   const [mouseMoved, setMouseMoved] = useState(false)
   const [moveDistance, setMoveDistance] = useState(0)
-  const currentTab = searchParams?.get('tab')
-  const prevTabRef = useRef<string | null>(currentTab)
-
-  // URL 파라미터가 변경될 때 태그 선택 상태 업데이트
-  useEffect(() => {
-    const currentTagsParam = searchParams?.get('tags')
-
-    // 탭이 변경되었는지 확인
-    if (currentTab !== prevTabRef.current) {
-      // 탭이 변경되었으면 태그 리스트 초기화
-      setSelectedTags([])
-
-      // 부모 컴포넌트에 빈 태그 배열 전달하여 카드 리스트 리셋 방지
-      if (onTagSelect) {
-        onTagSelect([])
-      }
-
-      // 태그 파라미터 제거
-      if (currentTagsParam) {
-        // URL에서 태그 파라미터 제거
-        startTransition(() => {
-          const params = new URLSearchParams(searchParams?.toString() || '')
-          params.delete('tags')
-          const newUrl = `${pathname}?${params.toString()}`
-          router.push(newUrl, { scroll: false })
-        })
-      }
-      // 현재 탭 저장
-      prevTabRef.current = currentTab
-    } else if (currentTagsParam) {
-      // 탭이 변경되지 않았고 태그 파라미터가 있으면 선택된 태그 업데이트
-      const newSelectedTags = currentTagsParam.split('&')
-      setSelectedTags(newSelectedTags)
-
-      // 부모 컴포넌트에 선택된 태그 전달
-      if (onTagSelect) {
-        onTagSelect(newSelectedTags)
-      }
-    } else {
-      // 태그 파라미터가 없으면 선택된 태그 초기화
-      setSelectedTags([])
-
-      // 부모 컴포넌트에 빈 태그 배열 전달
-      if (onTagSelect) {
-        onTagSelect([])
-      }
-    }
-  }, [searchParams, currentTab, pathname, router, onTagSelect])
-
-  // URL 파라미터 업데이트
-  const updateUrlParams = useCallback(
-    (tagIds: string[]) => {
-      startTransition(() => {
-        const params = new URLSearchParams(searchParams?.toString() || '')
-
-        // 탭 파라미터 유지
-        const tabParam = searchParams?.get('tab')
-        if (tabParam) {
-          params.set('tab', tabParam)
-        }
-
-        // 태그 파라미터 업데이트
-        if (tagIds.length > 0) {
-          params.set('tags', tagIds.join('&'))
-        } else {
-          params.delete('tags')
-        }
-
-        // 페이지 이동 없이 URL 업데이트 (replaceState)
-        const newUrl = `${pathname}?${params.toString()}`
-        window.history.replaceState(null, '', newUrl)
-      })
-    },
-    [pathname, searchParams]
-  )
 
   // 마우스 다운 이벤트 핸들러
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -151,7 +87,7 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
       e.preventDefault()
       scrollContainerRef.current.scrollLeft += deltaX
     }
-  }, [])
+  }, [expanded])
 
   // 전역 마우스 이벤트 리스너 설정
   useEffect(() => {
@@ -201,15 +137,15 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
         newSelectedTags = [...selectedTags, tagId]
       }
 
+      // 내부 상태도 업데이트 (부모로부터 prop이 다시 오기 전에 UI 반영)
       setSelectedTags(newSelectedTags)
-      updateUrlParams(newSelectedTags)
-
+      
       // 부모 컴포넌트에 선택된 태그 전달
       if (onTagSelect) {
         onTagSelect(newSelectedTags)
       }
     },
-    [selectedTags, updateUrlParams, onTagSelect, isDragging, mouseMoved, moveDistance]
+    [selectedTags, onTagSelect, isDragging, mouseMoved, moveDistance]
   )
 
   // 로딩 중이거나 태그가 없는 경우
@@ -243,7 +179,6 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
               key={tag.c_chrbot_tag_key}
               className="h-7 px-3 sm:h-8 sm:px-3.5 md:h-9 md:px-4 rounded-full text-xs sm:text-sm whitespace-nowrap transition-colors bg-primary-100 text-primary-700 dark:bg-dark-primary-900/50 dark:text-dark-primary-300"
               onClick={() => handleTagClick(tag.c_chrbot_tag_key.toString())}
-              disabled={isPending}
             >
               #{tag.tag}
             </button>
@@ -278,7 +213,6 @@ export default function TagList({ categoryId, tags, isLoading = false, onTagSele
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:text-dark-secondary-300 dark:hover:bg-dark-secondary-700'
               }`}
               onClick={() => handleTagClick(tag.c_chrbot_tag_key.toString())}
-              disabled={isPending}
             >
               #{tag.tag}
             </button>

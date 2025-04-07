@@ -14,6 +14,7 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import { useRouter } from 'next/navigation'
+import { useAuthorStore } from '@/store/useAuthorStore'
 
 // 작가 타입 정의
 interface Author {
@@ -82,7 +83,30 @@ export default function AuthorGrid({
 
   // 작가 클릭 핸들러
   const handleAuthorClick = (author: Author) => {
-    router.push(`/author/1`)
+    if (author && author.nickname) {
+      // 작가 정보를 스토어에 미리 저장
+      const authorStore = useAuthorStore.getState();
+      
+      // 작가 기본 정보 설정
+      authorStore.reset(); // 기존 데이터 초기화
+      
+      // 작가 정보 미리 설정 (상세 정보는 없지만 기본 정보만이라도 표시)
+      const preloadedAuthor = {
+        nickname: author.nickname,
+        profileImage: author.profileImageUrl || '/images/default-profile.jpg',
+        bio: author.description || '',
+        isBlocked: false
+      };
+      
+      // 스토어 상태 수동 업데이트
+      useAuthorStore.setState({
+        author: preloadedAuthor,
+        isLoading: true // API 호출을 위해 로딩 상태로 설정
+      });
+      
+      // 페이지 이동 (나머지 데이터는 페이지에서 로드)
+      router.push(`/author/${encodeURIComponent(author.nickname)}`)
+    }
   }
 
   // 스와이프 끝에 도달했을 때 핸들러

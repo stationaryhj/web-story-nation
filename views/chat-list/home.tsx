@@ -126,6 +126,16 @@ export default function ChatListPage() {
     }>
   >([])
 
+  const [likeList, setLikeList] = useState<
+    {
+      id: string
+      characterId: string
+      name: string
+      lastMessage: string
+      time: string
+    }[]
+  >([])
+
   // 데이터가 변경될 때마다 채팅 목록 업데이트
   useEffect(() => {
     if (chatDataList?.chrbot_chat) {
