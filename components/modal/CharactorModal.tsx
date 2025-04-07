@@ -210,12 +210,12 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
           </div>
         </div>
       </div>
-      <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
+      <div className="flex flex-col md:flex-row">
         {/* 좌측: 캐릭터 이미지와 기본 정보 (PC 레이아웃) */}
-        <div className="hidden md:block md:w-[40%] p-5 overflow-y-auto">
+        <div className="md:w-[40%] p-5 overflow-y-auto">
           <div className="h-full flex flex-col items-start">
             {/* 이미지 영역 */}
-            <div className="h-full max-h-[650px] relative mb-6 w-full flex items-center justify-center">
+            <div className="h-full min-h-[650px] relative mb-6 w-full flex items-center justify-center">
               {selectedCharacter.imageUrl && (
                 <>
                   <div
@@ -277,14 +277,14 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
             </div>
 
             {/* 간략한 캐릭터 설명 */}
-            <div className="w-full mt-4 bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-dark-primary-900/70 dark:to-dark-secondary-900/70 rounded-lg border border-secondary-100 dark:border-dark-secondary-800/30 overflow-hidden">
-              <div className="p-4 backdrop-blur-sm">
+            <div className="w-full mt-4 bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-dark-primary-900/70 dark:to-dark-secondary-900/70 rounded-lg border border-secondary-100 dark:border-dark-secondary-800/30">
+              <div className="p-4">
                 <h3 className="text-base font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-secondary-700 dark:from-dark-primary-300 dark:to-dark-secondary-300">
                     캐릭터 소개
                   </span>
                 </h3>
-                <p className="text-secondary-800 dark:text-dark-secondary-200 text-sm leading-relaxed pl-3">
+                <p className="text-secondary-800 dark:text-dark-secondary-200 text-sm leading-relaxed whitespace-pre-wrap break-words">
                   {selectedCharacter.description || '캐릭터에 대한 간략한 설명이 없습니다.'}
                 </p>
               </div>
@@ -293,7 +293,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
         </div>
 
         {/* 우측: 캐릭터 상세 설명 및 대화 예시 */}
-        <div className="hidden md:block md:w-[60%] h-full overflow-y-auto">
+        <div className="md:w-[60%] h-full overflow-y-auto">
           <div className="p-5 space-y-5">
             {/* 첫 번째 섹션: 캐릭터 소개 */}
             {isContentShow == 1 && (
@@ -482,7 +482,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   캐릭터 소개
                 </span>
               </h3>
-              <p className="text-secondary-800 dark:text-dark-secondary-200 text-sm leading-relaxed pl-3 border-l-2 border-primary-200 dark:border-dark-primary-700">
+              <p className="text-secondary-800 dark:text-dark-secondary-200 text-sm pl-3 border-l-2 border-primary-200 dark:border-dark-primary-700">
                 {selectedCharacter.detailDescription || selectedCharacter.description || '설명이 없습니다.'}
               </p>
             </div>
