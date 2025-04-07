@@ -1088,7 +1088,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       try {
         updatePromptKey(response.data.prompt_key)
 
-
         // 응답 JSON 파싱 및 content 추출
         const responseObj = JSON.parse(response.data.response);
         let messageContent = '';
