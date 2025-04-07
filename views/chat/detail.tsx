@@ -508,7 +508,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     if (currentModeId !== mode.id) {
       // 재화(펜) 부족 여부 확인
       const requiredPens = mode.penCost
-      const availablePens = (accountData?.coin_free || 0) + (accountData?.coin_user || 0)
+      const availablePens = useAccountStore.getState().getCoinSum()
 
       if (availablePens < requiredPens) {
         // 재화 부족 시 모달 표시
