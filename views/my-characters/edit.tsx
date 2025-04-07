@@ -9,7 +9,6 @@ import CharacterForm from '@/components/form/CharacterForm'
 import { toast } from 'react-toastify'
 import { useModalStore } from '@/store/useStoreModal'
 
-
 export default function EditCharacterPage() {
   const { openModal, closeModal } = useModalStore()
 
@@ -30,8 +29,14 @@ export default function EditCharacterPage() {
   } = useCreateCharacterData()
 
   // 유효성 검사 상태
-  const [isFormValid, setIsFormValid] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // 유효하지 않은 필드 상태 관리
+  const [invalidFields, setInvalidFields] = useState<{ [key: string]: boolean }>({
+    name: false,
+    bio: false,
+    firstMessage: false,
+    hashtags: false,
+  })
 
   // 캐릭터 데이터 로드
   useEffect(() => {
@@ -52,38 +57,30 @@ export default function EditCharacterPage() {
     }
   }, [characterId, resetForm, fetchInProgressData])
 
-  // 폼 유효성 검사
+  // 이 부분은 유지: 각 개별 필드 값이 입력되었을 때만 해당 필드의 에러 상태 초기화
   useEffect(() => {
-    const validateCurrentForm = () => {
-      return checkFormValidity(formData, activeTab)
+    if (formData.name.trim()) {
+      setInvalidFields(prev => ({ ...prev, name: false }))
     }
+  }, [formData.name])
 
-    setIsFormValid(validateCurrentForm())
-  }, [activeTab, formData])
-
-  // 다음 버튼 클릭 핸들러
-  const handleNext = async () => {
-
-    console.log('activeTab :: ', activeTab, formData.finishYn, formData.visibility)
-
-    if(activeTab === 'basic') {
-      if(formData.finishYn === 0 && formData.visibility === 'public') {
-        openModal('confirmAction', {
-          title: '캐릭터 공개 시 주의사항',
-          description: '한 번 공개한 캐릭터는 비공개로 전환할 수 없어요!',
-          onConfirm: () => {
-            handleSaveToNextStep()
-            closeModal()
-          },
-          confirmText: '확인',
-          confirmButtonClass: 'bg-red-500 hover:bg-red-600 text-white',
-        })
-        return
-      }
+  useEffect(() => {
+    if (formData.bio.trim()) {
+      setInvalidFields(prev => ({ ...prev, bio: false }))
     }
+  }, [formData.bio])
 
-    handleSaveToNextStep()
-  }
+  useEffect(() => {
+    if (formData.firstMessage.trim()) {
+      setInvalidFields(prev => ({ ...prev, firstMessage: false }))
+    }
+  }, [formData.firstMessage])
+
+  useEffect(() => {
+    if (formData.hashtags.length > 0) {
+      setInvalidFields(prev => ({ ...prev, hashtags: false }))
+    }
+  }, [formData.hashtags])
 
   const handleSaveToNextStep = async () => {
     // 현재 단계 저장
@@ -106,14 +103,48 @@ export default function EditCharacterPage() {
       // 완료 상태로 저장
 
       // 기본 설정 부분에서 필수값 미입력 시 저장 불가, 미입력한 부분으로 페이지 이동 및 focus
-      // 기본 설정 부분에서 필수값 미입력 시 저장 불가, 미입력한 부분으로 페이지 이동 및 focus
-      // 기본 설정 부분에서 필수값 미입력 시 저장 불가, 미입력한 부분으로 페이지 이동 및 focus
+      const isFormValid = checkFormValidity(formData, activeTab)
 
-      const saveResult = await saveInProgress(1)
-      if (!saveResult) return
+      if (isFormValid) {
+        // const saveResult = await saveInProgress(1)
+        // if (!saveResult) return
+        // closeModal()
+      } else {
+        // 유효하지 않은 필드 표시
+        const newInvalidFields = {
+          name: !formData.name?.trim(),
+          bio: !formData.bio?.trim(),
+          firstMessage: !formData.firstMessage?.trim(),
+          hashtags: formData.hashtags.length === 0,
+        }
+
+        // 중요: 탭 이동 후 상태를 설정하도록 순서 변경
+        // 리액트는 state 업데이트를 배치로 처리하므로, 함수로 감싸서 확실하게 순서를 보장
+        setActiveTab('basic')
+        // setTimeout을 사용하여 탭 변경 이후에 invalidFields 상태 설정
+        setTimeout(() => {
+          setInvalidFields(newInvalidFields)
+        }, 0)
+
+        toast.error('필수값이 입력되지 않았습니다.')
+        return
+      }
+
+      if (formData.finishYn === 0 && formData.visibility === 'public') {
+        openModal('confirmAction', {
+          title: '캐릭터 공개 시 주의사항',
+          description: '한 번 공개한 캐릭터는 비공개로 전환할 수 없어요!',
+          onConfirm: async () => {
+            setActiveTab('basic')
+          },
+          confirmText: '확인',
+          confirmButtonClass: 'bg-red-500 hover:bg-red-600 text-white',
+        })
+        return
+      }
 
       toast.success('캐릭터가 성공적으로 수정되었습니다!')
-      router.push('/my-characters')
+      // router.push('/my-characters')
     } catch (error) {
       console.error('캐릭터 수정 실패:', error)
       toast.error('캐릭터 수정에 실패했습니다. 다시 시도해주세요.')
@@ -180,7 +211,7 @@ export default function EditCharacterPage() {
             {/* 폼 컨텐츠 */}
             <div className="p-6">
               <FadeIn>
-                <CharacterForm formType="edit" mode={activeTab} onValidationChange={setIsFormValid} />
+                <CharacterForm formType="edit" mode={activeTab} invalidFields={invalidFields} />
               </FadeIn>
             </div>
 
@@ -196,10 +227,10 @@ export default function EditCharacterPage() {
               </button>
               <button
                 type="button"
-                onClick={handleNext}
-                disabled={!isFormValid || isSaving}
+                onClick={handleSaveToNextStep}
+                disabled={isSaving}
                 className={`px-6 py-3 rounded-lg transition-colors ${
-                  isFormValid && !isSaving
+                  !isSaving
                     ? 'bg-primary-500 hover:bg-primary-600 text-white dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600'
                     : 'bg-primary-300 text-white cursor-not-allowed dark:bg-dark-primary-800 dark:text-dark-secondary-300'
                 }`}

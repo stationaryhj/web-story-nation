@@ -301,15 +301,6 @@ export default function ImageUploadForm({
         </div>
       ) : null}
 
-      {/* 이미지 가이드라인 경고 메시지 */}
-      <div className="mt-4 p-4 bg-secondary-50 dark:bg-dark-secondary-100/5 rounded-lg">
-        <p className="text-sm text-secondary-800 dark:text-dark-secondary-400 leading-relaxed">
-          성기 노출, 잔인한 장면, 그외 사회 통념상 허용할 수 없는 이미지는 통보 없이 삭제될 수 있습니다.
-          <br />
-          초상권, 저작권 침해 이미지는 통보 없이 삭제될 수 있습니다.
-        </p>
-      </div>
-
       {/* 이용등급별 경고문구 */}
       <div className="rounded-lg bg-secondary-50 p-4 dark:bg-dark-secondary-100/5">
         <h3 className="mb-2 text-sm font-medium text-secondary-800 dark:text-dark-secondary-300">

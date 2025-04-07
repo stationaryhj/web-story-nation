@@ -13,16 +13,17 @@ import { toast } from 'react-toastify'
 import RatingSelect from './RatingSelect'
 
 interface BasicInfoFormProps {
-  formData: any;
-  setFormField: (name: string, value: any) => void;
-  addHashtag: (tag: string) => Promise<boolean>;
-  removeHashtag: (tag: string) => Promise<boolean>;
-  addCustomTag: (tag: string) => Promise<boolean>;
-  fetchTagList: () => Promise<void>;
-  saveHashtags: () => Promise<boolean>;
-  availableTags: Tag[];
-  isLoadingTags: boolean;
-  onValidationChange?: (isValid: boolean) => void;
+  formData: any
+  setFormField: (name: string, value: any) => void
+  addHashtag: (tag: string) => Promise<boolean>
+  removeHashtag: (tag: string) => Promise<boolean>
+  addCustomTag: (tag: string) => Promise<boolean>
+  fetchTagList: () => Promise<void>
+  saveHashtags: () => Promise<boolean>
+  availableTags: Tag[]
+  isLoadingTags: boolean
+  onValidationChange?: (isValid: boolean) => void
+  invalidFields?: { [key: string]: boolean }
 }
 
 export default function BasicInfoForm({
@@ -36,17 +37,21 @@ export default function BasicInfoForm({
   availableTags,
   isLoadingTags,
   onValidationChange,
+  invalidFields = {},
 }: BasicInfoFormProps) {
-  
   const [visibleWarnigModal, setVisibleWarnigModal] = useState(false)
   const [customTagInput, setCustomTagInput] = useState('')
   const { isAdult } = useAccountStore()
   const isAdultModeEnabled = isAdult()
-  
+
   // 태그 데이터 로드
   useEffect(() => {
     fetchTagList()
   }, [fetchTagList])
+
+  useEffect(() => {
+    console.log('invalidFields', invalidFields)
+  }, [invalidFields])
 
   // 그룹별로 태그 정리하기
   const allAvailableTags = useMemo(() => {
@@ -91,9 +96,8 @@ export default function BasicInfoForm({
 
   // 게시 범위 선택 핸들러
   const handleVisibilitySelect = (visibility: 'public' | 'private') => {
-
     // 이미 공개된 캐릭터라면 비공개로 변경 불가능
-    if(formData.isVisibilityLock) {
+    if (formData.isVisibilityLock) {
       toast.error('공개된 캐릭터는 비공개로 전환할 수 없어요!')
       return
     }
@@ -197,7 +201,11 @@ export default function BasicInfoForm({
               value={formData.name}
               onChange={handleInputChange}
               placeholder="캐릭터의 이름을 입력하세요"
-              className="mt-1 block w-full rounded-lg border border-secondary-200 px-4 py-3 text-secondary-900 placeholder-secondary-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500"
+              className={`mt-1 block w-full rounded-lg border ${
+                invalidFields.name
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                  : 'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
+              } px-4 py-3 text-secondary-900 placeholder-secondary-400 focus:outline-none focus:ring-1 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500`}
               maxLength={25}
             />
           </div>
@@ -346,7 +354,11 @@ export default function BasicInfoForm({
               onChange={handleInputChange}
               placeholder="예시)까칠한 뱀파이어"
               rows={2}
-              className="w-full px-4 py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
+              className={`w-full px-4 py-3 rounded-lg border ${
+                invalidFields.bio
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                  : 'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
+              } dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none`}
               maxLength={80}
             />
           </div>
@@ -377,7 +389,11 @@ export default function BasicInfoForm({
               onChange={handleInputChange}
               placeholder="캐릭터가 보내는 첫 메세지를 입력하세요"
               rows={2}
-              className="w-full px-4 py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
+              className={`w-full px-4 py-3 rounded-lg border ${
+                invalidFields.firstMessage
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                  : 'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
+              } dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none`}
               maxLength={80}
             />
           </div>
@@ -398,7 +414,13 @@ export default function BasicInfoForm({
               내 캐릭터를 태그로 설명한다면? (최대7개)
             </p>
             <div className="relative w-full">
-              <div className="flex flex-wrap gap-1.5 items-center w-full px-3 py-2 min-h-[52px] rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light">
+              <div
+                className={`flex flex-wrap gap-1.5 items-center w-full px-3 py-2 min-h-[52px] rounded-lg border ${
+                  invalidFields.hashtags
+                    ? 'border-red-500 focus-within:border-red-500 focus-within:ring-red-500'
+                    : 'border-secondary-200 focus-within:border-primary-500 focus-within:ring-primary-500'
+                } dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light`}
+              >
                 {formData.hashtags.length > 0 ? (
                   formData.hashtags.map((tag: string) => (
                     <div
@@ -422,7 +444,7 @@ export default function BasicInfoForm({
                 )}
               </div>
             </div>
-            
+
             <div className="flex flex-wrap gap-2 mt-3">
               {isLoadingTags ? (
                 <div className="w-full py-4 text-center text-secondary-500 dark:text-dark-secondary-400">
@@ -467,7 +489,9 @@ export default function BasicInfoForm({
                 onClick={handleAddCustomTag}
                 disabled={formData.hashtags.length >= 7}
                 className={`px-4 py-2 rounded-r-lg bg-primary-500 text-white dark:bg-dark-primary-500 flex items-center justify-center ${
-                  formData.hashtags.length >= 7 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-600 dark:hover:bg-dark-primary-600'
+                  formData.hashtags.length >= 7
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-primary-600 dark:hover:bg-dark-primary-600'
                 }`}
               >
                 <FontAwesomeIcon icon={faPlus} className="mr-1" />

@@ -69,16 +69,6 @@ interface DetailInfoFormProps {
   onValidationChange?: (isValid: boolean) => void
 }
 
-// 대화 예시 인터페이스 정의
-interface ChatExample {
-  id: string
-  title: string
-  userMessage: string
-  characterMessage: string
-  visibility: 'public' | 'private'
-  isEditing: boolean
-}
-
 // 대화 예시에 title 프로퍼티가 존재하도록 TypeScript 인터페이스 타입을 지정
 // 참고: 실제 ConversationExample 타입은 다른 파일에 정의되어 있으므로
 // 여기서는 타입 확장(Type Assertion)으로 처리합니다
@@ -97,7 +87,6 @@ export default function DetailInfoForm({
   setConversationExampleTitle,
   onValidationChange,
 }: DetailInfoFormProps) {
-
   // 대화 예시 관련 ref 추가
   const exampleRefs = useRef<{ [key: string]: HTMLTextAreaElement }>({})
 
@@ -162,7 +151,7 @@ export default function DetailInfoForm({
         }
 
         if (!titles[example.id]) {
-          titles[example.id] = (example as EnhancedConversationExample).title || '';
+          titles[example.id] = (example as EnhancedConversationExample).title || ''
           messagesUpdated = true
         }
       }
@@ -272,7 +261,7 @@ export default function DetailInfoForm({
     setTitles(prev => ({ ...prev, [id]: title }))
     setConversationExampleTitle(id, title)
   }
-  
+
   // 대화 예시 텍스트 변경 핸들러 (사용자 메시지)
   const handleUserMessageChange = (id: string, message: string) => {
     setUserMessages(prev => ({ ...prev, [id]: message }))
@@ -507,8 +496,7 @@ export default function DetailInfoForm({
                   className="relative bg-secondary-50 dark:bg-dark-secondary-800/5 p-3 sm:p-4 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10"
                 >
                   <div className="flex justify-between items-center mb-3 sm:mb-4">
-                    <h4 className="text-xs sm:text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-                    </h4>
+                    <h4 className="text-xs sm:text-sm font-medium text-secondary-700 dark:text-dark-secondary-400"></h4>
                     <div className="flex space-x-1 sm:space-x-2">
                       {/* 특수 태그 버튼들 */}
                       <div className="flex flex-wrap sm:flex-nowrap space-x-0 sm:space-x-2 space-y-2 sm:space-y-0">
