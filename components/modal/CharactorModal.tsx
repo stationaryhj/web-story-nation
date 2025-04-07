@@ -39,7 +39,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   const router = useRouter()
   const { selectedCharacter, setSelectedCharacter, openModal, modalProps } = useModalStore()
   const [isImageLoaded, setIsImageLoaded] = useState(false)
-  const { isLogin } = useAccountStore()
+  const { isLogin, isAdult } = useAccountStore()
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [reportSubmitted, setReportSubmitted] = useState(false)
 
@@ -128,6 +128,11 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
     if (selectedCharacter && selectedCharacter.id) {
       if (!isLogin) {
         openModal('login')
+        return
+      }
+
+      if (!isAdult()) {
+        openModal('adultVerification')
         return
       }
 
