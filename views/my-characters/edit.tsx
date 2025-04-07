@@ -3,6 +3,7 @@
 import { SectionTransition, FadeIn } from '@/components/motion/PageTransition'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { flushSync } from 'react-dom'
 
 import { useCreateCharacterData, isFormValid as checkFormValidity } from '@/store/useCreateCharacterData'
 import CharacterForm from '@/components/form/CharacterForm'
@@ -105,11 +106,7 @@ export default function EditCharacterPage() {
       // 기본 설정 부분에서 필수값 미입력 시 저장 불가, 미입력한 부분으로 페이지 이동 및 focus
       const isFormValid = checkFormValidity(formData, activeTab)
 
-      if (isFormValid) {
-        // const saveResult = await saveInProgress(1)
-        // if (!saveResult) return
-        // closeModal()
-      } else {
+      if (!isFormValid) {
         // 유효하지 않은 필드 표시
         const newInvalidFields = {
           name: !formData.name?.trim(),
@@ -118,13 +115,11 @@ export default function EditCharacterPage() {
           hashtags: formData.hashtags.length === 0,
         }
 
-        // 중요: 탭 이동 후 상태를 설정하도록 순서 변경
-        // 리액트는 state 업데이트를 배치로 처리하므로, 함수로 감싸서 확실하게 순서를 보장
-        setActiveTab('basic')
-        // setTimeout을 사용하여 탭 변경 이후에 invalidFields 상태 설정
-        setTimeout(() => {
-          setInvalidFields(newInvalidFields)
-        }, 0)
+        // flushSync를 사용하여 탭 변경을 즉시 완료한 후 invalidFields 설정
+        flushSync(() => {
+          setActiveTab('basic')
+        })
+        setInvalidFields(newInvalidFields)
 
         toast.error('필수값이 입력되지 않았습니다.')
         return
@@ -135,7 +130,11 @@ export default function EditCharacterPage() {
           title: '캐릭터 공개 시 주의사항',
           description: '한 번 공개한 캐릭터는 비공개로 전환할 수 없어요!',
           onConfirm: async () => {
-            setActiveTab('basic')
+            const saveResult = await saveInProgress(1)
+            console.log('saveResult', saveResult)
+            if (!saveResult) return
+            closeModal()
+            // router.push('/my-characters')
           },
           confirmText: '확인',
           confirmButtonClass: 'bg-red-500 hover:bg-red-600 text-white',
