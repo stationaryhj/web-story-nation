@@ -37,18 +37,44 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
     const fetchRankingData = async () => {
       setIsLoading(true)
       try {
-        const mockAuthors = rankingCreatersSlide.map(character => ({
-          id: character.id,
-          name: character.name,
-          nickname: character.creator?.nickname || character.name,
-          description: character.description || '',
-          profileImageUrl: character.imageUrl,
-          characterCount: 0, // 기본값 설정
-          isVerified: true, // 기본값 설정
-        }))
+        // 실제 구현에서는 API를 호출해야 합니다.
+        // 현재는 목업 데이터를 사용합니다.
+
+        const mockAuthors = {
+          weekly: Array.from({ length: 100 }, (_, index) => ({
+            id: index + 1,
+            nickname: `작가${index + 1}`,
+            profileImage: `/images/profile/author${(index % 10) + 1}.jpg`,
+            introduction: `안녕하세요! 저는 ${index + 1}번째 작가입니다. 다양한 장르의 캐릭터를 만들고 있어요.`,
+            penIncome: Math.floor(Math.random() * 100000) + 50000,
+            rank: index + 1,
+            characterCount: Math.floor(Math.random() * 50) + 1,
+            likeCount: Math.floor(Math.random() * 1000) + 100,
+            isFollowing: Math.random() > 0.5,
+            isVerified: Math.random() > 0.7, // 30%의 확률로 인증된 작가
+            badges: [
+              Math.random() > 0.7 ? '인기작가' : null,
+              Math.random() > 0.8 ? '신인상' : null,
+              Math.random() > 0.9 ? '베스트작가' : null,
+            ].filter(Boolean),
+            tags: ['로맨스', '판타지', 'SF', '일상', '코미디', '드라마', '미스터리', '호러']
+              .sort(() => Math.random() - 0.5)
+              .slice(0, Math.floor(Math.random() * 3) + 1),
+          })).sort((a, b) => b.penIncome - a.penIncome), // 펜 수익 기준으로 정렬
+        }
+
+        // const mockAuthors = rankingCreatersSlide.map(character => ({
+        //   id: character.id,
+        //   name: character.name,
+        //   nickname: character.creator?.nickname || character.name,
+        //   description: character.description || '',
+        //   profileImageUrl: character.imageUrl,
+        //   characterCount: 0, // 기본값 설정
+        //   isVerified: true, // 기본값 설정
+        // }))
 
         // 탭에 따라 다른 정렬 적용
-        let sortedAuthors = [...mockAuthors]
+        let sortedAuthors = [...mockAuthors.weekly]
         if (activeTab === 'weekly') {
           // 주간 랭킹 - 캐릭터 수 기준 정렬
           sortedAuthors.sort((a, b) => b.characterCount - a.characterCount)
@@ -120,7 +146,7 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
   const renderAuthorCards = () => {
     return rankingData.map((author, index) => {
       // 8위까지는 상세 정보 표시
-      if (index < 8) {
+      if (index < 20) {
         return (
           <div
             key={author.id}
@@ -172,7 +198,7 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
       return (
         <div
           key={author.id}
-          className="flex items-center py-2 cursor-pointer hover:bg-secondary-50 dark:hover:bg-dark-secondary-900/30 transition-colors rounded-lg"
+          className="flex items-center px-4 py-2 cursor-pointer hover:bg-secondary-50 dark:hover:bg-dark-secondary-900/30 transition-colors rounded-lg"
           onClick={() => handleAuthorClick(author)}
         >
           <div
