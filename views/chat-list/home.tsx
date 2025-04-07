@@ -4,7 +4,7 @@ import Footer from '@/components/common/footer'
 import Header from '@/components/common/header'
 import PageTransition from '@/components/motion/PageTransition'
 import { bridgeCharbotChatDataToChatList } from '@/lib/utils/storyNationUtil'
-import { contentApi, chatApi } from '@/services/api/storyNationApi'
+import { createApi, contentApi, chatApi } from '@/services/api/storyNationApi'
 import { ReqGetChatList } from '@/services/hooks/DataListManager'
 import { faSearch, faSort, faThumbtack, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -315,6 +315,27 @@ export default function ChatListPage() {
     )
   }
 
+  const handleOnClickChatData = async (chat: { characterId: string }) => {
+    console.log('chat :: ', chat)
+
+    const response = await createApi.GetChatBot(Number(chat.characterId))
+    if(response.data.result.err === 0)
+    {
+      if(response.data.chrbot.block_type !== 0) {
+        // 신고된놈
+        return
+      }
+
+
+      if(response.data.chrbot.delete_yn !== 0) {
+        // 삭제된놈
+        return
+      }
+
+      router.push(`/chat/${chat.characterId}`)
+    }
+  }
+
   return (
     <PageTransition>
       <div className="flex flex-col min-h-screen">
@@ -393,7 +414,7 @@ export default function ChatListPage() {
                             key={chat.id}
                             className="flex items-center p-3 rounded-lg hover:bg-secondary-50 dark:hover:bg-dark-secondary-100/10 cursor-pointer group"
                             whileHover={{ scale: 1.02 }}
-                            onClick={() => router.push(`/chat/${chat.characterId}`)}
+                            onClick={() => handleOnClickChatData(chat)}
                           >
                             <div className="relative w-12 h-12 rounded-full overflow-hidden mr-3">
                               <Image
