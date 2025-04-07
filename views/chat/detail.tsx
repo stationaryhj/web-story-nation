@@ -1146,6 +1146,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             <form onSubmit={handleSendMessage} className="flex items-center max-w-3xl mx-auto">
               {/* 상황 설명 버튼 (별표 아이콘) */}
               <button
+                id="message-input"
                 type="button"
                 onClick={() => setMessage(prevMessage => prevMessage + '**')}
                 className="w-12 h-12 flex items-center justify-center rounded-full transition-colors bg-gray-100 text-gray-500 hover:bg-gray-200 mr-2"
