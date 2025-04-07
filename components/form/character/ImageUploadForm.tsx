@@ -5,7 +5,7 @@ import { faUpload } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import type { ChangeEvent } from 'react'
-import { Trash2 } from 'lucide-react'
+import { Trash2, ArrowRight } from 'lucide-react'
 
 import { RequiredLabel } from '../CharacterForm'
 import { useAccountStore } from '@/store/useAccountStore'
@@ -150,7 +150,7 @@ export default function ImageUploadForm({
               },
             })
 
-            console.log(isNormalImage , isAdultImage)
+            console.log(isNormalImage, isAdultImage)
 
             if (isNormalImage) {
               if (isAdultImage) {
@@ -191,17 +191,22 @@ export default function ImageUploadForm({
     setAdultImage('')
   }
 
-
   return (
     <div className="space-y-6">
       {/* 이용등급 */}
       <RatingSelect rating={formData.rating} onRatingSelect={handleRatingSelect} />
 
       {/* 이미지 그리드 */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
+      <div className="flex">
         {/* 이미지 표시 - 전체 이용가인 경우 */}
         {formData.rating === 'all' && (
-          <>
+          <div className="flex flex-col justify-between min-w-[150px] md:min-w-[300px]">
+            <div className="text-center">
+              <h3 className="text-lg font-medium text-secondary-700 dark:text-dark-secondary-400">기본 이미지</h3>
+              <p className="text-sm text-secondary-500 dark:text-dark-secondary-500 mb-4">
+                일반 모드에서 표시되는 기본 이미지입니다.
+              </p>
+            </div>
             {/* 현재 이미지 표시 */}
             {formData.imgUrl ? (
               <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
@@ -218,121 +223,111 @@ export default function ImageUploadForm({
               </div>
             ) : (
               <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={e => handleImageUpload(e, false, true)}
-                className="hidden"
-              />
-              <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
-                <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
-                <span className="text-xs sm:text-sm">{formData.imgUrl ? '이미지 교체' : '이미지 업로드'}</span>
-              </div>
-            </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={e => handleImageUpload(e, false, true)}
+                  className="hidden"
+                />
+                <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
+                  <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
+                  <span className="text-xs sm:text-sm">{formData.imgUrl ? '이미지 교체' : '이미지 업로드'}</span>
+                </div>
+              </label>
             )}
-          </>
+          </div>
         )}
 
         {/* 이미지 표시 - 성인 전용인 경우 */}
         {formData.rating === 'adult' && isAdultModeEnabled && (
-          <>
-            {/* 기본 이미지 섹션 */}
-            <div className="col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5 mt-4 mb-2">
-              <h3 className="text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-                기본 이미지 (img_url)
-              </h3>
-              <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-                기본 모드에서 표시되는 이미지입니다.
-              </p>
-            </div>
-
-            {/* 기본 이미지 표시 */}
-            {formData.imgWebUrl ? (
-              <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
-                <Image src={imgNormalWeb} alt="캐릭터 기본 이미지" fill className="object-cover" />
-                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
-                  기본 이미지
-                </div>
-                <div
-                  className="absolute top-1 right-1 cursor-pointer hover:text-red-500 transition-colors duration-200"
-                  onClick={() => handleImageDeleteAdultNormal()}
-                >
-                  <Trash2 />
-                </div>
+          <div className="flex flex-col md:flex-row gap-6 md:gap-12 w-full items-center">
+            <div className="flex flex-col justify-between w-[300px] max-w-full">
+              {/* 기본 이미지 섹션 */}
+              <div className="text-center">
+                <h3 className="text-lg font-medium text-secondary-700 dark:text-dark-secondary-400">기본 이미지</h3>
+                <p className="text-sm text-secondary-500 dark:text-dark-secondary-500 mb-4">
+                  짜릿 모드에서 표시되는 기본 이미지입니다.
+                </p>
               </div>
-            ) : (
-              <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
-              <input type="file" accept="image/*" onChange={e => handleImageUpload(e, true, true)} className="hidden" />
-              <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
-                <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
-                <span className="text-xs sm:text-sm">
-                  {formData.imgUrl ? '기본 이미지 교체' : '기본 이미지 업로드'}
-                </span>
-              </div>
-            </label>
-            )}
 
-
-            {/* 구분선 */}
-            <div className="col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5 my-4 border-t border-secondary-200 dark:border-dark-secondary-200/10"></div>
-
-            {/* 성인 이미지 섹션 */}
-            <div className="col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5 mt-4 mb-2">
-              <h3 className="text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-                짜릿 모드 이미지 (img_url_nsfw, img_web_url)
-              </h3>
-              <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-                성인 모드에서만 표시되는 이미지입니다.
-              </p>
+              {/* 기본 이미지 표시 */}
+              {formData.imgWebUrl ? (
+                <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
+                  <Image src={imgNormalWeb} alt="캐릭터 기본 이미지" fill className="object-cover" />
+                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
+                    기본 이미지
+                  </div>
+                  <div
+                    className="absolute top-1 right-1 cursor-pointer hover:text-red-500 transition-colors duration-200"
+                    onClick={() => handleImageDeleteAdultNormal()}
+                  >
+                    <Trash2 />
+                  </div>
+                </div>
+              ) : (
+                <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => handleImageUpload(e, true, true)}
+                    className="hidden"
+                  />
+                  <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
+                    <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
+                    <span className="text-sm">{formData.imgUrl ? '기본 이미지 교체' : '기본 이미지 업로드'}</span>
+                  </div>
+                </label>
+              )}
             </div>
-
-            {/* 성인 이미지 표시 */}
-            {formData.imgUrlNsfw ? (
-              <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
-                <Image src={imgNsfw} alt="캐릭터 성인 이미지" fill className="object-cover" />
-                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
+            <div className="flex flex-col items-center justify-center gap-2 text-secondary-500 py-4 md:py-0">
+              <div className="rotate-90 md:rotate-0">
+                <ArrowRight />
+              </div>
+              <div className="text-center">첫번째 대화 이후</div>
+            </div>
+            <div className="flex flex-col justify-between w-[300px] max-w-full">
+              {/* 성인 이미지 섹션 */}
+              <div className="text-center">
+                <h3 className="text-lg font-medium text-secondary-700 dark:text-dark-secondary-400">
                   짜릿 모드 이미지
-                </div>
-                <div
-                  className="absolute top-1 right-1 cursor-pointer hover:text-red-500 transition-colors duration-200"
-                  onClick={() => handleImageDeleteAdult()}
-                >
-                  <Trash2 />
-                </div>
+                </h3>
+                <p className="text-sm text-secondary-500 dark:text-dark-secondary-500 mb-4">
+                  성인 모드에서만 표시되는 이미지입니다.
+                </p>
               </div>
-            ) : (
-              <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={e => handleImageUpload(e, true, false)}
-                className="hidden"
-              />
-              <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
-                <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
-                <span className="text-xs sm:text-sm">
-                  {formData.imgUrlNsfw ? '짜릿 모드 이미지 교체' : '짜릿 모드 이미지 업로드'}
-                </span>
-              </div>
-            </label>
-            )}
 
-            {/* 성인 이미지 업로드 버튼 */}
-            {/* <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={e => handleImageUpload(e, true, false)}
-                className="hidden"
-              />
-              <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
-                <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
-                <span className="text-xs sm:text-sm">
-                  {formData.imgUrlNsfw ? '짜릿 모드 이미지 교체' : '짜릿 모드 이미지 업로드'}
-                </span>
-              </div>
-            </label> */}
-          </>
+              {/* 성인 이미지 표시 */}
+              {formData.imgUrlNsfw ? (
+                <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
+                  <Image src={imgNsfw} alt="캐릭터 성인 이미지" fill className="object-cover" />
+                  <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
+                    짜릿 모드 이미지
+                  </div>
+                  <div
+                    className="absolute top-1 right-1 cursor-pointer hover:text-red-500 transition-colors duration-200"
+                    onClick={() => handleImageDeleteAdult()}
+                  >
+                    <Trash2 />
+                  </div>
+                </div>
+              ) : (
+                <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => handleImageUpload(e, true, false)}
+                    className="hidden"
+                  />
+                  <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
+                    <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
+                    <span className="text-sm">
+                      {formData.imgUrlNsfw ? '짜릿 모드 이미지 교체' : '짜릿 모드 이미지 업로드'}
+                    </span>
+                  </div>
+                </label>
+              )}
+            </div>
+          </div>
         )}
       </div>
 
