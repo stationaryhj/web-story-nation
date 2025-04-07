@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import { toast } from 'react-toastify'
 import { useRouter } from 'next/navigation'
 import type { FormEvent } from 'react'
 import { useState, useEffect, useCallback } from 'react'
@@ -76,22 +77,22 @@ export default function ChatListPage() {
   const [selectedOption, setSelectedOption] = useState({ value: 'latest', label: '최근 대화순' })
 
   // Toast 알림 상태
-  const [toast, setToast] = useState({
+  const [customToast, setCustomToast] = useState({
     message: '',
     isVisible: false,
   })
 
   // Toast 표시 함수
-  const showToast = (message: string) => {
-    setToast({
+  const showCustomToast = (message: string) => {
+    setCustomToast({
       message,
       isVisible: true,
     })
   }
 
   // Toast 닫기 함수
-  const closeToast = () => {
-    setToast(prev => ({
+  const closeCustomToast = () => {
+    setCustomToast(prev => ({
       ...prev,
       isVisible: false,
     }))
@@ -227,7 +228,7 @@ export default function ChatListPage() {
 
         // 이미 10개가 즐겨찾기되어 있으면 토스트 메시지 표시하고 함수 종료
         if (pinnedChatsCount >= 10) {
-          showToast('즐겨찾기는 최대 10개까지만 가능합니다.')
+          showCustomToast('즐겨찾기는 최대 10개까지만 가능합니다.')
           return
         }
 
@@ -237,7 +238,7 @@ export default function ChatListPage() {
         await refetch()
       } catch (error) {
         console.error('Failed to update chat fixed status:', error)
-        showToast('즐겨찾기 설정 중 오류가 발생했습니다.')
+        showCustomToast('즐겨찾기 설정 중 오류가 발생했습니다.')
       }
     } else {
       // 즐겨찾기 해제
@@ -246,7 +247,7 @@ export default function ChatListPage() {
         await refetch()
       } catch (error) {
         console.error('Failed to update chat fixed status:', error)
-        showToast('즐겨찾기 해제 중 오류가 발생했습니다.')
+        showCustomToast('즐겨찾기 해제 중 오류가 발생했습니다.')
       }
     }
   }
@@ -319,16 +320,15 @@ export default function ChatListPage() {
     console.log('chat :: ', chat)
 
     const response = await createApi.GetChatBot(Number(chat.characterId))
-    if(response.data.result.err === 0)
-    {
-      if(response.data.chrbot.block_type !== 0) {
-        // 신고된놈
+    console.log('response :: ', response.data.chrbot.block_type)
+    if (response.data.result.err === 0) {
+      if (response.data.chrbot.block_type !== 0) {
+        toast.error('정책 위반 사항이 포함되어 비공개된 캐릭터입니다.')
         return
       }
 
-
-      if(response.data.chrbot.delete_yn !== 0) {
-        // 삭제된놈
+      if (response.data.chrbot.delete_yn !== 0) {
+        toast.error('삭제된 캐릭터입니다.')
         return
       }
 
@@ -498,7 +498,7 @@ export default function ChatListPage() {
         />
 
         {/* Toast 알림 */}
-        <Toast message={toast.message} isVisible={toast.isVisible} onClose={closeToast} />
+        <Toast message={customToast.message} isVisible={customToast.isVisible} onClose={closeCustomToast} />
       </div>
     </PageTransition>
   )
