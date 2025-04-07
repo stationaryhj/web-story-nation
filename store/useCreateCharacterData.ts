@@ -85,7 +85,6 @@ interface CreateCharacterStore {
   // 에러 상태
   error: any
 
-
   // 함수들
   setActiveTab: (tab: 'basic' | 'detail' | 'image') => void
   setFormField: <K extends keyof CharacterFormData>(field: K, value: CharacterFormData[K]) => void
@@ -387,9 +386,8 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
 
       console.log('formData :: ', formData)
 
+      const isLock = formData.finishYn === 1 && formData.visibility === 'public'
 
-      const isLock = (formData.finishYn === 1 && formData.visibility === 'public')
-      
       // 폼 데이터에서 API 요청에 필요한 데이터 추출
       const payload = {
         world_list_detail_chrbot_key: formData.world_list_detail_chrbot_key || '',
@@ -423,10 +421,8 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
             : 0,
 
         finish_yn: formData.finishYn ? formData.finishYn : finishYn,
-        isVisibilityLock: isLock
-
+        isVisibilityLock: isLock,
       }
-
 
       // API 호출
       const response = await createApi.SaveInProgress(
@@ -456,9 +452,8 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         get().setFormField('world_list_detail_chrbot_key', response.data.world_list_detail_chrbot_key.toString())
       }
 
-
       get().setFormField('isVisibilityLock', isLock)
-      
+
       // 기본 정보 저장 후 태그 정보도 함께 저장
       if (formData.hashtags.length > 0) {
         try {
@@ -541,13 +536,16 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
 
 // 폼 유효성 검사 함수
 export const isFormValid = (formData: CharacterFormData, tab: 'basic' | 'detail' | 'image'): boolean => {
-  if (tab === 'basic') {
-    return !!(formData.name?.trim() && formData.bio?.trim() && formData.firstMessage?.trim())
-  } else if (tab === 'detail') {
-    return !!formData.bioDetail?.trim()
+  if (tab === 'image') {
+    return !!(
+      formData.name?.trim() &&
+      formData.bio?.trim() &&
+      formData.firstMessage?.trim() &&
+      formData.hashtags.length > 0
+    )
   }
 
-  // 이미지 탭은 필수 항목이 없으므로 항상 유효
+  // 이미지 탭이 아닌 경우 항상 유효
   return true
 }
 
