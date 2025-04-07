@@ -7,7 +7,7 @@ import type { ChangeEvent } from 'react'
 import { ConversationExample } from '@/store/useCreateCharacterData'
 import { useAccountStore } from '@/store/useAccountStore'
 import RatingSelect from './RatingSelect'
-import Tutorial from '@/components/tutorial/tutorial'
+import Tutorial from '@/components/tutorial/Tutorial'
 
 const createCharacterScenario = {
   storageKey: 'detail-info-tutorial-completed',
@@ -162,7 +162,7 @@ export default function DetailInfoForm({
         }
 
         if (!titles[example.id]) {
-          titles[example.id] = example.title
+          titles[example.id] = (example as EnhancedConversationExample).title || '';
           messagesUpdated = true
         }
       }

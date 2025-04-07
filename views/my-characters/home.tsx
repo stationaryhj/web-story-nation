@@ -22,13 +22,17 @@ export default function MyCharacterPage() {
   const [characterToDelete, setCharacterToDelete] = useState<Character | null>(null)
 
   const myNickName = useAccountStore.getState().data?.nick_nm
-  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 10)
+
+  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 20)
 
   useEffect(() => {
     if (inProgressData?.result.err === 4) {
       setIsLimitModalOpen(true)
     }
   }, [inProgressData?.result.err])
+
+  
+
 
   const myCharacters = bridgeCharbotGetListMineDataToCharacter(inProgressData?.chrbotList.data || []).map(char => ({
     ...char,

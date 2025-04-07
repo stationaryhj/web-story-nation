@@ -7,8 +7,12 @@ import { useEffect, useState } from 'react'
 import { useCreateCharacterData, isFormValid as checkFormValidity } from '@/store/useCreateCharacterData'
 import CharacterForm from '@/components/form/CharacterForm'
 import { toast } from 'react-toastify'
+import { useModalStore } from '@/store/useStoreModal'
+
 
 export default function EditCharacterPage() {
+  const { openModal, closeModal } = useModalStore()
+
   const params = useParams()
   const characterId = params?.id as string
 
@@ -59,6 +63,29 @@ export default function EditCharacterPage() {
 
   // 다음 버튼 클릭 핸들러
   const handleNext = async () => {
+
+    console.log('activeTab :: ', activeTab, formData.finishYn, formData.visibility)
+
+    if(activeTab === 'basic') {
+      if(formData.finishYn === 0 && formData.visibility === 'public') {
+        openModal('confirmAction', {
+          title: '캐릭터 공개 시 주의사항',
+          description: '한 번 공개한 캐릭터는 비공개로 전환할 수 없어요!',
+          onConfirm: () => {
+            handleSaveToNextStep()
+            closeModal()
+          },
+          confirmText: '확인',
+          confirmButtonClass: 'bg-red-500 hover:bg-red-600 text-white',
+        })
+        return
+      }
+    }
+
+    handleSaveToNextStep()
+  }
+
+  const handleSaveToNextStep = async () => {
     // 현재 단계 저장
     const saveResult = await saveInProgress()
     if (!saveResult) return

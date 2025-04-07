@@ -79,19 +79,17 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         setFormField={setFormField}
         addCustomTag={addHashtag}
         addHashtag={async (tag: string) => {
-          await addHashtag(tag)
-          return true
+          return await addHashtag(tag)
         }}
         removeHashtag={async (tag: string) => {
-          await removeHashtag(tag)
-          return true
+          return await removeHashtag(tag)
         }}
-        fetchTagList={async () => {
-          await fetchTagList()
+        addCustomTag={async (tag: string) => {
+          return await addHashtag(tag)
         }}
+        fetchTagList={fetchTagList}
         saveHashtags={async () => {
-          await saveHashtags()
-          return true
+          return await saveHashtags()
         }}
         availableTags={availableTags}
         isLoadingTags={isLoadingTags}
@@ -110,6 +108,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         removeConversationExample={removeConversationExample}
         setConversationExampleEditMode={setConversationExampleEditMode}
         setConversationExampleVisibility={setConversationExampleVisibility}
+        setConversationExampleTitle={setFormField}
         onValidationChange={onValidationChange}
       />
     )

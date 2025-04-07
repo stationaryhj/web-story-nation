@@ -20,9 +20,11 @@ interface WithdrawModalProps {
   requestAmount: number
   accountNo1: string
   accountNo2: string
+  name: string
   onRequestAmountChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onAccountNo1Change: (e: React.ChangeEvent<HTMLInputElement>) => void
   onAccountNo2Change: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onConfirm: () => void
 }
 
@@ -34,9 +36,11 @@ const WithdrawModal = ({
   requestAmount,
   accountNo1,
   accountNo2,
+  name,
   onRequestAmountChange,
   onAccountNo1Change,
   onAccountNo2Change,
+  onNameChange,
   onConfirm,
 }: WithdrawModalProps) => {
   // 모바일 상태 추가
@@ -134,6 +138,14 @@ const WithdrawModal = ({
 
           {/* 주민등록번호 */}
           <div className="py-4 mb-4">
+            <input
+              type="text"
+              value={name}
+              onChange={onNameChange}
+              maxLength={6}
+              placeholder="실명"
+              className="w-[100px] md:w-[120px] rounded-lg border border-secondary-200 px-3 py-2 text-secondary-900 placeholder-secondary-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500"
+            />
             <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400 mb-2">
               주민등록번호
             </label>

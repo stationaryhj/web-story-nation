@@ -18,7 +18,7 @@ export default function Footer() {
   // 현재 경로에 따라 활성화된 링크 확인
   const isActive = (path: string) => {
     if (path === '/' && pathname === '/') return true
-    if (path !== '/' && pathname.startsWith(path)) return true
+    if (path !== '/' && pathname?.startsWith(path)) return true
     return false
   }
 

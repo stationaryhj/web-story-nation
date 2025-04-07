@@ -132,7 +132,7 @@ export default function CardGrid({
     } else {
       if (character.finish_yn === 1) {
         setSelectedCharacter(character)
-        openModal('character')
+        openModal('character', { variant: 'my-character' })
       }
     }
   }

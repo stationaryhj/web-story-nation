@@ -42,7 +42,6 @@ export default function MyAccountView() {
     profileImage: null as string | null,
   })
 
-  const { settings, updateProfile, updateBankAccount, setLanguage, uploadProfileImage } = useSettingsStore()
   const { data: userInfo } = useAccountStore()
 
   console.log('@@ userInfo :: ', userInfo)

@@ -301,6 +301,7 @@ export default function LiveChatPage() {
         onClose={() => setIsReportModalOpen(false)}
         onSubmit={handleSubmitReport}
         submitted={submitted}
+        reportType="writer"
       />
     </>
   )

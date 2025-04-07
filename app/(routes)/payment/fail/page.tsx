@@ -16,9 +16,9 @@ function PaymentFailContent() {
   const [isLoading, setIsLoading] = useState(false);
 
   // 토스페이먼츠 실패 응답 파라미터
-  const errorCode = searchParams.get('code');
-  const errorMsg = searchParams.get('message');
-  const orderId = searchParams.get('orderId');
+  const errorCode = searchParams?.get('code');
+  const errorMsg = searchParams?.get('message');
+  const orderId = searchParams?.get('orderId');
 
   // 에러 코드별 사용자 친화적인 메시지
   const getErrorMessage = (code: string | null) => {
@@ -54,7 +54,7 @@ function PaymentFailContent() {
         </div>
         <h2 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-2">결제에 실패했습니다</h2>
         <p className="text-secondary-600 dark:text-dark-secondary-500 mb-1">
-          {getErrorMessage(errorCode)}
+          {getErrorMessage(errorCode || null)}
         </p>
         {errorMsg && (
           <p className="text-sm text-secondary-500 dark:text-dark-secondary-500 mb-4">
