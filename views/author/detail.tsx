@@ -18,6 +18,7 @@ export default function AuthorDetailPage({ params }: AuthorDetailPageProps) {
   const router = useRouter()
   const { author, characters, isLoading, error, fetchAuthorByNickname } = useAuthorStore()
   const [bio, setBio] = useState('작가 소개가 없습니다.')
+  const [profileImage, setProfileImage] = useState('/images/placeholders/author_default_img.jpg')
 
   // 페이지 진입 시 작가 정보 조회
   useEffect(() => {
@@ -36,6 +37,7 @@ export default function AuthorDetailPage({ params }: AuthorDetailPageProps) {
     }
 
     setBio(author?.bio || '작가 소개가 없습니다.')
+    setProfileImage(author?.profileImage || '/images/placeholders/author_default_img.jpg')
 
     // 컴포넌트 언마운트 시 스토어 초기화
     return () => {
@@ -88,7 +90,7 @@ export default function AuthorDetailPage({ params }: AuthorDetailPageProps) {
               <div className="flex items-center justify-between border-b border-gray-200 dark:border-dark-gray-700 py-8">
                 <div className="flex items-center gap-4 ">
                   <Image
-                    src={author.profileImage || '/images/default-profile.jpg'}
+                    src={profileImage || '/images/default-profile.jpg'}
                     alt={author.nickname}
                     width={80}
                     height={80}

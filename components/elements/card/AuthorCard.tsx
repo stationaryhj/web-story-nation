@@ -77,7 +77,7 @@ export default function AuthorCard({
             <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
               {profileImageUrl ? (
                 <Image
-                  src="/images/placeholders/author_default_img.jpg"
+                  src={profileImageUrl || "/images/placeholders/author_default_img.jpg"}
                   alt={nickname || name}
                   fill
                   className="object-cover object-center"
@@ -160,7 +160,7 @@ export default function AuthorCard({
               <div className="relative w-[60px] h-[60px] rounded-full overflow-hidden flex-shrink-0 mb-3">
                 {profileImageUrl ? (
                   <Image
-                    src="/images/placeholders/author_default_img.jpg"
+                    src={profileImageUrl || "/images/placeholders/author_default_img.jpg"}
                     alt={nickname || name}
                     fill
                     className="object-cover object-center"
