@@ -19,6 +19,103 @@ const AnnouncementTab = () => {
   const { announcements, loadMoreAnnouncements, announcementPagination, isLoading, error, initialize } =
     useNotificationStoreData()
 
+  // 목데이터 추가
+  const mockAnnouncements = [
+    {
+      id: '1',
+      title: '스토리네이션 서비스 업데이트 안내',
+      message:
+        '안녕하세요, 스토리네이션 사용자 여러분! 서비스 업데이트가 완료되었습니다. 이번 업데이트에서는 사용자 인터페이스 개선, 성능 최적화, 그리고 새로운 기능이 추가되었습니다. 자세한 내용은 공지사항을 참고해주세요.',
+      isImportant: true,
+      date: new Date('2023-12-15'),
+      sort: 1,
+    },
+    {
+      id: '2',
+      title: '연말연시 서비스 운영 안내',
+      message:
+        '연말연시를 맞이하여 스토리네이션 서비스 운영 시간이 변경됩니다. 12월 31일부터 1월 2일까지는 고객센터 운영이 일시 중단되며, 1월 3일부터 정상 운영됩니다. 불편을 드려 죄송합니다.',
+      isImportant: true,
+      date: new Date('2023-12-20'),
+      sort: 2,
+    },
+    {
+      id: '3',
+      title: '새로운 캐릭터 생성 기능 안내',
+      message:
+        '스토리네이션에 새로운 캐릭터 생성 기능이 추가되었습니다. 이제 더 다양한 옵션으로 원하는 캐릭터를 만들 수 있습니다. 새로운 기능을 이용해보세요!',
+      isImportant: false,
+      date: new Date('2023-12-25'),
+      sort: 3,
+    },
+    {
+      id: '4',
+      title: '이벤트 안내: 연말 캐릭터 콘테스트',
+      message:
+        '연말을 맞이하여 캐릭터 콘테스트를 개최합니다. 여러분의 창의적인 캐릭터를 공유하고 상을 받아가세요! 참여 방법과 상품은 공지사항을 참고해주세요.',
+      isImportant: false,
+      date: new Date('2023-12-28'),
+      sort: 4,
+    },
+    {
+      id: '5',
+      title: '개인정보 처리방침 개정 안내',
+      message:
+        '스토리네이션의 개인정보 처리방침이 개정되었습니다. 주요 변경사항은 다음과 같습니다: 1) 개인정보 보호 강화, 2) 데이터 처리 방식 개선, 3) 사용자 권리 확대. 자세한 내용은 개인정보 처리방침을 참고해주세요.',
+      isImportant: true,
+      date: new Date('2024-01-05'),
+      sort: 5,
+    },
+    {
+      id: '6',
+      title: '서버 점검 안내',
+      message:
+        '서비스 안정성 향상을 위해 1월 10일 새벽 2시부터 4시까지 서버 점검이 진행됩니다. 점검 중에는 서비스 이용이 일시적으로 제한될 수 있습니다. 불편을 드려 죄송합니다.',
+      isImportant: false,
+      date: new Date('2024-01-08'),
+      sort: 6,
+    },
+    {
+      id: '7',
+      title: '신규 회원 이벤트 안내',
+      message:
+        '스토리네이션에 가입하신 신규 회원을 위한 특별 이벤트가 시작되었습니다. 가입 후 7일 이내에 캐릭터를 생성하고 공유하면 특별 보상을 받을 수 있습니다. 많은 참여 부탁드립니다!',
+      isImportant: false,
+      date: new Date('2024-01-12'),
+      sort: 7,
+    },
+    {
+      id: '8',
+      title: '앱 업데이트 안내',
+      message:
+        '스토리네이션 모바일 앱이 업데이트되었습니다. 이번 업데이트에서는 사용자 경험 개선, 버그 수정, 그리고 새로운 기능이 추가되었습니다. 앱스토어에서 최신 버전으로 업데이트해주세요.',
+      isImportant: false,
+      date: new Date('2024-01-15'),
+      sort: 8,
+    },
+    {
+      id: '9',
+      title: '커뮤니티 가이드라인 개정 안내',
+      message:
+        '스토리네이션 커뮤니티 가이드라인이 개정되었습니다. 이번 개정에서는 커뮤니티 활동에 대한 명확한 기준과 제재 조치가 추가되었습니다. 모든 사용자는 개정된 가이드라인을 준수해야 합니다.',
+      isImportant: true,
+      date: new Date('2024-01-18'),
+      sort: 9,
+    },
+    {
+      id: '10',
+      title: '결제 시스템 개선 안내',
+      message:
+        '결제 시스템이 개선되어 이제 더 안전하고 편리하게 결제할 수 있습니다. 새로운 결제 시스템에서는 다양한 결제 수단을 지원하며, 결제 과정이 더욱 간소화되었습니다.',
+      isImportant: false,
+      date: new Date('2024-01-20'),
+      sort: 10,
+    },
+  ]
+
+  // 목데이터 사용 (실제 데이터가 없을 때)
+  const displayAnnouncements = announcements.length > 0 ? announcements : mockAnnouncements
+
   // 날짜 포맷팅 함수
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('ko-KR', {
@@ -76,7 +173,7 @@ const AnnouncementTab = () => {
   }
 
   // 공지사항이 없는 경우
-  if (announcements.length === 0) {
+  if (displayAnnouncements.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-secondary-500 dark:text-dark-secondary-400 p-6">
         <FontAwesomeIcon icon={faCheckCircle} className="text-3xl mb-2" />
@@ -88,46 +185,74 @@ const AnnouncementTab = () => {
   return (
     <div className="flex-1 overflow-y-auto" onScroll={handleScroll}>
       <ul>
-        {announcements.map(item => (
-          <motion.li
-            key={item.id}
-            initial={{ opacity: 0.8 }}
-            animate={{ opacity: 1 }}
-            className="border-b border-secondary-100 dark:border-dark-secondary-800"
-          >
-            <div className="p-4 relative">
-              {/* 중요 공지사항 표시 */}
-              {item.isImportant && <div className="absolute left-0 top-0 w-1 h-full bg-red-500 dark:bg-red-600"></div>}
-              <div className="flex justify-between items-start">
-                <div className="ml-0.5 flex-1">
-                  {/* 중요 표시 */}
-                  {item.isImportant && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 inline-block mb-1">
-                      중요
-                    </span>
-                  )}
-                  {/* 제목 */}
-                  <h3 className="text-sm font-medium text-secondary-900 dark:text-dark-secondary-200">{item.title}</h3>
-                  {/* 메시지 내용 */}
-                  <p className="text-sm text-secondary-600 dark:text-dark-secondary-400 mt-1">{item.message}</p>
-                  {/* 날짜 */}
-                  <p className="text-xs text-secondary-400 dark:text-dark-secondary-500 mt-1">
-                    {formatDate(item.date)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </motion.li>
+        {displayAnnouncements.map(item => (
+          <AnnouncementItem key={item.id} item={item} formatDate={formatDate} />
         ))}
       </ul>
 
       {/* 추가 로딩 중 표시 */}
-      {isLoading && announcements.length > 0 && (
+      {isLoading && displayAnnouncements.length > 0 && (
         <div className="p-4 flex justify-center">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-500"></div>
         </div>
       )}
     </div>
+  )
+}
+
+// 공지사항 아이템 컴포넌트 (Collapse 구조)
+const AnnouncementItem = ({ item, formatDate }: { item: any; formatDate: (date: Date) => string }) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  return (
+    <motion.li
+      initial={{ opacity: 0.8 }}
+      animate={{ opacity: 1 }}
+      className="border-b border-secondary-100 dark:border-dark-secondary-800"
+    >
+      <div className="p-5 relative">
+        <div className="flex justify-between items-start">
+          <div className="ml-0.5 flex-1">
+            {/* 제목 */}
+            <h3 className="text-base font-medium text-secondary-900 dark:text-dark-secondary-200">{item.title}</h3>
+            {/* 날짜 */}
+            <p className="text-xs text-secondary-400 dark:text-dark-secondary-500 mt-1">{formatDate(item.date)}</p>
+            {/* 메시지 내용 (확장 시에만 표시) */}
+            <AnimatePresence>
+              {isExpanded && (
+                <motion.p
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="text-sm text-secondary-600 dark:text-dark-secondary-400 mt-3"
+                >
+                  {item.message}
+                </motion.p>
+              )}
+            </AnimatePresence>
+          </div>
+          {/* 확장/축소 버튼 */}
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="ml-2 p-1 text-secondary-400 hover:text-secondary-600 dark:text-dark-secondary-500 dark:hover:text-dark-secondary-300"
+            aria-label={isExpanded ? '공지사항 접기' : '공지사항 펼치기'}
+          >
+            <motion.svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              animate={{ rotate: isExpanded ? 180 : 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </motion.svg>
+          </button>
+        </div>
+      </div>
+    </motion.li>
   )
 }
 
