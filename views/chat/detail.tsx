@@ -1,6 +1,6 @@
 'use client'
 
-import { useAccountStore } from '@/store/useStoreData'
+import { Character, useAccountStore, useCoinStore } from '@/store/useStoreData'
 import {
   faPaperPlane,
   faArrowLeft,
@@ -40,7 +40,6 @@ import { chatApi } from '@/services/api/storyNationApi'
 import Tutorial from '@/components/tutorial/Tutorial'
 import ResetChatModal from '@/components/modal/ResetChatModal'
 
-
 interface ChatDetailClientProps {
   characterId: string
   charbotData: ChrbotData | null
@@ -64,7 +63,7 @@ const customChatModes: ChatMode[] = [
     name: '가성비모드',
     description: '일반적인 대화에 최적화된 모드입니다.',
     penCost: 1,
-    ai: 'GPT-3.5',
+    ai: 'Gemini 1.5 Flash',
     icon: faPiggyBank,
     discount: 0,
     original_coin: 0,
@@ -75,7 +74,7 @@ const customChatModes: ChatMode[] = [
     name: '스토리모드',
     description: '이야기 생성과 연속성이 필요한 대화에 적합합니다.',
     penCost: 3,
-    ai: 'GPT-4o',
+    ai: 'Sonnet 3.5 v2',
     icon: faBookOpen,
     discount: 0,
     original_coin: 0,
@@ -97,7 +96,7 @@ const customChatModes: ChatMode[] = [
     name: '짜릿모드 2.0',
     description: '가장 높은 품질과 창의성을 제공하는 최고급 모드입니다.',
     penCost: 7,
-    ai: 'Claude 3.5 Sonnet',
+    ai: 'Sonnet 3.5 v2',
     icon: faRocket,
     discount: 0,
     original_coin: 0,
@@ -209,6 +208,10 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 채팅 컨테이너 ref
   const chatContainerRef = useRef<HTMLDivElement>(null)
+
+  // 표시 이미지
+  const showImage = userIsAdult && chatMessages.length > 2 ? character.imageUrlNsfw : character.imageUrl
+
 
   // 모바일 환경 감지
   useEffect(() => {
@@ -472,6 +475,8 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       return
     }
 
+    if (!checkCoin()) return
+
     // 입력창 초기화 (먼저 수행하여 UX 향상)
     const messageText = message.trim()
     setMessage('')
@@ -512,7 +517,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           description: `이 모드를 사용하려면 ${requiredPens}개의 펜이 필요합니다. 현재 보유한 펜: ${availablePens}개`,
           onConfirm: () => {
             // 충전 페이지로 이동하는 로직 추가 가능
-            router.push('/charge')
+            router.push('/shop-recharge')
           },
           confirmText: '충전하기',
           cancelText: '취소',
@@ -531,11 +536,11 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 마지막 AI 응답 새로고침 함수 (Provider의 메서드 사용)
   const handleRefreshLastAIMessage = async (chat: any) => {
-    console.log('chat :: ' , chat)
+    if (!checkCoin()) return
     
     try {
       // Provider의 메서드를 사용하여 마지막 AI 메시지 새로고침
-      await refreshLastAIMessage()
+      await refreshLastAIMessage(chat)
     } catch (error) {
       console.error('메시지 새로고침 중 오류:', error)
       setError('메시지 새로고침에 실패했습니다. 다시 시도해주세요.')
@@ -544,7 +549,17 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 마지막 AI 응답 삭제 함수
   const handleDeleteLastAIMessage = async (chat: any) => {
-    await deleteChatMessage(chat)
+    openModal('confirmAction', {
+      title: '메세지 삭제',
+      description: `삭제된 채팅 내용은 복구할 수 없습니다.`,
+      onConfirm: async () => {
+        await deleteChatMessage(chat)
+        closeModal()
+      },
+      confirmText: '삭제',
+      cancelText: '취소',
+      confirmButtonClass: 'bg-primary-500 hover:bg-primary-600 text-white',
+    })
   }
 
   // 메시지 내용에서 상황 설명(*로 감싸진 텍스트)를 찾아 스타일을 적용하는 함수
@@ -583,12 +598,45 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     }
   }
 
+  const checkCoin = () => {
+    const selectModeData = chatMode.find(mode => mode.chat_mode === currentModeId)
+    const currentCoin = useAccountStore.getState().getCoinSum()
+
+    if (currentCoin < Number(selectModeData?.coin)) {
+      // 재화 부족 시 모달 표시
+      openModal('confirmAction', {
+        title: '펜 부족',
+        description: `보유한 펜이 부족해요..ㅠㅠ\n펜을 충전하러 갈까요?`,
+        onConfirm: () => {
+          // 충전 페이지로 이동하는 로직 추가 가능
+          router.push('/shop-recharge')
+          closeModal()
+        },
+        confirmText: '충전하러 가기',
+        cancelText: '취소',
+        confirmButtonClass: 'bg-primary-500 hover:bg-primary-600 text-white',
+      })
+      return false
+    }
+
+    return true
+  }
+
+  // 모드 코인 차감 액
+  const getModePrice = (modeId: number) => {
+    switch(modeId) {
+      case 1:
+        return 100
+        
+    }
+  }
+
   // 이미지 저장 함수
   const handleSaveImage = () => {
     if (!character || !character.imageUrl) return
 
     // 이미지 URL 가져오기
-    const imageUrl = character.imageUrl
+    const imageUrl = showImage
 
     // a 태그를 생성하여 다운로드 링크로 사용
     const link = document.createElement('a')
@@ -703,6 +751,15 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     )
   }
 
+  const handleOnClickCharacter = () => {
+    setSelectedCharacter(character as Character)
+    openModal('character')
+  }
+
+  const handleOnClickShop = () => {
+    router.push('/shop-recharge')
+  }
+
   // 나머지 UI 부분은 이전과 동일하게 유지
   return (
     <div className="flex flex-col h-screen max-h-screen w-full bg-gray-50">
@@ -740,16 +797,16 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           {/* 캐릭터 프로필 */}
           <div className="flex items-center min-w-0 overflow-hidden">
             {/* 캐릭터 프로필 이미지 - PC에서만 표시 */}
-            <Link href={`/chat/character/${characterId}`} className="hidden md:block">
+            <button onClick={handleOnClickCharacter} className="hidden md:block">
               <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 border border-gray-200 flex-shrink-0 hover:opacity-90 transition-opacity shadow-sm">
                 <Image
-                  src={character.imageUrl || '/images/character1.jpg'}
+                  src={showImage || '/images/character1.jpg'}
                   alt={character.name}
                   fill
                   className="object-cover"
                 />
               </div>
-            </Link>
+            </button>
 
             <div className="min-w-0 overflow-hidden">
               <div className="flex items-center">
@@ -757,11 +814,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                 <h2 className="font-medium text-gray-800 truncate">{character.name}</h2>
                 {/* 프로필 상세 버튼 - PC에서만 표시 */}
                 <div
-                  onClick={() => {
-                    // TODO: 캐릭터 정보 받아와서 캐릭터 관련 모달 열어야됨
-                    // setSelectedCharacter(character)
-                    openModal('character')
-                  }}
+                  onClick={handleOnClickCharacter}
                 >
                   <FontAwesomeIcon
                     icon={faInfoCircle}
@@ -813,17 +866,17 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
           {/* 무료 재화 (펜) */}
           <div className="flex items-center">
-            <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+            <button onClick={handleOnClickShop} className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
               <FontAwesomeIcon icon={faGift} className="text-sm md:text-base" />
-            </div>
-            <span className="ml-1 text-sm font-semibold text-gray-700">{accountData?.coin_free || 0}</span>
+            </button>
+            <span className="ml-1 text-sm font-semibold text-gray-700">{Number(accountData?.coin_free) + Number(accountData?.coin_register) || 0}</span>
           </div>
 
           {/* 유료 재화 (펜) */}
           <div className="flex items-center">
-            <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+            <button onClick={handleOnClickShop} className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
               <FontAwesomeIcon icon={faCoins} className="h-3 w-3 md:h-4 md:w-4" />
-            </div>
+            </button>
             <span className="ml-1 text-sm font-semibold text-gray-700">{accountData?.coin_user || 0}</span>
           </div>
 
@@ -988,7 +1041,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           {/* 이미지 컨테이너 */}
           <div className="relative h-full w-full group">
             <Image
-              src={character.imageUrl || '/images/character1.jpg'}
+              src={showImage || '/images/character1.jpg'}
               alt={character.name}
               fill
               className="object-cover cursor-pointer"
@@ -1100,6 +1153,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                 </div>
               ) : (
                 chatMessages.map((chat, index) => {
+                  const isLastAiMessage = (chatMessages.length - 1) === index
                   return (
                     <motion.div
                       key={index}
@@ -1144,16 +1198,16 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
                       {chat.sender === 'character' && chat.id !== 'first-message' &&(
                         <div className="flex ml-2 items-center justify-start max-w-[85%] mt-2">
-                          {/* 새로고침 버튼 */}
+                        {/* 마지막 AI 메시지인 경우 새로고침/삭제 버튼 표시 */}
+                        {isLastAiMessage && (
                           <button
-                          onClick={() => handleRefreshLastAIMessage(chat)}
-                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-500 hover:text-violet-600 hover:bg-violet-100 transition-colors mr-1.5 shadow-sm"
-                          title="응답 새로고침"
-                        >
-                          <FontAwesomeIcon icon={faSync} className="text-sm sm:text-base" />
-                        </button>
-
-                        {/* 삭제 버튼 */}
+                            onClick={handleRefreshLastAIMessage}
+                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-500 hover:text-violet-600 hover:bg-violet-100 transition-colors mr-1.5 shadow-sm"
+                            title="응답 새로고침"
+                          >
+                            <FontAwesomeIcon icon={faSync} className="text-sm sm:text-base" />
+                          </button>
+                        )}
                         <button
                           onClick={() => handleDeleteLastAIMessage(chat)}
                           className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-100 transition-colors shadow-sm"
@@ -1163,27 +1217,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                         </button>
                       </div>
                       )}
-
-                      {/* 마지막 AI 메시지인 경우 새로고침/삭제 버튼 표시 */}
-                      {/* {isLastAiMessage && (
-                        <div className="flex ml-2 items-center justify-start max-w-[85%] mt-2">
-                          <button
-                            onClick={handleRefreshLastAIMessage}
-                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-500 hover:text-violet-600 hover:bg-violet-100 transition-colors mr-1.5 shadow-sm"
-                            title="응답 새로고침"
-                          >
-                            <FontAwesomeIcon icon={faSync} className="text-sm sm:text-base" />
-                          </button>
-
-                          <button
-                            onClick={() => handleDeleteLastAIMessage(chat)}
-                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-100 transition-colors shadow-sm"
-                            title="응답 삭제"
-                          >
-                            <FontAwesomeIcon icon={faTrashAlt} className="text-sm sm:text-base" />
-                          </button>
-                        </div>
-                      )} */}
                     </motion.div>
                   )
                 })

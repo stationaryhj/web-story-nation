@@ -790,11 +790,12 @@ export const chatApi = {
    * @param summary_id 요약 키
    * @param countryCode 국가 코드 ( KR )
    */
-  SummaryChat: async (chrbot_chat_key: number, summary_id: string, countryCode: string): Promise<ApiResponse> => {
+  SummaryChat: async (chrbot_chat_key: number, summary_id: string, countryCode: string, chat_mode: number): Promise<ApiResponse> => {
     return chatApiInstance.post('/api/charbot/chat/summary', {
       chrbot_chat_key,
       summary_id,
       countryCode,
+      chat_mode
     })
   },
 
