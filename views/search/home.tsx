@@ -212,10 +212,15 @@ export default function searchPage({}: Props) {
           </div>
         </div>
         <div>
-          {pagination.totalItems === 0 ? (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center text-center h-[calc(100vh-300px)] min-h-[400px]">
+              <div className="w-12 h-12 rounded-full border-4 border-primary-500 border-t-transparent animate-spin mb-4"></div>
+              <p className="text-gray-600 dark:text-dark-gray-400">검색 결과를 불러오는 중입니다...</p>
+            </div>
+          ) : pagination.totalItems === 0 ? (
             <div className="flex flex-col items-center justify-center text-center h-[calc(100vh-300px)] min-h-[400px]">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-dark-gray-200 mb-4">
-              {searchOption === 'creator' ? '검색된 작가가 없어요' : '검색된 캐릭터가 없어요'}
+                {searchOption === 'creator' ? '검색된 작가가 없어요' : '검색된 캐릭터가 없어요'}
               </h2>
               <p className="text-gray-600 dark:text-dark-gray-400 mb-8">내가 원하는 캐릭터를 직접 만들어 보세요!</p>
               <button

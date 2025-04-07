@@ -18,10 +18,10 @@ export const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
 interface CharacterFormProps {
   formType: 'create' | 'edit'
   mode: 'basic' | 'detail' | 'image'
-  onValidationChange?: (isValid: boolean) => void
+  invalidFields?: { [key: string]: boolean }
 }
 
-export default function CharacterForm({ mode, onValidationChange }: CharacterFormProps) {
+export default function CharacterForm({ mode, invalidFields = {} }: CharacterFormProps) {
   const {
     formData,
     setFormField,
@@ -47,22 +47,6 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
       fetchTagList()
     }
   }, [mode]) // mode만 의존성으로 추가
-
-  // 유효성 검사
-  useEffect(() => {
-    if (mode === 'basic' && onValidationChange) {
-      // 기본 정보 탭은 필수 입력 항목이 많음
-      const isValid = !!(formData.name?.trim() && formData.bio?.trim() && formData.firstMessage?.trim())
-      onValidationChange(isValid)
-    } else if (mode === 'detail' && onValidationChange) {
-      // 상세 정보 탭은 bioDetail만 필수
-      const isValid = !!formData.bioDetail?.trim()
-      onValidationChange(isValid)
-    } else if (mode === 'image' && onValidationChange) {
-      // 이미지 탭은 필수 항목이 없음
-      onValidationChange(true)
-    }
-  }, [formData, mode, onValidationChange])
 
   // 최초 대화 예시가 없는 경우 자동으로 하나만 생성합니다
   // useEffect(() => {
@@ -90,7 +74,7 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         }}
         availableTags={availableTags}
         isLoadingTags={isLoadingTags}
-        onValidationChange={onValidationChange}
+        invalidFields={invalidFields}
       />
     )
   }
@@ -106,7 +90,6 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         setConversationExampleEditMode={setConversationExampleEditMode}
         setConversationExampleVisibility={setConversationExampleVisibility}
         setConversationExampleTitle={setFormField}
-        onValidationChange={onValidationChange}
       />
     )
   }
@@ -119,7 +102,6 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         setNormalImage={setNormalImage}
         setAdultImage={setAdultImage}
         setAdultNormalImage={setAdultNormalImage}
-        onValidationChange={onValidationChange}
       />
     )
   }

@@ -44,24 +44,24 @@ export interface CharacterFormData {
 
   // 이미지 설정 - 실제 데이터는 별도 스토어에 저장
   images: Array<CharacterImage>
-  
+
   // S3에 업로드된 이미지 URL (edit.tsx에서 사용)
   imgUrl?: string
   imgUrlNsfw?: string
-  
+
   // 추가 API 호환성 속성
   imageUrl?: string
   img_url?: string
   img_url_nsfw?: string
-  
+
   // 추가 속성을 위한 인덱스 시그니처
   [key: string]: any
 }
 
 // 이미지 스토어 인터페이스 - 메모리에만 저장되는 별도 스토어
 interface ImageStore {
-  normalImage: CharacterImage | null;
-  adultImage: CharacterImage | null;
+  normalImage: CharacterImage | null
+  adultImage: CharacterImage | null
   activeImageTab: ImageType
   setActiveImageTab: (tab: ImageType) => void
   addNormalImage: (url: string) => void
@@ -125,7 +125,7 @@ export const useImageStore = create<ImageStore>(set => ({
 
   setActiveImageTab: tab => set({ activeImageTab: tab }),
 
-  addNormalImage: (url) =>
+  addNormalImage: url =>
     set(_state => {
       const newImage: CharacterImage = {
         id: generateId(),
@@ -135,7 +135,7 @@ export const useImageStore = create<ImageStore>(set => ({
       return { normalImage: newImage }
     }),
 
-  addAdultImage: (url) =>
+  addAdultImage: url =>
     set(_state => {
       const newImage: CharacterImage = {
         id: generateId(),
@@ -146,40 +146,40 @@ export const useImageStore = create<ImageStore>(set => ({
     }),
 
   clearImages: () => set({ normalImage: null, adultImage: null }),
-  
+
   // 호환성을 위한 getImages 함수
   getImages: () => {
     const state = useImageStore.getState()
     const images: CharacterImage[] = []
-    
+
     if (state.normalImage) images.push(state.normalImage)
     if (state.adultImage) images.push(state.adultImage)
-    
+
     return images
-  }
+  },
 }))
 
 // 이미지 정보만 추출하는 함수 (base64 데이터 없이)
 export const getImageInfoForSubmit = () => {
   const { normalImage, adultImage } = useImageStore.getState()
   const images: Array<Partial<CharacterImage>> = []
-  
+
   if (normalImage) {
     images.push({
       id: normalImage.id,
       type: normalImage.type,
-      url: normalImage.url.substring(0, 100) + '...' // URL 정보는 간략히 저장
+      url: normalImage.url.substring(0, 100) + '...', // URL 정보는 간략히 저장
     })
   }
-  
+
   if (adultImage) {
     images.push({
       id: adultImage.id,
       type: adultImage.type,
-      url: adultImage.url.substring(0, 100) + '...' // URL 정보는 간략히 저장
+      url: adultImage.url.substring(0, 100) + '...', // URL 정보는 간략히 저장
     })
   }
-  
+
   return images
 }
 
@@ -187,7 +187,7 @@ export const getImageInfoForSubmit = () => {
 export const uploadImagesToServer = async () => {
   const { normalImage, adultImage } = useImageStore.getState()
   const images: Array<CharacterImage> = []
-  
+
   if (normalImage) images.push(normalImage)
   if (adultImage) images.push(adultImage)
 

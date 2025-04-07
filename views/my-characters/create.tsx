@@ -56,18 +56,8 @@ export default function CreateCharacterPage() {
   // 폼 제출 핸들러
   const handleSubmit = async () => {
     try {
-      // API 호출 (실제 구현 시 추가)
-      // const response = await fetch('/api/characters', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(formData),
-      // })
-
-      // 임시 처리 (성공으로 가정)
       toast.success('캐릭터가 성공적으로 생성되었습니다!')
-      router.push('/my-characters')
+      // router.push('/my-characters')
     } catch (error) {
       console.error('캐릭터 생성 실패:', error)
       toast.error('캐릭터 생성에 실패했습니다. 다시 시도해주세요.')
