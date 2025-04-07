@@ -38,6 +38,8 @@ const AuthorRankingSection = memo(() => {
   const [isAuthorRankingSidebarOpen, setIsAuthorRankingSidebarOpen] = useState(false)
   const { rankingCreaters, UpdateRankingTopCreater } = useRecommendSectionStoreData()
 
+  
+
   const handleAuthorRankingTabChange = (tabId: string) => {
     setAuthorActiveTab(tabId)
     const topid = tabId === 'weekly' ? 2 : tabId === 'monthly' ? 3 : tabId === 'all' ? 5 : 2
@@ -46,13 +48,14 @@ const AuthorRankingSection = memo(() => {
   }
 
   const getAuthorRankingData = () => {
+
     // Character 타입을 Author 타입으로 변환
     return rankingCreaters.map(character => ({
       id: character.id,
       name: character.name,
       nickname: character.creator?.nickname || character.name,
       description: character.description || '',
-      profileImageUrl: character.imageUrl,
+      profileImageUrl: character.profileImageUrl || character.imageUrl,
       characterCount: 0, // 기본값 설정
       isVerified: true,  // 기본값 설정
     }));
