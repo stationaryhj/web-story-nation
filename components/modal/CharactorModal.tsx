@@ -131,7 +131,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
         return
       }
 
-      if (!isAdult()) {
+      if (!isAdult() && selectedCharacter.isAdult) {
         openModal('adultVerification')
         return
       }
