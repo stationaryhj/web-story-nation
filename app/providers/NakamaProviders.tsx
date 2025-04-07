@@ -49,6 +49,8 @@ interface NakamaContextType {
   addChatMessage: (message: ChatMessage) => void;         // 메시지 추가
 
   updateChatMode: (mode: number) => void;
+  updatePromptKey: (key: string) => void;
+  deleteChatMessage: (message: ChatMessage) => Promise<boolean>;
 }
 
 // 채팅 메시지 인터페이스
@@ -92,7 +94,7 @@ const defaultContextValue: NakamaContextType = {
   isInitRoom: false,   // 룸 초기화 상태 추가
   charbotData: null,   // 캐릭터 데이터 추가
   chatMessages: [],    // 채팅 메시지 배열
-  
+
   setSession: () => {},
   chatRoomInit: async () => ({ success: false }),
   connectSocket: async () => false,
@@ -113,7 +115,9 @@ const defaultContextValue: NakamaContextType = {
   clearChatHistory: () => {},
   addChatMessage: () => {},
 
-  updateChatMode: () => {}
+  updateChatMode: () => {},
+  updatePromptKey: () => {},
+  deleteChatMessage: async () => false,
 };
 
 // Nakama 컨텍스트 생성
@@ -203,14 +207,11 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     
     // 이미 유효한 세션이 있는지 확인
     if (session && !session.isexpired(new Date().getTime() / 1000)) {
-      console.log('🔑 유효한 세션이 이미 존재함, 인증 과정 스킵');
       return session;
     }
     
-    console.log('🔑 새 인증 프로세스 시작');
     try {
       const newSession = await _client.authenticateDevice(deviceId, true, userKey?.toString());
-      console.log('🔑 인증 성공');
       return newSession;
     } catch (error) {
       console.error('인증 실패:', error);
@@ -224,17 +225,14 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
   ): Promise<Socket | null> => {
     // 이미 연결된 소켓이 있는지 확인
     if (socketRef.current && connectionState.isConnected) {
-      console.log('🔌 이미 연결된 소켓 재사용');
       return socketRef.current;
     }
     
-    console.log('🔌 새 소켓 연결 시작');
     try {
       const newSocket = _client.createSocket(useSSL);
       
       // 소켓 이벤트 리스너 설정
       newSocket.ondisconnect = (evt) => {
-        console.log('Nakama 소켓 연결 해제:', evt);
         updateConnectionState({ isConnected: false });
         
         // 연결 해제 리스너 호출
@@ -253,7 +251,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       };
       
       await newSocket.connect(currentSession, false);
-      console.log('🔌 소켓 연결 성공');
       return newSocket;
     } catch (error) {
       console.error('소켓 연결 실패:', error);
@@ -267,11 +264,9 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     chatBotId: string
   ): Promise<{ channelId: string; roomName: string } | null> => {
     const roomName = `chat_${userKey}_${chatBotId}`;
-    console.log('💬 채팅방 참여 시도:', roomName);
     
     try {
       const channel = await socket.joinChat(roomName, 1, true, false);
-      console.log('💬 채팅방 참여 성공:', channel);
       
       // 채널 객체에서 room_name 가져오기 (타입 캐스팅으로 에러 방지)
       const actualRoomName = (channel as any).room_name || roomName;
@@ -283,7 +278,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
   }, []);
   
   const extractChatKey = useCallback((roomName: string): number => {
-    console.log('🔑 채팅 키 추출 시도:', roomName);
     
     // room_name이 없으면 0 반환
     if (!roomName) {
@@ -293,13 +287,11 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     
     const roomNameStr = String(roomName);
     const split = roomNameStr.split('|') || [];
-    console.log('🔑 채팅 키 추출 룸네임 분할:', split);
     
     let chatKey = 0;
     
     if (split.length >= 2) {
       chatKey = parseInt(split[1]);
-      console.log('🔑 채팅 키 추출 결과:', chatKey);
     } else {
       console.error('❌ 채팅 키 추출 실패: 분할 결과 부족', split);
     }
@@ -318,7 +310,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         const promptKey = response.data.prompt_key;
         const nsfwValue = response.data.world_list_detail_chrbot?.nsfw || 0;
         
-        console.log('💾 채팅 초기화 성공:', { promptKey, nsfwValue });
         return { promptKey, nsfwValue };
       } else {
         console.error('❌ 채팅 초기화 실패:', response?.data);
@@ -353,17 +344,16 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
             await new Promise(resolve => setTimeout(resolve, 1000));
             continue;
           }
+          console.log('result :: ' , result)
           
           console.log(`💬 채팅 메시지 ${result.messages.length}개 수신`);
 
           // 메시지 처리 로직...
           const processedIds = new Set<string>();
 
-          console.log(result.messages)
-
           result.messages.forEach((message) => {
             const messageContent = message.content as any;
-            const senderId = message.sender_id || 
+            const senderId = message.message_id || 
               `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             const createTime = message.create_time ? 
               new Date(message.create_time) : new Date();
@@ -416,7 +406,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
   }> => {
     // 이미 초기화 중이면 중복 호출 방지
     if (isInitializingChatRoom.current) {
-      console.log('🚫 이미 채팅방 초기화 중입니다');
       return { success: false, error: 'ALREADY_INITIALIZING' };
     }
     
@@ -520,13 +509,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       // 단계 8: 메시지 목록 가져오기
       await fetchMessages(_client, currentSession, channelId);
       
-      console.log('✅ 채팅방 초기화 완료: ', {
-        success: true,
-        channelId,
-        roomName,
-        chatKey
-      });
-      
       return {
         success: true,
         channelId,
@@ -610,7 +592,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           isConnected: false,
           isInitRoom: false
         });
-        console.log('소켓 연결이 성공적으로 해제되었습니다.');
       }
     } catch (error) {
       console.error('소켓 연결 해제 중 오류:', error);
@@ -627,7 +608,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         // 이미 연결 시도 중이거나 컴포넌트가 언마운트되었으면 무시
         if (connectionState.isConnecting || !isMounted) return;
         
-        console.log('🔄 자동 재연결 시도 중...');
         updateConnectionState({ isConnecting: true });
         
         try {
@@ -644,7 +624,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           
           // 소켓 이벤트 리스너 설정
           newSocket.ondisconnect = (evt) => {
-            console.log('Nakama 소켓 연결 해제:', evt);
             if (isMounted) updateConnectionState({ isConnected: false });
             
             // 연결 해제 리스너 호출
@@ -669,7 +648,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
             updateConnectionState({ isConnected: true });
             updateConnectionState({ isConnecting: false });
           }
-          console.log('🔌 소켓 재연결 성공!');
         } catch (error) {
           console.error('재연결 중 오류 발생:', error);
           if (isMounted) {
@@ -705,8 +683,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         return;
       }
 
-      console.log('✉️ 메시지 수신:', message);
-      
       // 메시지 내용 파싱
       let contentObj;
       try {
@@ -755,8 +731,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         timestamp: timestamp
       };
       
-      console.log('✉️ 채팅 히스토리에 추가될 메시지:', newMessage);
-      
       // 채팅 메시지 배열에 추가
       setChatMessages(prev => {
         // 임시 메시지 대체 로직 (사용자가 보낸 메시지인 경우)
@@ -768,7 +742,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           );
           
           if (tempMessage) {
-            console.log('✅ 임시 메시지를 실제 메시지로 대체:', tempMessage.id, '->', messageId);
             return prev.map(msg => 
               msg.id === tempMessage.id ? newMessage : msg
             );
@@ -778,16 +751,11 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         // 중복 메시지 방지
         const isDuplicate = prev.some(msg => msg.id === messageId);
         if (isDuplicate) {
-          console.log('⚠️ 중복 메시지 무시:', messageId);
           return prev;
         }
         
         // 기존 메시지에 추가
         const newMessages = [...prev, newMessage];
-        console.log(`✅ 메시지 추가됨 (총 ${newMessages.length}개)`, { 
-          메시지ID: newMessage.id, 
-          보낸사람: newMessage.sender
-        });
         return newMessages;
       });
       
@@ -856,7 +824,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           } else if (typeof message.content === 'object') {
             contentObj = message.content;
           } else {
-            console.log('⚠️ 메시지 내용이 문자열이나 객체가 아님, API 호출 중단');
             return;
           }
         } catch (parseError) {
@@ -866,37 +833,24 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         
         // contentObj가 null이나 undefined가 아닌지 확인
         if (!contentObj || !contentObj.content || !contentObj.type) {
-          console.log('⚠️ 파싱된 콘텐츠 객체가 없거나 유효하지 않음, API 호출 중단');
           return;
         }
         
         // type이 user 또는 ai만 허용
         if (contentObj.type !== 'user' && contentObj.type !== 'ai') {
-          console.log('⚠️ 지원하지 않는 메시지 타입:', contentObj.type);
           return;
         }
-        
-        console.log('📨 파싱된 메시지 타입:', contentObj.type);
         
         // 메시지 내용이 파싱되면 처리
         if (contentObj.type === 'user') {
           const channelId = message.channel_id;
           if (!channelId) {
-            console.log('⚠️ 채널 ID가 없어 API 호출 중단');
             return;
           }
           
           // 자신이 보낸 메시지라도 응답은 처리
           const promptKey = apiState.sendPrompt_key || '';
-          console.log('👤 사용자 메시지 수신, SendChat API 호출:', {
-            content: contentObj.content,
-            channel: channelId,
-            chatKey: chatRoomState.chrBotChatKey,
-            promptKey: promptKey,
-            chatMode: chatRoomState.currentChatMode,
-            nsfw: apiState.nsfw
-          });
-          
+
           // 저장된 채팅 키 사용
           if (chatRoomState.chrBotChatKey) {
             
@@ -909,7 +863,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
                 chatRoomState.chrBotChatKey,
                 false // stream 설정
               );
-              console.log('🤖 AI 응답 수신:', response);
               
               // 응답 상태 확인
               if (response && response.data && response.data.result && response.data.result.err === 0) {
@@ -954,8 +907,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
                       messageContent = "응답 형식이 잘못되었습니다. 다시 시도해주세요.";
                     }
                     
-                    console.log('🤖 AI 응답 내용 (채널로 전송 중):', messageContent);
-                    
                     // 단순화된 메시지 형식 - content와 type만 포함
                     const content = { 
                       content: messageContent, 
@@ -964,7 +915,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
                     
                     // AI 응답을 채널에 전송
                     await socketRef.current.writeChatMessage(channelId, content);
-                    console.log('✅ AI 응답 채널 전송 완료');
                   } catch (parseError) {
                     console.error('AI 응답 파싱 오류:', parseError);
                     // 파싱 오류 시 원본 응답 전송
@@ -1007,7 +957,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           }
         } else if (contentObj.type === 'ai') {
           // AI 메시지는 handleMessage에서 이미 처리됨
-          console.log('🤖 AI 메시지 수신: 이미 처리됨', contentObj.content.substring(0, 50) + '...');
         }
       } catch (error) {
         console.error('채널 메시지 수신 중 오류:', error);
@@ -1024,7 +973,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
   // 메시지 전송 함수 (캡슐화)
   const sendChatMessage = async (messageText: string): Promise<boolean> => {
-    console.log('sendChatMessage 호출됨 :: ', messageText);
 
     try {
       if (!chatRoomState.channelId) {
@@ -1046,24 +994,15 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         timestamp: new Date(),
       };
       
-      console.log('📤 메시지 전송 준비:', {
-        tempId: tempMessageId,
-        content: messageText,
-        channelId: chatRoomState.channelId
-      });
-      
       // 임시 메시지 저장
       setChatMessages(prev => [...prev, userMessage]);
       
-      // 소켓을 통해 메시지 전송
-      console.log('Nakama 메시지 전송 중...');
       // 단순화된 메시지 형식 - content와 type만 포함
       const content = { 
         content: messageText, 
         type: 'user' 
       };
       await socketRef.current.writeChatMessage(chatRoomState.channelId, content);
-      console.log('✅ 메시지 전송 완료');
       
       return true;
     } catch (error) {
@@ -1103,7 +1042,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     const lastAIMessageIndex = [...chatMessages].reverse().findIndex(msg => msg.sender === 'character');
 
     if (lastAIMessageIndex === -1) {
-      console.log('새로고침할 AI 메시지가 없습니다.');
       return false;
     }
 
@@ -1125,15 +1063,9 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         throw new Error('새로고침할 대화를 찾을 수 없습니다.');
       }
 
-      console.log('메시지 새로고침 시도:', {
-        chatMode: chatRoomState.currentChatMode,
-        userMessage: lastUserMessage,
-        chrBotChatKey: chatRoomState.chrBotChatKey
-      });
-
       // API 호출하여 새로운 응답 생성
       const promptKey = apiState.sendPrompt_key || '';
-      const response = await chatApi.SendChat(
+      const response = await chatApi.ReSendChat(
         chatRoomState.currentChatMode,
         apiState.nsfw,
         promptKey,
@@ -1146,16 +1078,16 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         throw new Error('서버 응답이 없습니다.');
       }
 
-      console.log('새로운 AI 응답 받음:', response.data);
-
       // 응답 상태 확인
-      if (!response.success || !response.data.result || response.data.result.err !== 0) {
+      if (!response.data.result || response.data.result.err !== 0) {
         console.error('API 응답 오류:', response.data);
         throw new Error(response.data.result?.msg || '서버 응답 오류가 발생했습니다.');
       }
 
       // Nakama를 통해 AI 응답 전송
       try {
+        updatePromptKey(response.data.prompt_key)
+
         // 응답 JSON 파싱 및 content 추출
         const responseObj = JSON.parse(response.data.response);
         let messageContent = '';
@@ -1164,17 +1096,13 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         if (responseObj.candidates) {
           // Gemini AI 모델 응답 형식
           messageContent = responseObj.candidates[0]?.content?.parts[0]?.text;
-          console.log('🤖 Gemini AI 응답 감지');
         } else if (responseObj.content) {
           // 다른 AI 모델 응답 형식
           messageContent = responseObj.content[0].text;
-          console.log('🤖 일반 AI 응답 감지');
         } else {
           console.error('알 수 없는 AI 응답 형식:', responseObj);
           messageContent = "응답 형식이 잘못되었습니다. 다시 시도해주세요.";
         }
-        
-        console.log('🤖 AI 응답 내용 (채널로 전송 중):', messageContent);
         
         // 단순화된 메시지 형식 - content와 type만 포함
         const content = { 
@@ -1192,7 +1120,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         };
         await socketRef.current.writeChatMessage(chatRoomState.channelId, content);
       }
-      console.log('새로운 메시지 전송 완료');
       
       // UI에서 기존 메시지 제거
       setChatMessages(prev => prev.filter(msg => msg.id !== lastMessage.id));
@@ -1223,20 +1150,20 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       // 대화 규칙 확인: user와 character가 번갈아 나타나야 함
       const cleanedMessages = prevMessages.reduce((result, currentMsg, index) => {
         // 첫 메시지는 항상 포함
-        if (index === 0) {
-          return [currentMsg];
-        }
+        // if (index === 0) {
+        //   return [currentMsg];
+        // }
         
         const prevMsg = result[result.length - 1];
         
         // 같은 발신자의 연속된 메시지인 경우, 가장 최근 메시지만 유지
-        if (prevMsg.sender === currentMsg.sender) {
-          // 마지막 메시지를 최신 메시지로 교체
-          return [...result.slice(0, -1), currentMsg];
-        }
+        // if (prevMsg.sender === currentMsg.sender) {
+        //   // 마지막 메시지를 최신 메시지로 교체
+        //   return [...result.slice(0, -1), currentMsg];
+        // }
         
         // 규칙이 유지되는 메시지는 추가
-        return [...result, currentMsg];
+        return [];
       }, [] as ChatMessage[]);
       
       console.log(`🧹 메시지 정리: ${prevMessages.length}개 → ${cleanedMessages.length}개`);
@@ -1273,7 +1200,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       }
 
       if (socketRef.current && connectionState.isConnected) {
-        console.log('이미 연결된 소켓이 있습니다.');
         return true;
       }
 
@@ -1284,7 +1210,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       
       // 소켓 이벤트 리스너 설정
       newSocket.ondisconnect = (evt) => {
-        console.log('Nakama 소켓 연결 해제:', evt);
         updateConnectionState({ isConnected: false });
         
         // 연결 해제 리스너 호출
@@ -1354,7 +1279,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         return false;
       }
       
-      console.log(`채팅방 나가기: ${channelId}`);
       await socketRef.current.leaveChat(channelId);
       
       // 채팅방 상태 초기화
@@ -1382,7 +1306,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     
     const listeners = channelListenersRef.current.get(channelId);
     listeners?.add(listener);
-    console.log(`채널 메시지 리스너 추가: ${channelId}`);
   }, []);
 
   const removeChannelMessageListener = useCallback((channelId: string, listener: (message: any) => void): void => {
@@ -1392,30 +1315,70 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     
     const listeners = channelListenersRef.current.get(channelId);
     listeners?.delete(listener);
-    console.log(`채널 메시지 리스너 제거: ${channelId}`);
   }, []);
 
   // 연결 리스너 관리 함수들
   const addConnectionListener = useCallback((listener: () => void): void => {
     connectionListenersRef.current.add(listener);
-    console.log('연결 리스너 추가');
   }, []);
 
   const removeConnectionListener = useCallback((listener: () => void): void => {
     connectionListenersRef.current.delete(listener);
-    console.log('연결 리스너 제거');
   }, []);
 
   // 연결 해제 리스너 관리 함수들
   const addDisconnectionListener = useCallback((listener: (evt: any) => void): void => {
     disconnectionListenersRef.current.add(listener);
-    console.log('연결 해제 리스너 추가');
   }, []);
 
   const removeDisconnectionListener = useCallback((listener: (evt: any) => void): void => {
     disconnectionListenersRef.current.delete(listener);
-    console.log('연결 해제 리스너 제거');
   }, []);
+
+  // prompt_key 업데이트 함수
+  const updatePromptKey = (key: string): void => {
+    if (key) {
+      console.log('prompt_key 업데이트:', key);
+      setApiState(prev => ({
+        ...prev,
+        sendPrompt_key: key,
+      }));
+    }
+  };
+
+  const deleteChatMessage = async (message: ChatMessage): Promise<boolean> => {
+    if(message.sender === 'character') {
+      // ai면 그 전
+      const index = chatMessages.findIndex(data => data.id === message.id)
+      console.log('index :: ' , index, chatMessages.length)
+
+      const deleteMessage = chatMessages[index - 1]
+
+      let DeleteMessageList = []
+      for(let i = index - 1; i < chatMessages.length; ++i)
+      {
+        DeleteMessageList.push(chatMessages[i])
+      }
+      console.log('DeleteMessageList :: ', DeleteMessageList)
+
+      const responseData = await chatApi.DeleteChat(
+        Number(chatRoomState.chrBotChatKey),
+        chatRoomState.currentChatMode,
+        apiState.nsfw,
+        deleteMessage.id
+      )
+      console.log('responseData :: ' , responseData)
+
+      if(responseData?.data?.result?.err === 0  ) {
+        updatePromptKey(responseData.data.prompt_key)
+        setChatMessages(prev => prev.filter(msg => !DeleteMessageList.includes(msg)))
+        return true
+      }
+    }
+
+    return false
+  };
+    
 
   // 먼저 useMemo로 chatContextValue 객체 생성
   const contextValue: NakamaContextType = {
@@ -1454,7 +1417,9 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     refreshLastAIMessage,
     clearChatHistory,
     addChatMessage,
-    updateChatMode
+    updateChatMode,
+    updatePromptKey,
+    deleteChatMessage,
   };
 
   // Provider 컴포넌트 간소화

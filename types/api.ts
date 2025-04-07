@@ -791,6 +791,15 @@ export interface ChatFreePenResponse {
   coin_free_dt: string;
 }
 
+
+// InitChat Response
+export interface InitChatResponse {
+  arrangePrompt: string;
+  prompt_key: string;
+  result: ApiResult;
+}
+
+
 // API Result
 export type ApiResult = {
   err: number;
