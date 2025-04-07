@@ -40,13 +40,6 @@ import { chatApi } from '@/services/api/storyNationApi'
 import Tutorial from '@/components/tutorial/Tutorial'
 import ResetChatModal from '@/components/modal/ResetChatModal'
 
-// 메시지 타입 정의
-interface ChatMessage {
-  id: string
-  sender: 'user' | 'character'
-  message: string
-  timestamp: Date
-}
 
 interface ChatDetailClientProps {
   characterId: string
@@ -113,12 +106,16 @@ const customChatModes: ChatMode[] = [
 ]
 
 export default function ChatDetailClient({ characterId, charbotData }: ChatDetailClientProps) {
+  console.log('charbotData :: ' , charbotData)
   const router = useRouter()
 
-  const { data: accountData } = useAccountStore(state => ({
+  const { data: accountData, userIsAdult } = useAccountStore(state => ({
     isLogin: state.isLogin,
     data: state.data,
+    userIsAdult: state.isAdult() ? 1 : 0,
   }))
+
+  // const first_talk = charbotData?.first_talk
 
   // 튜토리얼 관련 상태를 최상위로 이동
   const [showTutorial, setShowTutorial] = useState(true)
@@ -165,11 +162,13 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     isInitRoom,
     // 새로운 메시지 관련 필드와 메서드들
     chatMessages,
+
     sendChatMessage,
     refreshLastAIMessage,
     clearChatHistory,
     addChatMessage,
     updateChatMode,
+    updatePromptKey,
   } = nakamaContext
 
   const [message, setMessage] = useState('')
@@ -209,6 +208,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 채팅 컨테이너 ref
   const chatContainerRef = useRef<HTMLDivElement>(null)
+
 
   // 모바일 환경 감지
   useEffect(() => {
@@ -620,7 +620,30 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   }
 
   // 채팅 초기화 확인
-  const handleConfirmResetChat = () => {
+  const handleConfirmResetChat = async () => {
+
+    const responseData = await chatApi.InitChat(Number(chrBotChatKey), currentModeId, userIsAdult)
+    console.log('💬 채팅 초기화 응답:', responseData.data)
+
+    if(responseData?.data?.result?.err === 0) {
+      await clearChatHistory()
+
+      updatePromptKey(responseData.data.prompt_key)
+
+      // 채팅 초기화 성공
+      handleCloseResetChatModal()
+    } else {
+      // 채팅 초기화 실패
+      console.error('채팅 초기화 실패:', responseData.data.result.msg)
+    }
+
+
+    // if (response.success) {
+    //   // 채팅 초기화 성공
+    //   handleCloseResetChatModal()
+    // } else {
+    //   // 채팅 초기화 실패
+    //   console.error('채팅 초기화 실패:', response.message)
     // 여기에 채팅 초기화 로직 추가 (현재는 기능 연결 없음)
     handleCloseResetChatModal()
   }

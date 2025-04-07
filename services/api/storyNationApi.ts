@@ -43,6 +43,7 @@ import type {
   NicknmChangeResponse,
   ChatFreePenResponse,
   UserInfoResponse,
+  InitChatResponse,
 } from '../../types/api'
 
 // API 기본 설정
