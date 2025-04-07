@@ -137,7 +137,7 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
       {/* 검은색 오버레이 배경 - 클리핑 경로 사용 */}
       <div
         ref={overlayRef}
-        className="fixed inset-0 bg-black/85 z-[9999] backdrop-blur-sm transition-all duration-300"
+        className="fixed inset-0 bg-black/85 z-[9999] backdrop-blur-none transition-all duration-300"
         style={{
           clipPath: clipPath,
           WebkitClipPath: clipPath,
@@ -153,13 +153,12 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
           left: rect.left - 4,
           width: rect.width + 8,
           height: rect.height + 8,
-          boxShadow: '0 0 0 2px rgba(99, 102, 241, 0.4), 0 0 15px rgba(99, 102, 241, 0.4)',
         }}
       />
 
       {/* 설명 텍스트 */}
       <div
-        className="fixed text-white text-center max-w-[300px] z-[10001] p-3 backdrop-blur-sm shadow-lg"
+        className="fixed text-white text-center max-w-[300px] z-[10001] p-3 shadow-lg"
         style={{
           ...getTextPosition(),
           borderRadius: '12px',
@@ -185,7 +184,7 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
       </div>
 
       {/* 다시보지 않기 체크박스 */}
-      <div className="fixed top-4 right-4 flex items-center gap-2 text-white z-[10001] bg-black/60 px-3 py-2 rounded-full backdrop-blur-sm shadow-lg transition-all duration-300 hover:bg-black/70">
+      <div className="fixed top-4 right-4 flex items-center gap-2 text-white z-[10001] bg-black/60 px-3 py-2 rounded-full shadow-lg transition-all duration-300 hover:bg-black/70">
         <input
           type="checkbox"
           id="dontShowAgain"
