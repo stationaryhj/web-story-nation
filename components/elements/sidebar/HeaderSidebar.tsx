@@ -62,7 +62,7 @@ export default function HeaderSidebar({
         <div className="">
           <h3 className="text-sm font-semibold text-secondary-500 dark:text-dark-secondary-500 mb-4">설정</h3>
           <ul className="space-y-4">
-            <li>
+            {/* <li>
               <button
                 onClick={toggleDarkMode}
                 className="flex items-center w-full py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors"
@@ -70,7 +70,7 @@ export default function HeaderSidebar({
                 <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} className="text-lg mr-3" />
                 {isDarkMode ? '라이트 모드' : '다크 모드'}
               </button>
-            </li>
+            </li> */}
             {/* <li>
               <div className="flex items-center py-2">
                 <SimpleToggle isOn={isAdultModeEnabled} onToggle={handleAdultModeToggle} isSidebar={true} />

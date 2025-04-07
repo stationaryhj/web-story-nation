@@ -71,20 +71,8 @@ export default function Header() {
   const pathname = usePathname()
   const [activeLink, setActiveLink] = useState('/')
   const { openModal } = useModalStore()
-  const { isAdultModeEnabled, toggleAdultMode } = useSettingsStore()
   const { isLogin, logout } = useAccountStore()
   const router = useRouter()
-
-  // 짜릿모드 토글 핸들러
-  const handleAdultModeToggle = () => {
-    if (!isAdultModeEnabled) {
-      // 성인 모드가 꺼져 있을 때는 먼저 성인 인증 모달 표시
-      openModal('adultVerification')
-    } else {
-      // 성인 모드가 켜져 있을 때는 바로 토글
-      toggleAdultMode()
-    }
-  }
 
   // 네비게이션 링크 (아이콘 추가)
   const navLinks = [
@@ -193,7 +181,7 @@ export default function Header() {
             )} */}
 
             {/* 다크모드 토글 버튼 - 모바일에서는 숨김 */}
-            {mounted && (
+            {/* {mounted && (
               <motion.button
                 onClick={toggleDarkMode}
                 className="hidden md:block text-secondary-500 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600 transition-colors"
@@ -203,7 +191,7 @@ export default function Header() {
               >
                 <FontAwesomeIcon icon={themeIcon!} className="text-xl" />
               </motion.button>
-            )}
+            )} */}
 
             {/* 알림 버튼 - 모든 화면 크기에서 표시 */}
             <div>
