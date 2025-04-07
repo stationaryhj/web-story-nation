@@ -1,13 +1,12 @@
 'use client'
 
-import { faCheckCircle, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faCheckCircle, faTrash, faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { useModalStore } from '@/store/useStoreModal'
 import BaseSidebar from '@/components/elements/sidebar/BaseSidebar'
 import { useNotificationStoreData } from '@/store/useNotificationStoreData'
-import Portal from '@/components/portal/Portal'
 import { useAccountStore } from '@/store/useAccountStore'
 
 // 알림 타입 정의
@@ -17,7 +16,8 @@ type ActiveTabType = 'notification' | 'announcement'
 
 // 공지사항 목록 컴포넌트
 const AnnouncementTab = () => {
-  const { announcements, loadMoreAnnouncements, announcementPagination, isLoading } = useNotificationStoreData()
+  const { announcements, loadMoreAnnouncements, announcementPagination, isLoading, error, initialize } =
+    useNotificationStoreData()
 
   // 날짜 포맷팅 함수
   const formatDate = (date: Date) => {
@@ -30,12 +30,50 @@ const AnnouncementTab = () => {
 
   // 스크롤 이벤트 처리 함수 (무한 스크롤)
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget
     // 스크롤이 90% 이상 내려갔고, 더 불러올 데이터가 있을 때
     if (scrollTop + clientHeight >= scrollHeight * 0.9 && announcementPagination.hasMore && !isLoading) {
-      loadMoreAnnouncements();
+      loadMoreAnnouncements()
     }
-  };
+  }
+
+  // 로딩 중일 때 스켈레톤 UI 표시
+  if (isLoading && announcements.length === 0) {
+    return (
+      <div className="flex-1 overflow-y-auto">
+        {Array(5)
+          .fill(0)
+          .map((_, index) => (
+            <div key={`skeleton-${index}`} className="border-b border-secondary-100 dark:border-dark-secondary-800 p-4">
+              <div className="w-16 h-5 bg-secondary-100 dark:bg-dark-secondary-800 rounded-full animate-pulse mb-2"></div>
+              <div className="w-3/4 h-5 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse mb-2"></div>
+              <div className="w-full h-4 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse mb-2"></div>
+              <div className="w-32 h-3 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse"></div>
+            </div>
+          ))}
+      </div>
+    )
+  }
+
+  // 에러 발생 시 에러 메시지 표시
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-6">
+        <div className="text-center space-y-4">
+          <FontAwesomeIcon icon={faExclamationCircle} className="text-4xl text-red-500 dark:text-red-400 mb-2" />
+          <p className="text-secondary-700 dark:text-dark-secondary-300 text-base">
+            공지사항 불러오기 중 오류가 발생했습니다. 다시 시도해주세요.
+          </p>
+          <button
+            onClick={() => initialize()}
+            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors"
+          >
+            다시 시도
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   // 공지사항이 없는 경우
   if (announcements.length === 0) {
@@ -59,9 +97,7 @@ const AnnouncementTab = () => {
           >
             <div className="p-4 relative">
               {/* 중요 공지사항 표시 */}
-              {item.isImportant && (
-                <div className="absolute left-0 top-0 w-1 h-full bg-red-500 dark:bg-red-600"></div>
-              )}
+              {item.isImportant && <div className="absolute left-0 top-0 w-1 h-full bg-red-500 dark:bg-red-600"></div>}
               <div className="flex justify-between items-start">
                 <div className="ml-0.5 flex-1">
                   {/* 중요 표시 */}
@@ -71,9 +107,7 @@ const AnnouncementTab = () => {
                     </span>
                   )}
                   {/* 제목 */}
-                  <h3 className="text-sm font-medium text-secondary-900 dark:text-dark-secondary-200">
-                    {item.title}
-                  </h3>
+                  <h3 className="text-sm font-medium text-secondary-900 dark:text-dark-secondary-200">{item.title}</h3>
                   {/* 메시지 내용 */}
                   <p className="text-sm text-secondary-600 dark:text-dark-secondary-400 mt-1">{item.message}</p>
                   {/* 날짜 */}
@@ -86,6 +120,13 @@ const AnnouncementTab = () => {
           </motion.li>
         ))}
       </ul>
+
+      {/* 추가 로딩 중 표시 */}
+      {isLoading && announcements.length > 0 && (
+        <div className="p-4 flex justify-center">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-500"></div>
+        </div>
+      )}
     </div>
   )
 }
@@ -98,6 +139,9 @@ const NotificationTab = () => {
     markAllAsRead,
     deleteNotification,
     deleteAllNotifications,
+    isLoading,
+    error,
+    initialize,
   } = useNotificationStoreData()
   const { isLogin } = useAccountStore()
   const { openModal } = useModalStore()
@@ -107,9 +151,9 @@ const NotificationTab = () => {
     return (
       <div className="flex flex-col items-center justify-center h-full p-6">
         <div className="text-center space-y-4">
-          <FontAwesomeIcon 
-            icon={faCheckCircle} 
-            className="text-4xl text-secondary-400 dark:text-dark-secondary-500 mb-2" 
+          <FontAwesomeIcon
+            icon={faCheckCircle}
+            className="text-4xl text-secondary-400 dark:text-dark-secondary-500 mb-2"
           />
           <p className="text-secondary-700 dark:text-dark-secondary-300 text-base">
             알림 기능을 이용하려면 로그인이 필요합니다.
@@ -161,6 +205,64 @@ const NotificationTab = () => {
       default:
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
     }
+  }
+
+  // 로딩 중일 때 스켈레톤 UI 표시
+  if (isLoading) {
+    return (
+      <>
+        {/* 알림 관리 버튼 스켈레톤 */}
+        <div className="flex justify-end space-x-2 p-2 border-b border-secondary-100 dark:border-dark-secondary-800">
+          <div className="w-16 h-6 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse"></div>
+          <div className="w-16 h-6 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse"></div>
+        </div>
+
+        {/* 알림 목록 스켈레톤 */}
+        <div className="flex-1 overflow-y-auto">
+          {Array(5)
+            .fill(0)
+            .map((_, index) => (
+              <div
+                key={`skeleton-${index}`}
+                className="border-b border-secondary-100 dark:border-dark-secondary-800 p-4"
+              >
+                <div className="flex justify-between">
+                  <div className="ml-0.5">
+                    <div className="w-16 h-5 bg-secondary-100 dark:bg-dark-secondary-800 rounded-full animate-pulse mb-2"></div>
+                    <div className="w-32 h-5 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse mb-2"></div>
+                  </div>
+                  <div className="flex space-x-1">
+                    <div className="w-6 h-6 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse"></div>
+                    <div className="w-6 h-6 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse"></div>
+                  </div>
+                </div>
+                <div className="w-full h-4 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse mt-2"></div>
+                <div className="w-24 h-3 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse mt-2"></div>
+              </div>
+            ))}
+        </div>
+      </>
+    )
+  }
+
+  // 에러 발생 시 에러 메시지 표시
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-6">
+        <div className="text-center space-y-4">
+          <FontAwesomeIcon icon={faExclamationCircle} className="text-4xl text-red-500 dark:text-red-400 mb-2" />
+          <p className="text-secondary-700 dark:text-dark-secondary-300 text-base">
+            알림 불러오기 중 오류가 발생했습니다. 다시 시도해주세요.
+          </p>
+          <button
+            onClick={() => initialize()}
+            className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors"
+          >
+            다시 시도
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -260,14 +362,8 @@ const NotificationTab = () => {
 
 export default function NotificationSidebar() {
   const { isOpen, modalType, closeModal } = useModalStore()
-  const { 
-    notifications, 
-    hasNewNotification,
-    isLoading, 
-    error, 
-    initialize,
-    deleteAllNotifications
-  } = useNotificationStoreData()
+  const { notifications, hasNewNotification, isLoading, error, initialize, deleteAllNotifications } =
+    useNotificationStoreData()
   const { isLogin } = useAccountStore()
   const [activeTab, setActiveTab] = useState<ActiveTabType>('notification')
 
@@ -306,65 +402,12 @@ export default function NotificationSidebar() {
   const sidebarTitle = activeTab === 'notification' ? '알림' : '공지사항'
 
   // 헤더에 표시할 추가 요소 (알림 개수)
-  const headerExtra = activeTab === 'notification' && unreadCount > 0 ? (
-    <div className="flex items-center">
-      <span className="text-sm font-medium text-primary-600 dark:text-dark-primary-400">
-        {unreadCount}개 안 읽음
-      </span>
-    </div>
-  ) : null
-
-  if (isLoading) {
-    const loadingContent = (
-      <AnimatePresence>
-        <motion.div
-          className="fixed inset-0 bg-black/50 z-[999]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={closeModal}
-        />
-        <motion.div
-          className="fixed top-0 right-0 h-full min-w-[600px] bg-white dark:bg-dark-background-light shadow-xl z-[999] overflow-hidden flex flex-col"
-          initial={{ x: '100%' }}
-          animate={{ x: 0 }}
-          exit={{ x: '100%' }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        >
-          <div className="flex items-center justify-center h-full">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-          </div>
-        </motion.div>
-      </AnimatePresence>
-    )
-    return <Portal>{loadingContent}</Portal>
-  }
-
-  if (error) {
-    const errorContent = (
-      <AnimatePresence>
-        <motion.div
-          className="fixed inset-0 bg-black/50 z-[999]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={closeModal}
-        />
-        <motion.div
-          className="fixed top-0 right-0 h-full min-w-[600px] bg-white dark:bg-dark-background-light shadow-xl z-[999] overflow-hidden flex flex-col"
-          initial={{ x: '100%' }}
-          animate={{ x: 0 }}
-          exit={{ x: '100%' }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        >
-          <div className="flex items-center justify-center h-full text-red-500">
-            <p>알림을 불러오는데 실패했습니다.</p>
-          </div>
-        </motion.div>
-      </AnimatePresence>
-    )
-    return <Portal>{errorContent}</Portal>
-  }
+  const headerExtra =
+    activeTab === 'notification' && unreadCount > 0 ? (
+      <div className="flex items-center">
+        <span className="text-sm font-medium text-primary-600 dark:text-dark-primary-400">{unreadCount}개 안 읽음</span>
+      </div>
+    ) : null
 
   return (
     <BaseSidebar
