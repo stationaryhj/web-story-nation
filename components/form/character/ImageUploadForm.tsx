@@ -5,6 +5,7 @@ import { faUpload } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import type { ChangeEvent } from 'react'
+import { Trash2 } from 'lucide-react'
 
 import { RequiredLabel } from '../CharacterForm'
 import { useAccountStore } from '@/store/useAccountStore'
@@ -172,6 +173,9 @@ export default function ImageUploadForm({
     }
   }
 
+  const handleImageDelete = () => {
+    console.log('click delete')
+  }
   return (
     <div className="space-y-6">
       {/* 이용등급 */}
@@ -228,6 +232,12 @@ export default function ImageUploadForm({
                 <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
                   기본 이미지
                 </div>
+                <div
+                  className="absolute top-1 right-1 cursor-pointer hover:text-red-500 transition-colors duration-200"
+                  onClick={() => handleImageDelete()}
+                >
+                  <Trash2 />
+                </div>
               </div>
             )}
 
@@ -248,7 +258,7 @@ export default function ImageUploadForm({
             {/* 성인 이미지 섹션 */}
             <div className="col-span-2 sm:col-span-3 md:col-span-4 lg:col-span-5 mt-4 mb-2">
               <h3 className="text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-                싸릿 모드 이미지 (img_url_nsfw, img_web_url)
+                짜릿 모드 이미지 (img_url_nsfw, img_web_url)
               </h3>
               <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">
                 성인 모드에서만 표시되는 이미지입니다.
@@ -260,7 +270,13 @@ export default function ImageUploadForm({
               <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
                 <Image src={imgNsfw} alt="캐릭터 성인 이미지" fill className="object-cover" />
                 <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
-                  싸릿 모드 이미지
+                  짜릿 모드 이미지
+                </div>
+                <div
+                  className="absolute top-1 right-1 cursor-pointer hover:text-red-500 transition-colors duration-200"
+                  onClick={() => handleImageDelete()}
+                >
+                  <Trash2 />
                 </div>
               </div>
             )}
@@ -276,7 +292,7 @@ export default function ImageUploadForm({
               <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
                 <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
                 <span className="text-xs sm:text-sm">
-                  {formData.imgUrlNsfw ? '싸릿 모드 이미지 교체' : '싸릿 모드 이미지 업로드'}
+                  {formData.imgUrlNsfw ? '짜릿 모드 이미지 교체' : '짜릿 모드 이미지 업로드'}
                 </span>
               </div>
             </label>
