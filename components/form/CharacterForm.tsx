@@ -84,9 +84,6 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
         removeHashtag={async (tag: string) => {
           return await removeHashtag(tag)
         }}
-        addCustomTag={async (tag: string) => {
-          return await addHashtag(tag)
-        }}
         fetchTagList={fetchTagList}
         saveHashtags={async () => {
           return await saveHashtags()
