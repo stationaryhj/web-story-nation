@@ -4,6 +4,7 @@ import { useState } from 'react'
 import BaseModal from './BaseModal'
 import { useSettingsStore } from '@/store/useStoreSettings'
 import { toast } from 'react-toastify'
+import { useRouter } from 'next/navigation'
 
 interface AdultVerificationModalProps {
   isOpen: boolean
@@ -14,10 +15,14 @@ interface AdultVerificationModalProps {
 export default function AdultVerificationModal({ isOpen, onClose, onVerify }: AdultVerificationModalProps) {
   const [isVerifying, setIsVerifying] = useState(false)
   const { enableAdultMode } = useSettingsStore()
+  const router = useRouter()
 
   // 본인인증 처리 함수
   const handleVerify = async () => {
     try {
+
+      router.push('/settings')
+
       setIsVerifying(true)
 
       // 여기에 본인인증 API 호출 코드 추가
