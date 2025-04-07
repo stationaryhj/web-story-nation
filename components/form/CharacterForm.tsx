@@ -77,14 +77,12 @@ export default function CharacterForm({ mode, onValidationChange }: CharacterFor
       <BasicInfoForm
         formData={formData}
         setFormField={setFormField}
+        addCustomTag={addHashtag}
         addHashtag={async (tag: string) => {
           return await addHashtag(tag)
         }}
         removeHashtag={async (tag: string) => {
           return await removeHashtag(tag)
-        }}
-        addCustomTag={async (tag: string) => {
-          return await addHashtag(tag)
         }}
         fetchTagList={fetchTagList}
         saveHashtags={async () => {

@@ -171,7 +171,7 @@ export default function BaseModal({
             {/* 모달 */}
             <motion.div
               {...getAnimationProps()}
-              className={`relative z-[101] max-h-[95vh] overflow-auto rounded-xl bg-white shadow-lg dark:bg-dark-background-light ${sizeClasses[size]} ${className}`}
+              className={`relative z-[101] rounded-xl bg-white shadow-lg dark:bg-dark-background-light ${sizeClasses[size]} ${className}`}
               onClick={handleModalClick}
               style={{ ...style, minWidth: '375px' }}
             >

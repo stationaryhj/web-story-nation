@@ -35,16 +35,3 @@ export default function NotificationButton({ count = 0, className = '' }: Notifi
     </button>
   )
 }
-
-// 애니메이션 정의를 tailwind.config.js에 추가:
-// extend: {
-//   keyframes: {
-//     wiggle: {
-//       '0%, 100%': { transform: 'rotate(-3deg)' },
-//       '50%': { transform: 'rotate(3deg)' },
-//     },
-//   },
-//   animation: {
-//     wiggle: 'wiggle 0.3s ease-in-out',
-//   },
-// },
