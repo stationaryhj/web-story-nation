@@ -138,6 +138,7 @@ export function bridgeCharbotGetListMineDataToCharacter(dataList: Array<CharbotM
     category: 'unspecified',
     finish_yn: item.finish_yn,
     show_yn: item.show_yn,
+    block_type: item.block_type,
   }))
 
   return characters
@@ -190,6 +191,7 @@ export function bridgeCharbotDataToCharacter(data: ChrbotData) {
     example: data.example,
     first_talk: data.first_talk,
     imageUrl: getImageUri(useAccountStore.getState().isAdult() ? data.img_web_url : data.img_url),
+    imageUrlNsfw: getImageUri(data.img_url_nsfw),
     commentCount: data.msg_cnt,
     hashtags: data.tags ? data.tags.split(',') : [],
     isAdult: data.nsfw === 1,

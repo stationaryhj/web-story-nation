@@ -23,7 +23,7 @@ export default function MyCharacterPage() {
 
   const myNickName = useAccountStore.getState().data?.nick_nm
 
-  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 20)
+  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 50)
 
   useEffect(() => {
     if (inProgressData?.result.err === 4) {
@@ -55,6 +55,13 @@ export default function MyCharacterPage() {
 
   // 수정 버튼 클릭 처리
   const handleEditClick = (character: Character) => {
+    console.log('character :: ', character)
+
+    if(character.block_type === 1) {
+      // 신고된놈
+      return
+    }
+
     router.push(`/my-characters/edit/${character.id}`)
   }
 
