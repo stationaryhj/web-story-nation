@@ -1,7 +1,16 @@
 'use client'
 
 import { useModalStore } from '@/store/useStoreModal'
-import { faComment, faHeart, faTimes, faShieldHalved, faMessage, faUser, faPlus, faUserEdit } from '@fortawesome/free-solid-svg-icons'
+import {
+  faComment,
+  faHeart,
+  faTimes,
+  faShieldHalved,
+  faMessage,
+  faUser,
+  faPlus,
+  faUserEdit,
+} from '@fortawesome/free-solid-svg-icons'
 import { Siren } from 'lucide-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
@@ -15,7 +24,6 @@ import { contentApi } from '@/services/api/storyNationApi'
 import { CharbotLikeResponse } from '@/types/api'
 import { useAccountStore } from '@/store/useStoreData'
 import ReportModal from './ReportModal'
-
 
 interface ExampleData {
   title: string
@@ -43,10 +51,9 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [reportSubmitted, setReportSubmitted] = useState(false)
 
-
   const variant = modalProps?.variant || 'default'
 
-  const { 
+  const {
     data: chatBotData,
     isLoading: chatBotLoading,
     error: chatBotError,
@@ -190,7 +197,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
       isOpen={isOpen}
       onClose={handleClose}
       size="full"
-      className="mx-auto w-full h-[90vh] flex flex-col"
+      className="mx-auto w-full max-h-[90vh] flex flex-col overflow-hidden"
       showCloseButton={false}
       hideHeader={true}
     >
@@ -225,12 +232,12 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
           </div>
         </div>
       </div>
-      <div className="flex flex-col md:flex-row">
+      <div className="flex flex-col md:flex-row overflow-hidden flex-1">
         {/* 좌측: 캐릭터 이미지와 기본 정보 (PC 레이아웃) */}
-        <div className="md:w-[40%] p-5 overflow-y-auto">
-          <div className="h-full flex flex-col items-start">
+        <div className="md:w-[40%] p-5 overflow-y-auto max-h-[calc(90vh-4rem)]">
+          <div className="flex flex-col items-start">
             {/* 이미지 영역 */}
-            <div className="h-full min-h-[650px] relative mb-6 w-full flex items-center justify-center">
+            <div className="relative mb-6 w-full flex items-center justify-center">
               {selectedCharacter.imageUrl && (
                 <>
                   <div
@@ -238,25 +245,25 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   >
                     <div className="w-10 h-10 rounded-full border-2 border-primary-500 border-t-transparent animate-spin"></div>
                   </div>
-                  <div className="relative w-full h-full rounded-xl overflow-hidden">
+                  <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingTop: '133%' }}>
                     <div className="absolute inset-0 bg-gradient-to-tr from-primary-100/50 to-transparent dark:from-primary-900/20 dark:to-transparent rounded-2xl opacity-70 z-0"></div>
                     <Image
                       src={selectedCharacter.imageUrl}
                       alt={selectedCharacter.name || '캐릭터 이미지'}
                       fill
                       priority
-                      style={{ objectFit: 'fill' }}
+                      style={{ objectFit: 'cover' }}
                       className="transition-opacity duration-300 z-10 opacity-100"
                       onLoadingComplete={() => setIsImageLoaded(true)}
                     />
+                    {/* 19세 이상 뱃지 */}
+                    {selectedCharacter.isAdult && (
+                      <div className="absolute top-3 left-3 z-20 bg-red-500 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center shadow-md backdrop-blur-sm">
+                        <FontAwesomeIcon icon={faShieldHalved} className="mr-1.5 h-3.5 w-3.5" />
+                        19+
+                      </div>
+                    )}
                   </div>
-                  {/* 19세 이상 뱃지 */}
-                  {selectedCharacter.isAdult && (
-                    <div className="absolute top-3 left-3 z-20 bg-red-500 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center shadow-md backdrop-blur-sm">
-                      <FontAwesomeIcon icon={faShieldHalved} className="mr-1.5 h-3.5 w-3.5" />
-                      19+
-                    </div>
-                  )}
                 </>
               )}
             </div>
@@ -308,7 +315,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
         </div>
 
         {/* 우측: 캐릭터 상세 설명 및 대화 예시 */}
-        <div className="md:w-[60%] h-full overflow-y-auto">
+        <div className="md:w-[60%] overflow-y-auto max-h-[calc(90vh-4rem)]">
           <div className="p-5 space-y-5">
             {/* 첫 번째 섹션: 캐릭터 소개 */}
             {isContentShow == 1 && (
