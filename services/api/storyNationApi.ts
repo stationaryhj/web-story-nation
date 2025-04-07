@@ -742,6 +742,34 @@ export const chatApi = {
     })
   },
 
+
+  /**
+   * 메세지 전송
+   * @param chat_mode 채팅 모드 ( 1: 가성비모드, 2: 스토리모드, 3: 짜릿1.0, 4: 짜릿2.0 )
+   * @param nsfw 유저가 성인이면 1, 아니면 0
+   * @param prompt_key 프롬프트 키
+   * @param chrbot_chat_key 채팅 키 ( nakama 에서 채팅 키 추출 )
+   * @param stream 스트리밍 여부 0으로
+   */
+  ReSendChat: async (
+    chat_mode: number,
+    nsfw: number,
+    prompt_key: string,
+    chrbot_chat_key: number,
+    stream: boolean,
+  ): Promise<ApiResponse> => {
+    return chatApiInstance.post('/api/charbot/chat/resend', {
+      chat_mode,
+      nsfw: 1,
+      prompt_key,
+      chrbot_chat_key,
+      stream: stream ? 1 : 0,
+      countryCode: 'KR',
+    })
+  },
+
+
+
   /**
    * 메세지 정렬
    * @param chrbot_chat_key 채팅 키 ( nakama 에서 채팅 키 추출 )

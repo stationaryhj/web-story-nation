@@ -50,6 +50,7 @@ interface NakamaContextType {
 
   updateChatMode: (mode: number) => void;
   updatePromptKey: (key: string) => void;
+  deleteChatMessage: (message: ChatMessage) => Promise<boolean>;
 }
 
 // 채팅 메시지 인터페이스
@@ -116,6 +117,7 @@ const defaultContextValue: NakamaContextType = {
 
   updateChatMode: () => {},
   updatePromptKey: () => {},
+  deleteChatMessage: async () => false,
 };
 
 // Nakama 컨텍스트 생성
@@ -342,6 +344,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
             await new Promise(resolve => setTimeout(resolve, 1000));
             continue;
           }
+          console.log('result :: ' , result)
           
           console.log(`💬 채팅 메시지 ${result.messages.length}개 수신`);
 
@@ -350,7 +353,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
           result.messages.forEach((message) => {
             const messageContent = message.content as any;
-            const senderId = message.sender_id || 
+            const senderId = message.message_id || 
               `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             const createTime = message.create_time ? 
               new Date(message.create_time) : new Date();
@@ -1062,7 +1065,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
       // API 호출하여 새로운 응답 생성
       const promptKey = apiState.sendPrompt_key || '';
-      const response = await chatApi.SendChat(
+      const response = await chatApi.ReSendChat(
         chatRoomState.currentChatMode,
         apiState.nsfw,
         promptKey,
@@ -1076,13 +1079,16 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       }
 
       // 응답 상태 확인
-      if (!response.success || !response.data.result || response.data.result.err !== 0) {
+      if (!response.data.result || response.data.result.err !== 0) {
         console.error('API 응답 오류:', response.data);
         throw new Error(response.data.result?.msg || '서버 응답 오류가 발생했습니다.');
       }
 
       // Nakama를 통해 AI 응답 전송
       try {
+        updatePromptKey(response.data.prompt_key)
+
+
         // 응답 JSON 파싱 및 content 추출
         const responseObj = JSON.parse(response.data.response);
         let messageContent = '';
@@ -1341,6 +1347,40 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     }
   };
 
+  const deleteChatMessage = async (message: ChatMessage): Promise<boolean> => {
+    if(message.sender === 'character') {
+      // ai면 그 전
+      const index = chatMessages.findIndex(data => data.id === message.id)
+      console.log('index :: ' , index, chatMessages.length)
+
+      const deleteMessage = chatMessages[index - 1]
+
+      let DeleteMessageList = []
+      for(let i = index - 1; i < chatMessages.length; ++i)
+      {
+        DeleteMessageList.push(chatMessages[i])
+      }
+      console.log('DeleteMessageList :: ', DeleteMessageList)
+
+      const responseData = await chatApi.DeleteChat(
+        Number(chatRoomState.chrBotChatKey),
+        chatRoomState.currentChatMode,
+        apiState.nsfw,
+        deleteMessage.id
+      )
+      console.log('responseData :: ' , responseData)
+
+      if(responseData?.data?.result?.err === 0  ) {
+        updatePromptKey(responseData.data.prompt_key)
+        setChatMessages(prev => prev.filter(msg => !DeleteMessageList.includes(msg)))
+        return true
+      }
+    }
+
+    return false
+  };
+    
+
   // 먼저 useMemo로 chatContextValue 객체 생성
   const contextValue: NakamaContextType = {
     client, 
@@ -1380,6 +1420,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     addChatMessage,
     updateChatMode,
     updatePromptKey,
+    deleteChatMessage,
   };
 
   // Provider 컴포넌트 간소화
