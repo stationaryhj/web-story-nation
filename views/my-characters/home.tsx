@@ -118,7 +118,7 @@ export default function MyCharacterPage() {
             <button
               type="button"
               className="flex items-center space-x-2 rounded-lg bg-primary-500 px-6 py-3 text-white transition-colors hover:bg-primary-600 dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600"
-              onClick={() => router.push('/my-characters/edit/')}
+              onClick={handleCreateCharacter}
             >
               <FontAwesomeIcon icon={faPlus} />
               <span>첫 캐릭터 만들기</span>
