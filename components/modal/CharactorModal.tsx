@@ -16,7 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { bridgeCharbotDataToCharacter } from '@/lib/utils/storyNationUtil'
+import { bridgeCharbotDataToCharacter, getChangeNameTag } from '@/lib/utils/storyNationUtil'
 import BaseModal from './BaseModal'
 import { ReqGetChatBot } from '@/services/hooks/DataListManager'
 import { Character } from '@/store/useStoreData'
@@ -343,7 +343,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   상세 설명
                 </h3>
                 <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed">
-                  {content || '설명이 없습니다.'}
+                  {getChangeNameTag(content || '', selectedCharacter.name)}
                 </p>
               </div>
             )}
@@ -369,12 +369,12 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                             <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
                           </div>
                           <div className="p-2 bg-secondary-50 dark:bg-dark-secondary-800/50 rounded-lg text-sm">
-                            {data.Character}
+                            {getChangeNameTag(data.Character, selectedCharacter.name)}
                           </div>
                         </div>
                         <div className="flex items-start justify-end space-x-2">
                           <div className="p-2 bg-primary-50 dark:bg-dark-primary-900/30 rounded-lg text-sm text-end">
-                            {data.User}
+                            {getChangeNameTag(data.User, selectedCharacter.name)}
                           </div>
                         </div>
                       </div>
@@ -430,7 +430,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                         {/* 말풍선 내용 */}
                         <div className="bg-primary-50 dark:bg-primary-900/30 text-secondary-800 dark:text-secondary-200 p-3 rounded-lg rounded-tl-none shadow-sm border border-primary-100 dark:border-primary-800/50">
                           <p className="text-sm leading-relaxed">
-                            {selectedCharacter?.first_talk || '첫 메시지가 없습니다.'}
+                            {getChangeNameTag(selectedCharacter?.first_talk || '', selectedCharacter.name)}
                           </p>
                         </div>
 
@@ -523,7 +523,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                 </span>
               </h3>
               <p className="text-secondary-800 dark:text-dark-secondary-200 text-sm pl-3 border-l-2 border-primary-200 dark:border-dark-primary-700">
-                {selectedCharacter.detailDescription || selectedCharacter.description || '설명이 없습니다.'}
+                {getChangeNameTag(selectedCharacter.detailDescription || selectedCharacter.description || '', selectedCharacter.name)}
               </p>
             </div>
           </div>
