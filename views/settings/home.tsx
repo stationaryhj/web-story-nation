@@ -577,7 +577,7 @@ export default function SettingsForm() {
                         : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     }`}
                   >
-                    중복확인
+                    닉네임 변경
                   </button>
                 </div>
                 <div className="mt-2">
