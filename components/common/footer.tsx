@@ -108,7 +108,7 @@ export default function Footer() {
                 </ul>
               </div>
 
-              <div>
+              {/* <div>
                 <h4 className="text-sm font-semibold text-secondary-900 dark:text-dark-secondary-700 mb-3">소셜</h4>
                 <ul className="flex space-x-4">
                   <li>
@@ -156,7 +156,7 @@ export default function Footer() {
                     </a>
                   </li>
                 </ul>
-              </div>
+              </div> */}
             </div>
           </div>
 

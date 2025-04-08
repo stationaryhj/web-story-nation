@@ -52,7 +52,7 @@ export default function RecommendSection({ onSearchTrigger }: RecommendSectionPr
               스토리네이션 앱 설치하기
             </h2>
             <p className="text-secondary-600 dark:text-dark-secondary-400 mb-8 max-w-2xl">
-              스토리네이션을 모바일에서도 편리하게 이용해보세요.
+              스토리네이션을 모바일에서도 편리하게 이용해보세요.<br />
               더 많은 캐릭터들과 함께 이야기를 나눌 수 있습니다.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md justify-center">
