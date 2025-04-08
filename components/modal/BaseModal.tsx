@@ -202,7 +202,7 @@ export default function BaseModal({
               )}
 
               {/* 모달 내용 */}
-              <div className={`${bodyClassName} flex-grow overflow-y-auto md:overflow-visible`}>
+              <div className={`${bodyClassName} flex-grow overflow-y-auto md:overflow-visible py-4`}>
                 {/* 아이콘이 있는 경우 타이틀 위에 표시 */}
                 {isIcon && icon && <div className="mb-3 flex justify-center">{icon}</div>}
                 {/* 타이틀을 바디에 포함 (가운데 정렬) */}
