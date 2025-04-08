@@ -6,6 +6,7 @@ import AuthorGrid from '@/components/elements/card/AuthorGrid'
 import { SectionTransition } from '@/components/motion/PageTransition'
 import AuthorRankingSidebar from '@/components/elements/sidebar/AuthorRankingSidebar'
 import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
+import { getValidImageUrl } from '@/lib/utils/storyNationUtil'
 
 // 작가 랭킹 탭 정의
 const authorRankingTabs: TabItem[] = [
@@ -17,19 +18,6 @@ const authorRankingTabs: TabItem[] = [
 // 랭킹 탭에 따른 업데이트 문구
 const getRankingUpdateMessage = (tabId: string) => {
   return '캐릭터 매출 20% 현금 정산 이벤트!(종료 후 10%) 15,000원부터 출금 가능!'
-  
-  switch (tabId) {
-    case 'realtime':
-      return `${Math.floor(Math.random() * 60)}분 전 업데이트`
-    case 'daily':
-      return '매일 밤 12시 업데이트'
-    case 'weekly':
-      return '매주 월요일 00시 업데이트'
-    case 'monthly':
-      return '매월 1일 00시 업데이트'
-    default:
-      return ''
-  }
 }
 
 // 작가 랭킹 섹션 컴포넌트
@@ -48,17 +36,34 @@ const AuthorRankingSection = memo(() => {
   }
 
   const getAuthorRankingData = () => {
-
     // Character 타입을 Author 타입으로 변환
-    return rankingCreaters.map(character => ({
-      id: character.id,
-      name: character.name,
-      nickname: character.creator?.nickname || character.name,
-      description: character.description || '',
-      profileImageUrl: character.profileImageUrl || character.imageUrl,
-      characterCount: 0, // 기본값 설정
-      isVerified: true,  // 기본값 설정
-    }));
+    return rankingCreaters.map(character => {
+      // 유효한 이미지 URL 체크 함수
+      const getValidImageUrl = (url: string | null | undefined): string | null => {
+        if (!url) return null;
+        
+        // 상대 경로는 그대로 통과, 절대 경로는 유효한 URL인지 확인
+        if (url.startsWith('/')) return url;
+        
+        try {
+          new URL(url); // URL 유효성 체크
+          return url;
+        } catch (e) {
+          console.warn('Invalid image URL:', url);
+          return null;
+        }
+      };
+
+      return {
+        id: character.id,
+        name: character.name,
+        nickname: character.creator?.nickname || character.name,
+        description: character.description || '',
+        profileImageUrl: getValidImageUrl(character.profileImageUrl || character.imageUrl),
+        characterCount: 0, // 기본값 설정
+        isVerified: true,  // 기본값 설정
+      }
+    });
   }
 
   const handleAuthorClick = (author: any) => {
