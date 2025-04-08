@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSun, faMoon, faCog, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
+import { faSun, faMoon, faCog, faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons'
 import BaseSidebar from './BaseSidebar'
 
 interface NavLink {
@@ -82,7 +82,7 @@ export default function HeaderSidebar({
                 className="flex items-center py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors"
                 onClick={() => onClose()}
               >
-                <FontAwesomeIcon icon={faCog} className="text-lg mr-3" />
+                <FontAwesomeIcon icon={faUser} className="text-lg mr-3" />
                 설정
               </Link>
             </li>
