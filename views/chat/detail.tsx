@@ -729,6 +729,14 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     }
   }, [isInitRoom, channelId, chatMessages.length, first_talk, addChatMessage])
 
+  // 채팅방 초기화 및 로딩 완료 시 스크롤 최하단으로 이동
+  useEffect(() => {
+    if (!isLoading && isInitRoom && channelId && chatMessages.length > 0) {
+      // 약간의 지연 후 스크롤 이동 (컴포넌트가 완전히 렌더링된 후)
+      setTimeout(scrollToBottom, 100)
+    }
+  }, [isLoading, isInitRoom, channelId, chatMessages.length, scrollToBottom])
+
   useEffect(() => {
     console.log('characterId :: ', characterId)
     const checkCharacter = async () => {
@@ -760,6 +768,83 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       toastShownRef.current = false
     }
   }, [characterId])
+
+  // 현재 보여지는 메시지의 시작 인덱스
+  const [visibleStartIndex, setVisibleStartIndex] = useState(0)
+  const MESSAGES_PER_VIEW = 20
+  const LOAD_MORE_THRESHOLD = 500 // 스크롤 임계값 증가
+  const LOAD_MORE_COUNT = 15 // 한 번에 로드할 메시지 수 증가
+  const PRELOAD_BUFFER = 10 // 미리 로드할 메시지 버퍼
+  
+  // 보여질 메시지만 필터링 - 앞뒤로 더 많은 메시지 미리 로드
+  const visibleMessages = chatMessages.slice(
+    Math.max(0, visibleStartIndex - PRELOAD_BUFFER), 
+    Math.min(chatMessages.length, visibleStartIndex + MESSAGES_PER_VIEW + PRELOAD_BUFFER)
+  )
+
+  // 마지막으로 수동 스크롤한 위치 기록
+  const lastManualScrollRef = useRef<number>(0)
+  const isAutoScrollingRef = useRef<boolean>(true)
+
+  // 스크롤 이벤트 핸들러
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const container = e.currentTarget
+    const scrollTop = container.scrollTop
+    const scrollHeight = container.scrollHeight
+    const clientHeight = container.clientHeight
+    const scrollBottom = scrollHeight - scrollTop - clientHeight
+    
+    // 맨 아래로부터의 거리가 100px 이하면 자동 스크롤 활성화
+    if (scrollBottom <= 100) {
+      isAutoScrollingRef.current = true
+    } else {
+      // 사용자가 스크롤을 올린 경우 자동 스크롤 비활성화
+      if (lastManualScrollRef.current > scrollTop + 50) {
+        isAutoScrollingRef.current = false
+      }
+      lastManualScrollRef.current = scrollTop
+    }
+    
+    // 스크롤이 상단에 가까워지면 이전 메시지 보여주기
+    if (scrollTop < LOAD_MORE_THRESHOLD && visibleStartIndex > 0) {
+      setVisibleStartIndex(prev => Math.max(0, prev - LOAD_MORE_COUNT))
+    }
+    
+    // 스크롤이 하단에 가까워지면 다음 메시지 보여주기
+    if (scrollBottom < LOAD_MORE_THRESHOLD && 
+        visibleStartIndex + MESSAGES_PER_VIEW < chatMessages.length) {
+      setVisibleStartIndex(prev => 
+        Math.min(chatMessages.length - MESSAGES_PER_VIEW, prev + LOAD_MORE_COUNT)
+      )
+    }
+  }
+
+  // 새 메시지가 추가되면 마지막 메시지가 보이도록 인덱스 조정
+  useEffect(() => {
+    // 자동 스크롤이 활성화된 경우에만 마지막 메시지로 스크롤
+    if (isAutoScrollingRef.current) {
+      if (chatMessages.length > 0) {
+        setVisibleStartIndex(Math.max(0, chatMessages.length - MESSAGES_PER_VIEW))
+        // 약간의 지연 후 스크롤 조정
+        setTimeout(scrollToBottom, 10)
+      }
+    }
+  }, [chatMessages.length])
+  
+  // 메시지가 길어질 경우를 대비한 길이 제한 함수
+  const getLimitedVisibleMessages = () => {
+    // 너무 긴 메시지의 경우 렌더링 최적화를 위해 일정 길이 이상인 경우만 특별 처리
+    return visibleMessages.map(msg => {
+      if (msg.message.length > 1000) {
+        return {
+          ...msg,
+          // 메시지 ID에 고유값 추가하여 리렌더링 방지
+          id: `${msg.id}-visible-${visibleStartIndex}`
+        };
+      }
+      return msg;
+    });
+  }
 
   // 로딩 상태 표시
   if (isLoading) {
@@ -1193,22 +1278,27 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           )}
 
           {/* 채팅 내용 */}
-          <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 md:p-6">
-            <div className="flex flex-col space-y-12 max-w-3xl mx-auto">
+          <div 
+            ref={chatContainerRef} 
+            className="flex-1 overflow-y-auto p-4 md:p-6 overscroll-contain"
+            onScroll={handleScroll}
+          >
+            <div className="flex flex-col space-y-8 max-w-3xl mx-auto">
               {chatMessages.length === 0 ? (
                 <div className="text-center text-gray-500 py-10">
                   <p>메시지가 없습니다. 채팅을 시작해보세요!</p>
                 </div>
               ) : (
-                chatMessages.map((chat, index) => {
-                  const isLastAiMessage = chatMessages.length - 1 === index
+                getLimitedVisibleMessages().map((chat, index) => {
+                  // 실제 인덱스 계산 (전체 메시지 배열 내에서의 위치)
+                  const actualIndex = chatMessages.findIndex(msg => msg.id === chat.id);
+                  const isLastAiMessage = chatMessages.length - 1 === actualIndex && chat.sender === 'character';
+                  const isLastMessage = actualIndex === chatMessages.length - 1;
+                  
                   return (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className={`flex flex-col ${chat.sender === 'user' ? 'items-end' : 'items-start'}`}
+                    <div
+                      key={chat.id}
+                      className={`flex flex-col ${chat.sender === 'user' ? 'items-end' : 'items-start'} ${isLastMessage ? 'pb-4' : ''}`}
                     >
                       {chat.sender === 'character' && (
                         <div
@@ -1265,7 +1355,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                           </button>
                         </div>
                       )}
-                    </motion.div>
+                    </div>
                   )
                 })
               )}
