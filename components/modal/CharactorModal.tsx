@@ -215,10 +215,10 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
       isOpen={isOpen}
       onClose={handleClose}
       size="full"
-      className="mx-auto w-full max-h-[90vh] flex flex-col"
+      className="mx-auto w-full"
       showCloseButton={false}
       hideHeader={true}
-      bodyClassName="p-0"
+      bodyClassName="p-0 max-h-[90vh] overflow-hidden"
     >
       {/* 모달 헤더 */}
       <div className="sticky top-0 z-[102] bg-white dark:bg-dark-background-light border-b border-secondary-100 dark:border-dark-secondary-800">
@@ -253,9 +253,9 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
           </div>
         </div>
       </div>
-      <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
+      <div className="flex flex-col md:flex-row overflow-auto max-h-[78vh]">
         {/* PC 레이아웃 */}
-        <div className="hidden md:block md:w-[40%] p-5 overflow-y-auto">
+        <div className="hidden md:block md:w-[40%] p-5 overflow-y-auto max-h-full">
           <div className="flex flex-col items-start">
             {/* 이미지 영역 */}
             <div className="relative mb-6 w-full flex items-center justify-center">
@@ -266,15 +266,15 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   >
                     <div className="w-10 h-10 rounded-full border-2 border-primary-500 border-t-transparent animate-spin"></div>
                   </div>
-                  <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingTop: '133%' }}>
-                    <div className="absolute inset-0 bg-gradient-to-tr from-primary-100/50 to-transparent dark:from-primary-900/20 dark:to-transparent rounded-2xl opacity-70 z-0"></div>
+                  <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingTop: '100%' }}>
+                    <div className="absolute inset-0 bg-gradient-to-b from-primary-100 via-primary-50/80 to-transparent dark:from-dark-primary-800 dark:via-dark-primary-700/80 dark:to-transparent rounded-2xl opacity-90 z-0"></div>
                     <Image
                       src={selectedCharacter.imageUrl}
                       alt={selectedCharacter.name || '캐릭터 이미지'}
                       fill
                       priority
-                      style={{ objectFit: 'cover' }}
-                      className="transition-opacity duration-300 z-10 opacity-100"
+                      style={{ objectFit: 'contain', objectPosition: 'center' }}
+                      className="transition-opacity duration-300 z-10 opacity-100 drop-shadow-md"
                       onLoadingComplete={() => setIsImageLoaded(true)}
                     />
                     {/* 19세 이상 뱃지 */}
@@ -334,11 +334,11 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
             </div>
           </div>
         </div>
-        <div className="hidden md:block md:w-[60%] overflow-y-auto">
-          <div className="p-5 space-y-5">
+        <div className="hidden md:block md:w-[60%] overflow-y-auto max-h-full">
+          <div className="p-5 space-y-4">
             {/* 첫 번째 섹션: 캐릭터 소개 */}
             {isContentShow == 1 && (
-              <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm mb-5 border border-secondary-100 dark:border-dark-secondary-800/30">
+              <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm mb-4 border border-secondary-100 dark:border-dark-secondary-800/30">
                 <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
                   <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
                   상세 설명
@@ -350,7 +350,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
             )}
             {/* 대화 예시 섹션 */}
             {isExampleShow == 1 && (
-              <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm mb-5 border border-secondary-100 dark:border-dark-secondary-800/30">
+              <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm mb-4 border border-secondary-100 dark:border-dark-secondary-800/30">
                 <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
                   <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
                   대화 예시
@@ -386,12 +386,12 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
             )}
 
             {/* 세 번째 섹션: 첫 메시지 */}
-            <div className="h-full bg-white dark:from-dark-secondary-800/50 dark:to-dark-primary-900/30 rounded-lg p-5 shadow-sm border border-secondary-100 dark:border-dark-secondary-800/30">
+            <div className="bg-white dark:from-dark-secondary-800/50 dark:to-dark-primary-900/30 rounded-lg p-5 shadow-sm border border-secondary-100 dark:border-dark-secondary-800/30">
               <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 flex items-center">
                 <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>첫 메시지
               </h3>
-              <div className="flex flex-col justify-between h-full">
-                <div className="p-4 flex flex-col justify-between bg-white/80 dark:bg-dark-secondary-900/50 rounded-lg h-full">
+              <div className="flex flex-col justify-between">
+                <div className="p-4 flex flex-col justify-between bg-white/80 dark:bg-dark-secondary-900/50 rounded-lg">
                   <div>
                     {mockFirstMessage.situation && (
                       <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mb-2 italic">
@@ -434,8 +434,6 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                             {getChangeNameTag(selectedCharacter?.first_talk || '', selectedCharacter.name)}
                           </p>
                         </div>
-
-                        {/* 시간 표시 */}
                       </div>
                     </div>
                   </div>
@@ -455,9 +453,9 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
         </div>
 
         {/* 모바일 레이아웃 */}
-        <div className="md:hidden w-full h-full overflow-y-auto">
+        <div className="md:hidden w-full overflow-y-auto max-h-full">
           {/* 상단: 이미지 섹션 */}
-          <div className="w-full relative bg-gradient-to-b from-primary-100 to-primary-50 dark:from-dark-primary-900 dark:to-dark-primary-800 flex-shrink-0">
+          <div className="w-full relative bg-gradient-to-b from-primary-100 to-primary-50 dark:from-dark-primary-900 dark:to-dark-primary-800 flex-shrink-0 max-h-[40vh] overflow-hidden">
             {selectedCharacter.imageUrl && (
               <>
                 <div
@@ -465,14 +463,15 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                 >
                   <div className="w-8 h-8 rounded-full border-2 border-primary-500 border-t-transparent animate-spin"></div>
                 </div>
-                <div className="relative w-full" style={{ paddingTop: '133%' }}>
+                <div className="relative w-full" style={{ paddingTop: '100%' }}>
+                  <div className="absolute inset-0 bg-gradient-to-b from-primary-100 via-primary-50/80 to-transparent dark:from-dark-primary-800 dark:via-dark-primary-700/80 dark:to-transparent rounded-md opacity-90 z-0"></div>
                   <Image
                     src={selectedCharacter.imageUrl}
                     alt={selectedCharacter.name || '캐릭터 이미지'}
                     fill
                     priority
-                    style={{ objectFit: 'contain' }}
-                    className={`transition-opacity duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                    style={{ objectFit: 'contain', objectPosition: 'center' }}
+                    className={`transition-opacity duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'} drop-shadow-md z-10`}
                     onLoadingComplete={() => setIsImageLoaded(true)}
                   />
                 </div>

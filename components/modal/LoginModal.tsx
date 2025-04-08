@@ -11,7 +11,7 @@ import { toast } from 'react-toastify'
 import { authService } from '@/services/auth'
 import { SpeechBubble } from '@/components/animation/SpeechBubble'
 import { ToastContainer } from 'react-toastify'
-
+import Image from 'next/image'
 interface LoginModalProps {
   isOpen: boolean
   onClose: () => void
@@ -230,44 +230,75 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             <button
               onClick={() => handleSocialLogin('GOOGLE')}
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-full bg-blue-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex w-full h-12 items-center justify-start rounded-full bg-[#F2F2F2] px-[71px] font-medium text-white transition-colors"
             >
-              <span>구글로 계정으로 로그인</span>
-            </button>
-            <button
-              onClick={() => handleSocialLogin('APPLE')}
-              disabled={loading}
-              className="flex w-full items-center justify-center rounded-full bg-black py-3 px-4 font-medium text-white shadow transition-colors hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <span>애플로 계정으로 로그인</span>
+              <div className="flex items-center justify-center gap-4">
+                <span>
+                  <Image src="/images/symbol/google.svg" alt="구글" width={20} height={20} />
+                </span>
+                <span className="text-[#1F1F1F]">구글 계정으로 로그인</span>
+              </div>
             </button>
             <button
               onClick={() => handleSocialLogin('KAKAO')}
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-full bg-yellow-400 py-3 px-4 font-medium text-yellow-900 shadow transition-colors hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex w-full h-12 items-center justify-center rounded-full bg-[#FEE500] font-medium text-yellow-900 shadow transition-colors"
             >
-              <span>카카오 계정으로 로그인</span>
+              <div className="flex items-center justify-center gap-4">
+                <span>
+                  <Image src="/images/social_logo/kakao.svg" alt="카카오" width={20} height={20} />
+                </span>
+                <span className="text-[#000000D9]">카카오 계정으로 로그인</span>
+              </div>
             </button>
+            <button
+              onClick={() => handleSocialLogin('APPLE')}
+              disabled={loading}
+              className="flex w-full h-12 items-center justify-start rounded-full px-[71px] bg-black font-medium text-white shadow transition-colors"
+            >
+              <div className="flex items-center justify-center gap-4">
+                <span>
+                  <Image src="/images/social_logo/apple.png" alt="애플" width={20} height={20} />
+                </span>
+                <span>애플 계정으로 로그인</span>
+              </div>
+            </button>
+
             <button
               onClick={() => handleSocialLogin('NAVER')}
               disabled={loading}
-              className="flex w-full items-center justify-center rounded-full bg-green-500 py-3 px-4 font-medium text-white shadow transition-colors hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex w-full h-12 items-center justify-center rounded-full bg-[#03C75A] py-1 font-medium text-white shadow transition-colors"
             >
-              <span>네이버 계정으로 로그인</span>
+              <div className="flex items-center justify-center gap-4">
+                <span>
+                  <Image src="/images/symbol/naver.svg" alt="네이버" width={20} height={20} />
+                </span>
+                <span>네이버 계정으로 로그인</span>
+              </div>
             </button>
             {!isNewUserMode ? (
               <button
                 onClick={handleNewUserClick}
-                className="flex w-full items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 py-3 px-4 font-medium text-gray-700 dark:text-gray-300 shadow transition-colors hover:bg-gray-200 dark:hover:bg-gray-700"
+                className="flex w-full h-12 items-center justify-between rounded-full px-[61px] bg-gradient-to-br from-[#109af7] to-[#4251f0] font-medium text-white"
               >
-                <span>신규 가입하기</span>
+                <div className="flex items-center justify-center gap-1 w-full">
+                  <span>
+                    <Image src="/images/symbol/storyNation.png" alt="스토리네이션 심볼" width={50} height={50} />
+                  </span>
+                  <span className="text-white w-full text-center">신규 유저 가입하기</span>
+                </div>
               </button>
             ) : (
               <button
                 onClick={handleSignupClick}
-                className="flex w-full items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 py-3 px-4 font-medium text-gray-700 dark:text-gray-300 shadow transition-colors hover:bg-gray-200 dark:hover:bg-gray-700"
+                className="flex w-full h-12 items-center justify-between rounded-full px-[61px] bg-gradient-to-br from-[#109af7] to-[#4251f0] font-medium text-white"
               >
-                <span>회원가입</span>
+                <div className="flex items-center justify-center gap-1 w-full">
+                  <span>
+                    <Image src="/images/symbol/storyNation.png" alt="스토리네이션 심볼" width={50} height={50} />
+                  </span>
+                  <span className="text-white w-full text-center">스토리 네이션 회원가입</span>
+                </div>
               </button>
             )}
           </div>
