@@ -368,6 +368,17 @@ export const bridgeWithdrawDataToWithdrawItems = (data: any[], page: number = 1)
   }))
 }
 
+export function getChangeNameTag(script: string, charName: string) {
+  let changeScript = ''
+  const userName = useAccountStore.getState().isLogin ?
+    useAccountStore.getState().data?.persona || useAccountStore.getState().data?.nick_nm || '정보없음'
+    :
+    '아무개'
+
+  changeScript = script.replace('{{character}}', charName).replace('{{user}}', userName)
+  return changeScript
+}
+
 function getCategory(gender: number) {
   if (gender === 1) {
     return 'male'
