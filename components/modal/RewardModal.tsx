@@ -2,13 +2,13 @@
 
 import { useRouter } from 'next/navigation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPen, faClock } from '@fortawesome/free-solid-svg-icons'
+import { faClock } from '@fortawesome/free-solid-svg-icons'
 import BaseModal from './BaseModal'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import { useAccountStore } from '@/store/useAccountStore'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-
+import Image from 'next/image'
 interface RewardModalProps {
   isOpen: boolean
   onClose: () => void
@@ -140,7 +140,7 @@ export default function RewardModal({ isOpen, onClose, isAfterSignup = false }: 
               {/* 아이콘 - isGetFreePen에 따라 다른 아이콘 표시 */}
               <div className="w-24 h-24 flex items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900">
                 {isGetFreePen ? (
-                  <FontAwesomeIcon icon={faPen} className="h-12 w-12 text-primary-500 dark:text-primary-400" />
+                  <Image src="/images/pen/pen_primary.svg" alt="pen" width={45} height={45} />
                 ) : (
                   <FontAwesomeIcon icon={faClock} className="h-12 w-12 text-primary-500 dark:text-primary-400" />
                 )}

@@ -1,30 +1,27 @@
 'use client'
 
-import { Character, useAccountStore, useCoinStore } from '@/store/useStoreData'
+import { Character, useAccountStore } from '@/store/useStoreData'
 import {
   faPaperPlane,
   faArrowLeft,
-  faGift,
   faCaretDown,
   faSync,
   faTrashAlt,
   faInfoCircle,
   faSignOutAlt,
-  faCoins,
   faAsterisk,
   faPiggyBank,
   faBookOpen,
   faFire,
   faRocket,
   faDownload,
-  faPen,
   faEllipsisV,
   faImage,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import Link from 'next/link'
+import { Gift } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import type { FormEvent } from 'react'
 import { useEffect, useState, useRef, useCallback } from 'react'
@@ -40,7 +37,6 @@ import { chatApi, createApi } from '@/services/api/storyNationApi'
 import Tutorial from '@/components/tutorial/Tutorial'
 import ResetChatModal from '@/components/modal/ResetChatModal'
 import { toast } from 'react-toastify'
-
 
 interface ChatDetailClientProps {
   characterId: string
@@ -214,7 +210,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 표시 이미지
   const showImage = userIsAdult && chatMessages.length > 2 ? character.imageUrlNsfw : character.imageUrl
-
 
   // 모바일 환경 감지
   useEffect(() => {
@@ -539,7 +534,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 마지막 AI 응답 새로고침 함수 (Provider의 메서드 사용)
   const handleRefreshLastAIMessage = async (chat: any) => {
-
     if (!checkCoin()) return
 
     try {
@@ -628,10 +622,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 모드 코인 차감 액
   const getModePrice = (modeId: number) => {
-    switch(modeId) {
+    switch (modeId) {
       case 1:
         return 100
-        
     }
   }
 
@@ -835,12 +828,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             {/* 캐릭터 프로필 이미지 - PC에서만 표시 */}
             <button onClick={handleOnClickCharacter} className="hidden md:block">
               <div className="relative w-10 h-10 rounded-full overflow-hidden mr-3 border border-gray-200 flex-shrink-0 hover:opacity-90 transition-opacity shadow-sm">
-                <Image
-                  src={showImage || '/images/character1.jpg'}
-                  alt={character.name}
-                  fill
-                  className="object-cover"
-                />
+                <Image src={showImage || '/images/character1.jpg'} alt={character.name} fill className="object-cover" />
               </div>
             </button>
 
@@ -849,9 +837,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                 {/* 캐릭터 이름 */}
                 <h2 className="font-medium text-gray-800 truncate">{character.name}</h2>
                 {/* 프로필 상세 버튼 - PC에서만 표시 */}
-                <div
-                  onClick={handleOnClickCharacter}
-                >
+                <div onClick={handleOnClickCharacter}>
                   <FontAwesomeIcon
                     icon={faInfoCircle}
                     size="sm"
@@ -902,16 +888,30 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
           {/* 무료 재화 (펜) */}
           <div className="flex items-center">
-            <button onClick={handleOnClickShop} className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
-              <FontAwesomeIcon icon={faGift} className="text-sm md:text-base" />
+            <button
+              onClick={handleOnClickShop}
+              className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-600"
+            >
+              <Gift className="text-sm md:text-base" />
             </button>
-            <span className="ml-1 text-sm font-semibold text-gray-700">{Number(accountData?.coin_free) + Number(accountData?.coin_register) || 0}</span>
+            <span className="ml-1 text-sm font-semibold text-gray-700">
+              {Number(accountData?.coin_free) + Number(accountData?.coin_register) || 0}
+            </span>
           </div>
 
           {/* 유료 재화 (펜) */}
           <div className="flex items-center">
-            <button onClick={handleOnClickShop} className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-              <FontAwesomeIcon icon={faCoins} className="h-3 w-3 md:h-4 md:w-4" />
+            <button
+              onClick={handleOnClickShop}
+              className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-primary-200 flex items-center justify-center text-blue-600"
+            >
+              <Image
+                src="/images/pen/pen_primary.svg"
+                alt="pen"
+                width={16}
+                height={16}
+                className="w-3.5 h-3.5 md:w-4 md:h-4"
+              />
             </button>
             <span className="ml-1 text-sm font-semibold text-gray-700">{accountData?.coin_user || 0}</span>
           </div>
@@ -995,10 +995,10 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                         </div>
                       </div>
                       <div className="flex items-center bg-primary-100 px-3 py-1 rounded-full self-start sm:self-auto">
-                        <span className="text-primary-700 font-medium text-sm whitespace-nowrap">
-                          <FontAwesomeIcon icon={faPen} className="mr-1" />
-                          {chatMode.penCost}
-                        </span>
+                        <div className="flex text-primary-700 font-medium text-sm whitespace-nowrap">
+                          <Image src="/images/pen/pen_primary.svg" alt="pen" width={11} height={11} className="mr-1" />
+                          <span>{chatMode.penCost}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1189,7 +1189,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                 </div>
               ) : (
                 chatMessages.map((chat, index) => {
-                  const isLastAiMessage = (chatMessages.length - 1) === index
+                  const isLastAiMessage = chatMessages.length - 1 === index
                   return (
                     <motion.div
                       key={index}
@@ -1234,27 +1234,24 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
                       {chat.sender === 'character' && chat.id !== 'first-message' && (
                         <div className="flex ml-2 items-center justify-start max-w-[85%] mt-2">
-                        {/* 마지막 AI 메시지인 경우 새로고침/삭제 버튼 표시 */}
-                        {isLastAiMessage && (
+                          {/* 마지막 AI 메시지인 경우 새로고침/삭제 버튼 표시 */}
+                          {isLastAiMessage && (
+                            <button
+                              onClick={handleRefreshLastAIMessage}
+                              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-500 hover:text-violet-600 hover:bg-violet-100 transition-colors mr-1.5 shadow-sm"
+                              title="응답 새로고침"
+                            >
+                              <FontAwesomeIcon icon={faSync} className="text-sm sm:text-base" />
+                            </button>
+                          )}
                           <button
-
-                            onClick={handleRefreshLastAIMessage}
-
-                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-500 hover:text-violet-600 hover:bg-violet-100 transition-colors mr-1.5 shadow-sm"
-                            title="응답 새로고침"
+                            onClick={() => handleDeleteLastAIMessage(chat)}
+                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-100 transition-colors shadow-sm"
+                            title="응답 삭제"
                           >
-                            <FontAwesomeIcon icon={faSync} className="text-sm sm:text-base" />
+                            <FontAwesomeIcon icon={faTrashAlt} className="text-sm sm:text-base" />
                           </button>
-
-                        )}
-                        <button
-                          onClick={() => handleDeleteLastAIMessage(chat)}
-                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-100 transition-colors shadow-sm"
-                          title="응답 삭제"
-                        >
-                          <FontAwesomeIcon icon={faTrashAlt} className="text-sm sm:text-base" />
-                        </button>
-                      </div>
+                        </div>
                       )}
                     </motion.div>
                   )

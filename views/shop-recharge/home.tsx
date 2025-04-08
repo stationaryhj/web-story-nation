@@ -3,7 +3,8 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronLeft, faPen, faHistory, faCrown } from '@fortawesome/free-solid-svg-icons'
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+import { Gift } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import PageTransition from '@/components/motion/PageTransition'
 import Image from 'next/image'
@@ -330,10 +331,7 @@ export default function ShopRecharge() {
             >
               <div className="flex items-center">
                 <div className="bg-primary-100 dark:bg-dark-primary-900/30 p-2 sm:p-3 rounded-full mr-3 sm:mr-4">
-                  <FontAwesomeIcon
-                    icon={faPen}
-                    className="h-5 w-5 sm:h-6 sm:w-6 text-primary-500 dark:text-primary-400"
-                  />
+                  <Image src="/images/pen/pen_primary.svg" alt="pen" width={24} height={24} />
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">유료 펜</p>
@@ -347,7 +345,7 @@ export default function ShopRecharge() {
             >
               <div className="flex items-center">
                 <div className="bg-yellow-100 dark:bg-yellow-900/30 p-2 sm:p-3 rounded-full mr-3 sm:mr-4">
-                  <FontAwesomeIcon icon={faCrown} className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-500" />
+                  <Gift className="h-[25px] w-[25px] sm:h-6 sm:w-6 text-yellow-500" />
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">무료 펜</p>

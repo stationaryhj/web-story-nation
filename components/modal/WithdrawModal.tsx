@@ -1,11 +1,10 @@
 'use client'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPen } from '@fortawesome/free-solid-svg-icons'
 import { useState, useEffect } from 'react'
 import BaseModal from './BaseModal'
 import { BaseButton } from '../elements/button/BaseButton'
-
+import Image from 'next/image'
 interface BankAccount {
   bank: string
   accountNumber: string
@@ -111,7 +110,8 @@ const WithdrawModal = ({
           <div className="mb-3">
             <div className="text-sm font-medium text-gray-500 mb-1">출금 가능 펜</div>
             <div className={`${isMobile ? 'text-base sm:text-lg' : 'text-lg'} font-semibold flex items-center`}>
-              {formatPen(availableAmount)} <FontAwesomeIcon icon={faPen} className="ml-1" />
+              {formatPen(availableAmount)}{' '}
+              <Image src="/images/pen/pen_black.svg" alt="pen" width={18} height={18} className="ml-1" />
             </div>
           </div>
 
@@ -130,7 +130,7 @@ const WithdrawModal = ({
                 placeholder="최소 1500펜"
               />
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                <FontAwesomeIcon icon={faPen} className="text-gray-400" />
+                <Image src="/images/pen/pen_secondary.svg" alt="pen" width={18} height={18} />
               </div>
             </div>
             <p className="text-xs text-gray-500 mt-1">최소 1500펜부터 출금 가능합니다.</p>
