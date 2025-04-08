@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import BaseModal from './BaseModal'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle, faPiggyBank, faBookOpen, faFire, faRocket } from '@fortawesome/free-solid-svg-icons'

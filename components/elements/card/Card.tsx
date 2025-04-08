@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import React from 'react'
 import { useRouter } from 'next/navigation'
+import { getChangeNameTag } from '@/lib/utils/storyNationUtil'
 
 interface CardProps {
   character: Character
@@ -247,7 +248,7 @@ export default function Card({
             </div>
 
             <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 mb-1 line-clamp-2 h-8 group-hover:text-secondary-800 dark:group-hover:text-dark-secondary-400 transition-colors">
-              {description}
+              {getChangeNameTag(description || '', name)}
             </p>
             <div className="flex items-center">
               <div className="w-5 h-5 rounded-full bg-secondary-200 dark:bg-dark-secondary-300 flex items-center justify-center overflow-hidden">

@@ -3,14 +3,40 @@
 import { useState } from 'react'
 import BaseModal from './BaseModal'
 
-// 신고 사유 목록
-const REPORT_REASONS = {
-  writer: ['불쾌감을 주는 프로필/소개글', '부적절한 프로필 이미지', '사칭/사기 의심', '스팸/도배', '욕설/비하', '기타'],
-  character: ['불쾌감을 주는 내용', '스팸 또는 광고성 내용', '욕설/비하', '성적인 내용', '폭력적인 내용', '기타'],
-} as const
+const REPORT_REASONS_KR = [
+  {
+    id: 67,
+    desc: '스팸홍보/도배글입니다.',
+  },
+  {
+    id: 68,
+    desc: '음란물입니다. (성인모드 캐릭터는 신고 대상 아님)',
+  },
+  {
+    id: 69,
+    desc: '청소년에게 유해한 내용입니다.',
+  },
+  {
+    id: 70,
+    desc: '불법 정보를 포함하고 있습니다.',
+  },
+  {
+    id: 71,
+    desc: '개인정보가 노출되어 있습니다.',
+  },
+  {
+    id: 72,
+    desc: '명예 훼손/저작권 침해를 포함하고 있습니다.',
+  },
+  {
+    id: 0,
+    desc: '기타',
+  },
+]
+
 
 interface ReportModalContentProps {
-  onSubmit: (reason: string, description: string) => void
+  onSubmit: (reason: number | null, description: string) => void
   onClose: () => void
   submitted: boolean
   reportType: 'writer' | 'character'
@@ -18,11 +44,10 @@ interface ReportModalContentProps {
 
 // 신고 모달 내용 컴포넌트
 function ReportModalContent({ onSubmit, onClose, submitted, reportType }: ReportModalContentProps) {
-  const [selectedReason, setSelectedReason] = useState<string | null>(null)
+  const [selectedReasonId, setSelectedReasonId] = useState<number | null>(null)
   const [description, setDescription] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const reasons = REPORT_REASONS[reportType]
   const reportTypeText = reportType === 'writer' ? '작가' : '캐릭터'
 
   if (submitted) {
@@ -48,10 +73,9 @@ function ReportModalContent({ onSubmit, onClose, submitted, reportType }: Report
   }
 
   const handleSubmit = () => {
-    if (!selectedReason || !description.trim()) return
-
     setIsSubmitting(true)
-    onSubmit(selectedReason, description)
+    console.log(selectedReasonId, description)
+    onSubmit(selectedReasonId, description)
   }
 
   return (
@@ -78,25 +102,25 @@ function ReportModalContent({ onSubmit, onClose, submitted, reportType }: Report
             사유 선택
           </h3>
           <div className="space-y-2">
-            {reasons.map(reason => (
+            {REPORT_REASONS_KR.map(reason => (
               <div
-                key={reason}
+                key={reason.id}
                 className={`border rounded-lg overflow-hidden transition-all duration-200 ${
-                  reason === selectedReason ? 'border-blue-400 shadow-sm' : 'border-gray-200 dark:border-gray-700'
+                  reason.id === selectedReasonId ? 'border-blue-400 shadow-sm' : 'border-gray-200 dark:border-gray-700'
                 }`}
               >
                 <button
-                  onClick={() => setSelectedReason(reason === selectedReason ? null : reason)}
+                  onClick={() => setSelectedReasonId(reason.id === selectedReasonId ? null : reason.id)}
                   className={`w-full px-5 py-3 text-left flex justify-between items-center transition-colors ${
-                    reason === selectedReason
+                    reason.id === selectedReasonId
                       ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300'
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/70'
                   }`}
                 >
-                  <span className="font-medium">{reason}</span>
+                  <span className="font-medium">{reason.desc}</span>
                   <svg
                     className={`w-5 h-5 transition-transform duration-200 ${
-                      reason === selectedReason ? 'text-blue-500 rotate-180' : 'text-gray-400'
+                      reason.id === selectedReasonId ? 'text-blue-500 rotate-180' : 'text-gray-400'
                     }`}
                     fill="none"
                     stroke="currentColor"
@@ -107,7 +131,7 @@ function ReportModalContent({ onSubmit, onClose, submitted, reportType }: Report
                   </svg>
                 </button>
 
-                {reason === selectedReason && (
+                {reason.id === selectedReasonId && (
                   <div className="p-4 bg-white dark:bg-gray-800/50">
                     <h3 className="font-medium text-gray-800 dark:text-gray-200 mb-3 flex items-center">
                       <span className="inline-block w-5 h-5 bg-blue-500 rounded-full text-white flex items-center justify-center text-xs mr-2">
@@ -137,9 +161,8 @@ function ReportModalContent({ onSubmit, onClose, submitted, reportType }: Report
       <div className="px-6 pb-6 flex justify-center">
         <button
           onClick={handleSubmit}
-          disabled={!selectedReason || !description.trim() || isSubmitting}
           className={`px-8 py-3 rounded-lg font-medium transition-all ${
-            selectedReason && description.trim() && !isSubmitting
+            selectedReasonId !== null
               ? 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white shadow-sm hover:shadow'
               : 'bg-gray-200 text-gray-500 dark:bg-gray-800 dark:text-gray-400 cursor-not-allowed'
           }`}
@@ -173,7 +196,7 @@ function ReportModalContent({ onSubmit, onClose, submitted, reportType }: Report
 interface ReportModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (reason: string, description: string) => void
+  onSubmit: (reason: number | null, description: string) => void
   submitted: boolean
   reportType: 'writer' | 'character'
 }
