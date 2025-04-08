@@ -81,7 +81,7 @@ export default function Footer() {
                   </li>
                   <li>
                     <Link
-                      href="/privacy"
+                      href="/terms?tab=privacy"
                       className="text-sm text-secondary-600 dark:text-dark-secondary-500 hover:text-primary-500 dark:hover:text-dark-primary-600 transition-colors"
                     >
                       개인정보처리방침
