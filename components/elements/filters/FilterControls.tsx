@@ -23,6 +23,9 @@ export default function FilterControls({ categoryId }: FilterControlsProps) {
   // 초기화 여부를 추적하는 ref
   const isInitialized = useRef(false)
 
+  // 모바일 화면 여부를 감지하는 상태
+  const [isMobile, setIsMobile] = useState(false)
+
   // 드롭다운 UI 상태
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
@@ -42,6 +45,22 @@ export default function FilterControls({ categoryId }: FilterControlsProps) {
 
   // URL 파라미터 가져오기 (초기 로드시에만 사용)
   const searchParams = useSearchParams()
+
+  // 화면 크기 변경 감지
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768) // md 브레이크포인트 기준
+    }
+
+    // 초기 로드 시 체크
+    checkIsMobile()
+
+    // 리사이즈 이벤트에 반응
+    window.addEventListener('resize', checkIsMobile)
+
+    // 클린업 함수
+    return () => window.removeEventListener('resize', checkIsMobile)
+  }, [])
 
   // isTagListExpanded 상태 변경 시 localStorage에 저장
   useEffect(() => {
@@ -142,148 +161,302 @@ export default function FilterControls({ categoryId }: FilterControlsProps) {
     setIsTagListExpanded((prev: boolean) => !prev)
   }, [])
 
+  // 정렬 및 이용등급 컨트롤 렌더링 함수
+  const renderSortAndRatingControls = () => (
+    <div className="flex justify-between items-center w-full">
+      {/* 왼쪽: 정렬 탭 버튼 */}
+      <div className="flex border rounded-lg overflow-hidden">
+        <button
+          className={`px-2 md:px-4 py-2 text-sm font-medium transition-colors ${
+            filter.order === 2
+              ? 'bg-indigo-600 text-white'
+              : 'bg-white dark:bg-dark-background-lighter text-gray-800 dark:text-black hover:bg-gray-100 dark:hover:bg-dark-background-lighter/80'
+          }`}
+          onClick={() => handleOrderChange(2)}
+          disabled={isLoading}
+        >
+          <span>최신순</span>
+        </button>
+        <button
+          className={`px-2 md:px-4 py-2 text-sm font-medium transition-colors ${
+            filter.order === 1
+              ? 'bg-indigo-600 text-white'
+              : 'bg-white dark:bg-dark-background-lighter text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-background-lighter/80'
+          }`}
+          onClick={() => handleOrderChange(1)}
+          disabled={isLoading}
+        >
+          <span>인기순</span>
+        </button>
+      </div>
+
+      {/* 오른쪽: 이용등급 드롭다운 */}
+      <div className="relative">
+        <button
+          className="h-full px-2.5 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium border rounded-lg dark-background-lighter dark:bg-dark-background-lighter text-black dark:text-white dark:hover:bg-dark-background-lighter/80 flex items-center gap-1.5 md:gap-2"
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          disabled={isLoading}
+        >
+          {filter.nsfw === 1 ? (
+            <>
+              <span className="inline-flex items-center">
+                짜릿모드 가능
+                <span className="ml-1 w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-red-500"></span>
+              </span>
+            </>
+          ) : filter.nsfw === 2 ? (
+            '전체 이용가'
+          ) : (
+            '이용등급 전체'
+          )}
+          <svg
+            className={`w-3.5 md:w-4 h-3.5 md:h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+
+        {isDropdownOpen && (
+          <div className="absolute right-0 mt-1 md:mt-2 w-40 md:w-48 bg-white dark:bg-dark-background-light rounded-lg shadow-lg z-10 border overflow-hidden">
+            <button
+              className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
+                filter.nsfw === 2 ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400' : ''
+              }`}
+              onClick={() => handleNsfwChange(2)}
+              disabled={isLoading}
+            >
+              전체 이용가
+            </button>
+            <button
+              className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
+                filter.nsfw === 1 ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400' : ''
+              }`}
+              onClick={() => handleNsfwChange(1)}
+              disabled={isLoading}
+            >
+              <span className="inline-flex items-center">짜릿모드 가능</span>
+            </button>
+            <button
+              className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
+                filter.nsfw === 3 ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400' : ''
+              }`}
+              onClick={() => handleNsfwChange(3)}
+              disabled={isLoading}
+            >
+              이용등급 전체
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+
+  // 태그 컨트롤 버튼 렌더링 함수
+  const renderTagControls = () => (
+    <div className="flex justify-between w-full mb-2">
+      <div className="flex items-center gap-2">
+        <span className="text-md font-bold text-gray-800 dark:text-gray-200 block sm:hidden">해시태그 선택</span>
+        <button
+          className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:hover:bg-dark-secondary-700 flex items-center justify-center"
+          onClick={handleTagRefresh}
+          aria-label="태그 필터 초기화"
+          disabled={isLoading || currentTags.length === 0}
+        >
+          <FontAwesomeIcon
+            icon={faRotate}
+            className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-600 dark:text-dark-secondary-300"
+          />
+        </button>
+      </div>
+      <div className="flex gap-2">
+        {/* 태그 필터 초기화 버튼 */}
+
+        {/* 태그 목록 토글 버튼 */}
+        <button
+          className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:hover:bg-dark-secondary-700 flex items-center justify-center"
+          onClick={toggleTagList}
+          aria-label={isTagListExpanded ? '태그 목록 접기' : '태그 목록 펼치기'}
+          disabled={isLoading}
+        >
+          <FontAwesomeIcon
+            icon={isTagListExpanded ? faChevronUp : faChevronDown}
+            className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-600 dark:text-dark-secondary-300"
+          />
+        </button>
+      </div>
+    </div>
+  )
+
+  // 태그 목록 렌더링 함수
+  const renderTagList = () => (
+    <>
+      {tags && tags.length > 0 && (
+        <div className="w-full">
+          {categoryId && (
+            <TagList
+              tags={tags}
+              isLoading={isTagsLoading}
+              onTagSelect={handleTagSelect}
+              expanded={isTagListExpanded}
+              selectedTags={currentTags}
+            />
+          )}
+        </div>
+      )}
+    </>
+  )
+
   return (
     <>
       {/* 필터링 컨트롤 */}
       <div className="flex flex-col justify-between items-start mb-6">
-        <div className="flex justify-between items-center w-full">
-          {/* 왼쪽: 정렬 탭 버튼 */}
-          <div className="flex border rounded-lg overflow-hidden">
-            <button
-              className={`px-2 md:px-4 py-2 text-sm font-medium transition-colors ${
-                filter.order === 2
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white dark:bg-dark-background-lighter text-gray-800 dark:text-black hover:bg-gray-100 dark:hover:bg-dark-background-lighter/80'
-              }`}
-              onClick={() => handleOrderChange(2)}
-              disabled={isLoading}
-            >
-              <Clock className="w-4 h-4 block md:hidden" />
-              <span className="hidden md:block">최신순</span>
-            </button>
-            <button
-              className={`px-2 md:px-4 py-2 text-sm font-medium transition-colors ${
-                filter.order === 1
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white dark:bg-dark-background-lighter text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-background-lighter/80'
-              }`}
-              onClick={() => handleOrderChange(1)}
-              disabled={isLoading}
-            >
-              <Flame className="w-4 h-4 block md:hidden" />
-              <span className="hidden md:block">인기순</span>
-            </button>
-          </div>
-
-          {/* 오른쪽: 이용등급 드롭다운과 태그 컨트롤 */}
-          <div className="flex items-center gap-2">
-            {/* 태그 컨트롤 버튼들 */}
-            <div className="flex gap-2">
-              {/* 태그 필터 초기화 버튼 */}
-              <button
-                className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:hover:bg-dark-secondary-700 flex items-center justify-center"
-                onClick={handleTagRefresh}
-                aria-label="태그 필터 초기화"
-                disabled={isLoading || currentTags.length === 0}
-              >
-                <FontAwesomeIcon
-                  icon={faRotate}
-                  className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-600 dark:text-dark-secondary-300"
-                />
-              </button>
-
-              {/* 태그 목록 토글 버튼 */}
-              <button
-                className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:hover:bg-dark-secondary-700 flex items-center justify-center"
-                onClick={toggleTagList}
-                aria-label={isTagListExpanded ? '태그 목록 접기' : '태그 목록 펼치기'}
-                disabled={isLoading}
-              >
-                <FontAwesomeIcon
-                  icon={isTagListExpanded ? faChevronUp : faChevronDown}
-                  className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-600 dark:text-dark-secondary-300"
-                />
-              </button>
-            </div>
-
-            {/* 이용등급 드롭다운 */}
-            <div className="relative">
-              <button
-                className="px-2.5 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium border rounded-lg dark-background-lighter dark:bg-dark-background-lighter text-black dark:text-white dark:hover:bg-dark-background-lighter/80 flex items-center gap-1.5 md:gap-2"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                disabled={isLoading}
-              >
-                {filter.nsfw === 1 ? (
-                  <>
-                    <span className="inline-flex items-center">
-                      짜릿모드 가능
-                      <span className="ml-1 w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-red-500"></span>
-                    </span>
-                  </>
-                ) : filter.nsfw === 2 ? (
-                  '전체 이용가'
-                ) : (
-                  '이용등급 전체'
-                )}
-                <svg
-                  className={`w-3.5 md:w-4 h-3.5 md:h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
+        {/* PC 레이아웃 (md 이상) */}
+        {!isMobile && (
+          <>
+            <div className="flex justify-between items-center w-full">
+              {/* 왼쪽: 정렬 탭 버튼 */}
+              <div className="flex border rounded-lg overflow-hidden">
+                <button
+                  className={`px-2 md:px-4 py-2 text-sm font-medium transition-colors ${
+                    filter.order === 2
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-white dark:bg-dark-background-lighter text-gray-800 dark:text-black hover:bg-gray-100 dark:hover:bg-dark-background-lighter/80'
+                  }`}
+                  onClick={() => handleOrderChange(2)}
+                  disabled={isLoading}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-              </button>
+                  <span>최신순</span>
+                </button>
+                <button
+                  className={`px-2 md:px-4 py-2 text-sm font-medium transition-colors ${
+                    filter.order === 1
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-white dark:bg-dark-background-lighter text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-background-lighter/80'
+                  }`}
+                  onClick={() => handleOrderChange(1)}
+                  disabled={isLoading}
+                >
+                  <span>인기순</span>
+                </button>
+              </div>
 
-              {isDropdownOpen && (
-                <div className="absolute right-0 mt-1 md:mt-2 w-40 md:w-48 bg-white dark:bg-dark-background-light rounded-lg shadow-lg z-10 border overflow-hidden">
+              {/* 오른쪽: 이용등급 드롭다운과 태그 컨트롤 */}
+              <div className="flex items-center gap-2">
+                {/* 태그 컨트롤 버튼들 */}
+                <div className="flex gap-2">
+                  {/* 태그 필터 초기화 버튼 */}
                   <button
-                    className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
-                      filter.nsfw === 2 ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400' : ''
-                    }`}
-                    onClick={() => handleNsfwChange(2)}
-                    disabled={isLoading}
+                    className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:hover:bg-dark-secondary-700 flex items-center justify-center"
+                    onClick={handleTagRefresh}
+                    aria-label="태그 필터 초기화"
+                    disabled={isLoading || currentTags.length === 0}
                   >
-                    전체 이용가
+                    <FontAwesomeIcon
+                      icon={faRotate}
+                      className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-600 dark:text-dark-secondary-300"
+                    />
                   </button>
+
+                  {/* 태그 목록 토글 버튼 */}
                   <button
-                    className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
-                      filter.nsfw === 1 ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400' : ''
-                    }`}
-                    onClick={() => handleNsfwChange(1)}
+                    className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:hover:bg-dark-secondary-700 flex items-center justify-center"
+                    onClick={toggleTagList}
+                    aria-label={isTagListExpanded ? '태그 목록 접기' : '태그 목록 펼치기'}
                     disabled={isLoading}
                   >
-                    <span className="inline-flex items-center">짜릿모드 가능</span>
-                  </button>
-                  <button
-                    className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
-                      filter.nsfw === 3 ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400' : ''
-                    }`}
-                    onClick={() => handleNsfwChange(3)}
-                    disabled={isLoading}
-                  >
-                    이용등급 전체
+                    <FontAwesomeIcon
+                      icon={isTagListExpanded ? faChevronUp : faChevronDown}
+                      className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-600 dark:text-dark-secondary-300"
+                    />
                   </button>
                 </div>
-              )}
-            </div>
-          </div>
-        </div>
 
-        {/* 태그 목록 */}
-        {tags && tags.length > 0 && (
-          <div className="w-full mt-4">
-            {categoryId && (
-              <TagList
-                tags={tags}
-                isLoading={isTagsLoading}
-                onTagSelect={handleTagSelect}
-                expanded={isTagListExpanded}
-                selectedTags={currentTags}
-              />
-            )}
-          </div>
+                {/* 이용등급 드롭다운 */}
+                <div className="relative">
+                  <button
+                    className="px-2.5 md:px-4 py-1.5 md:py-2 text-xs md:text-sm font-medium border rounded-lg dark-background-lighter dark:bg-dark-background-lighter text-black dark:text-white dark:hover:bg-dark-background-lighter/80 flex items-center gap-1.5 md:gap-2"
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    disabled={isLoading}
+                  >
+                    {filter.nsfw === 1 ? (
+                      <>
+                        <span className="inline-flex items-center">
+                          짜릿모드 가능
+                          <span className="ml-1 w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-red-500"></span>
+                        </span>
+                      </>
+                    ) : filter.nsfw === 2 ? (
+                      '전체 이용가'
+                    ) : (
+                      '이용등급 전체'
+                    )}
+                    <svg
+                      className={`w-3.5 md:w-4 h-3.5 md:h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </button>
+
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-1 md:mt-2 w-40 md:w-48 bg-white dark:bg-dark-background-light rounded-lg shadow-lg z-10 border overflow-hidden">
+                      <button
+                        className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
+                          filter.nsfw === 2 ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400' : ''
+                        }`}
+                        onClick={() => handleNsfwChange(2)}
+                        disabled={isLoading}
+                      >
+                        전체 이용가
+                      </button>
+                      <button
+                        className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
+                          filter.nsfw === 1 ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400' : ''
+                        }`}
+                        onClick={() => handleNsfwChange(1)}
+                        disabled={isLoading}
+                      >
+                        <span className="inline-flex items-center">짜릿모드 가능</span>
+                      </button>
+                      <button
+                        className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
+                          filter.nsfw === 3 ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400' : ''
+                        }`}
+                        onClick={() => handleNsfwChange(3)}
+                        disabled={isLoading}
+                      >
+                        이용등급 전체
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* 태그 목록 */}
+            <div className="w-full mt-4">{renderTagList()}</div>
+          </>
+        )}
+
+        {/* 모바일 레이아웃 (md 미만) */}
+        {isMobile && (
+          <>
+            {/* 태그 컨트롤 버튼 */}
+            {renderTagControls()}
+
+            {/* 태그 목록 */}
+            {renderTagList()}
+
+            {/* 정렬 및 이용등급 */}
+            <div className="w-full mt-4">{renderSortAndRatingControls()}</div>
+          </>
         )}
       </div>
     </>

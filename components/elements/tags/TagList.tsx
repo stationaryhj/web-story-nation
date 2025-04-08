@@ -20,23 +20,23 @@ interface TagListProps {
   selectedTags?: string[]
 }
 
-export default function TagList({ 
-  tags, 
-  isLoading = false, 
-  onTagSelect, 
+export default function TagList({
+  tags,
+  isLoading = false,
+  onTagSelect,
   expanded = false,
-  selectedTags: propSelectedTags = []
+  selectedTags: propSelectedTags = [],
 }: TagListProps) {
   // 내부 상태 대신 prop에서 가져온 selectedTags 사용
   const [selectedTags, setSelectedTags] = useState<string[]>(propSelectedTags)
-  
+
   // propSelectedTags가 변경될 때마다 내부 상태 업데이트
   useEffect(() => {
     if (propSelectedTags) {
-      setSelectedTags(propSelectedTags);
+      setSelectedTags(propSelectedTags)
     }
-  }, [propSelectedTags]);
-  
+  }, [propSelectedTags])
+
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
@@ -78,16 +78,19 @@ export default function TagList({
   }
 
   // 가로 스크롤 휠 이벤트 핸들러
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    if (expanded || !scrollContainerRef.current) return
+  const handleWheel = useCallback(
+    (e: React.WheelEvent) => {
+      if (expanded || !scrollContainerRef.current) return
 
-    // Shift 키를 누르고 있으면 가로 스크롤, 아니면 휠 이벤트의 deltaX 사용
-    const deltaX = e.shiftKey ? e.deltaY : e.deltaX
-    if (deltaX !== 0) {
-      e.preventDefault()
-      scrollContainerRef.current.scrollLeft += deltaX
-    }
-  }, [expanded])
+      // Shift 키를 누르고 있으면 가로 스크롤, 아니면 휠 이벤트의 deltaX 사용
+      const deltaX = e.shiftKey ? e.deltaY : e.deltaX
+      if (deltaX !== 0) {
+        e.preventDefault()
+        scrollContainerRef.current.scrollLeft += deltaX
+      }
+    },
+    [expanded]
+  )
 
   // 전역 마우스 이벤트 리스너 설정
   useEffect(() => {
@@ -139,7 +142,7 @@ export default function TagList({
 
       // 내부 상태도 업데이트 (부모로부터 prop이 다시 오기 전에 UI 반영)
       setSelectedTags(newSelectedTags)
-      
+
       // 부모 컴포넌트에 선택된 태그 전달
       if (onTagSelect) {
         onTagSelect(newSelectedTags)
@@ -197,7 +200,7 @@ export default function TagList({
           className={`${
             expanded
               ? 'flex flex-wrap gap-2 px-2'
-              : 'flex flex-nowrap overflow-x-scroll space-x-2 px-2 scrollbar-hide cursor-grab touch-pan-x'
+              : 'flex flex-nowrap overflow-x-scroll space-x-2 scrollbar-hide cursor-grab touch-pan-x'
           }`}
           onMouseDown={expanded ? undefined : handleMouseDown}
           onMouseMove={expanded ? undefined : handleMouseMove}
