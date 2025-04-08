@@ -29,7 +29,11 @@ import { useModalStore } from '@/store/useStoreModal'
 import type { ChatMode } from '@/components/modal/ChatModeModal'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import type { ChrbotData } from '@/types/api'
-import { bridgeCharbotDataToCharacter, bridgeChatModeDataToChatMode, getChangeNameTag } from '@/lib/utils/storyNationUtil'
+import {
+  bridgeCharbotDataToCharacter,
+  bridgeChatModeDataToChatMode,
+  getChangeNameTag,
+} from '@/lib/utils/storyNationUtil'
 import { useNakama } from '@/app/providers/NakamaProviders'
 import { useChatModeStore } from '@/store/useStoreData'
 import BaseSidebar from '@/components/elements/sidebar/BaseSidebar'
@@ -476,8 +480,8 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     if (!checkCoin()) return
 
     // 성인 유무 판단
-    if(currentModeId === 3 || currentModeId === 4) {
-      if(!userIsAdult) {
+    if (currentModeId === 3 || currentModeId === 4) {
+      if (!userIsAdult) {
         openModal('adultVerification')
         return
       }
@@ -843,13 +847,13 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             <div className="min-w-0 overflow-hidden">
               <div className="flex items-center">
                 {/* 캐릭터 이름 */}
-                <h2 className="font-medium text-gray-800 truncate">{character.name}</h2>
+                <h2 className="font-medium text-gray-800 truncate max-w-[100px] md:max-w-[500px]">{character.name}</h2>
                 {/* 프로필 상세 버튼 - PC에서만 표시 */}
                 <div onClick={handleOnClickCharacter}>
                   <FontAwesomeIcon
                     icon={faInfoCircle}
                     size="sm"
-                    className="ml-2 text-violet-500 hover:text-violet-600 flex-shrink-0"
+                    className="ml-1 text-violet-500 hover:text-violet-600 flex-shrink-0"
                   />
                 </div>
               </div>
@@ -875,7 +879,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         </div>
 
         {/* 헤더 우측 아이콘들 */}
-        <div className="flex items-center space-x-2 md:space-x-4">
+        <div className="flex items-center gap-2">
           {/* 짜릿모드 버튼 - PC에서만 표시 */}
           <BaseButton
             id="chat-mode-button"
@@ -898,9 +902,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           <div className="flex items-center">
             <button
               onClick={handleOnClickShop}
-              className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-600"
+              className="w-6 h-6 md:w-10 md:h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600"
             >
-              <Gift className="text-sm md:text-base" />
+              <Gift className="text-sm md:text-base w-4 h-4 md:w-6 md:h-6" />
             </button>
             <span className="ml-1 text-sm font-semibold text-gray-700">
               {Number(accountData?.coin_free) + Number(accountData?.coin_register) || 0}
@@ -911,22 +915,22 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           <div className="flex items-center">
             <button
               onClick={handleOnClickShop}
-              className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-primary-200 flex items-center justify-center text-blue-600"
+              className="w-6 h-6 md:w-10 md:h-10 rounded-full bg-primary-200 flex items-center justify-center text-blue-600"
             >
               <Image
                 src="/images/pen/pen_primary.svg"
                 alt="pen"
                 width={16}
                 height={16}
-                className="w-3.5 h-3.5 md:w-4 md:h-4"
+                className="w-3 h-3 md:w-5 md:h-5"
               />
             </button>
-            <span className="ml-1 text-sm font-semibold text-gray-700">{accountData?.coin_user || 0}</span>
+            <span className="ml-1 text-sm md:text-base font-semibold text-gray-700">{accountData?.coin_user || 0}</span>
           </div>
 
           {/* 더보기 버튼 - 모바일에서만 표시 */}
           <button
-            className="md:hidden w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors"
+            className="md:hidden w-2 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors"
             onClick={() => setIsMoreSidebarOpen(true)}
           >
             <FontAwesomeIcon icon={faEllipsisV} />
@@ -1133,17 +1137,17 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         >
           {/* 연결 상태 표시 */}
           {!isConnected && !isConnecting && (
-            <div className="bg-red-50 p-3 border-b border-red-100 flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-2 h-2 rounded-full bg-red-500 mr-2 animate-pulse"></div>
+            <div className="bg-red-50 p-3 border-b border-red-100 flex flex-col items-center md:flex-row md:justify-between gap-2">
+              <div className="flex items-center text-center md:text-left">
+                <div className="w-2 h-2 rounded-full bg-red-500 mr-2 animate-pulse flex-shrink-0"></div>
                 <p className="text-red-700 text-sm">
                   서버 연결이 끊어졌습니다. 메시지를 보낼 수 없습니다.
-                  {error && <span className="ml-2 font-medium">({error})</span>}
+                  {error && <span className="ml-1 md:ml-2 font-medium">({error})</span>}
                 </p>
               </div>
               <button
                 onClick={() => router.refresh()}
-                className="px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded text-xs font-medium transition-colors flex items-center"
+                className="w-full md:w-auto px-3 py-1.5 md:py-1 bg-red-100 text-red-700 hover:bg-red-200 rounded text-xs font-medium transition-colors flex items-center justify-center flex-shrink-0"
                 aria-label="새로고침"
               >
                 <FontAwesomeIcon icon={faSync} className="mr-1.5" />

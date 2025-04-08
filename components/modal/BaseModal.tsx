@@ -104,11 +104,11 @@ export default function BaseModal({
 
   // 모달 크기에 따른 클래스 설정
   const sizeClasses = {
-    sm: 'w-[375px] min-w-[375px] max-w-[375px]',
-    md: 'w-[375px] min-w-[375px] max-w-[375px]',
-    lg: 'w-full min-w-[375px] max-w-lg',
-    xl: 'w-full min-w-[375px] max-w-xl',
-    full: 'w-full min-w-[375px] max-w-[1300px] mx-4',
+    sm: 'w-[355px] min-w-[355px] max-w-[355px]',
+    md: 'w-[355px] min-w-[355px] max-w-[355px]',
+    lg: 'w-full min-w-[355px] max-w-lg',
+    xl: 'w-full min-w-[355px] max-w-xl',
+    full: 'w-full min-w-[355px] max-w-[1300px] mx-4',
   }
 
   // 모달 위치에 따른 클래스 설정
@@ -157,27 +157,27 @@ export default function BaseModal({
     <AnimatePresence onExitComplete={onAnimationComplete}>
       {isOpen && (
         <Portal>
-          <div className={`fixed inset-0 z-[100] flex min-w-[375px] ${positionClasses[position]}`}>
+          <div className={`fixed inset-0 z-[1100] flex min-w-[355px] ${positionClasses[position]}`}>
             {/* 백드롭 */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: animationDuration }}
-              className={`fixed inset-0 ${backdropColor} z-[99]`}
+              className={`fixed inset-0 ${backdropColor} z-[1101]`}
               onClick={handleBackdropClick}
             />
 
             {/* 모달 */}
             <motion.div
               {...getAnimationProps()}
-              className={`relative z-[101] rounded-xl bg-white shadow-lg dark:bg-dark-background-light ${sizeClasses[size]} ${className}`}
+              className={`relative z-[1102] rounded-xl p-2 bg-white shadow-lg dark:bg-dark-background-light ${sizeClasses[size]} ${className} max-h-[600px] md:max-h-none overflow-hidden md:overflow-visible flex flex-col`}
               onClick={handleModalClick}
-              style={{ ...style, minWidth: '375px' }}
+              style={{ ...style, minWidth: '355px' }}
             >
               {/* 모달 헤더 - 닫기 버튼만 포함 */}
               {!hideHeader && showCloseButton && (
-                <div className={`relative flex justify-end p-3 pb-0 ${headerClassName}`}>
+                <div className={`relative flex justify-end p-3 pb-0 ${headerClassName} flex-shrink-0`}>
                   <button
                     onClick={onClose}
                     className="text-secondary-500 transition-colors hover:text-secondary-700 dark:text-dark-secondary-400 dark:hover:text-dark-secondary-300"
@@ -190,7 +190,7 @@ export default function BaseModal({
 
               {/* 닫기 버튼이 필요하지만 헤더가 숨겨진 경우 */}
               {hideHeader && showCloseButton && (
-                <div className="absolute right-4 top-4 z-10">
+                <div className="absolute right-4 top-4 z-10 flex-shrink-0">
                   <button
                     onClick={onClose}
                     className="text-secondary-500 transition-colors hover:text-secondary-700 dark:text-dark-secondary-400 dark:hover:text-dark-secondary-300"
@@ -202,7 +202,7 @@ export default function BaseModal({
               )}
 
               {/* 모달 내용 */}
-              <div className={`p-5 ${bodyClassName}`}>
+              <div className={`${bodyClassName} flex-grow overflow-y-auto md:overflow-visible`}>
                 {/* 아이콘이 있는 경우 타이틀 위에 표시 */}
                 {isIcon && icon && <div className="mb-3 flex justify-center">{icon}</div>}
                 {/* 타이틀을 바디에 포함 (가운데 정렬) */}
@@ -216,7 +216,9 @@ export default function BaseModal({
 
               {/* 모달 푸터 */}
               {footerContent && (
-                <div className={`border-t border-secondary-100 dark:border-dark-secondary-800 p-4 ${footerClassName}`}>
+                <div
+                  className={`border-t border-secondary-100 dark:border-dark-secondary-800 p-4 ${footerClassName} flex-shrink-0`}
+                >
                   {footerContent}
                 </div>
               )}
