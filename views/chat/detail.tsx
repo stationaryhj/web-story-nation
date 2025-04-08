@@ -33,6 +33,7 @@ import {
   bridgeCharbotDataToCharacter,
   bridgeChatModeDataToChatMode,
   getChangeNameTag,
+  getValidImageUrl,
 } from '@/lib/utils/storyNationUtil'
 import { useNakama } from '@/app/providers/NakamaProviders'
 import { useChatModeStore } from '@/store/useStoreData'
@@ -196,6 +197,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   const [isMoreSidebarOpen, setIsMoreSidebarOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
+  // 캐릭터 이미지
+  const [showImage, setShowImage] = useState(getValidImageUrl(userIsAdult ? character.imageUrlNsfw : character.imageUrl))
+
   // 배경 이미지 상태 추가
   const [isBackgroundEnabled, setIsBackgroundEnabled] = useState(true)
 
@@ -213,7 +217,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   const toastShownRef = useRef(false)
 
   // 표시 이미지
-  const showImage = userIsAdult && chatMessages.length > 2 ? character.imageUrlNsfw : character.imageUrl
+  // const showImage = getValidImageUrl(userIsAdult && chatMessages.length > 2 ? character.imageUrlNsfw : character.imageUrl)
 
   // 모바일 환경 감지
   useEffect(() => {
@@ -226,6 +230,16 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
     return () => window.removeEventListener('resize', checkIsMobile)
   }, [])
+
+  useEffect(() => {
+    if(currentModeId === 3 || currentModeId === 4) {
+      setShowImage(getValidImageUrl(character.imageUrlNsfw))
+    }
+    else {
+      setShowImage(getValidImageUrl(character.imageUrl))
+    }
+    
+  }, [currentModeId])
 
   // 메시지 디버깅을 위한 로깅 추가 - 무한 루프 문제 수정
   useEffect(() => {
@@ -642,8 +656,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 이미지 저장 함수
   const handleSaveImage = () => {
-    if (!character || !character.imageUrl) return
-
     // 이미지 URL 가져오기
     const imageUrl = showImage
 
@@ -1214,7 +1226,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             minWidth: 0,
             backgroundImage:
               isMobile && isBackgroundEnabled
-                ? `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(${character.imageUrl || '/images/character1.jpg'})`
+                ? `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(${showImage || '/images/character1.jpg'})`
                 : 'none',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
@@ -1306,7 +1318,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                           onClick={() => handleProfileImageClick()}
                         >
                           <Image
-                            src={character.imageUrl || '/images/character1.jpg'}
+                            src={showImage || '/images/character1.jpg'}
                             alt={character.name}
                             fill
                             className="object-cover"
@@ -1440,7 +1452,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             {/* 이미지 */}
             <div className="relative w-full aspect-[3/4] rounded-lg overflow-hidden">
               <Image
-                src={character.imageUrl || '/images/character1.jpg'}
+                src={showImage || '/images/character1.jpg'}
                 alt={character.name}
                 fill
                 className="object-cover"

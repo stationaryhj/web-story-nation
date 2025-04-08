@@ -7,6 +7,7 @@ import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
 import Image from 'next/image'
 import BaseSidebar from './BaseSidebar'
 import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
+import { getValidImageUrl } from '@/lib/utils/storyNationUtil'
 
 // 작가 랭킹 탭 정의
 const rankingTabs: TabItem[] = [
@@ -40,57 +41,58 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
         // 실제 구현에서는 API를 호출해야 합니다.
         // 현재는 목업 데이터를 사용합니다.
 
-        const mockAuthors = {
-          weekly: Array.from({ length: 100 }, (_, index) => ({
-            id: index + 1,
-            nickname: `작가${index + 1}`,
-            profileImage: `/images/profile/author${(index % 10) + 1}.jpg`,
-            introduction: `안녕하세요! 저는 ${index + 1}번째 작가입니다. 다양한 장르의 캐릭터를 만들고 있어요.`,
-            penIncome: Math.floor(Math.random() * 100000) + 50000,
-            rank: index + 1,
-            characterCount: Math.floor(Math.random() * 50) + 1,
-            likeCount: Math.floor(Math.random() * 1000) + 100,
-            isFollowing: Math.random() > 0.5,
-            isVerified: Math.random() > 0.7, // 30%의 확률로 인증된 작가
-            badges: [
-              Math.random() > 0.7 ? '인기작가' : null,
-              Math.random() > 0.8 ? '신인상' : null,
-              Math.random() > 0.9 ? '베스트작가' : null,
-            ].filter(Boolean),
-            tags: ['로맨스', '판타지', 'SF', '일상', '코미디', '드라마', '미스터리', '호러']
-              .sort(() => Math.random() - 0.5)
-              .slice(0, Math.floor(Math.random() * 3) + 1),
-          })).sort((a, b) => b.penIncome - a.penIncome), // 펜 수익 기준으로 정렬
-        }
+        // const mockAuthors = {
+        //   weekly: Array.from({ length: 100 }, (_, index) => ({
+        //     id: index + 1,
+        //     nickname: `작가${index + 1}`,
+        //     profileImage: `/images/profile/author${(index % 10) + 1}.jpg`,
+        //     introduction: `안녕하세요! 저는 ${index + 1}번째 작가입니다. 다양한 장르의 캐릭터를 만들고 있어요.`,
+        //     penIncome: Math.floor(Math.random() * 100000) + 50000,
+        //     rank: index + 1,
+        //     characterCount: Math.floor(Math.random() * 50) + 1,
+        //     likeCount: Math.floor(Math.random() * 1000) + 100,
+        //     isFollowing: Math.random() > 0.5,
+        //     isVerified: Math.random() > 0.7, // 30%의 확률로 인증된 작가
+        //     badges: [
+        //       Math.random() > 0.7 ? '인기작가' : null,
+        //       Math.random() > 0.8 ? '신인상' : null,
+        //       Math.random() > 0.9 ? '베스트작가' : null,
+        //     ].filter(Boolean),
+        //     tags: ['로맨스', '판타지', 'SF', '일상', '코미디', '드라마', '미스터리', '호러']
+        //       .sort(() => Math.random() - 0.5)
+        //       .slice(0, Math.floor(Math.random() * 3) + 1),
+        //   })).sort((a, b) => b.penIncome - a.penIncome), // 펜 수익 기준으로 정렬
+        // }
 
-        // const mockAuthors = rankingCreatersSlide.map(character => ({
-        //   id: character.id,
-        //   name: character.name,
-        //   nickname: character.creator?.nickname || character.name,
-        //   description: character.description || '',
-        //   profileImageUrl: character.imageUrl,
-        //   characterCount: 0, // 기본값 설정
-        //   isVerified: true, // 기본값 설정
-        // }))
+        const mockAuthors = rankingCreatersSlide.map(character => ({
+          id: character.id,
+          name: character.name,
+          nickname: character.creator?.nickname || character.name,
+          description: character.description || '',
+          profileImageUrl: getValidImageUrl(character.imageUrl),
+          characterCount: 0, // 기본값 설정
+          isVerified: true, // 기본값 설정
+          isSidebar: true,
+        }))
 
         // 탭에 따라 다른 정렬 적용
-        let sortedAuthors = [...mockAuthors.weekly]
-        if (activeTab === 'weekly') {
-          // 주간 랭킹 - 캐릭터 수 기준 정렬
-          sortedAuthors.sort((a, b) => b.characterCount - a.characterCount)
-        } else if (activeTab === 'monthly') {
-          // 월간 랭킹 - 인증 여부 우선, 그 다음 캐릭터 수
-          sortedAuthors.sort((a, b) => {
-            if (a.isVerified !== b.isVerified) return b.isVerified ? 1 : -1
-            return b.characterCount - a.characterCount
-          })
-        } else {
-          // 전체 랭킹 - 이름 알파벳 순
-          sortedAuthors.sort((a, b) => a.nickname.localeCompare(b.nickname))
-        }
+        // let sortedAuthors = [...mockAuthors]
+        // if (activeTab === 'weekly') {
+        //   // 주간 랭킹 - 캐릭터 수 기준 정렬
+        //   sortedAuthors.sort((a, b) => b.characterCount - a.characterCount)
+        // } else if (activeTab === 'monthly') {
+        //   // 월간 랭킹 - 인증 여부 우선, 그 다음 캐릭터 수
+        //   sortedAuthors.sort((a, b) => {
+        //     if (a.isVerified !== b.isVerified) return b.isVerified ? 1 : -1
+        //     return b.characterCount - a.characterCount
+        //   })
+        // } else {
+        //   // 전체 랭킹 - 이름 알파벳 순
+        //   sortedAuthors.sort((a, b) => a.nickname.localeCompare(b.nickname))
+        // }
 
-        setRankingData(sortedAuthors)
-        console.log('sortedAuthors', sortedAuthors)
+        setRankingData(mockAuthors)
+        console.log('sortedAuthors', mockAuthors)
         setIsLoading(false)
       } catch (error) {
         console.error('작가 랭킹 데이터 로드 실패:', error)
@@ -160,7 +162,7 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
                 <div className="relative w-16 h-16 rounded-full overflow-hidden bg-secondary-100 dark:bg-dark-secondary-800">
                   {author.profileImageUrl ? (
                     <Image
-                      src="/images/placeholders/author_default_img.jpg"
+                      src={author.profileImageUrl}
                       alt={author.nickname || author.name}
                       fill
                       className="object-cover"

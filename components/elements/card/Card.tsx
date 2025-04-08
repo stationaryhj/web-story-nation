@@ -136,7 +136,7 @@ export default function Card({
             <h3 className="font-bold text-secondary-900 dark:text-dark-secondary-700 text-base truncate">{name}</h3>
 
             {/* 캐릭터 설명 - 최대 2줄 */}
-            <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 my-1.5">{description}</p>
+            <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 my-1.5">{getChangeNameTag(description || '', name)}</p>
 
             <div className="flex flex-wrap gap-1 my-1.5">
               {hashtags?.slice(0, 2).map((tag, index) => (
