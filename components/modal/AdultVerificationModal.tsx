@@ -5,6 +5,7 @@ import BaseModal from './BaseModal'
 import { useSettingsStore } from '@/store/useStoreSettings'
 import { toast } from 'react-toastify'
 import { useRouter } from 'next/navigation'
+import { useAccountStore } from '@/store/useStoreData'
 
 interface AdultVerificationModalProps {
   isOpen: boolean
@@ -20,57 +21,25 @@ export default function AdultVerificationModal({ isOpen, onClose, onVerify }: Ad
   // 본인인증 처리 함수
   const handleVerify = async () => {
     try {
+      const { verifyIdentity } = useAccountStore.getState()
+      const result = await verifyIdentity()
 
-      router.push('/settings')
+      if (result.success) {
+        // 인증 성공 시 콜백 실행
+        if (onVerify) {
+          onVerify()
+        }
 
-      setIsVerifying(true)
+        onClose()
 
-      // 여기에 본인인증 API 호출 코드 추가
-      // const response = await fetch('/api/verify-adult', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({ /* 필요한 데이터 */ }),
-      // });
-
-      // if (response.ok) {
-      //   const data = await response.json();
-      //   console.log('본인인증 성공:', data);
-      //
-      //   if (onVerify) {
-      //     onVerify();
-      //   }
-      //
-      //   onClose();
-      // } else {
-      //   const error = await response.json();
-      //   console.error('본인인증 실패:', error);
-      //   alert('본인인증에 실패했습니다. 다시 시도해주세요.');
-      // }
-
-      // 임시 구현: 바로 성공으로 처리 (실제 API 연동 전까지만 사용)
-      console.log('본인인증 프로세스 시작')
-
-      // 성인 모드 활성화 전 상태 확인
-      console.log('성인 모드 활성화 전 상태:', useSettingsStore.getState().isAdultModeEnabled)
-
-      // 성인 모드 활성화
-      const success = enableAdultMode()
-
-      // 성인 모드 활성화 후 상태 확인
-      console.log('성인 모드 활성화 성공 여부:', success)
-      console.log('성인 모드 활성화 후 상태:', useSettingsStore.getState().isAdultModeEnabled)
-
-      // 인증 성공 시 콜백 실행
-      if (onVerify) {
-        onVerify()
+        return
+      } else {
+        toast.error(result.message)
       }
 
-      onClose()
+      
     } catch (error) {
       console.error('본인인증 중 오류 발생:', error)
-      toast.error('본인인증 중 오류가 발생했습니다. 다시 시도해주세요.')
     } finally {
       setIsVerifying(false)
     }
