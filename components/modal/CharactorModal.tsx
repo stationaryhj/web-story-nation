@@ -180,15 +180,21 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
     setIsReportModalOpen(true)
   }
 
-  const handleReportSubmit = async (reportData: any) => {
+  const handleReportSubmit = async (reason: number | null, description: string) => {
     try {
       // 여기에 실제 신고 API 호출 로직 구현
-      console.log('Report submitted:', reportData)
-
-      const response = await contentApi.ReportChatBot(10, Number(selectedCharacter?.id), 67, reportData, 'KR')
+      const response = await contentApi.ReportChatBot(
+        10,
+        Number(selectedCharacter?.id),
+        reason || 0,
+        description,
+        'KR'
+      )
       const responseData = response.data
 
-      console.log('responseData : ', responseData)
+      if (responseData.result.err === 0) {
+        toast.success('신고가 접수되었습니다.')
+      }
 
       // 성공 시 상태 업데이트
       setReportSubmitted(true)
@@ -325,7 +331,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   </span>
                 </h3>
                 <p className="text-secondary-800 dark:text-dark-secondary-200 text-sm leading-relaxed whitespace-pre-wrap break-words">
-                  {selectedCharacter.description || '캐릭터에 대한 간략한 설명이 없습니다.'}
+                  {getChangeNameTag(selectedCharacter.description || '', selectedCharacter.name)}
                 </p>
               </div>
             </div>
