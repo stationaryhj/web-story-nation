@@ -20,10 +20,11 @@ import { bridgeCharbotDataToCharacter } from '@/lib/utils/storyNationUtil'
 import BaseModal from './BaseModal'
 import { ReqGetChatBot } from '@/services/hooks/DataListManager'
 import { Character } from '@/store/useStoreData'
-import { contentApi } from '@/services/api/storyNationApi'
+import { contentApi, createApi } from '@/services/api/storyNationApi'
 import { CharbotLikeResponse } from '@/types/api'
 import { useAccountStore } from '@/store/useStoreData'
 import ReportModal from './ReportModal'
+import { toast } from 'react-toastify'
 
 interface ExampleData {
   title: string
@@ -131,7 +132,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   }
 
   // 대화 시작 버튼 클릭 시 채팅 페이지로 이동
-  const handleStartChat = () => {
+  const handleStartChat = async () => {
     if (selectedCharacter && selectedCharacter.id) {
       if (!isLogin) {
         openModal('login')
@@ -145,8 +146,20 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
 
       handleClose()
       const chatId = String(selectedCharacter.id).trim()
-      if (chatId) {
-        router.push(`/chat/${chatId}`)
+      const response = await createApi.GetChatBot(Number(chatId))
+
+      if (response.data.result.err == 0) {
+        if (response.data.chrbot.block_type !== 0) {
+          toast.error('정책 위반 사항이 포함되어 비공개된 캐릭터입니다.')
+          return
+        }
+        if (response.data.chrbot.delete_yn !== 0) {
+          toast.error('삭제된 캐릭터입니다.')
+          return
+        }
+        if (chatId) {
+          router.push(`/chat/${chatId}`)
+        }
       }
     }
   }

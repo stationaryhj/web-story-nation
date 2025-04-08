@@ -23,17 +23,17 @@ export default function AuthorDetailPage({ params }: AuthorDetailPageProps) {
   // 페이지 진입 시 작가 정보 조회
   useEffect(() => {
     // 현재 스토어 상태 확인
-    const currentAuthor = useAuthorStore.getState().author;
-    const nickname = decodeURIComponent(params.id);
-    
+    const currentAuthor = useAuthorStore.getState().author
+    const nickname = decodeURIComponent(params.id)
+
     // 이미 저장된 정보가 있고, 같은 작가의 정보인 경우
     if (currentAuthor && currentAuthor.nickname === nickname) {
       // 작가의 캐릭터 목록만 로드 (상세 정보는 이미 있음)
-      fetchAuthorByNickname(nickname);
+      fetchAuthorByNickname(nickname)
     } else {
       // 작가 정보가 없거나 다른 작가의 정보인 경우 전체 정보 로드
-      useAuthorStore.getState().reset(); // 기존 데이터 초기화
-      fetchAuthorByNickname(nickname);
+      useAuthorStore.getState().reset() // 기존 데이터 초기화
+      fetchAuthorByNickname(nickname)
     }
 
     setBio(author?.bio || '작가 소개가 없습니다.')
@@ -71,7 +71,10 @@ export default function AuthorDetailPage({ params }: AuthorDetailPageProps) {
         {/* 로딩 중 */}
         {isLoading && !author && (
           <div className="flex justify-center items-center h-64">
-            <FontAwesomeIcon icon={faSpinner} className="h-8 w-8 text-primary-500 dark:text-dark-primary-400 animate-spin" />
+            <FontAwesomeIcon
+              icon={faSpinner}
+              className="h-8 w-8 text-primary-500 dark:text-dark-primary-400 animate-spin"
+            />
           </div>
         )}
 
@@ -101,9 +104,7 @@ export default function AuthorDetailPage({ params }: AuthorDetailPageProps) {
                       <h1 className="text-2xl font-bold dark:text-dark-gray-100">{author.nickname}</h1>
                     </div>
                     <div>
-                      <div className="text-lg text-gray-500 dark:text-dark-gray-400">
-                        {bio}
-                      </div>
+                      <div className="text-lg text-gray-500 dark:text-dark-gray-400">{bio}</div>
                     </div>
                   </div>
                 </div>

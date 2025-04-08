@@ -20,126 +20,126 @@ interface FilterControlsProps {
  */
 export default function FilterControls({ categoryId }: FilterControlsProps) {
   // 초기화 여부를 추적하는 ref
-  const isInitialized = useRef(false);
-  
+  const isInitialized = useRef(false)
+
   // 드롭다운 UI 상태
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  
+
   // 태그 목록 확장 상태 관리 (localStorage에 저장)
   const [isTagListExpanded, setIsTagListExpanded] = useState(() => {
     // 브라우저 환경에서만 localStorage 접근
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('tagListExpanded');
-      return saved ? JSON.parse(saved) : false;
+      const saved = localStorage.getItem('tagListExpanded')
+      return saved ? JSON.parse(saved) : false
     }
-    return false;
+    return false
   })
-  
+
   // 중앙 스토어에서 상태와 액션 가져오기
-  const { 
-    filter, 
-    tags, 
-    isTagsLoading, 
-    currentTags,
-    isLoading,
-    updateFilter, 
-    updateTags,
-    changeCategory
-  } = useCharacterGridStoreData()
-  
+  const { filter, tags, isTagsLoading, currentTags, isLoading, updateFilter, updateTags, changeCategory } =
+    useCharacterGridStoreData()
+
   // URL 파라미터 가져오기 (초기 로드시에만 사용)
-  const searchParams = useSearchParams();
-  
+  const searchParams = useSearchParams()
+
   // isTagListExpanded 상태 변경 시 localStorage에 저장
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('tagListExpanded', JSON.stringify(isTagListExpanded));
+      localStorage.setItem('tagListExpanded', JSON.stringify(isTagListExpanded))
     }
-  }, [isTagListExpanded]);
+  }, [isTagListExpanded])
 
   // 컴포넌트 마운트 시 초기화
   useEffect(() => {
     if (!isInitialized.current && categoryId) {
       // URL에서 파라미터 가져오기 (초기 로드시에만)
-      const orderFromUrl = searchParams?.get('order') ? parseInt(searchParams.get('order') as string, 10) : null;
-      const nsfwFromUrl = searchParams?.get('nsfw') ? parseInt(searchParams.get('nsfw') as string, 10) : null;
-      const tagsFromUrl = searchParams?.get('tags') ? searchParams.get('tags')?.split('&') || [] : [];
-      
+      const orderFromUrl = searchParams?.get('order') ? parseInt(searchParams.get('order') as string, 10) : null
+      const nsfwFromUrl = searchParams?.get('nsfw') ? parseInt(searchParams.get('nsfw') as string, 10) : null
+      const tagsFromUrl = searchParams?.get('tags') ? searchParams.get('tags')?.split('&') || [] : []
+
       // 필터 설정
       if (orderFromUrl || nsfwFromUrl) {
         updateFilter({
           order: orderFromUrl || filter.order,
-          nsfw: nsfwFromUrl || filter.nsfw
-        });
+          nsfw: nsfwFromUrl || filter.nsfw,
+        })
       } else {
         // 카테고리 변경 (태그가 있는 경우 태그도 같이 설정됨)
         if (tagsFromUrl.length > 0) {
           // 카테고리 변경 후 태그 설정
           changeCategory(categoryId.toString()).then(() => {
-            updateTags(tagsFromUrl);
-          });
+            updateTags(tagsFromUrl)
+          })
         } else {
           // 카테고리만 변경
-          changeCategory(categoryId.toString());
+          changeCategory(categoryId.toString())
         }
       }
-      
-      isInitialized.current = true;
+
+      isInitialized.current = true
     }
-  }, [categoryId, filter.order, filter.nsfw, searchParams, updateFilter, changeCategory, updateTags]);
-  
+  }, [categoryId, filter.order, filter.nsfw, searchParams, updateFilter, changeCategory, updateTags])
+
   // categoryId가 변경될 때 데이터 초기화 및 재로드
   useEffect(() => {
     if (isInitialized.current && categoryId) {
       // 카테고리 변경
-      changeCategory(categoryId.toString());
+      changeCategory(categoryId.toString())
     }
-  }, [categoryId, changeCategory]);
+  }, [categoryId, changeCategory])
 
   // 정렬 변경 핸들러
-  const handleOrderChange = useCallback((newOrder: number) => {
-    // 이미 같은 값이면 무시
-    if (filter.order === newOrder) return;
-    
-    // 스토어 업데이트
-    updateFilter({ order: newOrder });
-  }, [filter.order, updateFilter]);
+  const handleOrderChange = useCallback(
+    (newOrder: number) => {
+      // 이미 같은 값이면 무시
+      if (filter.order === newOrder) return
+
+      // 스토어 업데이트
+      updateFilter({ order: newOrder })
+    },
+    [filter.order, updateFilter]
+  )
 
   // NSFW 필터 변경 핸들러
-  const handleNsfwChange = useCallback((newNsfw: number) => {
-    // 이미 같은 값이면 무시
-    if (filter.nsfw === newNsfw) return;
-    
-    
-    // 스토어 업데이트
-    updateFilter({ nsfw: newNsfw });
-    
-    // 드롭다운 닫기
-    setIsDropdownOpen(false);
-  }, [filter.nsfw, updateFilter]);
+  const handleNsfwChange = useCallback(
+    (newNsfw: number) => {
+      // 이미 같은 값이면 무시
+      if (filter.nsfw === newNsfw) return
+
+      // 스토어 업데이트
+      updateFilter({ nsfw: newNsfw })
+
+      // 드롭다운 닫기
+      setIsDropdownOpen(false)
+    },
+    [filter.nsfw, updateFilter]
+  )
 
   // 태그 핸들러
-  const handleTagSelect = useCallback((tagIds: string[]) => {
-    // 이미 같은 값이면 무시 (깊은 비교)
-    if (JSON.stringify(currentTags) === JSON.stringify(tagIds)) return;
-    
-    // 스토어 업데이트
-    updateTags(tagIds);
-  }, [currentTags, updateTags]);
+  const handleTagSelect = useCallback(
+    (tagIds: string[]) => {
+      // 이미 같은 값이면 무시 (깊은 비교)
+      if (JSON.stringify(currentTags) === JSON.stringify(tagIds)) return
+
+      // 스토어 업데이트
+      updateTags(tagIds)
+    },
+    [currentTags, updateTags]
+  )
 
   // 태그 필터 초기화
   const handleTagRefresh = useCallback(() => {
     // 이미 태그가 없으면 무시
-    if (currentTags.length === 0) return;
-    
+    if (currentTags.length === 0) return
+
     // 선택된 태그 초기화
-    updateTags([]);
-  }, [currentTags, updateTags]);
+    updateTags([])
+  }, [currentTags, updateTags])
 
   // 태그 목록 토글
   const toggleTagList = useCallback(() => {
-    setIsTagListExpanded((prev: boolean) => !prev);
-  }, []);
+    setIsTagListExpanded((prev: boolean) => !prev)
+  }, [])
 
   return (
     <>
@@ -150,17 +150,6 @@ export default function FilterControls({ categoryId }: FilterControlsProps) {
           <div className="flex border rounded-lg overflow-hidden">
             <button
               className={`px-4 py-2 text-sm font-medium transition-colors ${
-                filter.order === 1
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white dark:bg-dark-background-lighter text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-background-lighter/80'
-              }`}
-              onClick={() => handleOrderChange(1)}
-              disabled={isLoading}
-            >
-              인기순
-            </button>
-            <button
-              className={`px-4 py-2 text-sm font-medium transition-colors ${
                 filter.order === 2
                   ? 'bg-indigo-600 text-white'
                   : 'bg-white dark:bg-dark-background-lighter text-gray-800 dark:text-black hover:bg-gray-100 dark:hover:bg-dark-background-lighter/80'
@@ -169,6 +158,17 @@ export default function FilterControls({ categoryId }: FilterControlsProps) {
               disabled={isLoading}
             >
               최신순
+            </button>
+            <button
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
+                filter.order === 1
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-white dark:bg-dark-background-lighter text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-background-lighter/80'
+              }`}
+              onClick={() => handleOrderChange(1)}
+              disabled={isLoading}
+            >
+              인기순
             </button>
           </div>
 
@@ -245,9 +245,7 @@ export default function FilterControls({ categoryId }: FilterControlsProps) {
                     onClick={() => handleNsfwChange(1)}
                     disabled={isLoading}
                   >
-                    <span className="inline-flex items-center">
-                      짜릿모드 가능
-                    </span>
+                    <span className="inline-flex items-center">짜릿모드 가능</span>
                   </button>
                   <button
                     className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${

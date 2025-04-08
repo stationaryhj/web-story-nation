@@ -36,9 +36,11 @@ import { bridgeCharbotDataToCharacter, bridgeChatModeDataToChatMode } from '@/li
 import { useNakama } from '@/app/providers/NakamaProviders'
 import { useChatModeStore } from '@/store/useStoreData'
 import BaseSidebar from '@/components/elements/sidebar/BaseSidebar'
-import { chatApi } from '@/services/api/storyNationApi'
+import { chatApi, createApi } from '@/services/api/storyNationApi'
 import Tutorial from '@/components/tutorial/Tutorial'
 import ResetChatModal from '@/components/modal/ResetChatModal'
+import { toast } from 'react-toastify'
+
 
 interface ChatDetailClientProps {
   characterId: string
@@ -208,6 +210,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 채팅 컨테이너 ref
   const chatContainerRef = useRef<HTMLDivElement>(null)
+  const toastShownRef = useRef(false)
 
   // 표시 이미지
   const showImage = userIsAdult && chatMessages.length > 2 ? character.imageUrlNsfw : character.imageUrl
@@ -321,17 +324,17 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     // 이미 초기화된 상태인지 확인
     if (isInitRoom && channelId) {
       console.log('✅ 채팅방이 이미 초기화되어 있습니다.')
-      
+
       // 채팅방이 초기화되어 있고 메시지가 없으면 first_talk 추가
       if (chatMessages.length === 0 && first_talk) {
         addChatMessage({
           id: 'first-message',
           sender: 'character',
           message: first_talk,
-          timestamp: new Date()
-        });
+          timestamp: new Date(),
+        })
       }
-      
+
       return
     }
 
@@ -536,8 +539,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 마지막 AI 응답 새로고침 함수 (Provider의 메서드 사용)
   const handleRefreshLastAIMessage = async (chat: any) => {
+
     if (!checkCoin()) return
-    
+
     try {
       // Provider의 메서드를 사용하여 마지막 AI 메시지 새로고침
       await refreshLastAIMessage(chat)
@@ -672,19 +676,19 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     const responseData = await chatApi.InitChat(Number(chrBotChatKey), currentModeId, userIsAdult)
     console.log('💬 채팅 초기화 응답:', responseData.data)
 
-    if(responseData?.data?.result?.err === 0) {
+    if (responseData?.data?.result?.err === 0) {
       await clearChatHistory()
 
       updatePromptKey(responseData.data.prompt_key)
-      
+
       // 캐릭터의 첫 대화 메시지 추가
       if (first_talk) {
         addChatMessage({
           id: 'first-message',
           sender: 'character',
           message: first_talk,
-          timestamp: new Date()
-        });
+          timestamp: new Date(),
+        })
       }
 
       // 채팅 초기화 성공
@@ -715,10 +719,42 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         id: 'first-message',
         sender: 'character',
         message: first_talk,
-        timestamp: new Date()
-      });
+        timestamp: new Date(),
+      })
     }
-  }, [isInitRoom, channelId, chatMessages.length, first_talk, addChatMessage]);
+  }, [isInitRoom, channelId, chatMessages.length, first_talk, addChatMessage])
+
+  useEffect(() => {
+    console.log('characterId :: ', characterId)
+    const checkCharacter = async () => {
+      if (toastShownRef.current) return
+
+      const response = await createApi.GetChatBot(Number(characterId))
+      if (response.data.result.err == 0) {
+        if (response.data.chrbot.block_type !== 0 && !toastShownRef.current) {
+          toastShownRef.current = true
+          toast.error('정책 위반 사항이 포함되어 비공개된 캐릭터입니다.', {
+            toastId: 'block-error',
+          })
+          router.back()
+          return
+        }
+        if (response.data.chrbot.delete_yn !== 0 && !toastShownRef.current) {
+          toastShownRef.current = true
+          toast.error('삭제된 캐릭터입니다.', {
+            toastId: 'delete-error',
+          })
+          router.back()
+          return
+        }
+      }
+    }
+    checkCharacter()
+
+    return () => {
+      toastShownRef.current = false
+    }
+  }, [characterId])
 
   // 로딩 상태 표시
   if (isLoading) {
@@ -1196,17 +1232,20 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                         </p>
                       </motion.div>
 
-                      {chat.sender === 'character' && chat.id !== 'first-message' &&(
+                      {chat.sender === 'character' && chat.id !== 'first-message' && (
                         <div className="flex ml-2 items-center justify-start max-w-[85%] mt-2">
                         {/* 마지막 AI 메시지인 경우 새로고침/삭제 버튼 표시 */}
                         {isLastAiMessage && (
                           <button
+
                             onClick={handleRefreshLastAIMessage}
+
                             className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-500 hover:text-violet-600 hover:bg-violet-100 transition-colors mr-1.5 shadow-sm"
                             title="응답 새로고침"
                           >
                             <FontAwesomeIcon icon={faSync} className="text-sm sm:text-base" />
                           </button>
+
                         )}
                         <button
                           onClick={() => handleDeleteLastAIMessage(chat)}
