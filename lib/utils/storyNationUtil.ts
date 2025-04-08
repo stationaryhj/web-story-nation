@@ -379,6 +379,21 @@ export function getChangeNameTag(script: string, charName: string) {
   return changeScript
 }
 
+// 이미지 URL 유효성 체크 함수 추가
+export const getValidImageUrl = (url: string | null | undefined): string => {
+  if (!url) return "/images/placeholders/author_default_img.jpg";
+  
+  try {
+    // URL 유효성 체크 (상대 경로는 그대로 통과, 절대 경로는 유효한 URL인지 확인)
+    if (url.startsWith('/')) return url; // 상대 경로는 그대로 사용
+    new URL(url); // 절대 URL인 경우 유효성 체크
+    return url;
+  } catch (e) {
+    console.warn('Invalid image URL:', url);
+    return "/images/placeholders/author_default_img.jpg";
+  }
+};
+
 function getCategory(gender: number) {
   if (gender === 1) {
     return 'male'
@@ -388,3 +403,4 @@ function getCategory(gender: number) {
     return 'unspecified'
   }
 }
+

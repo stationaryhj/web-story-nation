@@ -104,7 +104,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   const exampleDatas = chatBotData?.chrbot?.example ? bridgeExampleData(chatBotData.chrbot.example) : []
   const isExampleShow = chatBotData?.chrbot?.example_show_yn
 
-  const content = chatBotData?.chrbot?.content
+  const content = getChangeNameTag(chatBotData?.chrbot?.content || '', selectedCharacter?.name || '')
   const isContentShow = chatBotData?.chrbot?.content_show_yn
 
   useEffect(() => {
@@ -350,7 +350,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   상세 설명
                 </h3>
                 <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed">
-                  {getChangeNameTag(content || '', selectedCharacter.name)}
+                  {content}
                 </p>
               </div>
             )}
@@ -618,7 +618,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   </div>
                   <div className="bg-primary-50 dark:bg-primary-900/30 text-secondary-800 dark:text-secondary-200 p-3 rounded-lg rounded-tl-none shadow-sm border border-primary-100 dark:border-primary-800/50">
                     <p className="text-sm leading-relaxed">
-                      {selectedCharacter?.first_talk || '첫 메시지가 없습니다.'}
+                      {getChangeNameTag(selectedCharacter?.first_talk || '', selectedCharacter.name)}
                     </p>
                   </div>
                 </div>
