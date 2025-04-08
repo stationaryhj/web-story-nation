@@ -49,10 +49,6 @@ export default function BasicInfoForm({
     fetchTagList()
   }, [fetchTagList])
 
-  useEffect(() => {
-    console.log('invalidFields', invalidFields)
-  }, [invalidFields])
-
   // 그룹별로 태그 정리하기
   const allAvailableTags = useMemo(() => {
     // 모든 그룹의 태그를 하나의 배열로 합치기

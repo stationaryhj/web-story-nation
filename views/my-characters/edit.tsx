@@ -143,7 +143,7 @@ export default function EditCharacterPage() {
       }
 
       toast.success('캐릭터가 성공적으로 수정되었습니다!')
-      // router.push('/my-characters')
+      router.push('/my-characters')
     } catch (error) {
       console.error('캐릭터 수정 실패:', error)
       toast.error('캐릭터 수정에 실패했습니다. 다시 시도해주세요.')
