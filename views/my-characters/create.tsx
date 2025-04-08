@@ -109,7 +109,7 @@ export default function CreateCharacterPage() {
                 <CharacterForm
                   formType="create"
                   mode={activeTab}
-                  onValidationChange={activeTab === 'image' ? handleImageValidationChange : undefined}
+                  // onValidationChange={activeTab === 'image' ? handleImageValidationChange : undefined}
                 />
               </FadeIn>
             </div>

@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   title: '스토리네이션',
   description: '스토리네이션 - 캐릭터 기반 서비스',
   icons: {
-    icon: '/images/storyNation_thumb.png',
+    icon: '/images/sn-thumb.jpg',
   },
 }
 

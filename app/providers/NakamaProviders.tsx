@@ -21,6 +21,8 @@ interface NakamaContextType {
   
   // 새로운 채팅 메시지 관련 필드
   chatMessages: ChatMessage[]; // 채팅 메시지 배열
+
+  LatestSummaryPosition: number;
   
   // 메서드들
   setSession: (session: Session) => void;
@@ -44,13 +46,15 @@ interface NakamaContextType {
   
   // 새로운 채팅 메시지 메서드들
   sendChatMessage: (message: string) => Promise<boolean>; // 메시지 전송
-  refreshLastAIMessage: () => Promise<boolean>;           // 마지막 AI 메시지 재생성
   clearChatHistory: () => void;                          // 채팅 기록 초기화
   addChatMessage: (message: ChatMessage) => void;         // 메시지 추가
 
   updateChatMode: (mode: number) => void;
   updatePromptKey: (key: string) => void;
+  refreshLastAIMessage: (message: ChatMessage) => Promise<boolean>;           // 마지막 AI 메시지 재생성
   deleteChatMessage: (message: ChatMessage) => Promise<boolean>;
+  deleteChatMessageOne: (message: ChatMessage) => Promise<boolean>;
+  updateLatestSummaryPosition: (summaryPosition: number, msgLen?: number) => void;
 }
 
 // 채팅 메시지 인터페이스
@@ -78,6 +82,7 @@ interface ChatRoomState {
 interface ApiState {
   sendPrompt_key: string;
   nsfw: number;
+  LatestSummaryPosition: number;
 }
 
 // 기본 컨텍스트 값
@@ -95,6 +100,8 @@ const defaultContextValue: NakamaContextType = {
   charbotData: null,   // 캐릭터 데이터 추가
   chatMessages: [],    // 채팅 메시지 배열
 
+  LatestSummaryPosition: 0,
+
   setSession: () => {},
   chatRoomInit: async () => ({ success: false }),
   connectSocket: async () => false,
@@ -111,13 +118,17 @@ const defaultContextValue: NakamaContextType = {
   
   // 새로운 메시지 메서드들
   sendChatMessage: async () => false,
-  refreshLastAIMessage: async () => false,
+  
   clearChatHistory: () => {},
   addChatMessage: () => {},
 
   updateChatMode: () => {},
   updatePromptKey: () => {},
+
+  refreshLastAIMessage: async () => false,
   deleteChatMessage: async () => false,
+  deleteChatMessageOne: async () => false,
+  updateLatestSummaryPosition: () => {},
 };
 
 // Nakama 컨텍스트 생성
@@ -170,6 +181,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
   const [apiState, setApiState] = useState<ApiState>({
     sendPrompt_key: '',
     nsfw: 0,
+    LatestSummaryPosition: 0
   });
   
   // 채팅 메시지 상태
@@ -310,6 +322,11 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         const promptKey = response.data.prompt_key;
         const nsfwValue = response.data.world_list_detail_chrbot?.nsfw || 0;
         
+        // summary_position 업데이트 추가
+        if (response.data.summary_position !== undefined) {
+          updateLatestSummaryPosition(response.data.summary_position);
+        }
+
         return { promptKey, nsfwValue };
       } else {
         console.error('❌ 채팅 초기화 실패:', response?.data);
@@ -345,11 +362,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
             continue;
           }
           console.log('result :: ' , result)
-          
           console.log(`💬 채팅 메시지 ${result.messages.length}개 수신`);
-
-          // 메시지 처리 로직...
-          const processedIds = new Set<string>();
 
           result.messages.forEach((message) => {
             const messageContent = message.content as any;
@@ -358,12 +371,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
             const createTime = message.create_time ? 
               new Date(message.create_time) : new Date();
             
-            // if (processedIds.has(senderId)) {
-            //   console.log('⚠️ 중복 ID 감지, 메시지 건너뜀:', senderId);
-            //   return;
-            // }
-            
-            processedIds.add(senderId);
             
             addChatMessage({
               id: senderId,
@@ -374,8 +381,10 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           });
 
           cursor = result.next_cursor || '';
+
+          console.log('cursor :: ' , cursor)
           
-          if (result.messages.length < max_count) {
+          if (result.messages.length < max_count || (cursor === '' || cursor === null)) {
             max_count = -1; // 모든 메시지를 가져왔으므로 루프 종료
           } else {
             max_count = 50;
@@ -866,6 +875,9 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
               
               // 응답 상태 확인
               if (response && response.data && response.data.result && response.data.result.err === 0) {
+                console.log('@@@@@@@ ????????? response.data.summary_position :: ' , response.data.summary_position, response.data.msg_len)
+                updateLatestSummaryPosition(response.data.summary_position, response.data.msg_len)
+
                 // AI의 응답을 다시 채널에 전송
                 const chatMessageResponse = response.data;
 
@@ -1022,7 +1034,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
   };
 
   // 마지막 AI 메시지 새로고침 함수
-  const refreshLastAIMessage = async (): Promise<boolean> => {
+  const refreshLastAIMessage = async (message: ChatMessage): Promise<boolean> => {
     if (!connectionState.isConnected) {
       console.error('Nakama 서버에 연결되어 있지 않습니다.');
       throw new Error('채팅 서버에 연결되어 있지 않습니다.');
@@ -1086,6 +1098,25 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
       // Nakama를 통해 AI 응답 전송
       try {
+        // 코인 차감
+        const coinResponse = await chatApi.UseChat(
+          chatRoomState.chrBotChatKey,
+          chatRoomState.currentChatMode,
+        )
+
+        if (coinResponse && coinResponse?.data && coinResponse?.data.result?.err === 0) {  
+          console.log('💰 코인 차감 성공:', coinResponse.data);
+          
+          updateAccountData(
+            coinResponse.data.coin_free,
+            coinResponse.data.coin_free_dt,
+            coinResponse.data.coin_register,
+            coinResponse.data.coin
+          );
+        } else {
+          console.error('💰 코인 차감 실패:', coinResponse?.data);
+        }
+
         updatePromptKey(response.data.prompt_key)
 
         // 응답 JSON 파싱 및 content 추출
@@ -1104,6 +1135,10 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           messageContent = "응답 형식이 잘못되었습니다. 다시 시도해주세요.";
         }
         
+        // UI에서 기존 메시지 제거
+        await deleteChatMessageOne(lastMessage)
+        setChatMessages(prev => prev.filter(msg => msg.id !== lastMessage.id));
+
         // 단순화된 메시지 형식 - content와 type만 포함
         const content = { 
           content: messageContent, 
@@ -1113,30 +1148,12 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         await socketRef.current.writeChatMessage(chatRoomState.channelId, content);
       } catch (parseError) {
         console.error('AI 응답 파싱 오류:', parseError);
-        // 파싱 오류 시 기본 오류 메시지 전송
-        const content = { 
-          content: "응답을 처리하는 중 오류가 발생했습니다. 다시 시도해주세요.", 
-          type: 'ai' 
-        };
-        await socketRef.current.writeChatMessage(chatRoomState.channelId, content);
+        return false;
       }
-      
-      // UI에서 기존 메시지 제거
-      setChatMessages(prev => prev.filter(msg => msg.id !== lastMessage.id));
-      
+
       return true;
     } catch (error) {
       console.error('메시지 새로고침 중 오류:', error);
-      
-      // 오류 메시지 표시
-      const errorMessage: ChatMessage = {
-        id: Date.now().toString(),
-        sender: 'character',
-        message: '메시지 새로고침에 실패했습니다. 다시 시도해주세요.',
-        timestamp: new Date(),
-      };
-      
-      setChatMessages(prev => [...prev, errorMessage]);
       return false;
     }
   };
@@ -1378,7 +1395,54 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
     return false
   };
-    
+
+
+  const deleteChatMessageOne = async (message: ChatMessage): Promise<boolean> => {
+    const responseData = await chatApi.DeleteChat(
+      Number(chatRoomState.chrBotChatKey),
+      chatRoomState.currentChatMode,
+      apiState.nsfw,
+      message.id
+    )
+    if(responseData?.data?.result?.err === 0  ) {
+      updatePromptKey(responseData.data.prompt_key)
+      return true
+    }
+
+    return false
+  }
+
+  // updateLatestSummaryPosition 함수 추가
+  const updateLatestSummaryPosition = async (summaryPosition: number, msgLen: number = 0): Promise<void> => {
+    console.log('apiState.LatestSummaryPosition :: ', apiState.LatestSummaryPosition , summaryPosition)
+    console.log('summaryPosition :: ', apiState.LatestSummaryPosition === summaryPosition)
+
+    if (apiState.LatestSummaryPosition === summaryPosition) {
+      console.log('@@@@@@@@@@@@ 💬 Summary Position 업데이트:', {
+        이전값: apiState.LatestSummaryPosition,
+        새값: summaryPosition,
+        메시지길이: msgLen
+      });
+
+      // if (msgLen >= 3500) {
+      //   console.log('chatMessages :: ' , chatMessages)
+      //   console.log('⚠️ 메시지 길이가 3500자를 초과했습니다:', msgLen);
+
+      //   const responseData = await chatApi.SummaryChat(
+      //     Number(chatRoomState.chrBotChatKey),
+      //     // chatMessages[chatMessages.length - 1].id,
+      //     summaryPosition.toString(),
+      //     'KR',
+      //     chatRoomState.currentChatMode)
+      //   console.log('responseData :: ' , responseData)
+      // }
+    }
+
+    setApiState(prev => ({
+      ...prev,
+      LatestSummaryPosition: summaryPosition
+    }));
+  };
 
   // 먼저 useMemo로 chatContextValue 객체 생성
   const contextValue: NakamaContextType = {
@@ -1394,6 +1458,8 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     isInitRoom: connectionState.isInitRoom,
     charbotData,
     chatMessages,
+    
+    LatestSummaryPosition: apiState.LatestSummaryPosition,
     
     // 메서드들
     setSession,
@@ -1414,12 +1480,14 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     
     // 새로운 메시지 메서드들
     sendChatMessage,
-    refreshLastAIMessage,
     clearChatHistory,
     addChatMessage,
     updateChatMode,
     updatePromptKey,
+    refreshLastAIMessage,
     deleteChatMessage,
+    deleteChatMessageOne,
+    updateLatestSummaryPosition,
   };
 
   // Provider 컴포넌트 간소화

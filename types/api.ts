@@ -592,6 +592,7 @@ export interface OpenChatResponse {
   arrangePrompt: number
   prompt_key: string
   world_list_detail_chrbot: WorldListDetailChrbot;
+  summary_position: number
   result: ApiResult
 }
 
