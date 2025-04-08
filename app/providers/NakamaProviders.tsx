@@ -314,7 +314,8 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     chatMode: number
   ): Promise<{ promptKey: string; nsfwValue: number } | null> => {
     try {
-      const response = await chatApi.OpenChat(chatKey, chatMode, 1);
+      const userAdult = useAccountStore.getState().isAdult() ? 1 : 0
+      const response = await chatApi.OpenChat(chatKey, chatMode, userAdult);
       
       if (response && response.data.result.err === 0) {
         const promptKey = response.data.prompt_key;

@@ -475,6 +475,14 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
     if (!checkCoin()) return
 
+    // 성인 유무 판단
+    if(currentModeId === 3 || currentModeId === 4) {
+      if(!userIsAdult) {
+        openModal('adultVerification')
+        return
+      }
+    }
+
     // 입력창 초기화 (먼저 수행하여 UX 향상)
     const messageText = message.trim()
     setMessage('')
