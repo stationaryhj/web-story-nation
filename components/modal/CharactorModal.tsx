@@ -183,13 +183,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   const handleReportSubmit = async (reason: number | null, description: string) => {
     try {
       // 여기에 실제 신고 API 호출 로직 구현
-      const response = await contentApi.ReportChatBot(
-        10,
-        Number(selectedCharacter?.id),
-        reason || 0,
-        description,
-        'KR'
-      )
+      const response = await contentApi.ReportChatBot(10, Number(selectedCharacter?.id), reason || 0, description, 'KR')
       const responseData = response.data
 
       if (responseData.result.err === 0) {
@@ -279,7 +273,6 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                       alt={selectedCharacter.name || '캐릭터 이미지'}
                       fill
                       priority
-                      style={{ objectFit: 'contain', objectPosition: 'center' }}
                       className="transition-opacity duration-300 z-10 opacity-100 drop-shadow-md"
                       onLoadingComplete={() => setIsImageLoaded(true)}
                     />
@@ -414,7 +407,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                               alt={selectedCharacter.name || '캐릭터'}
                               width={40}
                               height={40}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full"
                             />
                           ) : (
                             <div className="w-full h-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
@@ -461,7 +454,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
         {/* 모바일 레이아웃 */}
         <div className="md:hidden w-full overflow-y-auto max-h-full">
           {/* 상단: 이미지 섹션 */}
-          <div className="w-full relative bg-gradient-to-b from-primary-100 to-primary-50 dark:from-dark-primary-900 dark:to-dark-primary-800 flex-shrink-0 max-h-[40vh] overflow-hidden">
+          <div className="w-full mb-3 relative bg-gradient-to-b from-primary-100 to-primary-50 dark:from-dark-primary-900 dark:to-dark-primary-800 flex-shrink-0 max-h-[40vh] overflow-hidden">
             {selectedCharacter.imageUrl && (
               <>
                 <div
@@ -476,7 +469,6 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                     alt={selectedCharacter.name || '캐릭터 이미지'}
                     fill
                     priority
-                    style={{ objectFit: 'contain', objectPosition: 'center' }}
                     className={`transition-opacity duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'} drop-shadow-md z-10`}
                     onLoadingComplete={() => setIsImageLoaded(true)}
                   />
@@ -492,7 +484,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
           </div>
 
           {/* 하단: 캐릭터 정보 및 콘텐츠 */}
-          <div className="p-4 space-y-4 pb-6">
+          <div className="flex flex-col gap-4">
             {/* 좋아요 & 댓글 수 */}
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 cursor-pointer" onClick={handleLike}>
@@ -626,13 +618,15 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
             </div>
 
             {/* 대화 시작 버튼 */}
-            <button
-              onClick={handleStartChat}
-              className="w-full flex items-center justify-center rounded-lg bg-primary-500 px-6 py-3.5 font-medium text-white transition-colors hover:bg-primary-600 dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600 shadow-sm"
-            >
-              <FontAwesomeIcon icon={faComment} className="mr-2" />
-              대화 시작하기
-            </button>
+            <div className="sticky bottom-0 left-0 right-0 bg-white p-2 dark:bg-dark-background-light border-t border-secondary-100 dark:border-dark-secondary-800 z-[103] md:static md:p-0 md:bg-transparent md:border-0">
+              <button
+                onClick={handleStartChat}
+                className="w-full flex items-center justify-center rounded-lg bg-primary-500 px-6 py-3.5 font-medium text-white transition-colors hover:bg-primary-600 dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600 shadow-sm"
+              >
+                <FontAwesomeIcon icon={faComment} className="mr-2" />
+                대화 시작하기
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -121,6 +121,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 튜토리얼 관련 상태를 최상위로 이동
   const [showTutorial, setShowTutorial] = useState(true)
+  const chatBoxRef = useRef<HTMLDivElement>(null)
 
   // 튜토리얼 설정
   const tutorialConfig = {
@@ -718,16 +719,22 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   }
 
   // 스크롤을 최하단으로 이동하는 함수
-  const scrollToBottom = useCallback(() => {
+  const scrollToBottom = () => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
     }
-  }, [])
+  }
 
   // 메시지가 추가될 때마다 스크롤을 최하단으로 이동
   useEffect(() => {
     scrollToBottom()
   }, [chatMessages, scrollToBottom])
+
+  useEffect(() => {
+    if (isInitRoom) {
+      scrollToBottom()
+    }
+  }, [isInitRoom, scrollToBottom])
 
   // 메시지가 없고 채팅방이 초기화되었을 때 first_talk 표시
   useEffect(() => {
@@ -1033,7 +1040,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             <FontAwesomeIcon icon={faEllipsisV} />
           </button>
 
-          {/* 채팅 새로고침 버튼 - PC에서만 표시 */}
+          {/* 채팅 새로고침 버튼 */}
           <div
             className="hidden md:flex w-9 h-9 rounded-full bg-blue-50 items-center justify-center text-blue-500 cursor-pointer hover:bg-blue-100 transition-colors"
             onClick={handleOpenResetChatModal}
@@ -1041,7 +1048,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             <FontAwesomeIcon icon={faSync} />
           </div>
 
-          {/* 채팅방 삭제 버튼 - PC에서만 표시 */}
+          {/* 채팅방 삭제 버튼 */}
           <div
             className="hidden md:flex w-9 h-9 rounded-full bg-red-50 items-center justify-center text-red-500 cursor-pointer hover:bg-red-100 transition-colors"
             onClick={() => {
@@ -1088,7 +1095,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                       setIsMoreSidebarOpen(false)
                     }}
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div className="flex justify-between items-center sm:flex-row sm:items-center sm:justify-between gap-2">
                       <div className="flex items-center">
                         <FontAwesomeIcon
                           icon={chatMode.icon}
@@ -1139,6 +1146,21 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                   }`}
                 />
               </button>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-4">채팅 초기화</h3>
+            <div
+              onClick={handleOpenResetChatModal}
+              className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center">
+                <FontAwesomeIcon icon={faSync} className="mr-3 text-gray-500" />
+                <div>
+                  <h4 className="font-medium text-gray-900">채팅 내용 초기화</h4>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1290,12 +1312,10 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           )}
 
           {/* 채팅 내용 */}
-          <div 
-            ref={chatContainerRef} 
-            className="flex-1 overflow-y-auto p-4 md:p-6 overscroll-contain"
-            onScroll={handleScroll}
-          >
-            <div className="flex flex-col space-y-8 max-w-3xl mx-auto">
+
+          <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 md:p-6">
+            <div ref={chatBoxRef} className="flex flex-col space-y-12 max-w-3xl mx-auto">
+
               {chatMessages.length === 0 ? (
                 <div className="text-center text-gray-500 py-10">
                   <p>메시지가 없습니다. 채팅을 시작해보세요!</p>
