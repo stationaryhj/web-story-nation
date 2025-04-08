@@ -210,10 +210,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         onClose={onClose}
         title={isNewUserMode ? '캐릭터와 설레는 대화를 시작하세요!' : '로그인'}
         size="md"
-        animation="fade"
-        backdropColor="bg-black/70 backdrop-blur-sm"
       >
-        <div className="flex flex-col space-y-6 pb-4">
+        <div className="flex flex-col pb-6">
           {/* 신규 가입 모드일 때만 보여줄 헤더 */}
           {isNewUserMode && (
             <>
@@ -226,7 +224,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               </div>
             </>
           )}
-          <div className="space-y-4">
+          <div className="space-y-4 mt-4">
             <button
               onClick={() => handleSocialLogin('GOOGLE')}
               disabled={loading}
