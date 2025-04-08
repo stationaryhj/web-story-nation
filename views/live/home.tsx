@@ -296,13 +296,13 @@ export default function LiveChatPage() {
       </div>
 
       {/* 신고 모달 */}
-      <ReportModal
+      {/* <ReportModal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
         onSubmit={handleSubmitReport}
         submitted={submitted}
         reportType="writer"
-      />
+      /> */}
     </>
   )
 }
