@@ -3,10 +3,8 @@
 import {
   faArrowLeft,
   faCreditCard,
-  faMoneyBillWave,
   faCalendarAlt,
   faBuildingColumns,
-  faPen,
   faInfoCircle,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -26,6 +24,8 @@ import {
 import { settlementApi } from '@/services/api/storyNationApi'
 import { bridgeIncomeDataToEarningItems, bridgeWithdrawDataToWithdrawItems } from '@/lib/utils/storyNationUtil'
 import { useModalStore } from '@/store/useStoreModal'
+import Image from 'next/image'
+import { Wallet } from 'lucide-react'
 
 export default function MyEarningsView() {
   const router = useRouter()
@@ -255,7 +255,6 @@ export default function MyEarningsView() {
   const formatPen = (amount: number) => {
     return amount.toLocaleString('ko-KR')
   }
-  
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
@@ -291,7 +290,13 @@ export default function MyEarningsView() {
             <h2 className="text-lg font-semibold mb-4">쌓은 펜</h2>
             <div className="text-3xl font-bold text-violet-700 mb-4 flex items-center">
               {formatPen(availableAmount)}
-              <FontAwesomeIcon icon={faPen} className="ml-2 text-violet-700" />
+              <Image
+                src="/images/pen/pen_purple.svg"
+                alt="pen"
+                width={24}
+                height={24}
+                className="ml-2 text-violet-700"
+              />
             </div>
 
             <div className="mt-4">
@@ -301,7 +306,7 @@ export default function MyEarningsView() {
                 className="w-full py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 !text-white hover:from-violet-700 hover:to-fuchsia-700 !border-transparent"
                 disabled={!withdrawAllow}
               >
-                <FontAwesomeIcon icon={faMoneyBillWave} className="mr-2" />
+                <Wallet className="mr-2" />
                 출금 신청하기
               </BaseButton>
               {!withdrawAllow && <p className="text-sm text-red-500 mt-2">* 최소 1500펜 이상부터 출금 가능합니다.</p>}
@@ -371,7 +376,8 @@ export default function MyEarningsView() {
             <div className="mb-4 p-3 bg-gray-50 rounded-lg">
               <div className="text-gray-700">지난달까지 총 수익</div>
               <div className="font-semibold text-xl flex items-center mt-1">
-                {formatPen(thisMonthEarnings)} <FontAwesomeIcon icon={faPen} className="ml-1" />
+                {formatPen(thisMonthEarnings)}{' '}
+                <Image src="/images/pen/pen_black.svg" alt="pen" width={18} height={18} className="ml-2" />
               </div>
             </div>
 
@@ -387,7 +393,8 @@ export default function MyEarningsView() {
                       <div className="font-medium">{item.description}</div>
                     </div>
                     <div className="flex items-center font-medium">
-                      {formatPen(item.amount)} <FontAwesomeIcon icon={faPen} className="ml-1" />
+                      {formatPen(item.amount)}{' '}
+                      <Image src="/images/pen/pen_black.svg" alt="pen" width={16} height={16} className="ml-1" />
                     </div>
                   </div>
                 ))
@@ -411,7 +418,7 @@ export default function MyEarningsView() {
               <div className="text-gray-700">총 출금 금액</div>
               <div className="font-semibold text-xl flex items-center mt-1">
                 {formatPen(Number(withdrawRequestList?.sum_price || 0))}{' '}
-                <FontAwesomeIcon icon={faPen} className="ml-1" />
+                <Image src="/images/pen/pen_black.svg" alt="pen" width={18} height={18} className="ml-1" />
               </div>
             </div>
             {withdrawRequestListLoading ? (
@@ -422,7 +429,8 @@ export default function MyEarningsView() {
                   <div key={request.id} className="py-3 flex justify-between">
                     <div className="text-sm text-gray-500">{request.date}</div>
                     <div className="flex items-center font-medium">
-                      {formatPen(request.amount)} <FontAwesomeIcon icon={faPen} className="ml-1" />
+                      {formatPen(request.amount)}{' '}
+                      <Image src="/images/pen/pen_black.svg" alt="pen" width={16} height={16} className="ml-1" />
                     </div>
                   </div>
                 ))}

@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import BaseModal from './BaseModal'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheckCircle, faPiggyBank, faBookOpen, faFire, faRocket, faPen } from '@fortawesome/free-solid-svg-icons'
+import { faCheckCircle, faPiggyBank, faBookOpen, faFire, faRocket } from '@fortawesome/free-solid-svg-icons'
 import { useChatModeStore } from '@/store/useStoreData'
 import { bridgeChatModeDataToChatMode } from '@/lib/utils/storyNationUtil'
+import Image from 'next/image'
 
 export interface ChatMode {
   id: number
@@ -139,7 +140,7 @@ export default function ChatModeModal({ isOpen, onClose, currentModeId, onSelect
                   <div className="flex-shrink-0 sm:ml-4">
                     <div className="flex items-center bg-primary-100 dark:bg-dark-primary-900/60 px-2 sm:px-3 py-1 rounded-full">
                       <span className="text-primary-700 dark:text-dark-primary-400 font-medium flex items-center text-xs sm:text-sm">
-                        <FontAwesomeIcon icon={faPen} size="xs" className="mr-1" />
+                        <Image src="/images/pen/pen_primary.svg" alt="pen" width={11} height={11} className="mr-1" />
                         {mode.penCost}
                       </span>
                       <span className="ml-1 text-[10px] sm:text-xs text-primary-600 dark:text-dark-primary-500">

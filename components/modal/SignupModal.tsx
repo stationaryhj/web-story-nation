@@ -6,13 +6,13 @@ import 'react-toastify/dist/ReactToastify.css'
 import BaseModal from './BaseModal'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck, faCheckSquare, faSquare, faPen } from '@fortawesome/free-solid-svg-icons'
+import { faCheckSquare, faSquare } from '@fortawesome/free-solid-svg-icons'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAccountStore } from '@/store/useAccountStore'
 import { contentApi } from '@/services/api/storyNationApi'
 import { createPortal } from 'react-dom'
-
+import Image from 'next/image'
 interface SignupModalProps {
   isOpen: boolean
   onClose: () => void
@@ -452,7 +452,7 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
 
       {/* 펜 아이콘 */}
       <div className="w-24 h-24 flex items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900">
-        <FontAwesomeIcon icon={faPen} className="h-12 w-12 text-primary-500 dark:text-primary-400" />
+        <Image src="/images/pen/pen_primary.svg" alt="pen" width={24} height={24} />
       </div>
 
       {/* 안내 메시지 */}

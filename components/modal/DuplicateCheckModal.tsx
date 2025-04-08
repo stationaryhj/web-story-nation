@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import BaseModal from './BaseModal'
 import { toast } from 'react-toastify'
-import { faCheckCircle, faPen } from '@fortawesome/free-solid-svg-icons'
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-
+import Image from 'next/image'
 interface DuplicateCheckModalProps {
   isOpen: boolean
   onClose: () => void
@@ -62,11 +62,11 @@ export default function DuplicateCheckModal({
         </div>
 
         {/* Cost Information */}
-        <div className="w-full bg-amber-50 dark:bg-amber-900/20 rounded-lg p-5 flex items-center justify-center space-x-3">
-          <FontAwesomeIcon icon={faPen} className="text-amber-500 dark:text-amber-400 text-lg" />
+        <div className="w-full bg-primary-100 dark:bg-amber-900/20 rounded-lg p-5 flex items-center justify-center space-x-3">
+          <Image src="/images/pen/pen_primary.svg" alt="pen" width={18} height={18} />
           <p className="text-base">
             <span className="text-gray-600 dark:text-gray-400">변경 시 </span>
-            <span className="font-bold text-amber-500 dark:text-amber-400">100펜</span>
+            <span className="font-bold text-primary-500 dark:text-amber-400">100펜</span>
             <span className="text-gray-600 dark:text-gray-400">이 소모됩니다</span>
           </p>
         </div>
