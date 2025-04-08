@@ -120,6 +120,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 튜토리얼 관련 상태를 최상위로 이동
   const [showTutorial, setShowTutorial] = useState(true)
+  const chatBoxRef = useRef<HTMLDivElement>(null)
 
   // 튜토리얼 설정
   const tutorialConfig = {
@@ -706,16 +707,22 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   }
 
   // 스크롤을 최하단으로 이동하는 함수
-  const scrollToBottom = useCallback(() => {
+  const scrollToBottom = () => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
     }
-  }, [])
+  }
 
   // 메시지가 추가될 때마다 스크롤을 최하단으로 이동
   useEffect(() => {
     scrollToBottom()
   }, [chatMessages, scrollToBottom])
+
+  useEffect(() => {
+    if (isInitRoom) {
+      scrollToBottom()
+    }
+  }, [isInitRoom, scrollToBottom])
 
   // 메시지가 없고 채팅방이 초기화되었을 때 first_talk 표시
   useEffect(() => {
@@ -1209,7 +1216,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
           {/* 채팅 내용 */}
           <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 md:p-6">
-            <div className="flex flex-col space-y-12 max-w-3xl mx-auto">
+            <div ref={chatBoxRef} className="flex flex-col space-y-12 max-w-3xl mx-auto">
               {chatMessages.length === 0 ? (
                 <div className="text-center text-gray-500 py-10">
                   <p>메시지가 없습니다. 채팅을 시작해보세요!</p>
