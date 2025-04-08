@@ -22,8 +22,6 @@ interface NakamaContextType {
   // 새로운 채팅 메시지 관련 필드
   chatMessages: ChatMessage[]; // 채팅 메시지 배열
 
-  LatestSummaryPosition: number;
-  
   // 메서드들
   setSession: (session: Session) => void;
   chatRoomInit: (userKey: string, chatBotId: string, chatMode: number) => Promise<{
@@ -54,7 +52,8 @@ interface NakamaContextType {
   refreshLastAIMessage: (message: ChatMessage) => Promise<boolean>;           // 마지막 AI 메시지 재생성
   deleteChatMessage: (message: ChatMessage) => Promise<boolean>;
   deleteChatMessageOne: (message: ChatMessage) => Promise<boolean>;
-  updateLatestSummaryPosition: (summaryPosition: number, msgLen?: number) => void;
+  updateLatestSummaryPosition: (summaryPosition: number, msgLen?: number, message_id?: string) => void;
+  LatestSummaryPosition: number;
 }
 
 // 채팅 메시지 인터페이스
@@ -99,7 +98,6 @@ const defaultContextValue: NakamaContextType = {
   isInitRoom: false,   // 룸 초기화 상태 추가
   charbotData: null,   // 캐릭터 데이터 추가
   chatMessages: [],    // 채팅 메시지 배열
-
   LatestSummaryPosition: 0,
 
   setSession: () => {},
@@ -324,7 +322,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         
         // summary_position 업데이트 추가
         if (response.data.summary_position !== undefined) {
-          updateLatestSummaryPosition(response.data.summary_position);
+          await updateLatestSummaryPosition(response.data.summary_position, undefined, '');
         }
 
         return { promptKey, nsfwValue };
@@ -862,7 +860,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
           // 저장된 채팅 키 사용
           if (chatRoomState.chrBotChatKey) {
-            
             try {
               // 저장된 채팅 모드 사용
               const response = await chatApi.SendChat(
@@ -875,8 +872,16 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
               
               // 응답 상태 확인
               if (response && response.data && response.data.result && response.data.result.err === 0) {
-                console.log('@@@@@@@ ????????? response.data.summary_position :: ' , response.data.summary_position, response.data.msg_len)
-                updateLatestSummaryPosition(response.data.summary_position, response.data.msg_len)
+                console.log('응답 데이터:', response.data);
+                
+                // summary_position 업데이트를 먼저 수행
+                if (response.data.summary_position !== undefined) {
+                  await updateLatestSummaryPosition(
+                    response.data.summary_position,
+                    response.data.msg_len,
+                    message.message_id
+                  );
+                }
 
                 // AI의 응답을 다시 채널에 전송
                 const chatMessageResponse = response.data;
@@ -885,90 +890,55 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
                 const coinResponse = await chatApi.UseChat(
                   chatRoomState.chrBotChatKey,
                   chatRoomState.currentChatMode,
-                )
+                );
 
-                if (coinResponse && coinResponse?.data && coinResponse?.data.result?.err === 0) {  
+                if (coinResponse?.data?.result?.err === 0) {
                   console.log('💰 코인 차감 성공:', coinResponse.data);
-                  
                   updateAccountData(
                     coinResponse.data.coin_free,
                     coinResponse.data.coin_free_dt,
                     coinResponse.data.coin_register,
                     coinResponse.data.coin
                   );
-                } else {
-                  console.error('💰 코인 차감 실패:', coinResponse?.data);
                 }
 
                 if (socketRef.current) {
                   try {
                     // 응답 JSON 파싱 및 content 추출
                     const responseObj = JSON.parse(chatMessageResponse.response);
-
                     let messageContent = '';
                     
-                    // Gemini AI 모델 응답인지 확인 (candidates 속성 존재)
                     if (responseObj.candidates) {
-                      // Gemini AI 모델 응답 형식
                       messageContent = responseObj.candidates[0]?.content?.parts[0]?.text;
                     } else if (responseObj.content) {
-                      // 다른 AI 모델 응답 형식
                       messageContent = responseObj.content[0].text;
                     } else {
                       console.error('알 수 없는 AI 응답 형식:', responseObj);
                       messageContent = "응답 형식이 잘못되었습니다. 다시 시도해주세요.";
                     }
                     
-                    // 단순화된 메시지 형식 - content와 type만 포함
                     const content = { 
                       content: messageContent, 
                       type: 'ai' 
                     };
                     
-                    // AI 응답을 채널에 전송
                     await socketRef.current.writeChatMessage(channelId, content);
                   } catch (parseError) {
                     console.error('AI 응답 파싱 오류:', parseError);
-                    // 파싱 오류 시 원본 응답 전송
-                    // 단순화된 메시지 형식
-                    const content = { 
-                      content: "응답 처리 중 오류가 발생했습니다. 다시 시도해주세요.", 
-                      type: 'ai' 
-                    };
-                    await socketRef.current.writeChatMessage(channelId, content);
+                    if (socketRef.current) {
+                      const errorContent = {
+                        content: "응답 처리 중 오류가 발생했습니다. 다시 시도해주세요.",
+                        type: 'ai'
+                      };
+                      await socketRef.current.writeChatMessage(channelId, errorContent);
+                    }
                   }
-                }
-              } else {
-                console.error('AI 응답 오류:', response?.data);
-                // 오류 발생 시 사용자에게 알림
-                if (socketRef.current) {
-                  const errorContent = {
-                    content: '죄송합니다. 응답을 생성하는 중 오류가 발생했습니다.',
-                    type: 'ai'
-                  };
-                  await socketRef.current.writeChatMessage(channelId, errorContent);
                 }
               }
             } catch (error) {
               console.error('SendChat API 호출 또는 응답 전송 오류:', error);
-              // 오류 발생 시 클라이언트에게 오류 메시지 전송
-              try {
-                if (socketRef.current) {
-                  const errorContent = {
-                    content: '메시지 처리 중 오류가 발생했습니다. 다시 시도해주세요.',
-                    type: 'ai'
-                  };
-                  await socketRef.current.writeChatMessage(channelId, errorContent);
-                }
-              } catch (sendError) {
-                console.error('오류 메시지 전송 실패:', sendError);
-              }
             }
-          } else {
-            console.error('chrBotChatKey가 없습니다. API 호출 불가능.');
           }
-        } else if (contentObj.type === 'ai') {
-          // AI 메시지는 handleMessage에서 이미 처리됨
         }
       } catch (error) {
         console.error('채널 메시지 수신 중 오류:', error);
@@ -1075,6 +1045,8 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         throw new Error('새로고침할 대화를 찾을 수 없습니다.');
       }
 
+      console.log('lastUserMessage :: ' , lastUserMessage)
+
       // API 호출하여 새로운 응답 생성
       const promptKey = apiState.sendPrompt_key || '';
       const response = await chatApi.ReSendChat(
@@ -1095,6 +1067,8 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         console.error('API 응답 오류:', response.data);
         throw new Error(response.data.result?.msg || '서버 응답 오류가 발생했습니다.');
       }
+
+      
 
       // Nakama를 통해 AI 응답 전송
       try {
@@ -1145,7 +1119,9 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
           type: 'ai' 
         };
         
-        await socketRef.current.writeChatMessage(chatRoomState.channelId, content);
+        const message = await socketRef.current.writeChatMessage(chatRoomState.channelId, content);
+        await updateLatestSummaryPosition(response.data.summary_position, response.data.msg_len, message.message_id)
+
       } catch (parseError) {
         console.error('AI 응답 파싱 오류:', parseError);
         return false;
@@ -1412,36 +1388,45 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     return false
   }
 
-  // updateLatestSummaryPosition 함수 추가
-  const updateLatestSummaryPosition = async (summaryPosition: number, msgLen: number = 0): Promise<void> => {
-    console.log('apiState.LatestSummaryPosition :: ', apiState.LatestSummaryPosition , summaryPosition)
-    console.log('summaryPosition :: ', apiState.LatestSummaryPosition === summaryPosition)
+  // apiState의 최신 값을 추적하기 위한 ref 추가
+  const apiStateRef = useRef(apiState);
 
-    if (apiState.LatestSummaryPosition === summaryPosition) {
-      console.log('@@@@@@@@@@@@ 💬 Summary Position 업데이트:', {
-        이전값: apiState.LatestSummaryPosition,
-        새값: summaryPosition,
-        메시지길이: msgLen
+  // apiState가 변경될 때마다 ref 업데이트
+  useEffect(() => {
+    apiStateRef.current = apiState;
+  }, [apiState]);
+
+  // updateLatestSummaryPosition 함수 수정
+  const updateLatestSummaryPosition = async (summaryPosition: number, msgLen: number = 0, message_id: string = ''): Promise<void> => {
+    console.log('updateLatestSummaryPosition 호출:', {
+      현재값: apiStateRef.current.LatestSummaryPosition,
+      새값: summaryPosition,
+      메시지길이: msgLen
+    });
+
+    // 값이 같을 때 SummaryChat 호출 체크
+    if (apiStateRef.current.LatestSummaryPosition === summaryPosition) {
+      if (msgLen >= 3500 && message_id) {
+        console.log('⚠️ 메시지 길이가 3500자를 초과했습니다:', msgLen);
+        const responseData = await chatApi.SummaryChat(
+          Number(chatRoomState.chrBotChatKey),
+          message_id,
+          'KR',
+          chatRoomState.currentChatMode
+        );
+        console.log('Summary API 응답:', responseData);
+      }
+    } else {
+      console.log('💬 Summary Position 업데이트:', {
+        이전값: apiStateRef.current.LatestSummaryPosition,
+        새값: summaryPosition
       });
 
-      // if (msgLen >= 3500) {
-      //   console.log('chatMessages :: ' , chatMessages)
-      //   console.log('⚠️ 메시지 길이가 3500자를 초과했습니다:', msgLen);
-
-      //   const responseData = await chatApi.SummaryChat(
-      //     Number(chatRoomState.chrBotChatKey),
-      //     // chatMessages[chatMessages.length - 1].id,
-      //     summaryPosition.toString(),
-      //     'KR',
-      //     chatRoomState.currentChatMode)
-      //   console.log('responseData :: ' , responseData)
-      // }
+      await setApiState(prev => ({
+        ...prev,
+        LatestSummaryPosition: summaryPosition
+      }));
     }
-
-    setApiState(prev => ({
-      ...prev,
-      LatestSummaryPosition: summaryPosition
-    }));
   };
 
   // 먼저 useMemo로 chatContextValue 객체 생성
@@ -1458,7 +1443,6 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     isInitRoom: connectionState.isInitRoom,
     charbotData,
     chatMessages,
-    
     LatestSummaryPosition: apiState.LatestSummaryPosition,
     
     // 메서드들

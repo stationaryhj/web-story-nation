@@ -29,7 +29,7 @@ import { useModalStore } from '@/store/useStoreModal'
 import type { ChatMode } from '@/components/modal/ChatModeModal'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import type { ChrbotData } from '@/types/api'
-import { bridgeCharbotDataToCharacter, bridgeChatModeDataToChatMode } from '@/lib/utils/storyNationUtil'
+import { bridgeCharbotDataToCharacter, bridgeChatModeDataToChatMode, getChangeNameTag } from '@/lib/utils/storyNationUtil'
 import { useNakama } from '@/app/providers/NakamaProviders'
 import { useChatModeStore } from '@/store/useStoreData'
 import BaseSidebar from '@/components/elements/sidebar/BaseSidebar'
@@ -112,7 +112,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   }))
 
   // 주석 해제
-  const first_talk = charbotData?.first_talk
+  const first_talk = charbotData?.first_talk ? getChangeNameTag(charbotData?.first_talk, charbotData?.nick_nm) : ''
 
   // 튜토리얼 관련 상태를 최상위로 이동
   const [showTutorial, setShowTutorial] = useState(true)
