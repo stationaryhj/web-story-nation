@@ -171,7 +171,7 @@ export default function BaseModal({
             {/* 모달 */}
             <motion.div
               {...getAnimationProps()}
-              className={`relative z-[1102] rounded-xl p-2 bg-white shadow-lg dark:bg-dark-background-light ${sizeClasses[size]} ${className} max-h-[600px] md:max-h-none overflow-hidden md:overflow-visible flex flex-col`}
+              className={`relative z-[1102] rounded-xl p-2 bg-white shadow-lg dark:bg-dark-background-light ${sizeClasses[size]} ${className} overflow-hidden flex flex-col`}
               onClick={handleModalClick}
               style={{ ...style, minWidth: '355px' }}
             >
@@ -202,7 +202,7 @@ export default function BaseModal({
               )}
 
               {/* 모달 내용 */}
-              <div className={`${bodyClassName} flex-grow overflow-y-auto md:overflow-visible py-4`}>
+              <div className={`${bodyClassName} flex-grow overflow-y-auto py-4`}>
                 {/* 아이콘이 있는 경우 타이틀 위에 표시 */}
                 {isIcon && icon && <div className="mb-3 flex justify-center">{icon}</div>}
                 {/* 타이틀을 바디에 포함 (가운데 정렬) */}

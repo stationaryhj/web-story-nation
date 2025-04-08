@@ -34,7 +34,6 @@ const REPORT_REASONS_KR = [
   },
 ]
 
-
 interface ReportModalContentProps {
   onSubmit: (reason: number | null, description: string) => void
   onClose: () => void
@@ -208,8 +207,7 @@ export default function ReportModal({ isOpen, onClose, onSubmit, submitted, repo
       onClose={onClose}
       title={submitted ? undefined : `${reportType === 'writer' ? '작가' : '캐릭터'} 신고하기`}
       size="md"
-      backdropColor="bg-black/60"
-      animation="scale"
+      className="max-h-[60vh]"
     >
       <ReportModalContent onSubmit={onSubmit} onClose={onClose} submitted={submitted} reportType={reportType} />
     </BaseModal>

@@ -83,7 +83,7 @@ export default function HeaderSidebar({
                 onClick={() => onClose()}
               >
                 <FontAwesomeIcon icon={faUser} className="text-lg mr-3" />
-                설정
+                내정보
               </Link>
             </li>
             <li>
