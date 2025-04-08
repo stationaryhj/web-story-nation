@@ -134,14 +134,14 @@ export default function EditCharacterPage() {
             console.log('saveResult', saveResult)
             if (!saveResult) return
             closeModal()
-            // router.push('/my-characters')
+            toast.success('캐릭터가 성공적으로 수정되었습니다!')
+            router.push('/my-characters')
           },
           confirmText: '확인',
           confirmButtonClass: 'bg-red-500 hover:bg-red-600 text-white',
         })
         return
       }
-
       toast.success('캐릭터가 성공적으로 수정되었습니다!')
       router.push('/my-characters')
     } catch (error) {
