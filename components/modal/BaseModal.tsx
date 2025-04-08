@@ -157,21 +157,21 @@ export default function BaseModal({
     <AnimatePresence onExitComplete={onAnimationComplete}>
       {isOpen && (
         <Portal>
-          <div className={`fixed inset-0 z-[100] flex min-w-[375px] ${positionClasses[position]}`}>
+          <div className={`fixed inset-0 z-[1100] flex min-w-[375px] ${positionClasses[position]}`}>
             {/* 백드롭 */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: animationDuration }}
-              className={`fixed inset-0 ${backdropColor} z-[99]`}
+              className={`fixed inset-0 ${backdropColor} z-[1101]`}
               onClick={handleBackdropClick}
             />
 
             {/* 모달 */}
             <motion.div
               {...getAnimationProps()}
-              className={`relative z-[101] rounded-xl bg-white shadow-lg dark:bg-dark-background-light ${sizeClasses[size]} ${className} overflow-hidden md:overflow-visible`}
+              className={`relative z-[1102] rounded-xl bg-white shadow-lg dark:bg-dark-background-light ${sizeClasses[size]} ${className} overflow-hidden md:overflow-visible`}
               onClick={handleModalClick}
               style={{ ...style, minWidth: '375px' }}
             >
