@@ -936,7 +936,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             <FontAwesomeIcon icon={faEllipsisV} />
           </button>
 
-          {/* 채팅 새로고침 버튼 - PC에서만 표시 */}
+          {/* 채팅 새로고침 버튼 */}
           <div
             className="hidden md:flex w-9 h-9 rounded-full bg-blue-50 items-center justify-center text-blue-500 cursor-pointer hover:bg-blue-100 transition-colors"
             onClick={handleOpenResetChatModal}
@@ -944,7 +944,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             <FontAwesomeIcon icon={faSync} />
           </div>
 
-          {/* 채팅방 삭제 버튼 - PC에서만 표시 */}
+          {/* 채팅방 삭제 버튼 */}
           <div
             className="hidden md:flex w-9 h-9 rounded-full bg-red-50 items-center justify-center text-red-500 cursor-pointer hover:bg-red-100 transition-colors"
             onClick={() => {
@@ -991,7 +991,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                       setIsMoreSidebarOpen(false)
                     }}
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div className="flex justify-between items-center sm:flex-row sm:items-center sm:justify-between gap-2">
                       <div className="flex items-center">
                         <FontAwesomeIcon
                           icon={chatMode.icon}
@@ -1042,6 +1042,21 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                   }`}
                 />
               </button>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-4">채팅 초기화</h3>
+            <div
+              onClick={handleOpenResetChatModal}
+              className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center">
+                <FontAwesomeIcon icon={faSync} className="mr-3 text-gray-500" />
+                <div>
+                  <h4 className="font-medium text-gray-900">채팅 내용 초기화</h4>
+                </div>
+              </div>
             </div>
           </div>
 
