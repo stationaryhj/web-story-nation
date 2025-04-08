@@ -43,7 +43,7 @@ export default function MobileGNB() {
   const navLinks = [
     { href: '/', label: '홈', requireLogin: false, icon: Home },
     { href: '/chat-list', label: '대화', requireLogin: true, icon: MessageCircle },
-    { href: '/my-characters', label: '캐릭터 만들기', requireLogin: true, icon: UserRoundPlus },
+    { href: '/my-characters', label: '만들기', requireLogin: true, icon: UserRoundPlus },
     { href: '/my-account', label: '수익 관리', requireLogin: true, icon: HandCoins },
     { href: '/shop-recharge', label: '상점', requireLogin: true, icon: Store },
   ]
@@ -65,7 +65,7 @@ export default function MobileGNB() {
         left: 0,
         right: 0,
         width: '100%',
-        height: '64px',
+        height: '55px',
         zIndex: 100,
         boxShadow: '0 -2px 4px rgba(0,0,0,0.05)',
         margin: 0,
@@ -85,12 +85,13 @@ export default function MobileGNB() {
             }`}
           >
             {React.createElement(link.icon, {
-              className: `w-6 h-6 ${
+              className: `w-5 h-5 ${
                 activeLink === link.href
                   ? 'text-primary-500 dark:text-dark-primary-500'
                   : 'text-secondary-600 dark:text-dark-secondary-400'
               }`,
             })}
+            <span className="text-[10px] mt-1">{link.label}</span>
           </Link>
         ))}
       </div>
