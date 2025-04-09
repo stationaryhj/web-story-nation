@@ -393,7 +393,7 @@ export default function DetailInfoForm({
             <button
               type="button"
               onClick={() => handleVisibilitySelect('private')}
-              className={`w-full px-3 py-2 text-base rounded-lg text-center transition-colors ${
+              className={`w-full px-2 sm:px-3 py-1 sm:py-2 text-sm sm:text-base rounded-lg text-center transition-colors ${
                 formData.visibility === 'private'
                   ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                   : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -404,7 +404,7 @@ export default function DetailInfoForm({
             <button
               type="button"
               onClick={() => handleVisibilitySelect('public')}
-              className={`w-full px-3 py-2 text-base rounded-lg text-center transition-colors ${
+              className={`w-full px-2 sm:px-3 py-1 sm:py-2 text-sm sm:text-base rounded-lg text-center transition-colors ${
                 formData.visibility === 'public'
                   ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                   : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -419,8 +419,8 @@ export default function DetailInfoForm({
             value={formData.bioDetail}
             onChange={handleBioDetailChange}
             placeholder='예시) 유키는 차가운 첫인상을 가진 고등학교 3학년으로 공부와 운동 모두 뛰어난 완벽주의자다. 겉으로는 "귀찮게 하지마" 라며 주변을 밀어내지만 사실은 누구보다 친구들의 사소한 행동도 기억하며 배려하는 속 깊은 성격을 가졌다.'
-            rows={5}
-            className="w-full px-4 py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
+            rows={4}
+            className="w-full px-4 py-3 rounded-lg text-sm sm:text-base border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
             maxLength={3500}
           />
         </div>
@@ -447,7 +447,7 @@ export default function DetailInfoForm({
               <button
                 type="button"
                 onClick={() => handleExamplesVisibilitySelect('private')}
-                className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-center text-xs sm:text-sm transition-colors ${
+                className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-center text-sm sm:text-base transition-colors ${
                   formData.examplesVisibility === 'private'
                     ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                     : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -458,7 +458,7 @@ export default function DetailInfoForm({
               <button
                 type="button"
                 onClick={() => handleExamplesVisibilitySelect('public')}
-                className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-center text-xs sm:text-sm transition-colors ${
+                className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-center text-sm sm:text-base transition-colors ${
                   formData.examplesVisibility === 'public'
                     ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                     : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -497,14 +497,14 @@ export default function DetailInfoForm({
                 >
                   <div className="flex justify-between items-center mb-3 sm:mb-4">
                     <h4 className="text-xs sm:text-sm font-medium text-secondary-700 dark:text-dark-secondary-400"></h4>
-                    <div className="flex mb-2">
+                    <div className="flex space-x-1 sm:space-x-2">
                       {/* 특수 태그 버튼들 */}
-                      <div className="flex flex-wrap gap-2 mr-2">
+                      <div className="flex gap-2">
                         <button
                           id="context-info-button"
                           type="button"
                           onClick={handleContextInfoClick}
-                          className="px-1 sm:px-3 sm:py-1.5 bg-gray-200/80 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center sm:mb-0 w-auto h-8 sm:h-9"
+                          className="px-1 sm:px-3 sm:py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-[11px] sm:text-xs flex items-center sm:mr-0 sm:mb-0 w-auto"
                           title="상황 설명 추가"
                         >
                           상황 설명 추가(*)
@@ -513,7 +513,7 @@ export default function DetailInfoForm({
                           id="character-name-button"
                           type="button"
                           onClick={handleCharacterNameClick}
-                          className="px-1 sm:px-3 sm:py-1.5 bg-gray-200/80 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center sm:mb-0 w-auto h-8 sm:h-9"
+                          className="px-1 sm:px-3 sm:py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-[11px] sm:text-xs flex items-center sm:mr-0 sm:mb-0 w-auto"
                           title="캐릭터 이름 추가"
                         >
                           캐릭터 이름
@@ -522,7 +522,7 @@ export default function DetailInfoForm({
                           id="user-name-button"
                           type="button"
                           onClick={handleUserNameClick}
-                          className="px-1 sm:px-3 sm:py-1.5 bg-gray-200/80 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center sm:mr-0 sm:mb-0 w-auto h-8 sm:h-9"
+                          className="px-1 sm:px-3 sm:py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-[11px] sm:text-xs flex items-center w-auto"
                           title="유저 이름 추가"
                         >
                           유저 이름

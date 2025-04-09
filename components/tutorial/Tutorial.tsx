@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 // 튜토리얼 단계 설정 인터페이스
 interface TutorialStep {
@@ -24,6 +25,12 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
   const [dontShowAgain, setDontShowAgain] = useState(false)
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
+  const [isMounted, setIsMounted] = useState(false)
+
+  // 컴포넌트 마운트 확인 (클라이언트 측에서만 Portal 사용)
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // 현재 단계의 요소를 찾아서 하이라이트
   useEffect(() => {
@@ -49,6 +56,32 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
     }
   }, [isOpen, config.storageKey, onClose])
 
+  // main-content의 스크롤 높이 확인 (디버깅용)
+  useEffect(() => {
+    if (targetElement) {
+      const screenHeight = document.getElementById('main-content')?.scrollHeight
+      console.log('screenHeight', screenHeight)
+    }
+  }, [targetElement])
+
+  // 오버레이 높이 설정
+  useEffect(() => {
+    if (isOpen && overlayRef.current) {
+      // main-content의 높이가 있으면 해당 높이로, 없으면 document 높이로 설정
+      const mainContent = document.getElementById('main-content')
+      if (mainContent) {
+        const contentHeight = mainContent.scrollHeight
+        console.log('[튜토리얼] main-content 높이:', contentHeight)
+        overlayRef.current.style.height = `${contentHeight}px`
+      } else {
+        // main-content가 없는 경우 document 높이 사용
+        const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
+        console.log('[튜토리얼] document 높이:', docHeight)
+        overlayRef.current.style.height = `${docHeight}px`
+      }
+    }
+  }, [isOpen, targetElement])
+
   // 클릭 이벤트 핸들러
   const handleClick = () => {
     if (currentStep < config.steps.length - 1) {
@@ -69,7 +102,7 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
     }
   }, [isOpen, currentStep, config.steps.length, dontShowAgain])
 
-  if (!isOpen || !targetElement) return null
+  if (!isOpen || !targetElement || !isMounted) return null
 
   // 타겟 요소의 위치 계산
   const rect = targetElement.getBoundingClientRect()
@@ -132,36 +165,45 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
     )
   `
 
-  return (
+  // React Portal을 통해 body에 직접 렌더링
+  const tutorialContent = (
     <>
       {/* 검은색 오버레이 배경 - 클리핑 경로 사용 */}
       <div
         ref={overlayRef}
-        className="fixed inset-0 bg-black/85 z-[1001] backdrop-blur-none transition-all duration-300 h-screen"
+        className="fixed inset-0 bg-black/85 backdrop-blur-none transition-all duration-300"
         style={{
           clipPath: clipPath,
           WebkitClipPath: clipPath,
+          minHeight: '100vh',
+          top: 0,
+          left: 0,
+          right: 0,
+          position: 'fixed',
+          zIndex: 9999999,
         }}
         onClick={handleClick}
       />
 
       {/* 타겟 요소 테두리 */}
       <div
-        className="fixed border-2 border-primary rounded-lg z-[10000] animate-[pulse_2s_ease-in-out_infinite]"
+        className="fixed border-2 border-primary-500 rounded-lg animate-[pulse_2s_ease-in-out_infinite]"
         style={{
           top: rect.top - 4,
           left: rect.left - 4,
           width: rect.width + 8,
           height: rect.height + 8,
+          zIndex: 9999999,
         }}
       />
 
       {/* 설명 텍스트 */}
       <div
-        className="fixed text-white text-center max-w-[300px] z-[10001] p-3 shadow-lg"
+        className="fixed text-white text-center max-w-[300px] p-3 shadow-lg bg-black/80"
         style={{
           ...getTextPosition(),
           borderRadius: '12px',
+          zIndex: 9999999,
         }}
       >
         <div className="text-lg font-medium" dangerouslySetInnerHTML={{ __html: config.steps[currentStep].html }} />
@@ -169,7 +211,7 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
 
       {/* 클릭하여 계속하기 텍스트 - 화면 정중앙에 배치 */}
       <div
-        className="fixed text-white text-center z-[10001] animate-pulse"
+        className="fixed text-white text-center animate-pulse"
         style={{
           top: '50%',
           left: '50%',
@@ -178,19 +220,23 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
           padding: '10px 20px',
           borderRadius: '30px',
           width: 'auto',
+          zIndex: 9999999,
         }}
       >
         <p className="text-sm font-medium text-white">클릭하여 계속하기</p>
       </div>
 
       {/* 다시보지 않기 체크박스 */}
-      <div className="fixed top-4 right-4 flex items-center gap-2 text-white z-[10001] bg-black/60 px-3 py-2 rounded-full shadow-lg transition-all duration-300 hover:bg-black/70">
+      <div
+        className="fixed top-4 right-4 flex items-center gap-2 text-white bg-black/60 px-3 py-2 rounded-full shadow-lg transition-all duration-300 hover:bg-black/70"
+        style={{ zIndex: 9999999 }}
+      >
         <input
           type="checkbox"
           id="dontShowAgain"
           checked={dontShowAgain}
           onChange={e => setDontShowAgain(e.target.checked)}
-          className="w-4 h-4 rounded-md border-gray-300 text-primary cursor-pointer"
+          className="w-4 h-4 rounded-md border-gray-300 text-primary-500 focus:ring-primary-500 cursor-pointer accent-primary-500"
         />
         <label htmlFor="dontShowAgain" className="text-sm font-medium cursor-pointer select-none">
           다시 보지 않기
@@ -198,4 +244,7 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
       </div>
     </>
   )
+
+  // Portal을 사용하여 body에 직접 렌더링
+  return createPortal(tutorialContent, document.body)
 }
