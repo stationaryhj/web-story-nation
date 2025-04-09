@@ -164,7 +164,7 @@ export default function ImageUploadForm({
             }
 
             toast.success('이미지가 성공적으로 업로드되었습니다')
-            router.push('/my-characters')
+            // router.push('/my-characters')
           } catch (error) {
             console.error('이미지 업로드 중 오류:', error)
             toast.error('이미지 업로드 중 오류가 발생했습니다')
