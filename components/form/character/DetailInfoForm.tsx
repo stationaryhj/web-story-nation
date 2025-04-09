@@ -107,8 +107,8 @@ export default function DetailInfoForm({
 
     console.log('[스크롤] 스크롤 시작:', startPosition)
 
-    // 스크롤 대상 찾기: conversation-examples 또는 문서 끝
-    const conversationExamples = document.getElementById('conversation-examples')
+    // 스크롤 대상 찾기: conversation-examples
+    const conversationExamples = document.getElementById('scrollRef')
     const targetElement = conversationExamples || document.body
 
     // 스크롤 실행
@@ -121,7 +121,11 @@ export default function DetailInfoForm({
       const viewportHeight = window.innerHeight
       const isAtBottom = currentPosition + viewportHeight >= documentHeight - 50 // 50px 오차 허용
 
-      if (isAtBottom || Math.abs(currentPosition - startPosition) > 200) {
+      // 데스크탑에서는 위치 변화가 작을 수 있으므로 임계값 낮춤
+      const isMobile = window.innerWidth < 768
+      const scrollThreshold = isMobile ? 200 : 50
+
+      if (isAtBottom || Math.abs(currentPosition - startPosition) > scrollThreshold) {
         // 스크롤이 완료되었거나 충분히 이동했으면 튜토리얼 표시
         console.log('[스크롤] 스크롤 완료 감지, 튜토리얼 표시')
         setShowTutorial(true)
@@ -154,13 +158,13 @@ export default function DetailInfoForm({
       }
     }, 300)
 
-    // 5초 타임아웃 (최종 안전장치)
+    // 2초 타임아웃 (최종 안전장치) - 데스크탑에서 스크롤 이벤트가 발생하지 않는 경우 대비
     setTimeout(() => {
-      console.log('[스크롤] 5초 타임아웃, 튜토리얼 강제 표시')
+      console.log('[스크롤] 타임아웃, 튜토리얼 강제 표시')
       setShowTutorial(true)
       tutorialShownRef.current = true
       window.removeEventListener('scroll', handleScroll)
-    }, 5000)
+    }, 400)
   }
 
   // 대화 예시 추가 핸들러
@@ -636,19 +640,6 @@ export default function DetailInfoForm({
           setShowTutorial(false)
         }}
         config={createCharacterScenario}
-        beforeOpen={() => {
-          // 튜토리얼이 열리기 전에 페이지 하단으로 스크롤
-          const conversationExamples = document.getElementById('conversation-examples')
-          if (conversationExamples) {
-            conversationExamples.scrollIntoView({ behavior: 'smooth', block: 'end' })
-          } else {
-            const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
-            window.scrollTo({
-              top: docHeight - 200, // 약간의 여백을 두고 스크롤
-              behavior: 'smooth',
-            })
-          }
-        }}
       />
     </>
   )

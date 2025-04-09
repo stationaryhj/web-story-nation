@@ -238,6 +238,7 @@ export default function EditCharacterPage() {
               </button>
             </div>
           </div>
+          <div id="scrollRef"></div>
         </div>
       </SectionTransition>
     </div>
