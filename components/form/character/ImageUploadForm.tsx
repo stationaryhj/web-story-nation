@@ -38,7 +38,6 @@ export default function ImageUploadForm({
   const { isAdult } = useAccountStore()
   const isAdultModeEnabled = isAdult()
   // view Data - 이미지 URI 캐싱
-  console.log('invalidFields', invalidFields)
   const imgNormal = getImageUri(formData.imgUrl)
   const imgNormalWeb = getImageUri(formData.imgWebUrl)
   const imgNsfw = getImageUri(formData.imgUrlNsfw)

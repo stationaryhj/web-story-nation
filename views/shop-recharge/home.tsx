@@ -135,6 +135,21 @@ export default function ShopRecharge() {
 
   const coinChargeUseHistoryDataList = (coinChargeUseHistoryData?.historyList?.data as UseHistoryData[]) || []
 
+  // 날짜 형식 변환 함수 (시분초 제거)
+  const formatDate = (dateString: string) => {
+    // 공백을 기준으로 분리하여 첫 번째 부분(날짜)만 반환
+    return dateString.split(' ')[0]
+  }
+
+  // 콘텐츠 텍스트 변환 함수
+  const getContentText = (content: string) => {
+    // "Changing your nickname"인 경우 "닉네임 변경"으로 변경
+    if (content === 'Changing your nickname') {
+      return '닉네임 변경'
+    }
+    return content
+  }
+
   // 안전한 content 파싱 함수
   const getWebPrice = useCallback((content: string | undefined): number => {
     if (!content) return 0
@@ -229,7 +244,7 @@ export default function ShopRecharge() {
         modeText = '짜릿모드 2'
       } else {
         styleClass = 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
-        modeText = transaction.content || '기타'
+        modeText = getContentText(transaction.content || '기타')
       }
 
       typeInfo = <span className={`px-2 py-1 rounded-full text-xs font-medium ${styleClass}`}>{modeText}</span>
@@ -243,7 +258,7 @@ export default function ShopRecharge() {
               : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
           }`}
         >
-          {transaction.content || '오류'}
+          {getContentText(transaction.content || '오류')}
         </span>
       )
     }
@@ -254,11 +269,11 @@ export default function ShopRecharge() {
         className="bg-white dark:bg-dark-background-light rounded-lg shadow p-3 mb-3 border border-gray-200 dark:border-gray-700"
       >
         <div className="flex justify-between items-start mb-2">
-          <div className="text-xs text-gray-500 dark:text-gray-400">{transaction.create_dt}</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">{formatDate(transaction.create_dt)}</div>
           {typeInfo}
         </div>
         <div className="flex justify-between items-center">
-          <div className="text-sm text-gray-600 dark:text-gray-300">{transaction.content}</div>
+          <div className="text-sm text-gray-600 dark:text-gray-300">{getContentText(transaction.content)}</div>
           <div
             className={`font-medium ${
               transaction.coin > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
@@ -440,7 +455,7 @@ export default function ShopRecharge() {
                         {coinChargeUseHistoryDataList?.map((transaction, index) => (
                           <tr key={index}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                              {transaction.create_dt}
+                              {formatDate(transaction.create_dt)}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                               {(() => {
@@ -468,7 +483,7 @@ export default function ShopRecharge() {
                                     modeText = '짜릿모드 2'
                                   } else {
                                     styleClass = 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
-                                    modeText = transaction.content || '기타'
+                                    modeText = getContentText(transaction.content || '기타')
                                   }
 
                                   return (
@@ -486,7 +501,7 @@ export default function ShopRecharge() {
                                           : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                                       }`}
                                     >
-                                      {transaction.content || '오류'}
+                                      {getContentText(transaction.content || '오류')}
                                     </span>
                                   )
                                 }
@@ -503,7 +518,7 @@ export default function ShopRecharge() {
                               {transaction.coin}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                              {transaction.content}
+                              {getContentText(transaction.content)}
                             </td>
                           </tr>
                         ))}
