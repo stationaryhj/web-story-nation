@@ -8,9 +8,11 @@ import { ConversationExample } from '@/store/useCreateCharacterData'
 import { useAccountStore } from '@/store/useAccountStore'
 import RatingSelect from './RatingSelect'
 import Tutorial from '@/components/tutorial/Tutorial'
+import BaseModal from '@/components/modal/BaseModal'
 
 const createCharacterScenario = {
   storageKey: 'detail-info-tutorial-completed',
+  defaultMessagePosition: 'top' as const,
   steps: [
     {
       id: 'context-info-button',
@@ -87,31 +89,119 @@ export default function DetailInfoForm({
   setConversationExampleTitle,
   onValidationChange,
 }: DetailInfoFormProps) {
-  // 대화 예시 관련 ref 추가
-  const exampleRefs = useRef<{ [key: string]: HTMLTextAreaElement }>({})
-
-  // 초기화 여부를 추적하는 ref 추가
-  const initializedRef = useRef(false)
-
   // 현재 선택된 입력 필드 (user 또는 character)
   const [activeField, setActiveField] = useState<{ id: string; field: 'user' | 'character' } | null>(null)
   const [showTutorial, setShowTutorial] = useState(false)
 
   // 튜토리얼이 이미 표시된 적이 있는지 추적
   const tutorialShownRef = useRef(false)
+  // 마지막 대화 예시 요소 참조
+  const lastExampleRef = useRef<HTMLDivElement>(null)
 
   // 성인 인증 상태 확인
   const { isAdult } = useAccountStore()
   const isAdultModeEnabled = isAdult()
 
-  // 대화 예시가 처음 추가될 때 튜토리얼 표시
+  // 삭제 확인 모달 상태
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [deleteTargetId, setDeleteTargetId] = useState<string>('')
+
+  // 스크롤 후 튜토리얼 표시 함수
+  const scrollAndShowTutorial = () => {
+    // 스크롤 이전 위치 저장
+    const startPosition = window.scrollY
+
+    console.log('[스크롤] 스크롤 시작:', startPosition)
+
+    // 스크롤 대상 찾기: conversation-examples
+    const conversationExamples = document.getElementById('scrollRef')
+    const targetElement = conversationExamples || document.body
+
+    // 스크롤 실행
+    targetElement.scrollIntoView({ behavior: 'smooth', block: 'end' })
+
+    // 스크롤 완료 확인 함수
+    const checkScrollComplete = () => {
+      const currentPosition = window.scrollY
+      const documentHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
+      const viewportHeight = window.innerHeight
+      const isAtBottom = currentPosition + viewportHeight >= documentHeight - 50 // 50px 오차 허용
+
+      // 데스크탑에서는 위치 변화가 작을 수 있으므로 임계값 낮춤
+      const isMobile = window.innerWidth < 768
+      const scrollThreshold = isMobile ? 200 : 50
+
+      if (isAtBottom || Math.abs(currentPosition - startPosition) > scrollThreshold) {
+        // 스크롤이 완료되었거나 충분히 이동했으면 튜토리얼 표시
+        console.log('[스크롤] 스크롤 완료 감지, 튜토리얼 표시')
+        setShowTutorial(true)
+        tutorialShownRef.current = true
+        return true
+      }
+      return false
+    }
+
+    // 스크롤 이벤트 핸들러 등록
+    let scrollTimeout: NodeJS.Timeout
+    const handleScroll = () => {
+      // 이전 타임아웃 취소
+      clearTimeout(scrollTimeout)
+
+      // 0.3초 디바운싱
+      scrollTimeout = setTimeout(() => {
+        if (checkScrollComplete()) {
+          window.removeEventListener('scroll', handleScroll)
+        }
+      }, 300)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+
+    // 초기 체크 (스크롤이 발생하지 않을 경우 대비)
+    setTimeout(() => {
+      if (checkScrollComplete()) {
+        window.removeEventListener('scroll', handleScroll)
+      }
+    }, 300)
+
+    // 2초 타임아웃 (최종 안전장치) - 데스크탑에서 스크롤 이벤트가 발생하지 않는 경우 대비
+    setTimeout(() => {
+      console.log('[스크롤] 타임아웃, 튜토리얼 강제 표시')
+      setShowTutorial(true)
+      tutorialShownRef.current = true
+      window.removeEventListener('scroll', handleScroll)
+    }, 400)
+  }
+
+  // 대화 예시 추가 핸들러
+  const handleAddConversationExample = () => {
+    // 대화 예시 추가
+    addConversationExample()
+
+    // 약간의 지연 후 스크롤 및 튜토리얼 표시 (DOM 업데이트 대기)
+    setTimeout(() => {
+      const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
+
+      if (!tutorialCompleted && !tutorialShownRef.current) {
+        console.log('[대화 예시] 튜토리얼 시작 - 하단으로 스크롤')
+        scrollAndShowTutorial()
+      } else {
+        // 자동 스크롤만 수행
+        const conversationExamples = document.getElementById('conversation-examples')
+        if (conversationExamples) {
+          conversationExamples.scrollIntoView({ behavior: 'smooth', block: 'end' })
+        }
+      }
+    }, 300)
+  }
+
+  // 첫 대화 예시가 추가될 때 튜토리얼 표시
   useEffect(() => {
-    // 대화 예시가 하나 이상 있고, 이전에 튜토리얼이 표시된 적이 없다면 표시
     if (formData.conversationExamples.length === 1 && !tutorialShownRef.current) {
       const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
       if (!tutorialCompleted) {
-        setShowTutorial(true)
-        tutorialShownRef.current = true
+        console.log('[튜토리얼] 대화 예시 발견, 튜토리얼 준비')
+        scrollAndShowTutorial()
       }
     }
   }, [formData.conversationExamples.length])
@@ -196,66 +286,6 @@ export default function DetailInfoForm({
     }
   }
 
-  // 대화 예시 텍스트 변경 핸들러
-  const handleExampleTextChange = (id: string, text: string) => {
-    if (text.length <= 1500) {
-      updateConversationExample(id, text)
-    }
-  }
-
-  // 대화 예시 편집 모드 설정
-  const handleEditExample = (id: string) => {
-    // 모든 예시를 편집 모드 해제
-    formData.conversationExamples.forEach((ex: ConversationExample) => {
-      if (ex.id !== id && ex.isEditing) {
-        setConversationExampleEditMode(ex.id, false)
-
-        // 빈 텍스트 자동 삭제
-        if (ex.text.trim() === '') {
-          removeConversationExample(ex.id)
-        }
-      }
-    })
-
-    setConversationExampleEditMode(id, true)
-    // 편집 모드로 전환 후 해당 textarea에 포커스
-    setTimeout(() => {
-      if (exampleRefs.current[id]) {
-        exampleRefs.current[id].focus()
-      }
-    }, 0)
-  }
-
-  // 대화 예시 편집 완료
-  const handleCompleteEdit = (id: string) => {
-    const example = formData.conversationExamples.find((ex: ConversationExample) => ex.id === id)
-    // 빈 텍스트인 경우 자동 삭제
-    if (example && example.text.trim() === '') {
-      removeConversationExample(id)
-    } else {
-      setConversationExampleEditMode(id, false)
-    }
-  }
-
-  // 대화 예시 blur 이벤트 핸들러
-  const handleExampleBlur = (id: string, oldText: string) => {
-    const example = formData.conversationExamples.find((ex: ConversationExample) => ex.id === id)
-    if (example) {
-      // 빈 텍스트인 경우 자동 삭제
-      if (example.text.trim() === '') {
-        removeConversationExample(id)
-      }
-      // 텍스트가 변경되지 않았으면 편집 모드만 종료
-      else if (example.text === oldText) {
-        setConversationExampleEditMode(id, false)
-      }
-      // 변경된 경우 저장 (최적화)
-      else {
-        handleCompleteEdit(id)
-      }
-    }
-  }
-
   // 대화 예시 제목 변경 핸들러
   const handleExampleTitleChange = (id: string, title: string) => {
     setTitles(prev => ({ ...prev, [id]: title }))
@@ -327,21 +357,31 @@ export default function DetailInfoForm({
 
   // 대화 예시 삭제 버튼 핸들러
   const handleDeleteExample = (id: string) => {
-    if (confirm('정말로 이 대화 예시를 삭제하시겠습니까?')) {
-      removeConversationExample(id)
+    setDeleteTargetId(id)
+    setIsDeleteModalOpen(true)
+  }
+
+  // 대화 예시 삭제 확인
+  const confirmDeleteExample = () => {
+    if (deleteTargetId) {
+      removeConversationExample(deleteTargetId)
 
       // 로컬 상태에서도 삭제
       setUserMessages(prev => {
         const newMessages = { ...prev }
-        delete newMessages[id]
+        delete newMessages[deleteTargetId]
         return newMessages
       })
 
       setCharacterMessages(prev => {
         const newMessages = { ...prev }
-        delete newMessages[id]
+        delete newMessages[deleteTargetId]
         return newMessages
       })
+
+      // 모달 닫기
+      setIsDeleteModalOpen(false)
+      setDeleteTargetId('')
     }
   }
 
@@ -372,7 +412,7 @@ export default function DetailInfoForm({
   return (
     <>
       <div className="space-y-8">
-        <RatingSelect rating={formData.rating} onRatingSelect={handleRatingSelect} showRequired={false} />
+        {/* <RatingSelect rating={formData.rating} onRatingSelect={handleRatingSelect} showRequired={false} /> */}
 
         {/* 상세 설명 */}
         <div>
@@ -393,7 +433,7 @@ export default function DetailInfoForm({
             <button
               type="button"
               onClick={() => handleVisibilitySelect('private')}
-              className={`w-full px-3 py-2 text-base rounded-lg text-center transition-colors ${
+              className={`w-full px-2 sm:px-3 py-1 sm:py-2 text-sm sm:text-base rounded-lg text-center transition-colors ${
                 formData.visibility === 'private'
                   ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                   : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -404,7 +444,7 @@ export default function DetailInfoForm({
             <button
               type="button"
               onClick={() => handleVisibilitySelect('public')}
-              className={`w-full px-3 py-2 text-base rounded-lg text-center transition-colors ${
+              className={`w-full px-2 sm:px-3 py-1 sm:py-2 text-sm sm:text-base rounded-lg text-center transition-colors ${
                 formData.visibility === 'public'
                   ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                   : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -419,8 +459,8 @@ export default function DetailInfoForm({
             value={formData.bioDetail}
             onChange={handleBioDetailChange}
             placeholder='예시) 유키는 차가운 첫인상을 가진 고등학교 3학년으로 공부와 운동 모두 뛰어난 완벽주의자다. 겉으로는 "귀찮게 하지마" 라며 주변을 밀어내지만 사실은 누구보다 친구들의 사소한 행동도 기억하며 배려하는 속 깊은 성격을 가졌다.'
-            rows={5}
-            className="w-full px-4 py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
+            rows={4}
+            className="w-full px-4 py-3 rounded-lg text-sm sm:text-base border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
             maxLength={3500}
           />
         </div>
@@ -447,7 +487,7 @@ export default function DetailInfoForm({
               <button
                 type="button"
                 onClick={() => handleExamplesVisibilitySelect('private')}
-                className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-center text-xs sm:text-sm transition-colors ${
+                className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-center text-sm sm:text-base transition-colors ${
                   formData.examplesVisibility === 'private'
                     ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                     : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -458,7 +498,7 @@ export default function DetailInfoForm({
               <button
                 type="button"
                 onClick={() => handleExamplesVisibilitySelect('public')}
-                className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-center text-xs sm:text-sm transition-colors ${
+                className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-center text-sm sm:text-base transition-colors ${
                   formData.examplesVisibility === 'public'
                     ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                     : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -474,7 +514,7 @@ export default function DetailInfoForm({
             <div
               id="button-add-chat-example"
               className="flex items-center justify-center border-2 border-dashed border-secondary-200 dark:border-dark-secondary-200/10 rounded-lg p-3 sm:p-4 mt-3 sm:mt-4 cursor-pointer hover:border-primary-300 dark:hover:border-dark-primary-500/30 transition-colors mb-4"
-              onClick={() => addConversationExample()}
+              onClick={handleAddConversationExample}
             >
               <div className="flex flex-col items-center text-secondary-500 dark:text-dark-secondary-500">
                 <FontAwesomeIcon icon={faPlus} className="mb-1 sm:mb-2 text-lg sm:text-xl" />
@@ -499,12 +539,12 @@ export default function DetailInfoForm({
                     <h4 className="text-xs sm:text-sm font-medium text-secondary-700 dark:text-dark-secondary-400"></h4>
                     <div className="flex space-x-1 sm:space-x-2">
                       {/* 특수 태그 버튼들 */}
-                      <div className="flex flex-wrap sm:flex-nowrap space-x-0 sm:space-x-2 space-y-2 sm:space-y-0">
+                      <div className="flex gap-2">
                         <button
                           id="context-info-button"
                           type="button"
                           onClick={handleContextInfoClick}
-                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center mr-2 sm:mr-0 mb-2 sm:mb-0 w-auto"
+                          className="px-1 sm:px-3 sm:py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-[11px] sm:text-xs flex items-center sm:mr-0 sm:mb-0 w-auto"
                           title="상황 설명 추가"
                         >
                           상황 설명 추가(*)
@@ -513,7 +553,7 @@ export default function DetailInfoForm({
                           id="character-name-button"
                           type="button"
                           onClick={handleCharacterNameClick}
-                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center mr-2 sm:mr-0 mb-2 sm:mb-0 w-auto"
+                          className="px-1 sm:px-3 sm:py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-[11px] sm:text-xs flex items-center sm:mr-0 sm:mb-0 w-auto"
                           title="캐릭터 이름 추가"
                         >
                           캐릭터 이름
@@ -522,7 +562,7 @@ export default function DetailInfoForm({
                           id="user-name-button"
                           type="button"
                           onClick={handleUserNameClick}
-                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center w-auto"
+                          className="px-1 sm:px-3 sm:py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-[11px] sm:text-xs flex items-center w-auto"
                           title="유저 이름 추가"
                         >
                           유저 이름
@@ -616,7 +656,57 @@ export default function DetailInfoForm({
           setShowTutorial(false)
         }}
         config={createCharacterScenario}
+        {...{
+          beforeOpen: () => {
+            // 튜토리얼이 열리기 전에 페이지 하단으로 스크롤
+            const conversationExamples = document.getElementById('conversation-examples')
+            if (conversationExamples) {
+              conversationExamples.scrollIntoView({ behavior: 'smooth', block: 'end' })
+              // 요소 위치까지 스크롤된 후 약간의 지연 시간을 두고 추가로 100px 더 스크롤
+              setTimeout(() => {
+                window.scrollBy({
+                  top: 100,
+                  behavior: 'smooth',
+                })
+              }, 500)
+            } else {
+              const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
+              window.scrollTo({
+                top: docHeight - 200, // 약간의 여백을 두고 스크롤
+                behavior: 'smooth',
+              })
+            }
+          },
+        }}
       />
+
+      {/* 대화 예시 삭제 확인 모달 */}
+      <BaseModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="대화 예시 삭제"
+        size="sm"
+        animation="scale"
+        footerContent={
+          <div className="flex justify-end gap-2 w-full">
+            <button
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 transition-colors rounded-lg text-gray-700"
+            >
+              취소
+            </button>
+            <button
+              onClick={confirmDeleteExample}
+              className="px-4 py-2 bg-red-500 hover:bg-red-600 transition-colors rounded-lg text-white"
+            >
+              삭제
+            </button>
+          </div>
+        }
+      >
+        <p className="text-center my-4">정말로 이 대화 예시를 삭제하시겠습니까?</p>
+        <p className="text-center text-gray-500 text-sm mb-4">삭제한 대화 예시는 복구할 수 없습니다.</p>
+      </BaseModal>
     </>
   )
 }

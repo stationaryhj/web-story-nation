@@ -27,7 +27,7 @@ export default function RatingSelect({ rating, onRatingSelect, showRequired = tr
         <button
           type="button"
           onClick={() => onRatingSelect('all')}
-          className={`rounded-lg px-4 py-3 text-center transition-colors ${
+          className={`rounded-lg px-3 sm:px-4 py-3 sm:py-3 text-xs sm:text-base text-center transition-colors ${
             rating === 'all'
               ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
               : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -39,7 +39,7 @@ export default function RatingSelect({ rating, onRatingSelect, showRequired = tr
           type="button"
           onClick={() => onRatingSelect('adult')}
           disabled={!isAdultModeEnabled}
-          className={`rounded-lg px-4 py-3 text-center transition-colors ${
+          className={`rounded-lg px-3 sm:px-4 py-3 sm:py-3 text-xs sm:text-base text-center transition-colors ${
             rating === 'adult' && isAdultModeEnabled
               ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
               : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
