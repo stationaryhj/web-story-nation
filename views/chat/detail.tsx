@@ -24,7 +24,7 @@ import Image from 'next/image'
 import { Gift } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import type { FormEvent } from 'react'
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { useModalStore } from '@/store/useStoreModal'
 import type { ChatMode } from '@/components/modal/ChatModeModal'
 import { BaseButton } from '@/components/elements/button/BaseButton'
@@ -119,25 +119,40 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   // 주석 해제
   const first_talk = charbotData?.first_talk ? getChangeNameTag(charbotData?.first_talk, charbotData?.nick_nm) : ''
 
+  // 모바일 환경 감지
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkIsMobile()
+    window.addEventListener('resize', checkIsMobile)
+
+    return () => window.removeEventListener('resize', checkIsMobile)
+  }, [])
+
   // 튜토리얼 관련 상태를 최상위로 이동
   const [showTutorial, setShowTutorial] = useState(true)
   const chatBoxRef = useRef<HTMLDivElement>(null)
 
-  // 튜토리얼 설정
-  const tutorialConfig = {
-    storageKey: 'chat-tutorial-completed',
-    defaultMessagePosition: 'middle' as const,
-    steps: [
-      {
-        id: 'chat-mode-button',
-        html: `
+  // 튜토리얼 설정 - isMobile 상태에 따라 동적으로 id 설정
+  const tutorialConfig = useMemo(
+    () => ({
+      storageKey: 'chat-tutorial-completed',
+      defaultMessagePosition: 'middle' as const,
+      steps: [
+        {
+          id: isMobile ? 'more-button' : 'chat-mode-button',
+          html: `
           <p>탭하면 <span class="text-yellow-300 font-semibold">채팅모드를 선택</span>할 수 있어요!</p>
         `,
-        textPosition: 'bottom' as const,
-      },
-      {
-        id: 'message-input',
-        html: `
+          textPosition: 'bottom' as const,
+        },
+        {
+          id: 'message-input',
+          html: `
           <div class="text-start">
             <div>
               <span class="text-yellow-300">탭하면 **</span>가 입력돼요
@@ -148,10 +163,12 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             <div><span class="text-yellow-300">기울임체로 출력</span>될 거에요!</div>
           </div>
         `,
-        textPosition: 'top' as const,
-      },
-    ],
-  }
+          textPosition: 'top' as const,
+        },
+      ],
+    }),
+    [isMobile]
+  )
 
   // Nakama 컨텍스트 사용
   const nakamaContext = useNakama()
@@ -197,7 +214,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 모바일 환경 감지
   const [isMoreSidebarOpen, setIsMoreSidebarOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
 
   // 캐릭터 이미지
   const [showImage, setShowImage] = useState(
@@ -222,18 +238,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 표시 이미지
   // const showImage = getValidImageUrl(userIsAdult && chatMessages.length > 2 ? character.imageUrlNsfw : character.imageUrl)
-
-  // 모바일 환경 감지
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-
-    checkIsMobile()
-    window.addEventListener('resize', checkIsMobile)
-
-    return () => window.removeEventListener('resize', checkIsMobile)
-  }, [])
 
   useEffect(() => {
     if (currentModeId === 3 || currentModeId === 4) {
@@ -1032,6 +1036,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
           {/* 더보기 버튼 - 모바일에서만 표시 */}
           <button
+            id="more-button"
             className="md:hidden w-2 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors"
             onClick={() => setIsMoreSidebarOpen(true)}
           >

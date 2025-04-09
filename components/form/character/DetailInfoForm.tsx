@@ -11,6 +11,7 @@ import Tutorial from '@/components/tutorial/Tutorial'
 
 const createCharacterScenario = {
   storageKey: 'detail-info-tutorial-completed',
+  defaultMessagePosition: 'top' as const,
   steps: [
     {
       id: 'context-info-button',
