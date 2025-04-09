@@ -8,6 +8,7 @@ import { ConversationExample } from '@/store/useCreateCharacterData'
 import { useAccountStore } from '@/store/useAccountStore'
 import RatingSelect from './RatingSelect'
 import Tutorial from '@/components/tutorial/Tutorial'
+import BaseModal from '@/components/modal/BaseModal'
 
 const createCharacterScenario = {
   storageKey: 'detail-info-tutorial-completed',
@@ -100,6 +101,10 @@ export default function DetailInfoForm({
   // 성인 인증 상태 확인
   const { isAdult } = useAccountStore()
   const isAdultModeEnabled = isAdult()
+
+  // 삭제 확인 모달 상태
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [deleteTargetId, setDeleteTargetId] = useState<string>('')
 
   // 스크롤 후 튜토리얼 표시 함수
   const scrollAndShowTutorial = () => {
@@ -352,21 +357,31 @@ export default function DetailInfoForm({
 
   // 대화 예시 삭제 버튼 핸들러
   const handleDeleteExample = (id: string) => {
-    if (confirm('정말로 이 대화 예시를 삭제하시겠습니까?')) {
-      removeConversationExample(id)
+    setDeleteTargetId(id)
+    setIsDeleteModalOpen(true)
+  }
+
+  // 대화 예시 삭제 확인
+  const confirmDeleteExample = () => {
+    if (deleteTargetId) {
+      removeConversationExample(deleteTargetId)
 
       // 로컬 상태에서도 삭제
       setUserMessages(prev => {
         const newMessages = { ...prev }
-        delete newMessages[id]
+        delete newMessages[deleteTargetId]
         return newMessages
       })
 
       setCharacterMessages(prev => {
         const newMessages = { ...prev }
-        delete newMessages[id]
+        delete newMessages[deleteTargetId]
         return newMessages
       })
+
+      // 모달 닫기
+      setIsDeleteModalOpen(false)
+      setDeleteTargetId('')
     }
   }
 
@@ -641,7 +656,57 @@ export default function DetailInfoForm({
           setShowTutorial(false)
         }}
         config={createCharacterScenario}
+        {...{
+          beforeOpen: () => {
+            // 튜토리얼이 열리기 전에 페이지 하단으로 스크롤
+            const conversationExamples = document.getElementById('conversation-examples')
+            if (conversationExamples) {
+              conversationExamples.scrollIntoView({ behavior: 'smooth', block: 'end' })
+              // 요소 위치까지 스크롤된 후 약간의 지연 시간을 두고 추가로 100px 더 스크롤
+              setTimeout(() => {
+                window.scrollBy({
+                  top: 100,
+                  behavior: 'smooth',
+                })
+              }, 500)
+            } else {
+              const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
+              window.scrollTo({
+                top: docHeight - 200, // 약간의 여백을 두고 스크롤
+                behavior: 'smooth',
+              })
+            }
+          },
+        }}
       />
+
+      {/* 대화 예시 삭제 확인 모달 */}
+      <BaseModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="대화 예시 삭제"
+        size="sm"
+        animation="scale"
+        footerContent={
+          <div className="flex justify-end gap-2 w-full">
+            <button
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 transition-colors rounded-lg text-gray-700"
+            >
+              취소
+            </button>
+            <button
+              onClick={confirmDeleteExample}
+              className="px-4 py-2 bg-red-500 hover:bg-red-600 transition-colors rounded-lg text-white"
+            >
+              삭제
+            </button>
+          </div>
+        }
+      >
+        <p className="text-center my-4">정말로 이 대화 예시를 삭제하시겠습니까?</p>
+        <p className="text-center text-gray-500 text-sm mb-4">삭제한 대화 예시는 복구할 수 없습니다.</p>
+      </BaseModal>
     </>
   )
 }

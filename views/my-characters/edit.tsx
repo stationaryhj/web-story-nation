@@ -219,7 +219,7 @@ export default function EditCharacterPage() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-6 py-3 bg-secondary-100 hover:bg-secondary-200 text-secondary-700 rounded-lg transition-colors dark:bg-dark-secondary-100/10 dark:hover:bg-dark-secondary-100/20 dark:text-dark-secondary-400"
+                className="px-6 py-3 bg-secondary-100 hover:bg-secondary-200 text-secondary-700 rounded-lg transition-colors dark:bg-dark-secondary-100/10 dark:hover:bg-dark-secondary-100/20 dark:text-dark-secondary-400 text-xs sm:text-base"
                 disabled={isSaving}
               >
                 취소
@@ -230,7 +230,7 @@ export default function EditCharacterPage() {
                 disabled={isSaving}
                 className={`px-6 py-3 rounded-lg transition-colors ${
                   !isSaving
-                    ? 'bg-primary-500 hover:bg-primary-600 text-white dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600'
+                    ? 'bg-primary-500 hover:bg-primary-600 text-white dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600 text-xs sm:text-base'
                     : 'bg-primary-300 text-white cursor-not-allowed dark:bg-dark-primary-800 dark:text-dark-secondary-300'
                 }`}
               >

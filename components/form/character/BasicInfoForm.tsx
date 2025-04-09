@@ -215,7 +215,7 @@ export default function BasicInfoForm({
               <button
                 type="button"
                 onClick={() => handleGenderSelect('male')}
-                className={`rounded-lg px-4 py-3 text-center transition-colors ${
+                className={`rounded-lg px-4 py-3 text-center transition-colors text-xs sm:text-base ${
                   formData.gender === 'male'
                     ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                     : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -226,7 +226,7 @@ export default function BasicInfoForm({
               <button
                 type="button"
                 onClick={() => handleGenderSelect('female')}
-                className={`rounded-lg px-4 py-3 text-center transition-colors ${
+                className={`rounded-lg px-4 py-3 text-center transition-colors text-xs sm:text-base ${
                   formData.gender === 'female'
                     ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                     : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -237,7 +237,7 @@ export default function BasicInfoForm({
               <button
                 type="button"
                 onClick={() => handleGenderSelect('unspecified')}
-                className={`rounded-lg px-4 py-3 text-center transition-colors ${
+                className={`rounded-lg px-4 py-3 text-center transition-colors text-xs sm:text-base ${
                   formData.gender === 'unspecified'
                     ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                     : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -266,7 +266,7 @@ export default function BasicInfoForm({
               <button
                 type="button"
                 onClick={() => handleVisibilitySelect('private')}
-                className={`rounded-lg px-4 py-3 text-center transition-colors ${
+                className={`rounded-lg px-4 py-3 text-center transition-colors text-xs sm:text-base ${
                   formData.visibility === 'private'
                     ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                     : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -277,7 +277,7 @@ export default function BasicInfoForm({
               <button
                 type="button"
                 onClick={() => handleVisibilitySelect('public')}
-                className={`rounded-lg px-4 py-3 text-center transition-colors ${
+                className={`rounded-lg px-4 py-3 text-center transition-colors text-xs sm:text-base ${
                   formData.visibility === 'public'
                     ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                     : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
@@ -470,7 +470,7 @@ export default function BasicInfoForm({
             </div>
 
             {/* 사용자 정의 태그 입력 */}
-            <div className="mt-3 flex border-t border-secondary-200 dark:border-dark-secondary-200/10 pt-3">
+            <div className="mt-3 flex border-t border-secondary-200 dark:border-dark-secondary-200/10 pt-3 text-xs sm:text-base">
               <input
                 type="text"
                 value={customTagInput}
