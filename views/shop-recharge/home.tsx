@@ -274,7 +274,7 @@ export default function ShopRecharge() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-gray-50 dark:bg-dark-background">
+      <div className="min-h-screen bg-gray-50 dark:bg-dark-background pb-20">
         {/* 헤더 */}
         <div className="bg-white dark:bg-dark-background-light shadow-sm sticky top-0 z-10">
           <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
