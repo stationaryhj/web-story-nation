@@ -56,6 +56,10 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
     }
   }, [isOpen, config.storageKey, onClose])
 
+  useEffect(() => {
+    console.log('onClose')
+  }, [onClose])
+
   // main-content의 스크롤 높이 확인 (디버깅용)
   useEffect(() => {
     if (targetElement) {
@@ -83,7 +87,8 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
   }, [isOpen, targetElement])
 
   // 클릭 이벤트 핸들러
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation()
     if (currentStep < config.steps.length - 1) {
       setCurrentStep(prev => prev + 1)
     } else {
@@ -95,12 +100,12 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
   }
 
   // 튜토리얼이 열릴 때 클릭 이벤트 리스너 추가
-  useEffect(() => {
-    if (isOpen) {
-      document.addEventListener('click', handleClick)
-      return () => document.removeEventListener('click', handleClick)
-    }
-  }, [isOpen, currentStep, config.steps.length, dontShowAgain])
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     document.addEventListener('click', handleClick)
+  //     return () => document.removeEventListener('click', handleClick)
+  //   }
+  // }, [isOpen, currentStep, config.steps.length, dontShowAgain])
 
   if (!isOpen || !targetElement || !isMounted) return null
 

@@ -87,12 +87,6 @@ export default function DetailInfoForm({
   setConversationExampleTitle,
   onValidationChange,
 }: DetailInfoFormProps) {
-  // 대화 예시 관련 ref 추가
-  const exampleRefs = useRef<{ [key: string]: HTMLTextAreaElement }>({})
-
-  // 초기화 여부를 추적하는 ref 추가
-  const initializedRef = useRef(false)
-
   // 현재 선택된 입력 필드 (user 또는 character)
   const [activeField, setActiveField] = useState<{ id: string; field: 'user' | 'character' } | null>(null)
   const [showTutorial, setShowTutorial] = useState(false)
@@ -193,66 +187,6 @@ export default function DetailInfoForm({
     const value = e.target.value
     if (value.length <= 3500) {
       setFormField('bioDetail', value)
-    }
-  }
-
-  // 대화 예시 텍스트 변경 핸들러
-  const handleExampleTextChange = (id: string, text: string) => {
-    if (text.length <= 1500) {
-      updateConversationExample(id, text)
-    }
-  }
-
-  // 대화 예시 편집 모드 설정
-  const handleEditExample = (id: string) => {
-    // 모든 예시를 편집 모드 해제
-    formData.conversationExamples.forEach((ex: ConversationExample) => {
-      if (ex.id !== id && ex.isEditing) {
-        setConversationExampleEditMode(ex.id, false)
-
-        // 빈 텍스트 자동 삭제
-        if (ex.text.trim() === '') {
-          removeConversationExample(ex.id)
-        }
-      }
-    })
-
-    setConversationExampleEditMode(id, true)
-    // 편집 모드로 전환 후 해당 textarea에 포커스
-    setTimeout(() => {
-      if (exampleRefs.current[id]) {
-        exampleRefs.current[id].focus()
-      }
-    }, 0)
-  }
-
-  // 대화 예시 편집 완료
-  const handleCompleteEdit = (id: string) => {
-    const example = formData.conversationExamples.find((ex: ConversationExample) => ex.id === id)
-    // 빈 텍스트인 경우 자동 삭제
-    if (example && example.text.trim() === '') {
-      removeConversationExample(id)
-    } else {
-      setConversationExampleEditMode(id, false)
-    }
-  }
-
-  // 대화 예시 blur 이벤트 핸들러
-  const handleExampleBlur = (id: string, oldText: string) => {
-    const example = formData.conversationExamples.find((ex: ConversationExample) => ex.id === id)
-    if (example) {
-      // 빈 텍스트인 경우 자동 삭제
-      if (example.text.trim() === '') {
-        removeConversationExample(id)
-      }
-      // 텍스트가 변경되지 않았으면 편집 모드만 종료
-      else if (example.text === oldText) {
-        setConversationExampleEditMode(id, false)
-      }
-      // 변경된 경우 저장 (최적화)
-      else {
-        handleCompleteEdit(id)
-      }
     }
   }
 
