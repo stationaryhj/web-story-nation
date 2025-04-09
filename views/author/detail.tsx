@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useRouter } from 'next/navigation'
 import CardGrid from '@/components/elements/card/CardGrid'
-import { faArrowLeft, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeft, faChevronLeft, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { useAuthorStore } from '@/store/useAuthorStore'
 
 interface AuthorDetailPageProps {
@@ -55,17 +55,16 @@ export default function AuthorDetailPage({ params }: AuthorDetailPageProps) {
     <main className="flex-1">
       {/* 메인 컨텐츠 */}
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => {
-              router.back()
-            }}
-            className="mr-3"
-            aria-label="뒤로 가기"
-          >
-            <FontAwesomeIcon icon={faArrowLeft} className="text-gray-600 dark:text-dark-gray-400" />
-          </button>
-          <h1 className="text-xl font-bold text-gray-600 dark:text-dark-gray-200">작가정보</h1>
+        <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between ">
+          <div className="flex items-center">
+            <button
+              onClick={() => router.back()}
+              className="mr-3 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400"
+            >
+              <FontAwesomeIcon icon={faChevronLeft} className="h-5 w-5" />
+            </button>
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">작가 정보</h1>
+          </div>
         </div>
 
         {/* 로딩 중 */}

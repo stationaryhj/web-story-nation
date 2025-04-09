@@ -137,7 +137,7 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
       {/* 검은색 오버레이 배경 - 클리핑 경로 사용 */}
       <div
         ref={overlayRef}
-        className="fixed inset-0 bg-black/85 z-[9999] backdrop-blur-none transition-all duration-300"
+        className="fixed inset-0 bg-black/85 z-[1001] backdrop-blur-none transition-all duration-300 h-screen"
         style={{
           clipPath: clipPath,
           WebkitClipPath: clipPath,
@@ -147,7 +147,7 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
 
       {/* 타겟 요소 테두리 */}
       <div
-        className="fixed border-2 border-primary-500 rounded-lg z-[10000] animate-[pulse_2s_ease-in-out_infinite]"
+        className="fixed border-2 border-primary rounded-lg z-[10000] animate-[pulse_2s_ease-in-out_infinite]"
         style={{
           top: rect.top - 4,
           left: rect.left - 4,
@@ -190,7 +190,7 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
           id="dontShowAgain"
           checked={dontShowAgain}
           onChange={e => setDontShowAgain(e.target.checked)}
-          className="w-4 h-4 rounded-md border-gray-300 text-primary-500 focus:ring-primary-500 cursor-pointer accent-primary-500"
+          className="w-4 h-4 rounded-md border-gray-300 text-primary cursor-pointer"
         />
         <label htmlFor="dontShowAgain" className="text-sm font-medium cursor-pointer select-none">
           다시 보지 않기

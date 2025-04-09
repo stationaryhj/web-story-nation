@@ -497,14 +497,14 @@ export default function DetailInfoForm({
                 >
                   <div className="flex justify-between items-center mb-3 sm:mb-4">
                     <h4 className="text-xs sm:text-sm font-medium text-secondary-700 dark:text-dark-secondary-400"></h4>
-                    <div className="flex space-x-1 sm:space-x-2">
+                    <div className="flex mb-2">
                       {/* 특수 태그 버튼들 */}
-                      <div className="flex flex-wrap sm:flex-nowrap space-x-0 sm:space-x-2 space-y-2 sm:space-y-0">
+                      <div className="flex flex-wrap gap-2 mr-2">
                         <button
                           id="context-info-button"
                           type="button"
                           onClick={handleContextInfoClick}
-                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center mr-2 sm:mr-0 mb-2 sm:mb-0 w-auto"
+                          className="px-1 sm:px-3 sm:py-1.5 bg-gray-200/80 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center sm:mb-0 w-auto h-8 sm:h-9"
                           title="상황 설명 추가"
                         >
                           상황 설명 추가(*)
@@ -513,7 +513,7 @@ export default function DetailInfoForm({
                           id="character-name-button"
                           type="button"
                           onClick={handleCharacterNameClick}
-                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center mr-2 sm:mr-0 mb-2 sm:mb-0 w-auto"
+                          className="px-1 sm:px-3 sm:py-1.5 bg-gray-200/80 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center sm:mb-0 w-auto h-8 sm:h-9"
                           title="캐릭터 이름 추가"
                         >
                           캐릭터 이름
@@ -522,7 +522,7 @@ export default function DetailInfoForm({
                           id="user-name-button"
                           type="button"
                           onClick={handleUserNameClick}
-                          className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center w-auto"
+                          className="px-1 sm:px-3 sm:py-1.5 bg-gray-200/80 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-xs flex items-center sm:mr-0 sm:mb-0 w-auto h-8 sm:h-9"
                           title="유저 이름 추가"
                         >
                           유저 이름
