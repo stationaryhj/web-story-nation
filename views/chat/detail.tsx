@@ -696,12 +696,13 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 채팅 초기화 확인
   const handleConfirmResetChat = async () => {
+    console.log('asdasd')
     const responseData = await chatApi.InitChat(Number(chrBotChatKey), currentModeId, userIsAdult)
     console.log('💬 채팅 초기화 응답:', responseData.data)
 
     if (responseData?.data?.result?.err === 0) {
       await clearChatHistory()
-
+      setIsMoreSidebarOpen(false)
       updatePromptKey(responseData.data.prompt_key)
 
       // 캐릭터의 첫 대화 메시지 추가
@@ -716,6 +717,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
       // 채팅 초기화 성공
       handleCloseResetChatModal()
+      setIsMoreSidebarOpen(false)
     } else {
       // 채팅 초기화 실패
       console.error('채팅 초기화 실패:', responseData.data.result.msg)
