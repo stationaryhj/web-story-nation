@@ -121,17 +121,6 @@ export default function DetailInfoForm({
       const viewportHeight = window.innerHeight
       const isAtBottom = currentPosition + viewportHeight >= documentHeight - 50 // 50px 오차 허용
 
-      console.log(
-        '[스크롤] 현재위치:',
-        currentPosition,
-        '문서높이:',
-        documentHeight,
-        '화면높이:',
-        viewportHeight,
-        '바닥여부:',
-        isAtBottom
-      )
-
       if (isAtBottom || Math.abs(currentPosition - startPosition) > 200) {
         // 스크롤이 완료되었거나 충분히 이동했으면 튜토리얼 표시
         console.log('[스크롤] 스크롤 완료 감지, 튜토리얼 표시')
