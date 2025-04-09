@@ -28,6 +28,7 @@
     "classnames": "^2.5.1",
     "dotenv": "^16.4.7",
     "figma-api": "^2.0.1-beta",
+    "firebase": "^11.6.0",
     "framer-motion": "^12.5.0",
     "he": "^1.2.0",
     "i18next": "^24.2.1",

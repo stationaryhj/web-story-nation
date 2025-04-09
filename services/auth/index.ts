@@ -308,7 +308,13 @@ export class AuthManager {
           result = await googleAuth.handleCallback(params);
           break;
         case 'APPLE':
-          result = await appleAuth.handleCallback(params);
+          // Apple은 id_token도 필요하므로 특별 처리
+          const appleParams = {
+            ...params,
+            id_token: (params as any).id_token // id_token 추가
+          };
+          console.log('애플 로그인 콜백 파라미터 :: ', appleParams);
+          result = await appleAuth.handleCallback(appleParams);
           break;
         default:
           throw new Error('지원하지 않는 로그인 타입입니다.');
@@ -330,6 +336,7 @@ export class AuthManager {
       return result;
     } catch (error) {
       // 오류 발생 시 로컬 스토리지 정리 및 인증 정보 초기화
+      console.error('콜백 처리 오류 :: ', error);
       localStorage.removeItem('social_login_state');
       localStorage.removeItem('social_login_type');
       localStorage.removeItem('social_login_in_progress');

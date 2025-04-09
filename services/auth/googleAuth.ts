@@ -6,6 +6,7 @@ import {
   LoginResult,
   SocialLoginCallbacks
 } from './types';
+import { contentApi } from '../api/storyNationApi';
 
 // Google 인증 서비스
 export class GoogleAuthService extends BaseAuthService {
@@ -124,19 +125,47 @@ export class GoogleAuthService extends BaseAuthService {
       // 필수 정보 확인
       const { clientId, snsauth, snstype } = stateData;
 
+      
       // 액세스 토큰 요청
-      const tokenResponse = await this.getAccessToken(params.code, clientId);
+      //   const tokenResponse = await this.getAccessToken(params.code, clientId);
+      const tokenResponse = await contentApi.GetGoogleToken(params.code, JSON.stringify(stateData), this.redirectUri);
 
+      if (!tokenResponse.data || tokenResponse.data.result?.err !== 0) {
+        console.error('구글 토큰 요청 실패:', tokenResponse.data);
+        throw new Error('구글 인증 처리 중 오류가 발생했습니다.');
+      }
+
+      let accessToken;
+      try {
+        const responseData = JSON.parse(tokenResponse.data.response);
+        accessToken = responseData;
+        
+        if (!accessToken) {
+          throw new Error('액세스 토큰이 없습니다');
+        }
+      } catch (error) {
+        console.error('구글 토큰 응답 파싱 실패:', error);
+        console.error('원본 응답:', tokenResponse.data.response);
+        throw new Error('구글 인증 응답을 처리할 수 없습니다.');
+      }
+      
+      console.log('구글 액세스 토큰 획득 성공 :: ', accessToken);
+
+      const socialLoginState = JSON.parse(localStorage.getItem('social_login_state') || '{}');
+      if (!socialLoginState) {
+        throw new Error('저장된 로그인 정보가 없습니다. 다시 로그인해주세요.');
+      }
+      
       // 로그인 처리
       const loginParams: LoginParams = {
         provider: 'GOOGLE',
-        clientId,
-        snsauth,
-        snstype
+        clientId: socialLoginState.clientId,
+        snsauth: socialLoginState.snsauth,
+        snstype: socialLoginState.snstype
       };
 
       // 공통 로그인 처리 로직 호출
-      const result = await this.processLogin(tokenResponse, loginParams);
+      const result = await this.processLogin(accessToken, loginParams);
       
       // 회원가입 필요 시 signupRequired 플래그 명시적 설정
       if (!result.success && result.error?.includes('회원가입이 필요합니다')) {

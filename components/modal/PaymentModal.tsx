@@ -59,20 +59,12 @@ export default function PaymentModal({
     try {
       setIsProcessing(true)
 
-      console.log('@@ clientKey :: ', clientKey)
-      console.log('@@ orderID :: ', orderId)
-      console.log('@@ amount :: ', amount)
-      console.log('@@ orderName :: ', orderName)
-      console.log('@@ customerName :: ', customerName)
-
       // 토스페이먼츠 SDK 로드
       const tossPayments = await loadTossPayments(process.env.NEXT_PUBLIC_TOSS_PAYMENT_CLIENT_KEY || clientKey)
 
       // 위젯 초기화
       const widgets = tossPayments.widgets({ customerKey: ANONYMOUS })
       widgetsRef.current = widgets
-
-      console.log('@@ widgets :: ', widgets)
 
       // 금액 설정
       widgets.setAmount({
@@ -107,8 +99,6 @@ export default function PaymentModal({
       alert('결제 위젯이 초기화되지 않았습니다.')
       return
     }
-
-    console.log('@@ orderId :: ', orderId)
 
     try {
       setIsProcessing(true)
