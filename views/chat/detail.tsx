@@ -126,6 +126,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   // 튜토리얼 설정
   const tutorialConfig = {
     storageKey: 'chat-tutorial-completed',
+    defaultMessagePosition: 'middle' as const,
     steps: [
       {
         id: 'chat-mode-button',
@@ -199,7 +200,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   const [isMobile, setIsMobile] = useState(false)
 
   // 캐릭터 이미지
-  const [showImage, setShowImage] = useState(getValidImageUrl(userIsAdult ? character.imageUrlNsfw : character.imageUrl))
+  const [showImage, setShowImage] = useState(
+    getValidImageUrl(userIsAdult ? character.imageUrlNsfw : character.imageUrl)
+  )
 
   // 배경 이미지 상태 추가
   const [isBackgroundEnabled, setIsBackgroundEnabled] = useState(true)
@@ -233,13 +236,11 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   }, [])
 
   useEffect(() => {
-    if(currentModeId === 3 || currentModeId === 4) {
+    if (currentModeId === 3 || currentModeId === 4) {
       setShowImage(getValidImageUrl(character.imageUrlNsfw))
-    }
-    else {
+    } else {
       setShowImage(getValidImageUrl(character.imageUrl))
     }
-    
   }, [currentModeId])
 
   // 메시지 디버깅을 위한 로깅 추가 - 무한 루프 문제 수정
@@ -794,10 +795,10 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   const LOAD_MORE_THRESHOLD = 500 // 스크롤 임계값 증가
   const LOAD_MORE_COUNT = 15 // 한 번에 로드할 메시지 수 증가
   const PRELOAD_BUFFER = 10 // 미리 로드할 메시지 버퍼
-  
+
   // 보여질 메시지만 필터링 - 앞뒤로 더 많은 메시지 미리 로드
   const visibleMessages = chatMessages.slice(
-    Math.max(0, visibleStartIndex - PRELOAD_BUFFER), 
+    Math.max(0, visibleStartIndex - PRELOAD_BUFFER),
     Math.min(chatMessages.length, visibleStartIndex + MESSAGES_PER_VIEW + PRELOAD_BUFFER)
   )
 
@@ -812,7 +813,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     const scrollHeight = container.scrollHeight
     const clientHeight = container.clientHeight
     const scrollBottom = scrollHeight - scrollTop - clientHeight
-    
+
     // 맨 아래로부터의 거리가 100px 이하면 자동 스크롤 활성화
     if (scrollBottom <= 100) {
       isAutoScrollingRef.current = true
@@ -823,18 +824,15 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       }
       lastManualScrollRef.current = scrollTop
     }
-    
+
     // 스크롤이 상단에 가까워지면 이전 메시지 보여주기
     if (scrollTop < LOAD_MORE_THRESHOLD && visibleStartIndex > 0) {
       setVisibleStartIndex(prev => Math.max(0, prev - LOAD_MORE_COUNT))
     }
-    
+
     // 스크롤이 하단에 가까워지면 다음 메시지 보여주기
-    if (scrollBottom < LOAD_MORE_THRESHOLD && 
-        visibleStartIndex + MESSAGES_PER_VIEW < chatMessages.length) {
-      setVisibleStartIndex(prev => 
-        Math.min(chatMessages.length - MESSAGES_PER_VIEW, prev + LOAD_MORE_COUNT)
-      )
+    if (scrollBottom < LOAD_MORE_THRESHOLD && visibleStartIndex + MESSAGES_PER_VIEW < chatMessages.length) {
+      setVisibleStartIndex(prev => Math.min(chatMessages.length - MESSAGES_PER_VIEW, prev + LOAD_MORE_COUNT))
     }
   }
 
@@ -849,7 +847,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       }
     }
   }, [chatMessages.length])
-  
+
   // 메시지가 길어질 경우를 대비한 길이 제한 함수
   const getLimitedVisibleMessages = () => {
     // 너무 긴 메시지의 경우 렌더링 최적화를 위해 일정 길이 이상인 경우만 특별 처리
@@ -858,11 +856,11 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         return {
           ...msg,
           // 메시지 ID에 고유값 추가하여 리렌더링 방지
-          id: `${msg.id}-visible-${visibleStartIndex}`
-        };
+          id: `${msg.id}-visible-${visibleStartIndex}`,
+        }
       }
-      return msg;
-    });
+      return msg
+    })
   }
 
   // 로딩 상태 표시
@@ -1315,7 +1313,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
           <div ref={chatContainerRef} className="flex-1 overflow-y-auto p-4 md:p-6">
             <div ref={chatBoxRef} className="flex flex-col space-y-12 max-w-3xl mx-auto">
-
               {chatMessages.length === 0 ? (
                 <div className="text-center text-gray-500 py-10">
                   <p>메시지가 없습니다. 채팅을 시작해보세요!</p>
@@ -1323,10 +1320,10 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
               ) : (
                 getLimitedVisibleMessages().map((chat, index) => {
                   // 실제 인덱스 계산 (전체 메시지 배열 내에서의 위치)
-                  const actualIndex = chatMessages.findIndex(msg => msg.id === chat.id);
-                  const isLastAiMessage = chatMessages.length - 1 === actualIndex && chat.sender === 'character';
-                  const isLastMessage = actualIndex === chatMessages.length - 1;
-                  
+                  const actualIndex = chatMessages.findIndex(msg => msg.id === chat.id)
+                  const isLastAiMessage = chatMessages.length - 1 === actualIndex && chat.sender === 'character'
+                  const isLastMessage = actualIndex === chatMessages.length - 1
+
                   return (
                     <div
                       key={chat.id}
