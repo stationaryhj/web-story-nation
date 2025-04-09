@@ -412,7 +412,7 @@ export default function DetailInfoForm({
   return (
     <>
       <div className="space-y-8">
-        <RatingSelect rating={formData.rating} onRatingSelect={handleRatingSelect} showRequired={false} />
+        {/* <RatingSelect rating={formData.rating} onRatingSelect={handleRatingSelect} showRequired={false} /> */}
 
         {/* 상세 설명 */}
         <div>

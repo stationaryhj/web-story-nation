@@ -19,9 +19,10 @@ interface CharacterFormProps {
   formType: 'create' | 'edit'
   mode: 'basic' | 'detail' | 'image'
   invalidFields?: { [key: string]: boolean }
+  isSubmitting?: boolean
 }
 
-export default function CharacterForm({ mode, invalidFields = {} }: CharacterFormProps) {
+export default function CharacterForm({ mode, invalidFields = {}, isSubmitting = false }: CharacterFormProps) {
   const {
     formData,
     setFormField,
@@ -102,6 +103,8 @@ export default function CharacterForm({ mode, invalidFields = {} }: CharacterFor
         setNormalImage={setNormalImage}
         setAdultImage={setAdultImage}
         setAdultNormalImage={setAdultNormalImage}
+        invalidFields={invalidFields}
+        isSubmitting={isSubmitting}
       />
     )
   }

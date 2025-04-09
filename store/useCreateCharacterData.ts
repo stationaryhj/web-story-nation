@@ -537,12 +537,22 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
 // 폼 유효성 검사 함수
 export const isFormValid = (formData: CharacterFormData, tab: 'basic' | 'detail' | 'image'): boolean => {
   if (tab === 'image') {
-    return !!(
+    // 기본 정보 필드 검증
+    const basicInfoValid = !!(
       formData.name?.trim() &&
       formData.bio?.trim() &&
       formData.firstMessage?.trim() &&
       formData.hashtags.length > 0
     )
+
+    // 이용 등급에 따른 이미지 필드 검증
+    if (formData.rating === 'adult') {
+      // 성인 등급: imgWebUrl과 imgUrlNsfw 둘 다 필요
+      return !!(basicInfoValid && formData.imgWebUrl?.trim() && formData.imgUrlNsfw?.trim())
+    } else {
+      // 일반 등급: imgUrl만 필요
+      return !!(basicInfoValid && formData.imgUrl?.trim())
+    }
   }
 
   // 이미지 탭이 아닌 경우 항상 유효

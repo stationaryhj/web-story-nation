@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { faUpload } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
@@ -13,7 +13,6 @@ import { getImageUri } from '@/lib/utils/storyNationUtil'
 import { contentApi } from '@/services/api'
 import { toast } from 'react-toastify'
 import RatingSelect from './RatingSelect'
-import { useRouter } from 'next/navigation'
 
 interface ImageUploadFormProps {
   formData: any
@@ -22,6 +21,8 @@ interface ImageUploadFormProps {
   setAdultImage: (path: string) => void
   setAdultNormalImage: (path: string) => void
   onValidationChange?: (isValid: boolean) => void
+  invalidFields?: { [key: string]: boolean }
+  isSubmitting?: boolean
 }
 
 export default function ImageUploadForm({
@@ -31,30 +32,79 @@ export default function ImageUploadForm({
   setAdultImage,
   setAdultNormalImage,
   onValidationChange,
+  invalidFields,
+  isSubmitting,
 }: ImageUploadFormProps) {
   const { isAdult } = useAccountStore()
   const isAdultModeEnabled = isAdult()
-  const router = useRouter()
   // view Data - 이미지 URI 캐싱
+  console.log('invalidFields', invalidFields)
   const imgNormal = getImageUri(formData.imgUrl)
   const imgNormalWeb = getImageUri(formData.imgWebUrl)
   const imgNsfw = getImageUri(formData.imgUrlNsfw)
 
+  // 토스트 메시지가 이미 표시되었는지 추적하기 위한 ref
+  const toastShownRef = useRef(false)
+
+  // 제출 시도 시 유효성 검사 실패하면 toast 메시지 표시
+  useEffect(() => {
+    if (isSubmitting && invalidFields && 'image' in invalidFields && invalidFields.image && !toastShownRef.current) {
+      // 토스트 메시지가 이미 표시되었음을 표시
+      toastShownRef.current = true
+
+      if (formData.rating === 'adult') {
+        if (!formData.imgWebUrl && !formData.imgUrlNsfw) {
+          toast.error('기본 이미지와 짜릿 모드 이미지를 모두 업로드해주세요.')
+        } else if (!formData.imgWebUrl) {
+          toast.error('기본 이미지를 업로드해주세요.')
+        } else if (!formData.imgUrlNsfw) {
+          toast.error('짜릿 모드 이미지를 업로드해주세요.')
+        }
+      } else {
+        toast.error('캐릭터 이미지를 업로드해주세요.')
+      }
+    }
+
+    // isSubmitting이 false로 바뀌면 토스트 표시 상태 초기화
+    if (!isSubmitting) {
+      toastShownRef.current = false
+    }
+  }, [isSubmitting, invalidFields, formData.rating, formData.imgWebUrl, formData.imgUrlNsfw])
+
   // 유효성 검사
   useEffect(() => {
     if (onValidationChange) {
-      // 이미지 탭은 필수 항목이 없음
-      onValidationChange(true)
+      // 이미지 탭 유효성 검사
+      let isValid = false
+
+      // 이용등급에 따른 필수 이미지 확인
+      if (formData.rating === 'adult') {
+        // 성인 등급: imgWebUrl(기본 이미지)와 imgUrlNsfw(짜릿 모드 이미지) 모두 필요
+        isValid = !!(formData.imgWebUrl && formData.imgUrlNsfw)
+      } else {
+        // 전체 이용가: imgUrl(기본 이미지)만 필요
+        isValid = !!formData.imgUrl
+      }
+
+      // 유효성 검사 결과 전달
+      onValidationChange(isValid)
+
+      // 유효하지 않으면 invalidFields 업데이트 (props로 전달받은 경우)
+      if (invalidFields && typeof invalidFields === 'object') {
+        if ('image' in invalidFields) {
+          invalidFields.image = !isValid
+        }
+      }
     }
-  }, [onValidationChange])
+  }, [formData.rating, formData.imgUrl, formData.imgWebUrl, formData.imgUrlNsfw, onValidationChange, invalidFields])
 
   // 이용등급 선택 핸들러
-  const handleRatingSelect = (rating: 'all' | 'adult') => {
-    if (rating === 'adult' && !isAdultModeEnabled) {
-      return
-    }
-    setFormField('rating', rating)
-  }
+  // const handleRatingSelect = (rating: 'all' | 'adult') => {
+  //   if (rating === 'adult' && !isAdultModeEnabled) {
+  //     return
+  //   }
+  //   setFormField('rating', rating)
+  // }
 
   // 이미지 업로드 핸들러
   const handleImageUpload = async (
@@ -164,7 +214,6 @@ export default function ImageUploadForm({
             }
 
             toast.success('이미지가 성공적으로 업로드되었습니다')
-            // router.push('/my-characters')
           } catch (error) {
             console.error('이미지 업로드 중 오류:', error)
             toast.error('이미지 업로드 중 오류가 발생했습니다')
@@ -181,23 +230,65 @@ export default function ImageUploadForm({
   const handleImageDelete = () => {
     console.log('click delete')
     setNormalImage('')
+    // 삭제 후 유효성 상태 표시
+    if (onValidationChange && formData.rating === 'all') {
+      onValidationChange(false)
+      if (invalidFields && typeof invalidFields === 'object') {
+        if ('image' in invalidFields) {
+          invalidFields.image = true
+        }
+      }
+    }
   }
 
   // 성인 노멀 이미지 삭제
   const handleImageDeleteAdultNormal = () => {
     setAdultNormalImage('')
+    // 삭제 후 유효성 상태 표시
+    if (onValidationChange && formData.rating === 'adult') {
+      const isStillValid = !!formData.imgUrlNsfw
+      onValidationChange(false)
+      if (invalidFields && typeof invalidFields === 'object') {
+        if ('image' in invalidFields) {
+          invalidFields.image = true
+        }
+      }
+    }
   }
 
   // 성인 이미지 삭제
   const handleImageDeleteAdult = () => {
     setAdultImage('')
+    // 삭제 후 유효성 상태 표시
+    if (onValidationChange && formData.rating === 'adult') {
+      const isStillValid = !!formData.imgWebUrl
+      onValidationChange(false)
+      if (invalidFields && typeof invalidFields === 'object') {
+        if ('image' in invalidFields) {
+          invalidFields.image = true
+        }
+      }
+    }
   }
 
   return (
     <div className="space-y-6">
       {/* 이용등급 */}
-      <RatingSelect rating={formData.rating} onRatingSelect={handleRatingSelect} />
+      {/* <RatingSelect rating={formData.rating} onRatingSelect={handleRatingSelect} /> */}
 
+      <div className="flex flex-col items-center gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">이용등급 :</span>
+          <span className="text-sm text-primary-500 dark:text-dark-secondary-500 font-bold">
+            {formData.rating === 'adult' ? '성인 전용' : '전체이용가'}
+          </span>
+        </div>
+        <div>
+          <span className="text-xs text-accent-light dark:text-dark-secondary-500">
+            (이용 등급은 "기본 설정" 탭에서 변경 가능합니다.)
+          </span>
+        </div>
+      </div>
       {/* 이미지 그리드 */}
       <div className="flex">
         {/* 이미지 표시 - 전체 이용가인 경우 */}
@@ -224,7 +315,13 @@ export default function ImageUploadForm({
                 </div>
               </div>
             ) : (
-              <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
+              <label
+                className={`block aspect-square rounded-lg border-2 border-dashed ${
+                  invalidFields?.image
+                    ? 'border-red-500 bg-red-50 dark:border-red-500/70 dark:bg-red-950/20'
+                    : 'border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500'
+                } cursor-pointer`}
+              >
                 <input
                   type="file"
                   accept="image/*"
@@ -267,7 +364,13 @@ export default function ImageUploadForm({
                   </div>
                 </div>
               ) : (
-                <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
+                <label
+                  className={`block aspect-square rounded-lg border-2 border-dashed ${
+                    invalidFields?.image
+                      ? 'border-red-500 bg-red-50 dark:border-red-500/70 dark:bg-red-950/20'
+                      : 'border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500'
+                  } cursor-pointer`}
+                >
                   <input
                     type="file"
                     accept="image/*"
@@ -277,6 +380,7 @@ export default function ImageUploadForm({
                   <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
                     <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
                     <span className="text-sm">{formData.imgUrl ? '기본 이미지 교체' : '기본 이미지 업로드'}</span>
+                    {invalidFields?.image && <span className="text-red-500 text-xs mt-2">필수 항목입니다</span>}
                   </div>
                 </label>
               )}
@@ -313,7 +417,13 @@ export default function ImageUploadForm({
                   </div>
                 </div>
               ) : (
-                <label className="block aspect-square rounded-lg border-2 border-dashed border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500 cursor-pointer">
+                <label
+                  className={`block aspect-square rounded-lg border-2 border-dashed ${
+                    invalidFields?.image
+                      ? 'border-red-500 bg-red-50 dark:border-red-500/70 dark:bg-red-950/20'
+                      : 'border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500'
+                  } cursor-pointer`}
+                >
                   <input
                     type="file"
                     accept="image/*"
@@ -325,6 +435,7 @@ export default function ImageUploadForm({
                     <span className="text-sm">
                       {formData.imgUrlNsfw ? '짜릿 모드 이미지 교체' : '짜릿 모드 이미지 업로드'}
                     </span>
+                    {invalidFields?.image && <span className="text-red-500 text-xs mt-2">필수 항목입니다</span>}
                   </div>
                 </label>
               )}
@@ -335,17 +446,29 @@ export default function ImageUploadForm({
 
       {/* 이미지가 없을 때 안내 메시지 */}
       {formData.rating === 'all' && !formData.imgUrl ? (
-        <div className="text-center p-4 bg-secondary-50 dark:bg-dark-secondary-100/5 rounded-lg">
-          <p className="text-sm text-secondary-500 dark:text-dark-secondary-500">
-            이미지가 없습니다. 이미지를 업로드해주세요.
+        <div
+          className={`text-center p-4 ${invalidFields?.image ? 'bg-red-50 dark:bg-red-950/20' : 'bg-secondary-50 dark:bg-dark-secondary-100/5'} rounded-lg`}
+        >
+          <p
+            className={`text-sm ${invalidFields?.image ? 'text-red-500' : 'text-secondary-500 dark:text-dark-secondary-500'}`}
+          >
+            {invalidFields?.image
+              ? '캐릭터 이미지는 필수 항목입니다. 이미지를 업로드해주세요.'
+              : '이미지가 없습니다. 이미지를 업로드해주세요.'}
           </p>
         </div>
       ) : null}
 
-      {formData.rating === 'adult' && !formData.imgUrl && !formData.imgUrlNsfw ? (
-        <div className="text-center p-4 bg-secondary-50 dark:bg-dark-secondary-100/5 rounded-lg">
-          <p className="text-sm text-secondary-500 dark:text-dark-secondary-500">
-            이미지가 없습니다. 이미지를 업로드해주세요.
+      {formData.rating === 'adult' && (!formData.imgWebUrl || !formData.imgUrlNsfw) ? (
+        <div
+          className={`text-center p-4 ${invalidFields?.image ? 'bg-red-50 dark:bg-red-950/20' : 'bg-secondary-50 dark:bg-dark-secondary-100/5'} rounded-lg`}
+        >
+          <p
+            className={`text-sm ${invalidFields?.image ? 'text-red-500' : 'text-secondary-500 dark:text-dark-secondary-500'}`}
+          >
+            {invalidFields?.image
+              ? '모든 캐릭터 이미지는 필수 항목입니다. 기본 이미지와 짜릿 모드 이미지 모두 업로드해주세요.'
+              : '이미지가 없습니다. 이미지를 업로드해주세요.'}
           </p>
         </div>
       ) : null}

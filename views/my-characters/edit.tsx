@@ -9,9 +9,10 @@ import { useCreateCharacterData, isFormValid as checkFormValidity } from '@/stor
 import CharacterForm from '@/components/form/CharacterForm'
 import { toast } from 'react-toastify'
 import { useModalStore } from '@/store/useStoreModal'
-
+import { useAccountStore } from '@/store/useAccountStore'
 export default function EditCharacterPage() {
   const { openModal, closeModal } = useModalStore()
+  const isAdult = useAccountStore(state => state.isAdult)
 
   const params = useParams()
   const characterId = params?.id as string
@@ -37,7 +38,14 @@ export default function EditCharacterPage() {
     bio: false,
     firstMessage: false,
     hashtags: false,
+    imgUrl: false,
+    imgUrlNsfw: false,
+    imgWebUrl: false,
+    image: false,
   })
+
+  // 폼 제출 시도 중임을 나타내는 상태 설정
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // 캐릭터 데이터 로드
   useEffect(() => {
@@ -113,15 +121,50 @@ export default function EditCharacterPage() {
           bio: !formData.bio?.trim(),
           firstMessage: !formData.firstMessage?.trim(),
           hashtags: formData.hashtags.length === 0,
+          imgUrl: !formData.imgUrl?.trim(),
+          imgUrlNsfw: !formData.imgUrlNsfw?.trim(),
+          imgWebUrl: !formData.imgWebUrl?.trim(),
+          image:
+            formData.rating === 'adult'
+              ? !formData.imgWebUrl?.trim() || !formData.imgUrlNsfw?.trim()
+              : !formData.imgUrl?.trim(),
         }
+
+        // 먼저 invalidFields 설정 - 이를 참조하는 다른 UI 업데이트보다 먼저 실행
+        setInvalidFields(newInvalidFields)
+
+        // 폼 제출 시도 중임을 나타내는 상태 설정
+        setIsSubmitting(true)
+
+        // 일정 시간 후 제출 시도 상태 초기화
+        setTimeout(() => setIsSubmitting(false), 2000)
 
         // flushSync를 사용하여 탭 변경을 즉시 완료한 후 invalidFields 설정
         flushSync(() => {
-          setActiveTab('basic')
+          // 이용 등급에 따라 필요한 이미지 확인
+          if (formData.rating === 'adult') {
+            // 성인 등급인 경우: 성인 이미지 또는 기본 이미지가 없으면 이미지 탭으로 이동
+            if (newInvalidFields.imgUrlNsfw || newInvalidFields.imgWebUrl) {
+              setActiveTab('image')
+            } else {
+              setActiveTab('basic')
+            }
+          } else {
+            // 전체 이용가인 경우: 기본 이미지가 없으면 이미지 탭으로 이동
+            if (newInvalidFields.imgUrl) {
+              setActiveTab('image')
+            } else {
+              setActiveTab('basic')
+            }
+          }
         })
-        setInvalidFields(newInvalidFields)
 
-        toast.error('필수값이 입력되지 않았습니다.')
+        // 필수 입력 항목 누락 시 탭에 따라 다른 메시지 표시
+        if (activeTab === 'image') {
+          // 이미지 탭에서는 toast 메시지를 표시하지 않음 (ImageUploadForm에서 처리)
+        } else {
+          toast.error('필수값이 입력되지 않았습니다.')
+        }
         return
       }
 
@@ -210,7 +253,12 @@ export default function EditCharacterPage() {
             {/* 폼 컨텐츠 */}
             <div className="p-6">
               <FadeIn>
-                <CharacterForm formType="edit" mode={activeTab} invalidFields={invalidFields} />
+                <CharacterForm
+                  formType="edit"
+                  mode={activeTab}
+                  invalidFields={invalidFields}
+                  isSubmitting={isSubmitting}
+                />
               </FadeIn>
             </div>
 
