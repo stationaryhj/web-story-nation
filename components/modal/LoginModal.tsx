@@ -10,7 +10,6 @@ import GuestLoginForm from '@/components/form/GuestLoginForm'
 import { toast } from 'react-toastify'
 import { authService } from '@/services/auth'
 import { SpeechBubble } from '@/components/animation/SpeechBubble'
-import { ToastContainer } from 'react-toastify'
 import Image from 'next/image'
 interface LoginModalProps {
   isOpen: boolean
@@ -38,7 +37,6 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   // 로그인 타임아웃 핸들러
   const handleLoginTimeout = useCallback(() => {
     setLoading(false)
-    toast.error('로그인 시간이 초과되었습니다. 다시 시도해주세요.')
 
     // 타임아웃 관련 데이터 정리
     const timeoutId = localStorage.getItem('naver_login_timeout')
@@ -82,7 +80,6 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         // 에러 처리
         if (data.error) {
           setLoading(false)
-          toast.error(`로그인 중 오류가 발생했습니다: ${data.error}`)
           processingCallback.current = false
           return
         }
@@ -123,7 +120,6 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           }
         } catch (error) {
           console.error('콜백 처리 중 오류 발생:', error)
-          toast.error('로그인 처리 중 오류가 발생했습니다.')
         } finally {
           setLoading(false)
           // 처리 완료 후 상태 초기화
@@ -167,7 +163,6 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       }
     } catch (error) {
       console.error('소셜 로그인 오류:', error)
-      toast.error('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
     } finally {
       setLoading(false)
     }
