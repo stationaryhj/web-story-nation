@@ -1,7 +1,7 @@
 'use client'
 
 import { CardTransition } from '@/components/motion/PageTransition'
-import { getImageUri } from '@/lib/utils/storyNationUtil'
+import { getImageUri, getValidImageUrl } from '@/lib/utils/storyNationUtil'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faPen, faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import Image from 'next/image'
@@ -75,9 +75,9 @@ export default function AuthorCard({
             )}
 
             <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-              {profileImageUrl ? (
+              {profileImageUrl && !imageError ? (
                 <Image
-                  src={profileImageUrl || "/images/placeholders/author_default_img.jpg"}
+                  src={getValidImageUrl(profileImageUrl)}
                   alt={nickname || name}
                   fill
                   className="object-cover object-center"
@@ -158,9 +158,9 @@ export default function AuthorCard({
             >
               {/* 프로필 이미지 */}
               <div className="relative w-[60px] h-[60px] rounded-full overflow-hidden flex-shrink-0 mb-3">
-                {profileImageUrl ? (
+                {profileImageUrl && !imageError ? (
                   <Image
-                    src={profileImageUrl || "/images/placeholders/author_default_img.jpg"}
+                    src={getValidImageUrl(profileImageUrl)}
                     alt={nickname || name}
                     fill
                     className="object-cover object-center"
