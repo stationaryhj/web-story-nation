@@ -163,17 +163,15 @@ export abstract class BaseAuthService implements AuthService {
   // 공통 로그인 처리 로직
   protected async processLogin(tokenResponse: OAuthResponse, params: LoginParams): Promise<LoginResult> {
     try {
-      // 토큰 검증
-      const isValid = await this.verifyToken(tokenResponse.access_token);
-      if (!isValid) {
-        throw new Error('토큰 검증 실패');
-      }
+      const accessToken = params.snstype === 4 ? tokenResponse.id_token : tokenResponse.access_token;
+      const idToken = params.snstype === 4 ? tokenResponse.access_token : '';
 
       // 로그인 처리
       const response = await contentApi.loginDcheckV2(
         params.snsauth, 
         params.snstype, 
-        tokenResponse.access_token
+        accessToken || '',
+        idToken || '',
       );
 
       if (response.data.result.err === 0) {

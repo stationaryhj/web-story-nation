@@ -38,7 +38,7 @@ export default function Footer() {
               </p>
               <ul className="text-sm text-secondary-600/80 dark:text-dark-secondary-500/80 space-y-2">
                 <li>경기도 부천시 원미구 길주로 17 웹툰융합센터 606호 607호</li>
-                <li>대표자: 김현우 | 사업자 등록번호: 465-87-02166</li>
+                <li>대표자: 박호준 | 사업자 등록번호: 465-87-02166</li>
                 <li>통신판매업신고번호: 제 2024-서울관악-0165 호</li>
                 <li>전화번호: 032-321-0331</li>
                 <li>

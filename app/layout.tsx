@@ -24,12 +24,14 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: '스토리네이션',
-  description: '스토리네이션 - 캐릭터 기반 서비스',
+  description: '스네: 함께 만드는 세계관&캐릭터 채팅',
   icons: {
     icon: '/images/storyNation_thumb.png',
   },
   openGraph: {
     type: 'website',
+    title: '스토리네이션',
+    description: '스네: 함께 만드는 세계관&캐릭터 채팅',
     images: [
       {
         url: '/images/sn-thumb.jpg',

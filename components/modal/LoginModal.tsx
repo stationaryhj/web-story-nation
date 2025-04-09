@@ -66,6 +66,8 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       const data = event.data
       if (!data || typeof data !== 'object') return
 
+      console.log('로그인 콜백 메시지 수신:', data);
+
       // 소셜 로그인 데이터 확인
       if (data.code || data.error) {
         // 이미 처리 중인 경우 중복 처리 방지
@@ -95,11 +97,20 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             localStorage.removeItem('naver_login_timeout')
           }
 
-          // authService.handleCallback 호출
-          const result = await authService.handleCallback({
+          // 콜백 파라미터 준비
+          const callbackParams = {
             code: data.code,
             state: data.state,
-          })
+          };
+          
+          // id_token이 있는 경우 (Apple 로그인) 추가
+          if (data.id_token) {
+            console.log('id_token 감지됨 (Apple 로그인)')
+            Object.assign(callbackParams, { id_token: data.id_token });
+          }
+
+          // authService.handleCallback 호출
+          const result = await authService.handleCallback(callbackParams)
 
           if (result.success) {
             // 로그인 성공 시 상태 업데이트 (useAccountStore)

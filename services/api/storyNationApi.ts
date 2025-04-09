@@ -43,7 +43,6 @@ import type {
   NicknmChangeResponse,
   ChatFreePenResponse,
   UserInfoResponse,
-  InitChatResponse,
 } from '../../types/api'
 
 // API 기본 설정
@@ -234,11 +233,12 @@ export const contentApi = {
    * @param snstype 1: 카카오, 2: 네이버, 3: 구글, 4: 애플
    * @param token 토큰
    */
-  loginDcheckV2: async (snsauth: string, snstype: number, token: string): Promise<ApiResponse> => {
+  loginDcheckV2: async (snsauth: string, snstype: number, token: string, appleAccessToken: string): Promise<ApiResponse> => {
     return api.post('/api/loginDcheckV2', {
       snsauth,
       snstype,
       token,
+      appleAccessToken,
     })
   },
 
@@ -669,6 +669,24 @@ export const contentApi = {
     return api.post('api/naver/get/token', {
       code,
       state,
+    })
+  },
+
+
+  // google/get/token
+  GetGoogleToken: async (code: string, state: string, redirect_uri: string): Promise<ApiResponse> => {
+    return api.post('api/google/get/token', {
+      code,
+      state,
+      redirect_uri,
+    })
+  },
+
+  // api/apple/get/token
+  GetAppleToken: async (code: string, redirect_uri: string): Promise<ApiResponse> => {
+    return api.post('api/apple/get/token', {
+      code,
+      redirect_uri,
     })
   },
 }

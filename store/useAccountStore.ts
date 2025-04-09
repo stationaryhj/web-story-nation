@@ -557,7 +557,7 @@ export const useAccountStore = create<AccountState>()(
           if (!isValid) throw new Error('토큰 검증 실패');
 
           // 로그인 처리
-          const response = await contentApi.loginDcheckV2(snsauth, snstype, tokenResponse.access_token);
+          const response = await contentApi.loginDcheckV2(snsauth, snstype, tokenResponse.access_token, '');
           
           if (response.data.result.err === 0) {
             // 기존 회원

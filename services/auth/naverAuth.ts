@@ -312,7 +312,7 @@ export class NaverAuthService extends BaseAuthService {
     //   }
       
       // 로그인 처리
-      const response = await contentApi.loginDcheckV2(snsauth, snstype, accessToken);
+      const response = await contentApi.loginDcheckV2(snsauth, snstype, accessToken, '');
       
       if (response.data.result.err === 0) {
         // 기존 회원

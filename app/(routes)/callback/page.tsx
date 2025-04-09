@@ -60,9 +60,9 @@ function parseNaverCallback(callbackUrl: string) {
       console.error('JSON 파싱 오류:', e);
       
       // 2. 정규식으로 개별 필드 추출 시도
-      const providerMatch = decodedStateStr.match(/"provider"[\s]*:[\s]*"([^"]+)"/);
-      const snsauthMatch = decodedStateStr.match(/"snsauth"[\s]*:[\s]*"([^"]+)"/);
-      const clientIdMatch = decodedStateStr.match(/"clientId"[\s]*:[\s]*"([^"]+)"/);
+      const providerMatch = decodedStateStr.match(/"provider"[\s]*:[\s]*?"([^"]+)"/);
+      const snsauthMatch = decodedStateStr.match(/"snsauth"[\s]*:[\s]*?"([^"]+)"/);
+      const clientIdMatch = decodedStateStr.match(/"clientId"[\s]*:[\s]*?"([^"]+)"/);
       const snstypeMatch = decodedStateStr.match(/"snstype"[\s]*:[\s]*(\d+)/);
       
       const extractedState = {
@@ -101,12 +101,29 @@ function parseNaverCallback(callbackUrl: string) {
   return { code, state: null };
 }
 
+function parseAppleCallback(callbackUrl: string) {
+  console.log('파싱할 URL:', callbackUrl);
+
+  // code 파라미터 추출
+  const codeMatch = callbackUrl.match(/code=([^&]+)/);
+  const code = codeMatch ? codeMatch[1] : null;
+  console.log('추출된 code:', code);
+
+  return {
+    code,
+    state: null
+  }
+}
+
+
+
 export default function CallbackPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
   useEffect(() => {
     const processCallback = async () => {
+      // alert(window.location.href)
       // 원본 URL 로깅
       console.log('Original URL:', window.location.href)
 
@@ -120,6 +137,9 @@ export default function CallbackPage() {
       const code = searchParams?.get('code')
       const error = searchParams?.get('error')
       const errorDescription = searchParams?.get('error_description')
+      const idToken = searchParams?.get('id_token') // Apple 로그인에서 사용되는 id_token
+
+      // alert(code)
       
       // 디버깅을 위한 검색 파라미터 전체 로깅
       const allParams: Record<string, string> = {};
@@ -163,13 +183,30 @@ export default function CallbackPage() {
           }, 5000)
 
           return
+        }
+        else if(socialLoginType === 'apple') {
+          const result = parseAppleCallback(window.location.href);
+          
+          // 네이버는 여기서 리턴 (parsedState)
+          sessionStorage.setItem('callback_message_sent', 'true');
+          window.opener.postMessage(
+            {
+              code: result.code,
+              login_type: loginType
+            },
+            window.location.origin
+          )
 
+          setTimeout(() => {
+            console.log('콜백 창 닫기 시도');
+            // 세션 스토리지 정리
+            sessionStorage.removeItem('callback_message_sent');
+            window.close()
+          }, 5000)
 
-          if (stateObj) {
-            console.log('네이버 파싱된 State:', stateObj);
-            loginType = stateObj.provider || 'UNKNOWN';
-          }
-        } else {
+          return
+        }
+        else {
           // 기존 파싱 로직 (다른 소셜 로그인)
           const state = searchParams?.get('state');
           
@@ -222,14 +259,21 @@ export default function CallbackPage() {
         // 성공한 경우 - 파싱된 state 파라미터 추가
         else if (code) {
           console.log('성공 메시지 전송:', { code: code?.substring(0, 5) + '...', login_type: loginType });
-          window.opener.postMessage(
-            {
-              code,
-              state: parsedState || searchParams?.get('state'), // 파싱된 state 또는 원본 state
-              login_type: loginType
-            },
-            window.location.origin
-          )
+          
+          // 기본 메시지 객체
+          const messageData = {
+            code,
+            state: parsedState || searchParams?.get('state'), // 파싱된 state 또는 원본 state
+            login_type: loginType
+          };
+          
+          // Apple 로그인인 경우 id_token 추가
+          // if (loginType === 'APPLE' || idToken) {
+          //   console.log('Apple 로그인: id_token 포함');
+          //   (messageData as any).id_token = idToken;
+          // }
+          
+          window.opener.postMessage(messageData, window.location.origin);
         }
 
         // 5초 후 창 닫기 (안전장치)
