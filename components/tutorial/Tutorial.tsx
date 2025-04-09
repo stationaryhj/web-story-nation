@@ -60,14 +60,6 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
     console.log('onClose')
   }, [onClose])
 
-  // main-content의 스크롤 높이 확인 (디버깅용)
-  useEffect(() => {
-    if (targetElement) {
-      const screenHeight = document.getElementById('main-content')?.scrollHeight
-      console.log('screenHeight', screenHeight)
-    }
-  }, [targetElement])
-
   // 오버레이 높이 설정
   useEffect(() => {
     if (isOpen && overlayRef.current) {

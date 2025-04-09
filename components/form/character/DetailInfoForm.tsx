@@ -93,19 +93,116 @@ export default function DetailInfoForm({
 
   // 튜토리얼이 이미 표시된 적이 있는지 추적
   const tutorialShownRef = useRef(false)
+  // 마지막 대화 예시 요소 참조
+  const lastExampleRef = useRef<HTMLDivElement>(null)
 
   // 성인 인증 상태 확인
   const { isAdult } = useAccountStore()
   const isAdultModeEnabled = isAdult()
 
-  // 대화 예시가 처음 추가될 때 튜토리얼 표시
+  // 스크롤 후 튜토리얼 표시 함수
+  const scrollAndShowTutorial = () => {
+    // 스크롤 이전 위치 저장
+    const startPosition = window.scrollY
+
+    console.log('[스크롤] 스크롤 시작:', startPosition)
+
+    // 스크롤 대상 찾기: conversation-examples 또는 문서 끝
+    const conversationExamples = document.getElementById('conversation-examples')
+    const targetElement = conversationExamples || document.body
+
+    // 스크롤 실행
+    targetElement.scrollIntoView({ behavior: 'smooth', block: 'end' })
+
+    // 스크롤 완료 확인 함수
+    const checkScrollComplete = () => {
+      const currentPosition = window.scrollY
+      const documentHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
+      const viewportHeight = window.innerHeight
+      const isAtBottom = currentPosition + viewportHeight >= documentHeight - 50 // 50px 오차 허용
+
+      console.log(
+        '[스크롤] 현재위치:',
+        currentPosition,
+        '문서높이:',
+        documentHeight,
+        '화면높이:',
+        viewportHeight,
+        '바닥여부:',
+        isAtBottom
+      )
+
+      if (isAtBottom || Math.abs(currentPosition - startPosition) > 200) {
+        // 스크롤이 완료되었거나 충분히 이동했으면 튜토리얼 표시
+        console.log('[스크롤] 스크롤 완료 감지, 튜토리얼 표시')
+        setShowTutorial(true)
+        tutorialShownRef.current = true
+        return true
+      }
+      return false
+    }
+
+    // 스크롤 이벤트 핸들러 등록
+    let scrollTimeout: NodeJS.Timeout
+    const handleScroll = () => {
+      // 이전 타임아웃 취소
+      clearTimeout(scrollTimeout)
+
+      // 0.3초 디바운싱
+      scrollTimeout = setTimeout(() => {
+        if (checkScrollComplete()) {
+          window.removeEventListener('scroll', handleScroll)
+        }
+      }, 300)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+
+    // 초기 체크 (스크롤이 발생하지 않을 경우 대비)
+    setTimeout(() => {
+      if (checkScrollComplete()) {
+        window.removeEventListener('scroll', handleScroll)
+      }
+    }, 300)
+
+    // 5초 타임아웃 (최종 안전장치)
+    setTimeout(() => {
+      console.log('[스크롤] 5초 타임아웃, 튜토리얼 강제 표시')
+      setShowTutorial(true)
+      tutorialShownRef.current = true
+      window.removeEventListener('scroll', handleScroll)
+    }, 5000)
+  }
+
+  // 대화 예시 추가 핸들러
+  const handleAddConversationExample = () => {
+    // 대화 예시 추가
+    addConversationExample()
+
+    // 약간의 지연 후 스크롤 및 튜토리얼 표시 (DOM 업데이트 대기)
+    setTimeout(() => {
+      const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
+
+      if (!tutorialCompleted && !tutorialShownRef.current) {
+        console.log('[대화 예시] 튜토리얼 시작 - 하단으로 스크롤')
+        scrollAndShowTutorial()
+      } else {
+        // 자동 스크롤만 수행
+        const conversationExamples = document.getElementById('conversation-examples')
+        if (conversationExamples) {
+          conversationExamples.scrollIntoView({ behavior: 'smooth', block: 'end' })
+        }
+      }
+    }, 300)
+  }
+
+  // 첫 대화 예시가 추가될 때 튜토리얼 표시
   useEffect(() => {
-    // 대화 예시가 하나 이상 있고, 이전에 튜토리얼이 표시된 적이 없다면 표시
     if (formData.conversationExamples.length === 1 && !tutorialShownRef.current) {
       const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
       if (!tutorialCompleted) {
-        setShowTutorial(true)
-        tutorialShownRef.current = true
+        console.log('[튜토리얼] 대화 예시 발견, 튜토리얼 준비')
+        scrollAndShowTutorial()
       }
     }
   }, [formData.conversationExamples.length])
@@ -408,7 +505,7 @@ export default function DetailInfoForm({
             <div
               id="button-add-chat-example"
               className="flex items-center justify-center border-2 border-dashed border-secondary-200 dark:border-dark-secondary-200/10 rounded-lg p-3 sm:p-4 mt-3 sm:mt-4 cursor-pointer hover:border-primary-300 dark:hover:border-dark-primary-500/30 transition-colors mb-4"
-              onClick={() => addConversationExample()}
+              onClick={handleAddConversationExample}
             >
               <div className="flex flex-col items-center text-secondary-500 dark:text-dark-secondary-500">
                 <FontAwesomeIcon icon={faPlus} className="mb-1 sm:mb-2 text-lg sm:text-xl" />
@@ -550,6 +647,19 @@ export default function DetailInfoForm({
           setShowTutorial(false)
         }}
         config={createCharacterScenario}
+        beforeOpen={() => {
+          // 튜토리얼이 열리기 전에 페이지 하단으로 스크롤
+          const conversationExamples = document.getElementById('conversation-examples')
+          if (conversationExamples) {
+            conversationExamples.scrollIntoView({ behavior: 'smooth', block: 'end' })
+          } else {
+            const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
+            window.scrollTo({
+              top: docHeight - 200, // 약간의 여백을 두고 스크롤
+              behavior: 'smooth',
+            })
+          }
+        }}
       />
     </>
   )
