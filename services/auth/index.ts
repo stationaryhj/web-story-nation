@@ -1,5 +1,7 @@
 import { NaverAuthService } from './naverAuth';
 import { KakaoAuthService } from './kakaoAuth';
+import { GoogleAuthService } from './googleAuth';
+import { AppleAuthService } from './appleAuth';
 import { OAuthProvider, OAUTH_PROVIDERS } from '@/types/login';
 import { LoginParams, CallbackParams, SocialLoginCallbacks, LoginResult } from './types';
 import { contentApi } from '@/services/api';
@@ -9,6 +11,12 @@ const naverAuth = new NaverAuthService();
 
 // 카카오 로그인 서비스
 const kakaoAuth = new KakaoAuthService();
+
+// 구글 로그인 서비스
+const googleAuth = new GoogleAuthService();
+
+// 애플 로그인 서비스
+const appleAuth = new AppleAuthService();
 
 // API에서 가져온 소셜 로그인, 문자열로 통일
 interface SocialAuthInfo {
@@ -33,7 +41,9 @@ export class AuthManager {
       // 각 서비스 초기화
       await Promise.all([
         naverAuth.init(),
-        kakaoAuth.init()
+        kakaoAuth.init(),
+        googleAuth.init(),
+        appleAuth.init()
       ]);
       
       // 소셜 인증 정보 초기화
@@ -134,12 +144,13 @@ export class AuthManager {
           result = await kakaoAuth.login(params, callbacks);
           break;
         case 'GOOGLE':
+          console.log('구글 로그인 서비스 호출');
+          result = await googleAuth.login(params, callbacks);
+          break;
         case 'APPLE':
-          console.log('아직 지원하지 않는 로그인 방식입니다:', provider);
-          return {
-            success: false,
-            error: `아직 지원하지 않는 로그인 방식입니다: ${provider}`
-          };
+          console.log('애플 로그인 서비스 호출');
+          result = await appleAuth.login(params, callbacks);
+          break;
         default:
           throw new Error('지원하지 않는 로그인 방식입니다.');
       }
@@ -273,6 +284,7 @@ export class AuthManager {
   
   // 콜백 처리
   async handleCallback(params: CallbackParams): Promise<LoginResult> {
+    console.log('콜백 처리 시작 :: ', params);
     try {
       // 로그인 타입 확인
       const loginType = localStorage.getItem('social_login_type');
@@ -293,11 +305,11 @@ export class AuthManager {
           result = await kakaoAuth.handleCallback(params);
           break;
         case 'GOOGLE':
+          result = await googleAuth.handleCallback(params);
+          break;
         case 'APPLE':
-          return {
-            success: false,
-            error: `아직 지원하지 않는 로그인 방식입니다: ${provider}`
-          };
+          result = await appleAuth.handleCallback(params);
+          break;
         default:
           throw new Error('지원하지 않는 로그인 타입입니다.');
       }
