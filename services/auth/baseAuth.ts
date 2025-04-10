@@ -12,7 +12,8 @@ import {
 
 // 리다이렉트 URI 가져오기
 const getRedirectUri = () => {
-  return process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URI || '';
+  const callback = process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URI || '';
+  return typeof window !== 'undefined' ? `${window.location.origin}${callback}` : '';
 };
 
 // 네트워크 에러 메시지 매핑

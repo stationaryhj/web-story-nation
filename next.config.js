@@ -8,6 +8,7 @@ const nextConfig = {
       's3.us-east-1.amazonaws.com',
       'universestationery-en.s3.us-east-1.amazonaws.com',
     ],
+    unoptimized: true
   },
   async rewrites() {
     return [
