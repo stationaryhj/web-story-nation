@@ -211,20 +211,17 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   return (
     <>
       {/* 로그인 모달 - 회원가입 모달이 표시 중일 때 숨김 */}
-      <BaseModal
-        isOpen={isOpen && !showSignup}
-        onClose={onClose}
-        title={isNewUserMode ? '캐릭터와 설레는 대화를 시작하세요!' : '로그인'}
-        size="md"
-      >
+      <BaseModal isOpen={isOpen && !showSignup} onClose={onClose} size="md">
         <div className="flex flex-col pb-6">
           {/* 신규 가입 모드일 때만 보여줄 헤더 */}
 
-          <div className="flex flex-col justify-center items-center">
-            <div className="text-md text-gray-500">캐릭터부터 시작하는 세계관 공동 창작</div>
-            <div className="text-md text-gray-500">스토리네이션</div>
+          <div className="flex flex-col justify-center items-center gap-4 mb-4 mt-6">
+            <div>
+              <Image src="/images/logo.png" alt="logo" width={250} height={100} />
+            </div>
+            <div className="text-md text-gray-500">함께 만드는 세계관 & 캐릭터</div>
           </div>
-          <div className="mt-4">
+          <div className="mt-2">
             <SpeechBubble text="3초만에 가입하고 30펜 받으세요!" position="center" />
           </div>
 
