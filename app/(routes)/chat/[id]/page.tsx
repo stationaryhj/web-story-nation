@@ -1,13 +1,14 @@
 'use client'
 
+import React from 'react'
 import { Suspense, use } from 'react'
 import ChatDetailClient from '@/views/chat/detail'
 import { ReqGetChatBot } from '@/services/hooks/DataListManager';
 import { NakamaProvider } from '@/app/providers/NakamaProviders'
+import { CHAT_URL } from '@/services/api/storyNationApi';
 
 const serverConfig = {
-  serverUrl: 'qauschat.storynation.io',
-  // serverUrl: 'chat.storynation.io',
+  serverUrl: CHAT_URL || '',
   serverPort: '443',
   useSSL: true,
   autoConnect: false,
