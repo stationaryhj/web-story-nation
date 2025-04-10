@@ -283,28 +283,13 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             {!isNewUserMode ? (
               <button
                 onClick={handleNewUserClick}
-                className="flex w-full h-12 items-center justify-between rounded-full px-[61px] bg-gradient-to-br from-[#109af7] to-[#4251f0] font-medium text-white"
+                className="flex items-center justify-center w-full h-12 items-center justify-between rounded-full px-[61px] text-black"
               >
                 <div className="flex items-center justify-center gap-1 w-full">
-                  <span>
-                    <Image src="/images/symbol/storyNation.png" alt="스토리네이션 심볼" width={50} height={50} />
-                  </span>
-                  <span className="text-white w-full text-center">신규 유저 가입하기</span>
+                  <span className="text-secondary-700 text-sm w-full text-center">신규 유저 가입하기</span>
                 </div>
               </button>
-            ) : (
-              <button
-                onClick={handleSignupClick}
-                className="flex w-full h-12 items-center justify-between rounded-full px-[61px] bg-gradient-to-br from-[#109af7] to-[#4251f0] font-medium text-white"
-              >
-                <div className="flex items-center justify-center gap-1 w-full">
-                  <span>
-                    <Image src="/images/symbol/storyNation.png" alt="스토리네이션 심볼" width={50} height={50} />
-                  </span>
-                  <span className="text-white w-full text-center">스토리 네이션 회원가입</span>
-                </div>
-              </button>
-            )}
+            ) : null}
           </div>
           {/* 
           <div className="relative">
