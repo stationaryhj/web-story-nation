@@ -65,47 +65,32 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
     try {
       if (!exampleData) return []
 
-      // 예시 데이터를 더블 개행으로 분리
-      const exampleDataArray = exampleData.split('\n\n').filter(Boolean)
+      // JSON 파싱
+      const parsedData = JSON.parse(exampleData)
+      const { titles, examples } = parsedData
 
-      // 빈 배열 체크
-      if (!exampleDataArray.length) return []
+      return examples.map((item: any, index: number) => {
+        const title = titles[index] || `대화 예시 ${index + 1}`
+        const user = item.example.find((msg: any) => msg.speaker === '{{user}}')?.message || ''
+        const character = item.example.find((msg: any) => msg.speaker === '{{char}}')?.message || ''
 
-      return exampleDataArray.map(item => {
-        const lines = item.split('\n').filter(Boolean)
-        let title = '',
-          user = '',
-          character = ''
-
-        // 각 줄을 순회하며 데이터 형식 확인
-        lines.forEach(line => {
-          if (line.startsWith('Title: ')) {
-            title = line.replace('Title: ', '')
-          } else if (line.startsWith('User: ')) {
-            user = line.replace('User: ', '')
-          } else if (line.startsWith('Character: ')) {
-            character = line.replace('Character: ', '')
-          }
-        })
-
-        // 값이 없을 경우 기본값 설정
         return {
-          title: title || '제목 없음',
-          User: user || '',
-          Character: character || '',
+          title,
+          User: user,
+          Character: character,
         }
       })
     } catch (error) {
       console.error('대화 예시 파싱 에러:', error)
-      return [] // 에러 발생 시 빈 배열 반환
+      return []
     }
   }
 
   const exampleDatas = chatBotData?.chrbot?.example ? bridgeExampleData(chatBotData.chrbot.example) : []
-  const isExampleShow = chatBotData?.chrbot?.example_show_yn
+  const isExampleShow = (chatBotData?.chrbot?.example_show_yn === 1 && exampleDatas.length > 0) ? 1 : 0
 
   const content = getChangeNameTag(chatBotData?.chrbot?.content || '', selectedCharacter?.name || '')
-  const isContentShow = chatBotData?.chrbot?.content_show_yn
+  const isContentShow = (chatBotData?.chrbot?.content_show_yn === 1 && content !== '') ? 1 : 0
 
   useEffect(() => {
     if (chatBotData) {
@@ -355,7 +340,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   대화 예시
                 </h3>
                 <div className="space-y-4">
-                  {exampleDatas.map((data, index) => (
+                  {exampleDatas.map((data: any, index: number) => (
                     <div
                       key={index}
                       className="border-b border-secondary-100 dark:border-dark-secondary-800 last:border-0 pb-4 last:pb-0"
@@ -551,7 +536,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   대화 예시
                 </h3>
                 <div className="space-y-4">
-                  {exampleDatas.map((data, index) => (
+                  {exampleDatas.map((data: any, index: number) => (
                     <div
                       key={index}
                       className="border-b border-secondary-100 dark:border-dark-secondary-800 last:border-0 pb-4 last:pb-0"
