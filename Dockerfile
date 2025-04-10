@@ -11,6 +11,17 @@ WORKDIR /app
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/yarn.lock ./
+
+# 필요한 파일들 복사
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/tsconfig.json ./
+COPY --from=builder /app/tsconfig.node.json ./
+COPY --from=builder /app/postcss.config.js ./
+COPY --from=builder /app/tailwind.config.ts ./
+COPY --from=builder /app/global.d.ts ./
+COPY --from=builder /app/.env.local ./
+
 RUN yarn install --production
 EXPOSE 3100
 CMD ["yarn", "start"]
