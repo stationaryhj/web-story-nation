@@ -127,7 +127,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             setShowSignup(true)
           } else {
             // 기타 오류
-            toast.error(result.error || '로그인에 실패했습니다.')
+            // toast.error(result.error || '로그인에 실패했습니다.')
           }
         } catch (error) {
           console.error('콜백 처리 중 오류 발생:', error)
@@ -170,7 +170,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       })
 
       if (!result.success && result.error) {
-        toast.error(result.error)
+        // toast.error(result.error)
       }
     } catch (error) {
       console.error('소셜 로그인 오류:', error)
