@@ -431,7 +431,6 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         payload.example,
         payload.nsfw,
         payload.img_url_nsfw,
-        payload.img_web_url,
         payload.show_yn,
         payload.content_show_yn,
         payload.example_show_yn,
