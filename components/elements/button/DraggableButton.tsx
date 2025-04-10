@@ -6,6 +6,8 @@ import { Plus, Pen, Lightbulb, Minus, X } from 'lucide-react'
 import IdeaShareModal from '../../modal/IdeaShareModal'
 import RewardModal from '../../modal/RewardModal'
 import { contentApi } from '@/services/api/storyNationApi'
+import { useAccountStore } from '@/store/useAccountStore'
+import { useModalStore } from '@/store/useStoreModal'
 
 // 타입 정의는 types/window.ts 파일로 이동했습니다
 // window.resizeTimer 속성을 사용하기 위해 타입 참조
@@ -51,6 +53,7 @@ export default function DraggableButton({
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [ideaModalOpen, setIdeaModalOpen] = useState(false)
   const [rewardModalOpen, setRewardModalOpen] = useState(false)
+  const { openModal } = useModalStore()
 
   const isInitialized = useRef(false)
   const prevIsMobile = useRef(false)
@@ -71,6 +74,8 @@ export default function DraggableButton({
   const NAV_BUTTON_SIZE = isMobile ? 50 : 60
   // 버튼 간 거리
   const BUTTON_DISTANCE = isMobile ? 70 : 80
+
+  const { isLogin } = useAccountStore()
 
   // 모바일 환경 감지 함수
   const checkIfMobile = useCallback(() => {
@@ -195,7 +200,13 @@ export default function DraggableButton({
       icon: <Lightbulb size={20} color="white" />,
       label: '아이디어 제안',
       color: 'bg-primary-500',
-      onClick: () => setIdeaModalOpen(true),
+      onClick: () => {
+        if (isLogin) {
+          setIdeaModalOpen(true)
+        } else {
+          openModal('login')
+        }
+      },
       position: { x: 0, y: -BUTTON_DISTANCE },
     },
     {
@@ -203,7 +214,13 @@ export default function DraggableButton({
       icon: <Pen size={20} color="white" />,
       label: '출석체크',
       color: 'bg-primary-500',
-      onClick: () => setRewardModalOpen(true),
+      onClick: () => {
+        if (isLogin) {
+          setRewardModalOpen(true)
+        } else {
+          openModal('login')
+        }
+      },
       position: { x: 0, y: -BUTTON_DISTANCE * 2 },
     },
     {

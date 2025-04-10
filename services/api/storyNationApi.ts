@@ -97,7 +97,7 @@ const CHAT_URL =
 
 // API 인스턴스 생성
 const api = createApiInstance(API_URL || '')
-const chatApiInstance = createApiInstance(CHAT_URL || '')
+const chatApiInstance = createApiInstance(API_URL || '')
 
 // 인증 토큰 설정 함수
 const setAuthToken = (token: string | null) => {

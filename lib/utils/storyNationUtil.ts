@@ -375,7 +375,7 @@ export function getChangeNameTag(script: string, charName: string) {
     :
     '아무개'
 
-  changeScript = script.replaceAll('{{character}}', charName).replaceAll('{{user}}', userName)
+  changeScript = script.replaceAll('{{character}}', charName).replaceAll('{{user}}', userName).replaceAll('{{char}}', charName)
   return changeScript
 }
 

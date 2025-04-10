@@ -1,5 +1,6 @@
 // 'use client'
 
+import Image from 'next/image'
 import { useSettingsStore } from '@/store/useStoreSettings'
 import { useEffect } from 'react'
 import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
@@ -62,9 +63,7 @@ export default function RecommendSection({ onSearchTrigger }: RecommendSectionPr
                 rel="noopener noreferrer"
                 className="flex items-center justify-center bg-secondary-900 dark:bg-dark-secondary-800 text-white px-6 py-3 rounded-lg hover:bg-secondary-800 dark:hover:bg-dark-secondary-700 transition-colors"
               >
-                <svg className="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.9 5c.1 0 .2.1.3.2v13.5c0 .2-.1.3-.3.3H6.1c-.2 0-.3-.1-.3-.3V5.2c0-.1.1-.2.3-.2h11.8zm-4.7 14.2c.4 0 .7-.3.7-.7s-.3-.7-.7-.7-.7.3-.7.7.3.7.7.7zM16.4 17H7.6V6h8.8v11z"/>
-                </svg>
+                <Image src="/images/social_logo/google_btn.png" alt="Android 앱 다운로드" width={24} height={24} className='w-6 h-6 mr-2' />
                 Android 앱 다운로드
               </a>
               <a
