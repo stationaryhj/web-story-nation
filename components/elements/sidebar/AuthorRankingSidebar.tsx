@@ -8,6 +8,7 @@ import Image from 'next/image'
 import BaseSidebar from './BaseSidebar'
 import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
 import { getValidImageUrl } from '@/lib/utils/storyNationUtil'
+import { useRouter } from 'next/navigation'
 
 // 작가 랭킹 탭 정의
 const rankingTabs: TabItem[] = [
@@ -27,6 +28,7 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
   const [rankingData, setRankingData] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const { rankingCreatersSlide, UpdateRankingTopCreater } = useRecommendSectionStoreData()
+  const router = useRouter()
 
   useEffect(() => {
     // 주간
@@ -115,6 +117,8 @@ export default function AuthorRankingSidebar({ isOpen, onClose, isSidebar = fals
   // 작가 클릭 핸들러
   const handleAuthorClick = (author: any) => {
     console.log('작가 선택:', author)
+    router.push(`/author/${encodeURIComponent(author.nickname)}`)
+
     // 작가 프로필 페이지 이동 또는 추가 정보 표시 로직
   }
 
