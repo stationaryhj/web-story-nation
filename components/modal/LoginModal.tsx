@@ -66,7 +66,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       const data = event.data
       if (!data || typeof data !== 'object') return
 
-      console.log('로그인 콜백 메시지 수신:', data);
+      console.log('로그인 콜백 메시지 수신:', data)
 
       // 소셜 로그인 데이터 확인
       if (data.code || data.error) {
@@ -101,12 +101,12 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           const callbackParams = {
             code: data.code,
             state: data.state,
-          };
-          
+          }
+
           // id_token이 있는 경우 (Apple 로그인) 추가
           if (data.id_token) {
             console.log('id_token 감지됨 (Apple 로그인)')
-            Object.assign(callbackParams, { id_token: data.id_token });
+            Object.assign(callbackParams, { id_token: data.id_token })
           }
 
           // authService.handleCallback 호출
@@ -230,7 +230,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               </div>
             </>
           )}
-          <div className="space-y-4 mt-4">
+          <div className="space-y-4 my-4">
             <button
               onClick={() => handleSocialLogin('GOOGLE')}
               disabled={loading}
@@ -306,7 +306,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               </button>
             )}
           </div>
-
+          {/* 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
@@ -314,9 +314,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-white dark:bg-dark-background text-gray-500">또는</span>
             </div>
-          </div>
+          </div> */}
 
-          <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} />
+          {/* <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} /> */}
 
           {/* 신규 가입 모드일 때만 약관 동의 문구 표시 */}
           {isNewUserMode && (

@@ -55,7 +55,14 @@ const CharacterRankingSection = memo(() => {
   }
 
   const handleGenderChange = (option: { value: number; label: string }) => {
-    const topid = characterActiveTab === 'realtime' ? 4 : characterActiveTab === 'daily' ? 1 : characterActiveTab === 'weekly' ? 2 : 3
+    const topid =
+      characterActiveTab === 'realtime'
+        ? 4
+        : characterActiveTab === 'daily'
+          ? 1
+          : characterActiveTab === 'weekly'
+            ? 2
+            : 3
     UpdateRankingTopCharacter('KR', topid, option.value, false)
     setSelectedGender(option)
   }
@@ -73,7 +80,6 @@ const CharacterRankingSection = memo(() => {
           <div className="flex justify-between items-center mb-4 z-[1000]">
             <h2 className="text-2xl font-bold text-secondary-900 dark:text-dark-secondary-700 relative inline-block">
               캐릭터 랭킹
-              <span className="absolute bottom-0 left-0 w-1/2 h-1 bg-primary-500 dark:bg-dark-primary-500 rounded-full"></span>
             </h2>
             <button
               onClick={() => setIsCharacterRankingSidebarOpen(true)}
