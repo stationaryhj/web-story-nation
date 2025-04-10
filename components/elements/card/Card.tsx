@@ -155,10 +155,12 @@ export default function Card({
             )}
 
             {/* 댓글 수 표시 - 이미지 우측 하단으로 이동 */}
-            <div className="absolute bottom-2 right-2 flex items-center gap-[5px] text-white text-xs z-10">
-              <Image src="/images/comment_black.png" alt="댓글 아이콘" width={17} height={17} />
-              <span className="text-[15px]">{commentCount}</span>
-            </div>
+            {!isCharacterRankingSidebar && (
+              <div className="absolute bottom-2 right-2 flex items-center gap-[5px] text-white text-xs z-10">
+                <Image src="/images/comment_black.png" alt="댓글 아이콘" width={17} height={17} />
+                <span className="text-[15px]">{commentCount}</span>
+              </div>
+            )}
           </div>
 
           {/* 콘텐츠 영역 */}
@@ -264,15 +266,17 @@ export default function Card({
             )}
 
             {/* 댓글 수 표시 - 이미지 우측 하단으로 이동 */}
-            <div className="absolute bottom-[10px] right-[10px] flex md:bottom-[15] md:right-4 items-center gap-[1px] md:gap-[3px] text-white z-10">
-              <Image
-                src="/images/comment_black.png"
-                alt="댓글 아이콘"
-                width={isMobile ? 12 : 22}
-                height={isMobile ? 11 : 22}
-              />
-              <span className="text-[14px] md:text-[20px]">{commentCount}</span>
-            </div>
+            {!isCharacterRankingSidebar && (
+              <div className="absolute bottom-[10px] right-[10px] flex md:bottom-[15] md:right-4 items-center gap-[1px] md:gap-[3px] text-white z-10">
+                <Image
+                  src="/images/comment_black.png"
+                  alt="댓글 아이콘"
+                  width={isMobile ? 12 : 22}
+                  height={isMobile ? 11 : 22}
+                />
+                <span className="text-[14px] md:text-[20px]">{commentCount}</span>
+              </div>
+            )}
           </div>
 
           <div className="p-4">

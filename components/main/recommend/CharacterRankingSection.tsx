@@ -118,6 +118,7 @@ const CharacterRankingSection = memo(() => {
               hasRanking={true}
               useSwiper={true}
               sectionId="character-ranking-section"
+              isCharacterRankingSidebar={true}
             />
           </div>
         </SectionTransition>
@@ -126,7 +127,6 @@ const CharacterRankingSection = memo(() => {
       <CharacterRankingSidebar
         isOpen={isCharacterRankingSidebarOpen}
         onClose={() => setIsCharacterRankingSidebarOpen(false)}
-        isCharacterRankingSidebar={true}
       />
     </section>
   )
