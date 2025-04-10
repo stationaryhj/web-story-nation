@@ -34,7 +34,7 @@ interface ExampleData {
 
 // 목업 데이터
 const mockFirstMessage = {
-  situation: '어두운 밤, 비가 내리는 거리에서',
+  situation: '캐릭터의 첫 메세지가 도착했습니다.',
   message:
     '안녕하세요. 저는 도시의 수호자입니다. 이 도시에서 일어나는 모든 사건을 조사하고 있죠. 당신과 함께 이 도시의 비밀을 파헤치고 싶습니다.',
 }
