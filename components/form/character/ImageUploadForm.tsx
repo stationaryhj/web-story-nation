@@ -7,7 +7,6 @@ import Image from 'next/image'
 import type { ChangeEvent } from 'react'
 import { Trash2, ArrowRight } from 'lucide-react'
 
-import { RequiredLabel } from '../CharacterForm'
 import { useAccountStore } from '@/store/useAccountStore'
 import { getImageUri } from '@/lib/utils/storyNationUtil'
 import { contentApi } from '@/services/api'
@@ -39,7 +38,6 @@ export default function ImageUploadForm({
   const isAdultModeEnabled = isAdult()
   // view Data - 이미지 URI 캐싱
   const imgNormal = getImageUri(formData.imgUrl)
-  const imgNormalWeb = getImageUri(formData.imgWebUrl)
   const imgNsfw = getImageUri(formData.imgUrlNsfw)
 
   // 토스트 메시지가 이미 표시되었는지 추적하기 위한 ref
@@ -52,9 +50,9 @@ export default function ImageUploadForm({
       toastShownRef.current = true
 
       if (formData.rating === 'adult') {
-        if (!formData.imgWebUrl && !formData.imgUrlNsfw) {
+        if (!formData.imgUrl && !formData.imgUrlNsfw) {
           toast.error('기본 이미지와 짜릿 모드 이미지를 모두 업로드해주세요.')
-        } else if (!formData.imgWebUrl) {
+        } else if (!formData.imgUrl) {
           toast.error('기본 이미지를 업로드해주세요.')
         } else if (!formData.imgUrlNsfw) {
           toast.error('짜릿 모드 이미지를 업로드해주세요.')
@@ -68,7 +66,7 @@ export default function ImageUploadForm({
     if (!isSubmitting) {
       toastShownRef.current = false
     }
-  }, [isSubmitting, invalidFields, formData.rating, formData.imgWebUrl, formData.imgUrlNsfw])
+  }, [isSubmitting, invalidFields, formData.rating, formData.imgUrlNsfw])
 
   // 유효성 검사
   useEffect(() => {
@@ -78,8 +76,8 @@ export default function ImageUploadForm({
 
       // 이용등급에 따른 필수 이미지 확인
       if (formData.rating === 'adult') {
-        // 성인 등급: imgWebUrl(기본 이미지)와 imgUrlNsfw(짜릿 모드 이미지) 모두 필요
-        isValid = !!(formData.imgWebUrl && formData.imgUrlNsfw)
+        // 성인 등급: imgNormal(기본 이미지)와 imgUrlNsfw(짜릿 모드 이미지) 모두 필요
+        isValid = !!(formData.imgUrl && formData.imgUrlNsfw)
       } else {
         // 전체 이용가: imgUrl(기본 이미지)만 필요
         isValid = !!formData.imgUrl
@@ -95,7 +93,7 @@ export default function ImageUploadForm({
         }
       }
     }
-  }, [formData.rating, formData.imgUrl, formData.imgWebUrl, formData.imgUrlNsfw, onValidationChange, invalidFields])
+  }, [formData.rating, formData.imgUrl, formData.imgUrlNsfw, onValidationChange, invalidFields])
 
   // 이용등급 선택 핸들러
   // const handleRatingSelect = (rating: 'all' | 'adult') => {
@@ -260,7 +258,7 @@ export default function ImageUploadForm({
     setAdultImage('')
     // 삭제 후 유효성 상태 표시
     if (onValidationChange && formData.rating === 'adult') {
-      const isStillValid = !!formData.imgWebUrl
+      const isStillValid = !!formData.imgUrl
       onValidationChange(false)
       if (invalidFields && typeof invalidFields === 'object') {
         if ('image' in invalidFields) {
@@ -349,9 +347,9 @@ export default function ImageUploadForm({
               </div>
 
               {/* 기본 이미지 표시 */}
-              {formData.imgWebUrl ? (
+              {formData.imgUrl ? (
                 <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500">
-                  <Image src={imgNormalWeb} alt="캐릭터 기본 이미지" fill className="object-cover" />
+                  <Image src={imgNormal} alt="캐릭터 기본 이미지" fill className="object-cover" />
                   <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 bg-primary-500/90 text-white text-xs rounded-full whitespace-nowrap">
                     기본 이미지
                   </div>
@@ -458,7 +456,7 @@ export default function ImageUploadForm({
         </div>
       ) : null}
 
-      {formData.rating === 'adult' && (!formData.imgWebUrl || !formData.imgUrlNsfw) ? (
+      {formData.rating === 'adult' && (!formData.imgUrl || !formData.imgUrlNsfw) ? (
         <div
           className={`text-center p-4 ${invalidFields?.image ? 'bg-red-50 dark:bg-red-950/20' : 'bg-secondary-50 dark:bg-dark-secondary-100/5'} rounded-lg`}
         >
