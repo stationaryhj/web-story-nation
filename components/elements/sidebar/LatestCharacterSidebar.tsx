@@ -22,8 +22,7 @@ export default function LatestCharacterSidebar({ isOpen, onClose, moduleId }: Ne
   useEffect(() => {
     if (isOpen && moduleId) {
       UpdateLatestCharactersPaging(moduleId, 1, 1, 50)
-    }
-    else {
+    } else {
       ClearLatestCharactersSlide()
     }
   }, [isOpen, moduleId])
@@ -93,12 +92,7 @@ export default function LatestCharacterSidebar({ isOpen, onClose, moduleId }: Ne
       }
     >
       <div ref={contentRef} className="h-full overflow-y-auto px-4 py-6">
-        <CardGrid
-          customData={modules_sumSlide}
-          cardsPerRow={1}
-          useSwiper={false}
-          variant="horizontal"
-        />
+        <CardGrid customData={modules_sumSlide} cardsPerRow={2} useSwiper={false} />
       </div>
 
       {/* 맨 위로 스크롤 버튼 */}
