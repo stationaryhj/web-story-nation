@@ -91,6 +91,7 @@ export default function Footer() {
                 <ul className="space-y-2">
                   <li>
                     <Link
+                      target="_blank"
                       href="/terms"
                       className="text-sm text-secondary-600 dark:text-dark-secondary-500 hover:text-primary-500 dark:hover:text-dark-primary-600 transition-colors"
                     >
@@ -99,6 +100,7 @@ export default function Footer() {
                   </li>
                   <li>
                     <Link
+                      target="_blank"
                       href="/terms?tab=privacy"
                       className="text-sm text-secondary-600 dark:text-dark-secondary-500 hover:text-primary-500 dark:hover:text-dark-primary-600 transition-colors"
                     >
