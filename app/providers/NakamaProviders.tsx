@@ -725,7 +725,7 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
       // 생성 시간 확인
       let timestamp;
       try {
-        timestamp = message.create_time ? new Date(message.create_time * 1000) : new Date();
+        timestamp = message.create_time ? new Date(message.create_time) : new Date();
       } catch (timeError) {
         console.warn('타임스탬프 변환 오류:', timeError);
         timestamp = new Date();
@@ -818,7 +818,8 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
         console.log('📨 소켓 메시지 수신:', { 
           channel_id: message.channel_id,
           message_id: message.message_id,
-          content_type: typeof message.content
+          content_type: typeof message.content,
+          timestamp: new Date(message.create_time)
         });
         
         // 내부 메시지 처리 함수 호출하여 UI에 메시지 표시

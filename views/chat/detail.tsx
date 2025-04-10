@@ -217,7 +217,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 캐릭터 이미지
   const [showImage, setShowImage] = useState(
-    getValidImageUrl(userIsAdult ? character.imageUrlNsfw : character.imageUrl)
+    getValidImageUrl(character.imageUrl)
   )
 
   // 배경 이미지 상태 추가
@@ -236,21 +236,13 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   const chatContainerRef = useRef<HTMLDivElement>(null)
   const toastShownRef = useRef(false)
 
-  // 표시 이미지
-  // const showImage = getValidImageUrl(userIsAdult && chatMessages.length > 2 ? character.imageUrlNsfw : character.imageUrl)
-
-  useEffect(() => {
-    if (currentModeId === 3 || currentModeId === 4) {
-      setShowImage(getValidImageUrl(character.imageUrlNsfw))
-    } else {
-      setShowImage(getValidImageUrl(character.imageUrl))
-    }
-  }, [currentModeId])
 
   // 메시지 디버깅을 위한 로깅 추가 - 무한 루프 문제 수정
   useEffect(() => {
     if (chatMessages.length > 0) {
       const lastMsg = chatMessages[chatMessages.length - 1]
+
+      console.log('💬 마지막 메시지:', lastMsg)
 
       // 마지막 메시지 발신자에 따라 AI 응답 대기 상태 업데이트
       // 임시 메시지는 제외하고 실제 메시지만 고려
@@ -514,6 +506,8 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         openModal('adultVerification')
         return
       }
+
+      setShowImage(getValidImageUrl(character.imageUrlNsfw))
     }
 
     // 입력창 초기화 (먼저 수행하여 UX 향상)
