@@ -18,7 +18,6 @@ const LatestCharactersSection = memo(() => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-secondary-900 dark:text-dark-secondary-700 relative inline-block">
             지금 막 올라온 캐릭터
-            <span className="absolute bottom-0 left-0 w-1/2 h-1 bg-primary-500 dark:bg-dark-primary-500 rounded-full"></span>
           </h2>
           <button
             onClick={() => setIsNewCharacterSidebarOpen(true)}

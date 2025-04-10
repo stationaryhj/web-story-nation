@@ -85,25 +85,25 @@ export default function AuthorGrid({
   const handleAuthorClick = (author: Author) => {
     if (author && author.nickname) {
       // 작가 정보를 스토어에 미리 저장
-      const authorStore = useAuthorStore.getState();
-      
+      const authorStore = useAuthorStore.getState()
+
       // 작가 기본 정보 설정
-      authorStore.reset(); // 기존 데이터 초기화
-      
+      authorStore.reset() // 기존 데이터 초기화
+
       // 작가 정보 미리 설정 (상세 정보는 없지만 기본 정보만이라도 표시)
       const preloadedAuthor = {
         nickname: author.nickname,
         profileImage: author.profileImageUrl || '/images/default-profile.jpg',
         bio: author.description || '',
-        isBlocked: false
-      };
-      
+        isBlocked: false,
+      }
+
       // 스토어 상태 수동 업데이트
       useAuthorStore.setState({
         author: preloadedAuthor,
-        isLoading: true // API 호출을 위해 로딩 상태로 설정
-      });
-      
+        isLoading: true, // API 호출을 위해 로딩 상태로 설정
+      })
+
       // 페이지 이동 (나머지 데이터는 페이지에서 로드)
       router.push(`/author/${encodeURIComponent(author.nickname)}`)
     }
@@ -181,7 +181,6 @@ export default function AuthorGrid({
             <div>
               <h2 className="text-2xl font-bold text-secondary-900 dark:text-dark-secondary-700 relative inline-block">
                 {title}
-                <span className="absolute bottom-0 left-0 w-1/2 h-1 bg-primary-500 dark:bg-dark-primary-500 rounded-full"></span>
               </h2>
               {subtitle && <p className="text-sm text-gray-500 dark:text-dark-gray-500 mt-1">{subtitle}</p>}
               {lastUpdateTime && (

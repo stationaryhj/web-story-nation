@@ -44,9 +44,7 @@ export default function DraggableButton({
   floatingMenuButtons,
   id = 'default-draggable-button',
 }: DraggableButtonProps) {
-  const [isDragging, setIsDragging] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [isVisible, setIsVisible] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [actualSize, setActualSize] = useState(size)
@@ -54,13 +52,9 @@ export default function DraggableButton({
   const [ideaModalOpen, setIdeaModalOpen] = useState(false)
   const [rewardModalOpen, setRewardModalOpen] = useState(false)
 
-  const mouseDownPosition = useRef({ x: 0, y: 0 })
-  const hasMoved = useRef(false)
   const isInitialized = useRef(false)
   const prevIsMobile = useRef(false)
 
-  // 드래그로 간주할 최소 이동 거리 (픽셀)
-  const DRAG_THRESHOLD = 5
   // 모바일 기준 화면 너비 (이 값보다 작으면 모바일로 간주)
   const MOBILE_BREAKPOINT = 768
   // 모바일에서 버튼 크기 축소 비율
@@ -84,8 +78,8 @@ export default function DraggableButton({
     return window.innerWidth < MOBILE_BREAKPOINT
   }, [])
 
-  // 기본 위치 계산 (항상 좌측 하단에 위치하도록 수정)
-  const calculateDefaultPosition = useCallback(() => {
+  // 기본 위치 계산 (항상 좌측 하단에 위치하도록 설정)
+  const calculatePosition = useCallback(() => {
     if (typeof window === 'undefined') return { x: 0, y: 0 }
 
     const buttonSize = isMobile ? Math.round(size * MOBILE_SIZE_RATIO) : size
@@ -103,13 +97,7 @@ export default function DraggableButton({
     return { x: initialX, y: initialY }
   }, [isMobile, size])
 
-  // 버튼 위치 계산 함수 (항상 좌측 하단에 고정되도록 수정)
-  const calculatePosition = useCallback(() => {
-    // 항상 기본 위치(좌측 하단)를 반환
-    return calculateDefaultPosition()
-  }, [calculateDefaultPosition])
-
-  // 위치 및 크기 업데이트 최적화
+  // 위치 및 크기 업데이트
   const updatePositionAndSize = useCallback(() => {
     const newIsMobile = checkIfMobile()
     const newSize = newIsMobile ? Math.round(size * MOBILE_SIZE_RATIO) : size
@@ -121,7 +109,7 @@ export default function DraggableButton({
       setActualSize(newSize)
     }
 
-    // 위치 업데이트 (항상 좌측 하단으로 재설정)
+    // 위치 업데이트 (항상 좌측 하단으로 설정)
     const newPosition = calculatePosition()
     setPosition(newPosition)
 
@@ -149,28 +137,6 @@ export default function DraggableButton({
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [id])
-
-  // 드래그 이벤트 처리
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove)
-      window.addEventListener('mouseup', handleMouseUp)
-      window.addEventListener('touchmove', handleTouchMove, { passive: false })
-      window.addEventListener('touchend', handleTouchEnd)
-
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseup', handleMouseUp)
-      window.removeEventListener('touchmove', handleTouchMove)
-      window.removeEventListener('touchend', handleTouchEnd)
-      document.body.style.overflow = ''
-    }
-  }, [isDragging, dragStart, actualSize])
 
   // 초기 위치 업데이트
   useEffect(() => {
@@ -265,135 +231,11 @@ export default function DraggableButton({
     }
   }
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
-    // 마우스 다운 위치 저장
-    mouseDownPosition.current = { x: e.clientX, y: e.clientY }
-    hasMoved.current = false
-
-    setIsDragging(true)
-    setDragStart({
-      x: e.clientX - position.x,
-      y: e.clientY - position.y,
-    })
-  }
-
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging) return
-
-    // 마우스 이동 거리 계산
-    const dx = Math.abs(e.clientX - mouseDownPosition.current.x)
-    const dy = Math.abs(e.clientY - mouseDownPosition.current.y)
-    const distance = Math.sqrt(dx * dx + dy * dy)
-
-    // 임계값 이상 이동했다면 드래그 중으로 표시
-    if (distance > DRAG_THRESHOLD) {
-      hasMoved.current = true
-    }
-
-    const newX = e.clientX - dragStart.x
-    const newY = e.clientY - dragStart.y
-
-    // 화면 경계 제한
-    const maxX = window.innerWidth - actualSize
-    const maxY = window.innerHeight - actualSize
-
-    const newPosition = {
-      x: Math.max(0, Math.min(newX, maxX)),
-      y: Math.max(0, Math.min(newY, maxY)),
-    }
-
-    setPosition(newPosition)
-  }
-
-  const handleMouseUp = () => {
-    setIsDragging(false)
-    // 마우스 놓으면 다시 좌측 하단으로 위치 재설정
-    setTimeout(() => {
-      updatePositionAndSize()
-    }, 0)
-  }
-
+  // 버튼 클릭 핸들러
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    // 이벤트 전파 중지를 가장 먼저 실행
     e.preventDefault()
     e.stopPropagation()
-
-    // 드래그가 아닌 단순 클릭인 경우에만 메뉴 토글
-    if (!hasMoved.current) {
-      setIsMenuOpen(!isMenuOpen)
-    }
-  }
-
-  const handleTouchStart = (e: React.TouchEvent<HTMLButtonElement>) => {
-    // 이벤트 전파 중지를 가장 먼저 실행
-    e.preventDefault()
-    e.stopPropagation()
-
-    if (e.touches.length !== 1) return
-
-    const touch = e.touches[0]
-    mouseDownPosition.current = { x: touch.clientX, y: touch.clientY }
-    hasMoved.current = false
-
-    setIsDragging(true)
-    setDragStart({
-      x: touch.clientX - position.x,
-      y: touch.clientY - position.y,
-    })
-  }
-
-  const handleTouchMove = (e: TouchEvent) => {
-    if (!isDragging || e.touches.length !== 1) return
-
-    // 항상 기본 스크롤 동작 방지
-    e.preventDefault()
-    e.stopPropagation()
-
-    const touch = e.touches[0]
-
-    // 터치 이동 거리 계산
-    const dx = Math.abs(touch.clientX - mouseDownPosition.current.x)
-    const dy = Math.abs(touch.clientY - mouseDownPosition.current.y)
-    const distance = Math.sqrt(dx * dx + dy * dy)
-
-    // 임계값 이상 이동했다면 드래그 중으로 표시
-    if (distance > DRAG_THRESHOLD) {
-      hasMoved.current = true
-    }
-
-    const newX = touch.clientX - dragStart.x
-    const newY = touch.clientY - dragStart.y
-
-    // 화면 경계 제한
-    const maxX = window.innerWidth - actualSize
-    const maxY = window.innerHeight - actualSize
-
-    const newPosition = {
-      x: Math.max(0, Math.min(newX, maxX)),
-      y: Math.max(0, Math.min(newY, maxY)),
-    }
-
-    setPosition(newPosition)
-  }
-
-  const handleTouchEnd = (e: TouchEvent) => {
-    setIsDragging(false)
-
-    // 터치 끝나면 다시 좌측 하단으로 위치 재설정
-    setTimeout(() => {
-      updatePositionAndSize()
-    }, 0)
-
-    // 드래그하지 않은 경우에만 메뉴 토글
-    if (!hasMoved.current) {
-      // 이벤트 전파 중지
-      e.preventDefault()
-      e.stopPropagation()
-      // 메뉴 토글
-      setIsMenuOpen(!isMenuOpen)
-      // onClick prop이 실행되지 않도록 return
-      return false
-    }
+    setIsMenuOpen(!isMenuOpen)
   }
 
   // 아이콘 컨텐츠 기본값 설정
@@ -444,22 +286,12 @@ export default function DraggableButton({
     <>
       <button
         onClick={handleClick}
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={e => {
-          e.preventDefault()
-          e.stopPropagation()
-          if (!hasMoved.current) {
-            setIsMenuOpen(!isMenuOpen)
-          }
-        }}
         className={`
           fixed
           ${color}
           text-white
           rounded-full
           shadow-lg
-          cursor-pointer
           select-none
           flex
           items-center
@@ -468,7 +300,6 @@ export default function DraggableButton({
           duration-200
           hover:scale-110
           active:scale-95
-          touch-none
         `}
         style={{
           left: `${position.x}px`,
@@ -477,11 +308,9 @@ export default function DraggableButton({
           width: `${actualSize}px`,
           height: `${actualSize}px`,
           fontSize: isMobile ? '0.875rem' : '1rem',
-          transform: 'translate3d(0,0,0)',
           opacity: BUTTON_OPACITY_NORMAL,
           userSelect: 'none',
           WebkitTapHighlightColor: 'transparent',
-          touchAction: 'none',
         }}
       >
         <div className="transform scale-125 flex items-center justify-center w-full h-full">{buttonContent}</div>
@@ -498,11 +327,7 @@ export default function DraggableButton({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={e => {
-                e.preventDefault()
-                e.stopPropagation()
-                setIsMenuOpen(false)
-              }}
+              onClick={() => setIsMenuOpen(false)}
             />
 
             {/* 플로팅 메뉴 버튼 렌더링 */}
@@ -537,9 +362,7 @@ export default function DraggableButton({
                   y: '0',
                   transition: { duration: 0.2 },
                 }}
-                onClick={e => {
-                  e.preventDefault()
-                  e.stopPropagation()
+                onClick={() => {
                   setIsMenuOpen(false)
                   button.onClick()
                 }}
