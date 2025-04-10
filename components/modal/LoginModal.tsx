@@ -301,7 +301,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             </div>
           </div> */}
 
-          {/* <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} /> */}
+          <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} />
 
           {/* 신규 가입 모드일 때만 약관 동의 문구 표시 */}
           {isNewUserMode && (

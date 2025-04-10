@@ -38,6 +38,7 @@ interface CardGridProps {
   className?: string // 추가 스타일링을 위한 클래스명
   sectionId?: string // 각 섹션을 구분하기 위한 고유 ID
   isCharacterRankingSidebar?: boolean // 캐릭터 랭킹 사이드바 여부
+  isSidebar?: boolean // 사이드바 여부
 }
 
 export default function CardGrid({
@@ -59,6 +60,7 @@ export default function CardGrid({
   className = '',
   sectionId = '',
   isCharacterRankingSidebar = false,
+  isSidebar = false,
 }: CardGridProps) {
   const { isLoading: storeLoading, error: storeError, fetchCategoryCharacters } = useStoreData()
   const { openModal, setSelectedCharacter } = useModalStore()
@@ -242,6 +244,7 @@ export default function CardGrid({
           hasRank={hasRanking}
           rank={hasRanking ? index + 1 : undefined}
           isCharacterRankingSidebar={isCharacterRankingSidebar}
+          isSidebar={isSidebar}
         />
       </SwiperSlide>
     ))
@@ -369,6 +372,7 @@ export default function CardGrid({
                   hasRank={hasRanking}
                   rank={hasRanking ? index + 1 : undefined}
                   isCharacterRankingSidebar={isCharacterRankingSidebar}
+                  isSidebar={isSidebar}
                 />
               ))}
         </div>

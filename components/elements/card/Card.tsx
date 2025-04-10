@@ -7,7 +7,7 @@ import { useModalStore } from '@/store/useStoreModal'
 import { faPencilAlt, faTrash, faLock, faFire } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getChangeNameTag } from '@/lib/utils/storyNationUtil'
 
@@ -21,6 +21,7 @@ interface CardProps {
   rank?: number
   hasRank?: boolean
   isCharacterRankingSidebar?: boolean
+  isSidebar?: boolean
 }
 
 export default function Card({
@@ -32,10 +33,12 @@ export default function Card({
   onCardClick,
   rank,
   hasRank = false,
+  isSidebar = false,
   isCharacterRankingSidebar = false,
 }: CardProps) {
   const { name, description, imageUrl, commentCount, hashtags, isAdult, creator } = character
   const { openModal, setSelectedCharacter } = useModalStore()
+  const [isMobile, setIsMobile] = useState(false)
   const [imageError, setImageError] = React.useState(false)
   const router = useRouter()
 
@@ -47,6 +50,22 @@ export default function Card({
     setSelectedCharacter(character)
     openModal('character')
   }
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+
+    // 초기 체크
+    checkMobile()
+
+    // 화면 크기 변경 시 체크
+    window.addEventListener('resize', checkMobile)
+
+    return () => {
+      window.removeEventListener('resize', checkMobile)
+    }
+  }, [])
 
   // 실제 카드 클릭 핸들러
   const handleCardClick = () => {
@@ -129,9 +148,9 @@ export default function Card({
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent"></div>
 
             {/* 성인 컨텐츠 표시 */}
-            {isAdult && (
+            {isAdult && !isSidebar && (
               <div className="absolute top-2 right-2 z-[40] flex items-center justify-center">
-                <Image src="/images/flames.png" alt="성인인증" width={20} height={20} />
+                <Image src="/images/flames.png" alt="성인인증" width={18.5} height={23} />
               </div>
             )}
 
@@ -208,9 +227,14 @@ export default function Card({
             )}
 
             {/* 성인 컨텐츠 표시 */}
-            {isAdult && isCharacterRankingSidebar && (
-              <div className="absolute top-2 right-2 z-[40] flex items-center justify-center">
-                <Image src="/images/flames.png" alt="성인인증" width={20} height={20} />
+            {isAdult && !isSidebar && (
+              <div className="absolute top-2 right-2 md:top-[15px] md:right-[15px] z-[40] flex items-center justify-center">
+                <Image
+                  src="/images/flames.png"
+                  alt="성인인증"
+                  width={isMobile ? 18.5 : 27.7}
+                  height={isMobile ? 23 : 35.3}
+                />
               </div>
             )}
 
@@ -240,9 +264,14 @@ export default function Card({
             )}
 
             {/* 댓글 수 표시 - 이미지 우측 하단으로 이동 */}
-            <div className="absolute bottom-2 right-2 flex md:bottom-4 md:right-4 items-center gap-[5px] text-white z-10">
-              <Image src="/images/comment_black.png" alt="댓글 아이콘" width={22} height={22} />
-              <span className="text-[20px]">{commentCount}</span>
+            <div className="absolute bottom-[10px] right-[10px] flex md:bottom-[15] md:right-4 items-center gap-[1px] md:gap-[3px] text-white z-10">
+              <Image
+                src="/images/comment_black.png"
+                alt="댓글 아이콘"
+                width={isMobile ? 12 : 22}
+                height={isMobile ? 11 : 22}
+              />
+              <span className="text-[14px] md:text-[20px]">{commentCount}</span>
             </div>
           </div>
 

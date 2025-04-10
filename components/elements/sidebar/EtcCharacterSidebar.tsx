@@ -22,8 +22,7 @@ export default function EtcCharacterSidebar({ isOpen, onClose, moduleId }: NewCh
   useEffect(() => {
     if (isOpen && moduleId) {
       UpdateEtcCharactersPaging(moduleId, 1, 1, 50)
-    }
-    else {
+    } else {
       ClearEtcCharactersSlide()
     }
   }, [isOpen, moduleId])
@@ -98,6 +97,7 @@ export default function EtcCharacterSidebar({ isOpen, onClose, moduleId }: NewCh
           cardsPerRow={1}
           useSwiper={false}
           variant="horizontal"
+          isSidebar={true}
         />
       </div>
 

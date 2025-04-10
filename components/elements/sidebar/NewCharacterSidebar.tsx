@@ -119,6 +119,7 @@ export default function NewCharacterSidebar({ isOpen, onClose }: NewCharacterSid
           subtitle="최신 등록순"
           useSwiper={false}
           variant="horizontal"
+          isSidebar={true}
         />
       </div>
 
