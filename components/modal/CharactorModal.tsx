@@ -278,9 +278,8 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                     />
                     {/* 19세 이상 뱃지 */}
                     {selectedCharacter.isAdult && (
-                      <div className="absolute top-3 left-3 z-20 bg-red-500 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center shadow-md backdrop-blur-sm">
-                        <FontAwesomeIcon icon={faShieldHalved} className="mr-1.5 h-3.5 w-3.5" />
-                        19+
+                      <div className="absolute top-3 left-3 z-20 flex items-center ">
+                        <Image src="/images/flames.png" alt="성인인증" width={20} height={20} />
                       </div>
                     )}
                   </div>
@@ -342,9 +341,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
                   상세 설명
                 </h3>
-                <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed">
-                  {content}
-                </p>
+                <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed">{content}</p>
               </div>
             )}
             {/* 대화 예시 섹션 */}
@@ -474,9 +471,8 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   />
                 </div>
                 {selectedCharacter.isAdult && (
-                  <div className="absolute top-3 left-3 z-10 bg-red-500 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center shadow-md">
-                    <FontAwesomeIcon icon={faShieldHalved} className="mr-1.5 h-3.5 w-3.5" />
-                    19+
+                  <div className="absolute top-3 right-3 z-20 flex items-center ">
+                    <Image src="/images/flames.png" alt="성인인증" width={20} height={20} />
                   </div>
                 )}
               </>
