@@ -25,6 +25,7 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: '스토리네이션',
   description: '스네: 함께 만드는 세계관&캐릭터 채팅',
+  metadataBase: new URL('https://www.storynation.co.kr'),
   icons: {
     icon: '/images/storyNation_thumb.png',
   },
@@ -34,9 +35,18 @@ export const metadata: Metadata = {
     description: '스네: 함께 만드는 세계관&캐릭터 채팅',
     images: [
       {
-        url: '/images/sn-thumb.jpg',
+        url: 'https://www.storynation.co.kr/images/sn-thumb.jpg',
+        width: 1200,
+        height: 630,
+        alt: '스토리네이션 썸네일',
       },
     ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '스토리네이션',
+    description: '스네: 함께 만드는 세계관&캐릭터 채팅',
+    images: ['https://www.storynation.co.kr/images/sn-thumb.jpg'],
   },
 }
 
