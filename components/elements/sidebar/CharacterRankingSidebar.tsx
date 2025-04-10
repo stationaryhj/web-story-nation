@@ -37,7 +37,7 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
   const { rankingCharactersSlide, UpdateRankingTopCharacter } = useRecommendSectionStoreData()
 
   useEffect(() => {
-    UpdateRankingTopCharacter('KR', 4, 4, false)
+    UpdateRankingTopCharacter('KR', 4, 4, true)
   }, [])
 
   // 랭킹 데이터 가져오기
