@@ -365,7 +365,16 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       hasInitialized.current = true
 
       // 사용 가능한 채팅 모드 중 첫번째 선택 (또는 기본값 2번)
-      const selectedModeId = chatMode && chatMode.length > 0 ? chatMode[0].chat_mode : 2
+      // const selectedModeId = chatMode && chatMode.length > 0 ? chatMode[0].chat_mode : 2
+
+
+      // default selectModeId 변경 ( 04.10 )
+      /*
+        1. 선택된 캐릭터 기준 성인전용이면 성인모드 선택 ( 4 )
+        2. 성인전용이 아니면 스토리모드 선택 ( 2 )
+      */
+      const selectedModeId = character.isAdult ? 4 : 2
+
 
       console.log('💬 채팅방 초기화 시작 - ID:', character.id, '모드:', selectedModeId)
 
