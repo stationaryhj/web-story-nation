@@ -53,7 +53,6 @@ export interface CharacterFormData {
   // 이미지 설정 - 경로만 저장
   imgUrl: string // 기본 이미지 경로
   imgUrlNsfw: string // 성인 이미지 경로
-  imgWebUrl: string // 성인 웹 이미지 경로
 
   // API 호환성 속성
   world_list_detail_chrbot_key?: string
@@ -127,7 +126,6 @@ const defaultFormData: CharacterFormData = {
   conversationExamples: [],
   imgUrl: '',
   imgUrlNsfw: '',
-  imgWebUrl: '',
 
   finishYn: 0,
   isVisibilityLock: false,
@@ -293,7 +291,7 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
       return {
         formData: {
           ...state.formData,
-          imgWebUrl: path,
+          imgUrl: path,
         },
       }
     }),
@@ -327,7 +325,6 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         // 이미지 URL 정리 (중복 필드 정리)
         const imgUrl = characterData.img_url || ''
         const imgUrlNsfw = characterData.img_url_nsfw || ''
-        const imgWebUrl = characterData.img_web_url || ''
 
         // 한 번에 적절한 필드에만 설정
         set(state => ({
@@ -335,7 +332,6 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
             ...state.formData,
             imgUrl,
             imgUrlNsfw,
-            imgWebUrl,
             // 스네이크 케이스 필드 제거 (API 통신 시에만 사용)
             img_url: undefined,
             img_url_nsfw: undefined,
@@ -395,7 +391,6 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         img_url: formData.imgUrl || '',
         // 성인 이미지 URL (있는 경우에만 포함)
         img_url_nsfw: formData.imgUrlNsfw || '',
-        img_web_url: formData.imgWebUrl || '',
         title: formData.name || '',
         gender: formData.gender === 'male' ? 1 : formData.gender === 'female' ? 2 : 0,
         intro: formData.bio || '',
@@ -547,8 +542,8 @@ export const isFormValid = (formData: CharacterFormData, tab: 'basic' | 'detail'
 
     // 이용 등급에 따른 이미지 필드 검증
     if (formData.rating === 'adult') {
-      // 성인 등급: imgWebUrl과 imgUrlNsfw 둘 다 필요
-      return !!(basicInfoValid && formData.imgWebUrl?.trim() && formData.imgUrlNsfw?.trim())
+      // 성인 등급: imgUrl과 imgUrlNsfw 둘 다 필요
+      return !!(basicInfoValid && formData.imgUrl?.trim() && formData.imgUrlNsfw?.trim())
     } else {
       // 일반 등급: imgUrl만 필요
       return !!(basicInfoValid && formData.imgUrl?.trim())

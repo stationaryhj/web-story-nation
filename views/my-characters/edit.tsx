@@ -40,7 +40,6 @@ export default function EditCharacterPage() {
     hashtags: false,
     imgUrl: false,
     imgUrlNsfw: false,
-    imgWebUrl: false,
     image: false,
   })
 
@@ -123,10 +122,9 @@ export default function EditCharacterPage() {
           hashtags: formData.hashtags.length === 0,
           imgUrl: !formData.imgUrl?.trim(),
           imgUrlNsfw: !formData.imgUrlNsfw?.trim(),
-          imgWebUrl: !formData.imgWebUrl?.trim(),
           image:
             formData.rating === 'adult'
-              ? !formData.imgWebUrl?.trim() || !formData.imgUrlNsfw?.trim()
+              ? !formData.imgUrl?.trim() || !formData.imgUrlNsfw?.trim()
               : !formData.imgUrl?.trim(),
         }
 
@@ -144,7 +142,7 @@ export default function EditCharacterPage() {
           // 이용 등급에 따라 필요한 이미지 확인
           if (formData.rating === 'adult') {
             // 성인 등급인 경우: 성인 이미지 또는 기본 이미지가 없으면 이미지 탭으로 이동
-            if (newInvalidFields.imgUrlNsfw || newInvalidFields.imgWebUrl) {
+            if (newInvalidFields.imgUrlNsfw || newInvalidFields.imgUrl) {
               setActiveTab('image')
             } else {
               setActiveTab('basic')
@@ -174,10 +172,9 @@ export default function EditCharacterPage() {
           description: '한 번 공개한 캐릭터는 비공개로 전환할 수 없어요!',
           onConfirm: async () => {
             const saveResult = await saveInProgress(1)
-            console.log('saveResult', saveResult)
             if (!saveResult) return
+
             closeModal()
-            toast.success('캐릭터가 성공적으로 수정되었습니다!')
             router.push('/my-characters')
           },
           confirmText: '확인',
@@ -185,7 +182,10 @@ export default function EditCharacterPage() {
         })
         return
       }
-      toast.success('캐릭터가 성공적으로 수정되었습니다!')
+
+      console.log('💬 캐릭터 수정 완료')
+
+      const saveResult = await saveInProgress(1)
       router.push('/my-characters')
     } catch (error) {
       console.error('캐릭터 수정 실패:', error)
