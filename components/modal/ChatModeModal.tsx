@@ -43,7 +43,7 @@ const customChatModes: ChatMode[] = [
     name: '스토리모드',
     description: '이야기 생성과 연속성이 필요한 대화에 적합합니다.',
     penCost: 3,
-    ai: 'Claude 3.5 Sonnet',
+    ai: 'Claude Sonnet 3.5 v2',
     icon: faBookOpen,
     discount: 0,
     original_coin: 0,
