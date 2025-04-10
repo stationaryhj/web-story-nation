@@ -91,13 +91,12 @@ export default function EditCharacterPage() {
   }, [formData.hashtags])
 
   const handleSaveToNextStep = async () => {
-    // 현재 단계 저장
-    const saveResult = await saveInProgress()
-    if (!saveResult) return
 
     if (activeTab === 'basic') {
+      await saveInProgress()
       setActiveTab('detail')
     } else if (activeTab === 'detail') {
+      await saveInProgress()
       setActiveTab('image')
     } else if (activeTab === 'image') {
       // 최종 완료 처리
@@ -108,7 +107,6 @@ export default function EditCharacterPage() {
   // 폼 제출 핸들러
   const handleSubmit = async () => {
     try {
-      // 완료 상태로 저장
 
       // 기본 설정 부분에서 필수값 미입력 시 저장 불가, 미입력한 부분으로 페이지 이동 및 focus
       const isFormValid = checkFormValidity(formData, activeTab)
@@ -138,7 +136,7 @@ export default function EditCharacterPage() {
         setTimeout(() => setIsSubmitting(false), 2000)
 
         // flushSync를 사용하여 탭 변경을 즉시 완료한 후 invalidFields 설정
-        flushSync(() => {
+        await flushSync(() => {
           // 이용 등급에 따라 필요한 이미지 확인
           if (formData.rating === 'adult') {
             // 성인 등급인 경우: 성인 이미지 또는 기본 이미지가 없으면 이미지 탭으로 이동
@@ -182,8 +180,6 @@ export default function EditCharacterPage() {
         })
         return
       }
-
-      console.log('💬 캐릭터 수정 완료')
 
       const saveResult = await saveInProgress(1)
       router.push('/my-characters')
