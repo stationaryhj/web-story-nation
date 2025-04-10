@@ -33,8 +33,8 @@ export default function CharacterGridSection({
   } = useCharacterGridStoreData()
 
   // 카테고리 정보 가져오기
-  const categoryInfo = CATEGORIES.find(cat => cat.id === categoryId)
-  const categoryName = categoryInfo?.name || '캐릭터'
+  // const categoryInfo = CATEGORIES.find(cat => cat.id === categoryId)
+  // const categoryName = categoryInfo?.name || '캐릭터'
 
   // 컴포넌트 마운트 시 초기화
   useEffect(() => {
@@ -81,7 +81,7 @@ export default function CharacterGridSection({
     return (
       <SectionTransition className="py-12 bg-white dark:bg-dark-background-light">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-6">{categoryName}</h2>
+          {/* <h2 className="text-2xl font-bold mb-6">{categoryName}</h2> */}
           {/* 필터 컨트롤은 항상 보여줌 */}
           <FilterControls categoryId={categoryId} />
           <div className="mt-16 flex justify-center items-center flex-col">
@@ -104,7 +104,7 @@ export default function CharacterGridSection({
     return (
       <SectionTransition className="py-12 bg-white dark:bg-dark-background-light">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-6">{categoryName}</h2>
+          {/* <h2 className="text-2xl font-bold mb-6">{categoryName}</h2> */}
           <FilterControls categoryId={categoryId} />
           <div className="mt-8 py-12 text-center">
             <p className="text-red-500 mb-4">에러가 발생했습니다: {error.message}</p>
@@ -125,7 +125,7 @@ export default function CharacterGridSection({
     return (
       <SectionTransition className="py-12 bg-white dark:bg-dark-background-light">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-6">{categoryName}</h2>
+          {/* <h2 className="text-2xl font-bold mb-6">{categoryName}</h2> */}
           <FilterControls categoryId={categoryId} />
           <div className="mt-12 py-12 text-center">
             <div className="max-w-md mx-auto">
