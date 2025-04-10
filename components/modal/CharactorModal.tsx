@@ -256,16 +256,16 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                     <Image
                       src={selectedCharacter.imageUrl}
                       alt={selectedCharacter.name || '캐릭터 이미지'}
-                      fill
                       priority
+                      fill
                       className="transition-opacity duration-300 z-10 opacity-100 drop-shadow-md"
+                      style={{ objectFit: 'contain', objectPosition: 'center' }}
                       onLoadingComplete={() => setIsImageLoaded(true)}
                     />
                     {/* 19세 이상 뱃지 */}
                     {selectedCharacter.isAdult && (
-                      <div className="absolute top-3 left-3 z-20 bg-red-500 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center shadow-md backdrop-blur-sm">
-                        <FontAwesomeIcon icon={faShieldHalved} className="mr-1.5 h-3.5 w-3.5" />
-                        19+
+                      <div className="absolute z-30 flex items-center" style={{ top: '15px', right: '15px' }}>
+                        <Image src="/images/flames.png" alt="성인인증" width={27.7} height={35.3} />
                       </div>
                     )}
                   </div>
@@ -327,9 +327,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
                   상세 설명
                 </h3>
-                <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed">
-                  {content}
-                </p>
+                <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed">{content}</p>
               </div>
             )}
             {/* 대화 예시 섹션 */}
@@ -455,15 +453,15 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                     fill
                     priority
                     className={`transition-opacity duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'} drop-shadow-md z-10`}
+                    style={{ objectFit: 'contain', objectPosition: 'center' }}
                     onLoadingComplete={() => setIsImageLoaded(true)}
                   />
+                  {selectedCharacter.isAdult && (
+                    <div className="absolute z-30 flex items-center" style={{ top: '15px', right: '15px' }}>
+                      <Image src="/images/flames.png" alt="성인인증" width={27.7} height={35.3} />
+                    </div>
+                  )}
                 </div>
-                {selectedCharacter.isAdult && (
-                  <div className="absolute top-3 left-3 z-10 bg-red-500 text-white px-3 py-1.5 rounded-full text-xs font-medium flex items-center shadow-md">
-                    <FontAwesomeIcon icon={faShieldHalved} className="mr-1.5 h-3.5 w-3.5" />
-                    19+
-                  </div>
-                )}
               </>
             )}
           </div>

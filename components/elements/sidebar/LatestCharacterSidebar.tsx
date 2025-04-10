@@ -92,7 +92,7 @@ export default function LatestCharacterSidebar({ isOpen, onClose, moduleId }: Ne
       }
     >
       <div ref={contentRef} className="h-full overflow-y-auto px-4 py-6">
-        <CardGrid customData={modules_sumSlide} cardsPerRow={2} useSwiper={false} />
+        <CardGrid customData={modules_sumSlide} cardsPerRow={2} useSwiper={false} isSidebar={true} />
       </div>
 
       {/* 맨 위로 스크롤 버튼 */}

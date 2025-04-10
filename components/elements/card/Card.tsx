@@ -4,10 +4,10 @@
 import { CardTransition } from '@/components/motion/PageTransition'
 import type { Character } from '@/store/useStoreData'
 import { useModalStore } from '@/store/useStoreModal'
-import { faPencilAlt, faTrash, faLock } from '@fortawesome/free-solid-svg-icons'
+import { faPencilAlt, faTrash, faLock, faFire } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { getChangeNameTag } from '@/lib/utils/storyNationUtil'
 
@@ -20,6 +20,8 @@ interface CardProps {
   onCardClick?: (character: Character) => void
   rank?: number
   hasRank?: boolean
+  isCharacterRankingSidebar?: boolean
+  isSidebar?: boolean
 }
 
 export default function Card({
@@ -31,9 +33,12 @@ export default function Card({
   onCardClick,
   rank,
   hasRank = false,
+  isSidebar = false,
+  isCharacterRankingSidebar = false,
 }: CardProps) {
   const { name, description, imageUrl, commentCount, hashtags, isAdult, creator } = character
   const { openModal, setSelectedCharacter } = useModalStore()
+  const [isMobile, setIsMobile] = useState(false)
   const [imageError, setImageError] = React.useState(false)
   const router = useRouter()
 
@@ -46,6 +51,22 @@ export default function Card({
     openModal('character')
   }
 
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+
+    // 초기 체크
+    checkMobile()
+
+    // 화면 크기 변경 시 체크
+    window.addEventListener('resize', checkMobile)
+
+    return () => {
+      window.removeEventListener('resize', checkMobile)
+    }
+  }, [])
+
   // 실제 카드 클릭 핸들러
   const handleCardClick = () => {
     if (onCardClick) {
@@ -54,6 +75,8 @@ export default function Card({
       defaultCardClick()
     }
   }
+
+  console.log('isCharacterRankingSidebar', isCharacterRankingSidebar)
 
   // 이미지 로드 에러 핸들러
   const handleImageError = () => {
@@ -124,9 +147,16 @@ export default function Card({
             {/* 그라데이션 오버레이 */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent"></div>
 
+            {/* 성인 컨텐츠 표시 */}
+            {isAdult && !isSidebar && (
+              <div className="absolute top-2 right-2 z-[40] flex items-center justify-center">
+                <Image src="/images/flames.png" alt="성인인증" width={18.5} height={23} />
+              </div>
+            )}
+
             {/* 댓글 수 표시 - 이미지 우측 하단으로 이동 */}
             <div className="absolute bottom-2 right-2 flex items-center gap-[5px] text-white text-xs z-10">
-              <Image src="/images/comment_white.svg" alt="댓글 아이콘" width={17} height={17} />
+              <Image src="/images/comment_black.png" alt="댓글 아이콘" width={17} height={17} />
               <span className="text-[15px]">{commentCount}</span>
             </div>
           </div>
@@ -136,7 +166,9 @@ export default function Card({
             <h3 className="font-bold text-secondary-900 dark:text-dark-secondary-700 text-base truncate">{name}</h3>
 
             {/* 캐릭터 설명 - 최대 2줄 */}
-            <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 my-1.5">{getChangeNameTag(description || '', name)}</p>
+            <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 my-1.5">
+              {getChangeNameTag(description || '', name)}
+            </p>
 
             <div className="flex flex-wrap gap-1 my-1.5">
               {hashtags?.slice(0, 2).map((tag, index) => (
@@ -165,6 +197,7 @@ export default function Card({
                   </span>
                 )}
               </div>
+
               <span className="ml-1.5 text-xs text-secondary-500 dark:text-dark-secondary-500 truncate max-w-[100px]">
                 {creator?.nickname || '익명'}
               </span>
@@ -193,6 +226,18 @@ export default function Card({
               </div>
             )}
 
+            {/* 성인 컨텐츠 표시 */}
+            {isAdult && !isSidebar && (
+              <div className="absolute top-2 right-2 md:top-[15px] md:right-[15px] z-[40] flex items-center justify-center">
+                <Image
+                  src="/images/flames.png"
+                  alt="성인인증"
+                  width={isMobile ? 18.5 : 27.7}
+                  height={isMobile ? 23 : 35.3}
+                />
+              </div>
+            )}
+
             <Image
               src={imageUrl}
               alt={`${name} 캐릭터 이미지`}
@@ -204,12 +249,6 @@ export default function Card({
 
             {/* 그라데이션 오버레이 */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent"></div>
-
-            {isAdult && (
-              <div className="absolute top-3 right-3 bg-red-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-                성인인증
-              </div>
-            )}
 
             {isTemp && (
               <div className="absolute top-3 left-3 bg-black/60 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
@@ -225,9 +264,14 @@ export default function Card({
             )}
 
             {/* 댓글 수 표시 - 이미지 우측 하단으로 이동 */}
-            <div className="absolute bottom-2 right-2 flex md:bottom-4 md:right-4 items-center gap-[5px] text-white z-10">
-              <Image src="/images/comment_black.svg" alt="댓글 아이콘" width={22} height={22} />
-              <span className="text-[20px]">{commentCount}</span>
+            <div className="absolute bottom-[10px] right-[10px] flex md:bottom-[15] md:right-4 items-center gap-[1px] md:gap-[3px] text-white z-10">
+              <Image
+                src="/images/comment_black.png"
+                alt="댓글 아이콘"
+                width={isMobile ? 12 : 22}
+                height={isMobile ? 11 : 22}
+              />
+              <span className="text-[14px] md:text-[20px]">{commentCount}</span>
             </div>
           </div>
 

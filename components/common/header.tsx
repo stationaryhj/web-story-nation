@@ -146,7 +146,7 @@ export default function Header() {
               }}
             >
               <Image
-                src={`${isDarkMode ? '/images/logo.svg' : '/images/logo_dark.svg'}`}
+                src={`${isDarkMode ? '/images/logo.png' : '/images/logo.png'}`}
                 alt="스토리네이션"
                 width={143}
                 height={100}

@@ -112,6 +112,7 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
           subtitle={`${selectedGender.label} · ${rankingTabs.find(tab => tab.id === activeTab)?.label || ''} 랭킹`}
           useSwiper={false}
           variant="horizontal"
+          isCharacterRankingSidebar={true}
         />
       </div>
     </BaseSidebar>
