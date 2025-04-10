@@ -81,14 +81,15 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
     <BaseSidebar isOpen={isOpen} onClose={onClose} title="캐릭터 랭킹" width="600px">
       {/* 필터 영역 */}
       <div className="px-6 py-4 border-b dark:border-dark-secondary-200/10 space-y-4">
-        {/* 탭 */}
-        <div>
-          <ButtonTabs tabs={rankingTabs} defaultTabId={activeTab} onTabChange={handleTabChange} />
-        </div>
+        <div className="w-full flex items-center justify-between">
 
-        {/* 성별 필터 */}
-        <div className="w-full flex items-center justify-end">
-          <div>
+          {/* 탭 */}
+          <div className="flex items-center justify-between">
+            <ButtonTabs tabs={rankingTabs} defaultTabId={activeTab} onTabChange={handleTabChange} />
+          </div>
+          
+          {/* 성별 필터 */}
+          <div className='flex items-center justify-end'>
             <SidebarSelectBox
               options={genderOptions}
               selectedOption={selectedGender}
