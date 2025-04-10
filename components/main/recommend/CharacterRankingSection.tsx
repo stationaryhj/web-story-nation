@@ -126,7 +126,6 @@ const CharacterRankingSection = memo(() => {
       <CharacterRankingSidebar
         isOpen={isCharacterRankingSidebarOpen}
         onClose={() => setIsCharacterRankingSidebarOpen(false)}
-        isCharacterRankingSidebar={true}
       />
     </section>
   )
