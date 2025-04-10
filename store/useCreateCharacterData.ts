@@ -53,7 +53,6 @@ export interface CharacterFormData {
   // 이미지 설정 - 경로만 저장
   imgUrl: string // 기본 이미지 경로
   imgUrlNsfw: string // 성인 이미지 경로
-  imgWebUrl: string // 성인 웹 이미지 경로
 
   // API 호환성 속성
   world_list_detail_chrbot_key?: string
@@ -127,7 +126,6 @@ const defaultFormData: CharacterFormData = {
   conversationExamples: [],
   imgUrl: '',
   imgUrlNsfw: '',
-  imgWebUrl: '',
 
   finishYn: 0,
   isVisibilityLock: false,
@@ -293,7 +291,7 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
       return {
         formData: {
           ...state.formData,
-          imgWebUrl: path,
+          imgUrl: path,
         },
       }
     }),

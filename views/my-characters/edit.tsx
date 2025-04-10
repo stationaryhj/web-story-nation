@@ -174,10 +174,9 @@ export default function EditCharacterPage() {
           description: '한 번 공개한 캐릭터는 비공개로 전환할 수 없어요!',
           onConfirm: async () => {
             const saveResult = await saveInProgress(1)
-            console.log('saveResult', saveResult)
             if (!saveResult) return
+
             closeModal()
-            toast.success('캐릭터가 성공적으로 수정되었습니다!')
             router.push('/my-characters')
           },
           confirmText: '확인',
@@ -185,6 +184,9 @@ export default function EditCharacterPage() {
         })
         return
       }
+
+      const saveResult = await saveInProgress(1)
+      
       toast.success('캐릭터가 성공적으로 수정되었습니다!')
       router.push('/my-characters')
     } catch (error) {
