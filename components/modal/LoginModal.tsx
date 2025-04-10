@@ -219,17 +219,15 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       >
         <div className="flex flex-col pb-6">
           {/* 신규 가입 모드일 때만 보여줄 헤더 */}
-          {isNewUserMode && (
-            <>
-              <div className="flex flex-col justify-center items-center">
-                <div className="text-sm text-gray-500">캐릭터부터 시작하는 세계관 공동 창작</div>
-                <div className="text-sm text-gray-500">스토리네이션</div>
-              </div>
-              <div>
-                <SpeechBubble text="3초만에 가입하고 30펜 받으세요!" position="center" />
-              </div>
-            </>
-          )}
+
+          <div className="flex flex-col justify-center items-center">
+            <div className="text-md text-gray-500">캐릭터부터 시작하는 세계관 공동 창작</div>
+            <div className="text-md text-gray-500">스토리네이션</div>
+          </div>
+          <div className="mt-4">
+            <SpeechBubble text="3초만에 가입하고 30펜 받으세요!" position="center" />
+          </div>
+
           <div className="space-y-4 my-4">
             <button
               onClick={() => handleSocialLogin('GOOGLE')}
@@ -280,16 +278,6 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                 <span>네이버 계정으로 로그인</span>
               </div>
             </button>
-            {!isNewUserMode ? (
-              <button
-                onClick={handleNewUserClick}
-                className="flex items-center justify-center w-full h-12 items-center justify-between rounded-full px-[61px] text-black"
-              >
-                <div className="flex items-center justify-center gap-1 w-full">
-                  <span className="text-secondary-700 text-sm w-full text-center">신규 유저 가입하기</span>
-                </div>
-              </button>
-            ) : null}
           </div>
           {/* 
           <div className="relative">
@@ -301,14 +289,13 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             </div>
           </div> */}
 
-          <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} />
+          {/* <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} /> */}
 
           {/* 신규 가입 모드일 때만 약관 동의 문구 표시 */}
-          {isNewUserMode && (
-            <div className="text-center text-xs text-gray-500 dark:text-gray-400">
-              <p>계속 진행하면 이용약관 및 개인정보 처리방침에 동의하는 것으로 간주됩니다.</p>
-            </div>
-          )}
+
+          <div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6 px-4">
+            <p>계속 진행하면 이용약관 및 개인정보 처리방침에 동의하는 것으로 간주됩니다.</p>
+          </div>
         </div>
       </BaseModal>
 
