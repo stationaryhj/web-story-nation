@@ -56,8 +56,6 @@ export default function DraggableButton({
 
   const mouseDownPosition = useRef({ x: 0, y: 0 })
   const hasMoved = useRef(false)
-  const hasUserRepositioned = useRef(false)
-  const positionRef = useRef({ x: 0, y: 0 })
   const isInitialized = useRef(false)
   const prevIsMobile = useRef(false)
 
@@ -69,8 +67,8 @@ export default function DraggableButton({
   const MOBILE_SIZE_RATIO = 0.7
   // 버튼 여백
   const BUTTON_MARGIN = 20
-  // 모바일 GNB 높이
-  const MOBILE_GNB_HEIGHT = 64
+  // 모바일 GNB 높이 (MobileGNB.tsx의 실제 높이인 55px로 수정)
+  const MOBILE_GNB_HEIGHT = 55
   // 버튼 간 간격 (픽셀)
   const BUTTON_SPACING = 80
   // 버튼 투명도 값
@@ -86,7 +84,7 @@ export default function DraggableButton({
     return window.innerWidth < MOBILE_BREAKPOINT
   }, [])
 
-  // 기본 위치 계산 (드래그 무시)
+  // 기본 위치 계산 (항상 좌측 하단에 위치하도록 수정)
   const calculateDefaultPosition = useCallback(() => {
     if (typeof window === 'undefined') return { x: 0, y: 0 }
 
@@ -94,35 +92,22 @@ export default function DraggableButton({
     const screenWidth = window.innerWidth
     const screenHeight = window.innerHeight
 
-    // 왼쪽 하단에 위치하도록 변경
+    // 왼쪽 하단에 위치하도록 설정
     const initialX = BUTTON_MARGIN
-    // 모바일에서는 GNB 높이를 고려하여 위치 조정
-    const bottomMargin = isMobile ? BUTTON_MARGIN + MOBILE_GNB_HEIGHT : BUTTON_MARGIN
+
+    // 모바일에서는 GNB 높이를 고려하여 위치 조정 (추가 여백 포함)
+    const gapFromGNB = 15 // GNB로부터의 추가 간격
+    const bottomMargin = isMobile ? BUTTON_MARGIN + MOBILE_GNB_HEIGHT + gapFromGNB : BUTTON_MARGIN
     const initialY = screenHeight - bottomMargin - buttonSize
 
     return { x: initialX, y: initialY }
   }, [isMobile, size])
 
-  // 버튼 위치 계산 함수 최적화
+  // 버튼 위치 계산 함수 (항상 좌측 하단에 고정되도록 수정)
   const calculatePosition = useCallback(() => {
-    if (typeof window === 'undefined') return { x: 0, y: 0 }
-
-    const buttonSize = isMobile ? Math.round(size * MOBILE_SIZE_RATIO) : size
-
-    // 사용자가 드래그로 위치를 변경한 경우
-    if (hasUserRepositioned.current) {
-      const maxX = Math.max(0, window.innerWidth - buttonSize)
-      const maxY = Math.max(0, window.innerHeight - buttonSize)
-
-      return {
-        x: Math.min(Math.max(0, positionRef.current.x), maxX),
-        y: Math.min(Math.max(0, positionRef.current.y), maxY),
-      }
-    }
-
-    // 기본 위치 반환
+    // 항상 기본 위치(좌측 하단)를 반환
     return calculateDefaultPosition()
-  }, [isMobile, size, calculateDefaultPosition])
+  }, [calculateDefaultPosition])
 
   // 위치 및 크기 업데이트 최적화
   const updatePositionAndSize = useCallback(() => {
@@ -136,9 +121,8 @@ export default function DraggableButton({
       setActualSize(newSize)
     }
 
-    // 위치 업데이트
+    // 위치 업데이트 (항상 좌측 하단으로 재설정)
     const newPosition = calculatePosition()
-    positionRef.current = newPosition
     setPosition(newPosition)
 
     if (!isInitialized.current) {
@@ -187,11 +171,6 @@ export default function DraggableButton({
       document.body.style.overflow = ''
     }
   }, [isDragging, dragStart, actualSize])
-
-  // 위치 ref 업데이트
-  useEffect(() => {
-    positionRef.current = position
-  }, [position])
 
   // 초기 위치 업데이트
   useEffect(() => {
@@ -309,7 +288,6 @@ export default function DraggableButton({
     // 임계값 이상 이동했다면 드래그 중으로 표시
     if (distance > DRAG_THRESHOLD) {
       hasMoved.current = true
-      hasUserRepositioned.current = true // 사용자가 드래그로 위치 변경했음을 표시
     }
 
     const newX = e.clientX - dragStart.x
@@ -324,13 +302,15 @@ export default function DraggableButton({
       y: Math.max(0, Math.min(newY, maxY)),
     }
 
-    // ref와 state 둘 다 업데이트
-    positionRef.current = newPosition
     setPosition(newPosition)
   }
 
   const handleMouseUp = () => {
     setIsDragging(false)
+    // 마우스 놓으면 다시 좌측 하단으로 위치 재설정
+    setTimeout(() => {
+      updatePositionAndSize()
+    }, 0)
   }
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -379,7 +359,6 @@ export default function DraggableButton({
     // 임계값 이상 이동했다면 드래그 중으로 표시
     if (distance > DRAG_THRESHOLD) {
       hasMoved.current = true
-      hasUserRepositioned.current = true
     }
 
     const newX = touch.clientX - dragStart.x
@@ -394,13 +373,16 @@ export default function DraggableButton({
       y: Math.max(0, Math.min(newY, maxY)),
     }
 
-    // ref와 state 둘 다 업데이트
-    positionRef.current = newPosition
     setPosition(newPosition)
   }
 
   const handleTouchEnd = (e: TouchEvent) => {
     setIsDragging(false)
+
+    // 터치 끝나면 다시 좌측 하단으로 위치 재설정
+    setTimeout(() => {
+      updatePositionAndSize()
+    }, 0)
 
     // 드래그하지 않은 경우에만 메뉴 토글
     if (!hasMoved.current) {

@@ -9,12 +9,11 @@ const LatestCharactersSection = memo(() => {
   const [isNewCharacterSidebarOpen, setIsNewCharacterSidebarOpen] = useState(false)
   const { latestCharacters: characterList } = useRecommendSectionStoreData()
 
-  
   // 최신 캐릭터 데이터
   const latestCharacters = characterList
 
   return (
-    <section className="py-20">
+    <section className="pt-20 sm:py-20">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-secondary-900 dark:text-dark-secondary-700 relative inline-block">
@@ -41,7 +40,11 @@ const LatestCharactersSection = memo(() => {
         </SectionTransition>
       </div>
 
-      <LatestCharacterSidebar isOpen={isNewCharacterSidebarOpen} onClose={() => setIsNewCharacterSidebarOpen(false)} moduleId={8} />
+      <LatestCharacterSidebar
+        isOpen={isNewCharacterSidebarOpen}
+        onClose={() => setIsNewCharacterSidebarOpen(false)}
+        moduleId={8}
+      />
     </section>
   )
 })

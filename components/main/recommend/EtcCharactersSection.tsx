@@ -13,7 +13,7 @@ const EtcCharactersSection = memo(() => {
   return (
     <div>
       {modules_sum.map((module, idx) => (
-        <section className="py-20" key={idx}>
+        <section className="pt-10 sm:py-20" key={idx}>
           <div className="container mx-auto px-4">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-bold text-secondary-900 dark:text-dark-secondary-700 relative inline-block">
@@ -48,8 +48,8 @@ const EtcCharactersSection = memo(() => {
         </section>
       ))}
 
-      <EtcCharacterSidebar 
-        isOpen={isNewCharacterSidebarOpen} 
+      <EtcCharacterSidebar
+        isOpen={isNewCharacterSidebarOpen}
         onClose={() => setIsNewCharacterSidebarOpen(false)}
         moduleId={selectedModuleId}
       />
