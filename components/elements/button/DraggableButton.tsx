@@ -223,21 +223,6 @@ export default function DraggableButton({
       },
       position: { x: 0, y: -BUTTON_DISTANCE * 2 },
     },
-    {
-      id: 'close',
-      icon: <X size={20} color="white" />,
-      label: '닫기',
-      color: 'bg-red-500',
-      onClick: () => {
-        // 상태 업데이트를 우선적으로 처리
-        setIsVisible(false)
-        // localStorage 저장은 비동기로 처리
-        setTimeout(() => {
-          localStorage.setItem(`draggable-button-hidden-${id}`, 'true')
-        }, 0)
-      },
-      position: { x: 0, y: -BUTTON_DISTANCE * 3 },
-    },
   ]
 
   // 아이디어 제출 처리

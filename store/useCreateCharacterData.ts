@@ -45,6 +45,7 @@ export interface CharacterFormData {
   bio: string
   firstMessage: string
   hashtags: Array<string>
+  examplesVisibility: CharacterVisibility
 
   // 상세 설정
   bioDetail: string
@@ -118,6 +119,7 @@ const defaultFormData: CharacterFormData = {
   name: '',
   gender: 'unspecified',
   visibility: 'private',
+  examplesVisibility: 'private',
   rating: 'all',
   bio: '',
   firstMessage: '',
@@ -410,7 +412,7 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         // 대화 예시 (공개=1, 비공개=0) - 대화 예시가 없을 경우 0 설정
         example_show_yn:
           formData.conversationExamples && formData.conversationExamples.length > 0
-            ? formData.conversationExamples[0]?.visibility === 'public'
+            ? formData.examplesVisibility === 'public'
               ? 1
               : 0
             : 0,

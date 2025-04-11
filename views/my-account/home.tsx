@@ -26,6 +26,7 @@ import { bridgeIncomeDataToEarningItems, bridgeWithdrawDataToWithdrawItems } fro
 import { useModalStore } from '@/store/useStoreModal'
 import Image from 'next/image'
 import { Wallet } from 'lucide-react'
+import Tooltip from '@/components/common/Tooltip'
 
 export default function MyEarningsView() {
   const router = useRouter()
@@ -38,6 +39,7 @@ export default function MyEarningsView() {
 
   // 월별 수익 내역 ( 1: 이번달, 2: 지난달 )
   const { data: monthlyIncomeV1 } = GetMonthlyIncome(2)
+  const { data: currentMonthIncome } = GetMonthlyIncome(1)
 
   // 수익 내역
   const { data: settlementListData, isLoading: settlementListLoading } = GetSettlementList(1, currentPage, 50)
@@ -72,8 +74,14 @@ export default function MyEarningsView() {
   const [accountNo2, setAccountNo2] = useState('')
   const [name, setName] = useState('')
 
+  // 이번달/지난달 선택을 위한 탭 상태
+  const [selectedTab, setSelectedTab] = useState<'current' | 'last'>('current')
+
   // 이번달 수익
-  const thisMonthEarnings = monthlyIncomeV1?.monthlyIncome || 0
+  const currentMonthEarnings = currentMonthIncome?.monthlyIncome || 0
+
+  // 지난달 수익
+  const lastMonthEarnings = monthlyIncomeV1?.monthlyIncome || 0
 
   // 출금 가능 금액
   const availableAmount = writerWithdrawStatus?.withdraw_pen || 0
@@ -372,13 +380,74 @@ export default function MyEarningsView() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* 수익 요약 */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
-            <h2 className="text-lg font-semibold mb-4">수익 요약</h2>
+            <div className="flex items-center justify-start mb-4">
+              <h2 className="text-lg font-semibold">수익 요약</h2>
+            </div>
+
             <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-              <div className="text-gray-700">지난달까지 총 수익</div>
+              <div className="text-gray-700 flex items-center justify-start gap-2">
+                <span>총 수익</span>
+                <Tooltip
+                  content={`
+                    <div>
+                      <p><strong>총 수익 = 직접 수익 + 개인 후원 + 캐릭터 후원</strong></p>
+                      <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(229, 231, 235, 0.5);">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                          <span>이번달 수익:</span>
+                          <strong>${formatPen(currentMonthEarnings)} 펜</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                          <span>지난달 수익:</span>
+                          <strong>${formatPen(lastMonthEarnings)} 펜</strong>
+                        </div>
+                      </div>
+                      <ul style="margin-top: 12px;">
+                        <li>직접 수익: 자신의 캐릭터에서 발생한 수익</li>
+                        <li>개인 후원: 개인 후원으로 받은 금액</li>
+                        <li>캐릭터 후원: 캐릭터를 통해 후원 받은 금액</li>
+                      </ul>
+                    </div>
+                  `}
+                  position="bottom"
+                  allowHtml={true}
+                  offset={[0, 5]}
+                  animation="scale"
+                  theme="dark"
+                  interactive={true}
+                >
+                  <button className="text-gray-500 hover:text-gray-700">
+                    <FontAwesomeIcon icon={faInfoCircle} />
+                  </button>
+                </Tooltip>
+              </div>
               <div className="font-semibold text-xl flex items-center mt-1">
-                {formatPen(thisMonthEarnings)}{' '}
+                {formatPen(currentMonthEarnings + lastMonthEarnings)}{' '}
                 <Image src="/images/pen/pen_black.svg" alt="pen" width={18} height={18} className="ml-2" />
               </div>
+            </div>
+
+            {/* 이번달/지난달 수익 탭 UI */}
+            <div className="flex border-b border-gray-200 mb-4 w-full">
+              <button
+                onClick={() => setSelectedTab('current')}
+                className={`pb-2 px-4 font-medium text-sm flex-1 text-center ${
+                  selectedTab === 'current'
+                    ? 'text-primary-500 border-b-2 border-primary-500'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                이번달 수익
+              </button>
+              <button
+                onClick={() => setSelectedTab('last')}
+                className={`pb-2 px-4 font-medium text-sm flex-1 text-center ${
+                  selectedTab === 'last'
+                    ? 'text-primary-500 border-b-2 border-primary-500'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                지난달 수익
+              </button>
             </div>
 
             {/* 수익 내역 리스트 - 스크롤 가능한 영역으로 변경 */}

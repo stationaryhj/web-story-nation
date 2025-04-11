@@ -91,7 +91,6 @@ export default function EditCharacterPage() {
   }, [formData.hashtags])
 
   const handleSaveToNextStep = async () => {
-
     if (activeTab === 'basic') {
       await saveInProgress()
       setActiveTab('detail')
@@ -107,7 +106,6 @@ export default function EditCharacterPage() {
   // 폼 제출 핸들러
   const handleSubmit = async () => {
     try {
-
       // 기본 설정 부분에서 필수값 미입력 시 저장 불가, 미입력한 부분으로 페이지 이동 및 focus
       const isFormValid = checkFormValidity(formData, activeTab)
 
@@ -171,7 +169,7 @@ export default function EditCharacterPage() {
           onConfirm: async () => {
             const saveResult = await saveInProgress(1)
             if (!saveResult) return
-
+            setActiveTab('basic')
             closeModal()
             router.push('/my-characters')
           },
@@ -182,12 +180,30 @@ export default function EditCharacterPage() {
       }
 
       const saveResult = await saveInProgress(1)
+      setActiveTab('basic')
       router.push('/my-characters')
     } catch (error) {
       console.error('캐릭터 수정 실패:', error)
       toast.error('캐릭터 수정에 실패했습니다. 다시 시도해주세요.')
     }
   }
+
+  useEffect(() => {
+    // 뒤로가기를 포함한 모든 라우트 변경 전에 실행
+    setActiveTab('basic')
+
+    // 뒤로가기 감지를 위한 이벤트 리스너
+    const handleRouteChange = () => {
+      setActiveTab('basic')
+    }
+
+    window.addEventListener('popstate', handleRouteChange)
+
+    // 컴포넌트가 언마운트될 때 이벤트 리스너 제거
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange)
+    }
+  }, [])
 
   if (isLoadingData) {
     return (

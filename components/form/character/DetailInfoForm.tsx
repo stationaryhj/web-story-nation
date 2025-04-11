@@ -9,6 +9,7 @@ import { useAccountStore } from '@/store/useAccountStore'
 import RatingSelect from './RatingSelect'
 import Tutorial from '@/components/tutorial/Tutorial'
 import BaseModal from '@/components/modal/BaseModal'
+import { toast } from 'react-toastify'
 
 const createCharacterScenario = {
   storageKey: 'detail-info-tutorial-completed',
@@ -92,11 +93,15 @@ export default function DetailInfoForm({
   // 현재 선택된 입력 필드 (user 또는 character)
   const [activeField, setActiveField] = useState<{ id: string; field: 'user' | 'character' } | null>(null)
   const [showTutorial, setShowTutorial] = useState(false)
+  const [totalMessageLength, setTotalMessageLength] = useState(0) // 전체 메시지 길이
+  const [remainingChars, setRemainingChars] = useState(1500) // 남은 글자 수
 
   // 튜토리얼이 이미 표시된 적이 있는지 추적
   const tutorialShownRef = useRef(false)
   // 마지막 대화 예시 요소 참조
   const lastExampleRef = useRef<HTMLDivElement>(null)
+  // toast 알림 디바운스를 위한 타임아웃 참조
+  const toastDebounceRef = useRef<NodeJS.Timeout | null>(null)
 
   // 성인 인증 상태 확인
   const { isAdult } = useAccountStore()
@@ -106,12 +111,39 @@ export default function DetailInfoForm({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [deleteTargetId, setDeleteTargetId] = useState<string>('')
 
+  // 디바운스된 토스트 알림 함수
+  const showDebouncedToast = (message: string) => {
+    if (toastDebounceRef.current) {
+      clearTimeout(toastDebounceRef.current)
+    }
+
+    toastDebounceRef.current = setTimeout(() => {
+      toast.error(message)
+      toastDebounceRef.current = null
+    }, 500) // 500ms 디바운스 딜레이
+  }
+
+  // 전체 메시지 길이 계산 함수
+  const calculateTotalMessageLength = () => {
+    let total = 0
+    formData.conversationExamples.forEach((example: ConversationExample) => {
+      const { userMsg, characterMsg } = parseConversationExampleText(example.text)
+      total += userMsg.length + characterMsg.length
+    })
+    return total
+  }
+
+  // 전체 메시지 길이 업데이트
+  useEffect(() => {
+    const total = calculateTotalMessageLength()
+    setTotalMessageLength(total)
+    setRemainingChars(1500 - total)
+  }, [formData.conversationExamples])
+
   // 스크롤 후 튜토리얼 표시 함수
   const scrollAndShowTutorial = () => {
     // 스크롤 이전 위치 저장
     const startPosition = window.scrollY
-
-    console.log('[스크롤] 스크롤 시작:', startPosition)
 
     // 스크롤 대상 찾기: conversation-examples
     const conversationExamples = document.getElementById('scrollRef')
@@ -133,7 +165,6 @@ export default function DetailInfoForm({
 
       if (isAtBottom || Math.abs(currentPosition - startPosition) > scrollThreshold) {
         // 스크롤이 완료되었거나 충분히 이동했으면 튜토리얼 표시
-        console.log('[스크롤] 스크롤 완료 감지, 튜토리얼 표시')
         setShowTutorial(true)
         tutorialShownRef.current = true
         return true
@@ -166,7 +197,6 @@ export default function DetailInfoForm({
 
     // 2초 타임아웃 (최종 안전장치) - 데스크탑에서 스크롤 이벤트가 발생하지 않는 경우 대비
     setTimeout(() => {
-      console.log('[스크롤] 타임아웃, 튜토리얼 강제 표시')
       setShowTutorial(true)
       tutorialShownRef.current = true
       window.removeEventListener('scroll', handleScroll)
@@ -183,7 +213,6 @@ export default function DetailInfoForm({
       const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
 
       if (!tutorialCompleted && !tutorialShownRef.current) {
-        console.log('[대화 예시] 튜토리얼 시작 - 하단으로 스크롤')
         scrollAndShowTutorial()
       } else {
         // 자동 스크롤만 수행
@@ -200,7 +229,6 @@ export default function DetailInfoForm({
     if (formData.conversationExamples.length === 1 && !tutorialShownRef.current) {
       const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
       if (!tutorialCompleted) {
-        console.log('[튜토리얼] 대화 예시 발견, 튜토리얼 준비')
         scrollAndShowTutorial()
       }
     }
@@ -294,20 +322,48 @@ export default function DetailInfoForm({
 
   // 대화 예시 텍스트 변경 핸들러 (사용자 메시지)
   const handleUserMessageChange = (id: string, message: string) => {
+    // 기존 메시지 길이 계산
+    const oldMessage = userMessages[id] || ''
+    const lengthDiff = message.length - oldMessage.length
+
+    // 길이 제한 확인
+    if (totalMessageLength + lengthDiff > 1500) {
+      showDebouncedToast('전체 대화 예시는 1500자를 초과할 수 없습니다.')
+      return
+    }
+
     setUserMessages(prev => ({ ...prev, [id]: message }))
 
     // 기존 대화 예시 형식으로 변환하여 저장
     const combinedText = `User: ${message}\nCharacter: ${characterMessages[id] || ''}`
     updateConversationExample(id, combinedText)
+
+    // 전체 길이 업데이트
+    setTotalMessageLength(prev => prev + lengthDiff)
+    setRemainingChars(prev => prev - lengthDiff)
   }
 
   // 대화 예시 텍스트 변경 핸들러 (캐릭터 메시지)
   const handleCharacterMessageChange = (id: string, message: string) => {
+    // 기존 메시지 길이 계산
+    const oldMessage = characterMessages[id] || ''
+    const lengthDiff = message.length - oldMessage.length
+
+    // 길이 제한 확인
+    if (totalMessageLength + lengthDiff > 1500) {
+      showDebouncedToast('전체 대화 예시는 1500자를 초과할 수 없습니다.')
+      return
+    }
+
     setCharacterMessages(prev => ({ ...prev, [id]: message }))
 
     // 기존 대화 예시 형식으로 변환하여 저장
     const combinedText = `User: ${userMessages[id] || ''}\nCharacter: ${message}`
     updateConversationExample(id, combinedText)
+
+    // 전체 길이 업데이트
+    setTotalMessageLength(prev => prev + lengthDiff)
+    setRemainingChars(prev => prev - lengthDiff)
   }
 
   // 커서 관련 공통 함수
@@ -608,7 +664,7 @@ export default function DetailInfoForm({
                         <FontAwesomeIcon icon={faUser} className="mr-1" /> 유저 메시지
                       </label>
                       <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-                        {formatTextLength((userMessages[example.id] || '').length, 750)}
+                        {userMessages[example.id]?.length || 0}자
                       </span>
                     </div>
                     <textarea
@@ -619,7 +675,6 @@ export default function DetailInfoForm({
                       placeholder="유저 대화 내용을 입력하세요"
                       rows={2}
                       className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none text-sm"
-                      maxLength={750}
                     />
                   </div>
 
@@ -630,7 +685,7 @@ export default function DetailInfoForm({
                         <FontAwesomeIcon icon={faRobot} className="mr-1" /> 캐릭터 메시지
                       </label>
                       <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-                        {formatTextLength((characterMessages[example.id] || '').length, 750)}
+                        {characterMessages[example.id]?.length || 0}자
                       </span>
                     </div>
                     <textarea
@@ -641,12 +696,18 @@ export default function DetailInfoForm({
                       placeholder="캐릭터 대화 내용을 입력하세요"
                       rows={2}
                       className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none text-sm"
-                      maxLength={750}
                     />
                   </div>
                 </div>
               ))
             )}
+          </div>
+
+          {/* 전체 대화 예시 글자 수 표시 */}
+          <div className="mt-4 flex justify-end items-center">
+            <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
+              전체 대화 예시 글자 수: {totalMessageLength}/1500 (남은 글자 수: {remainingChars}자)
+            </span>
           </div>
         </div>
       </div>

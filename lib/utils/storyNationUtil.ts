@@ -249,23 +249,25 @@ export function bridgeLoginDataToUserInfo(data: LoginResponse | null) {
  */
 export function bridgeCharacterInProgressToCharacter(data: any) {
   // 대화 예시를 파싱하는 함수
+
+  console.log('data', data)
   const parseConversationExamples = (exampleText: string) => {
     // 대화 예시가 없으면 빈 배열 반환
-    if (!exampleText) return [];
-    
+    if (!exampleText) return []
+
     // 대화 예시들을 분리 (빈 줄 두 개로 구분)
-    const examples = exampleText.split('\n\n').filter(ex => ex.trim() !== '');
-    
+    const examples = exampleText.split('\n\n').filter(ex => ex.trim() !== '')
+
     return examples.map((example, index) => {
       // Title 포맷 확인: "Title: 제목\n내용" 형태로 되어 있는지 확인
-      const titleMatch = example.match(/^Title:\s*(.+?)\n([\s\S]*)$/);
-      let title = '';
-      let text = example;
-      
+      const titleMatch = example.match(/^Title:\s*(.+?)\n([\s\S]*)$/)
+      let title = ''
+      let text = example
+
       if (titleMatch) {
         // Title이 있는 경우, title과 text 분리
-        title = titleMatch[1].trim();
-        text = titleMatch[2].trim();
+        title = titleMatch[1].trim()
+        text = titleMatch[2].trim()
       }
 
       // ConversationExample 객체 생성
@@ -274,10 +276,10 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
         title,
         text,
         visibility: data.example_show_yn === 1 ? 'public' : 'private',
-        isEditing: false
-      };
-    });
-  };
+        isEditing: false,
+      }
+    })
+  }
 
   return {
     id: data.world_list_detail_chrbot_key?.toString() || '',
@@ -289,19 +291,25 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
     // 대화 예시 파싱
     conversationExamples: parseConversationExamples(data.example || ''),
     // 태그 처리
-    hashtags: data.tags ? data.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag !== '') : [],
+    hashtags: data.tags
+      ? data.tags
+          .split(',')
+          .map((tag: string) => tag.trim())
+          .filter((tag: string) => tag !== '')
+      : [],
     // 이미지 URL
     img_url: data.img_url || '',
     img_url_nsfw: data.img_url_nsfw || '',
     img_web_url: data.img_web_url || '',
     // 가시성 및 등급
     visibility: data.show_yn === 1 ? 'public' : 'private',
+    examplesVisibility: data.example_show_yn === 1 ? 'public' : 'private',
     rating: data.nsfw === 1 ? 'adult' : 'all',
     // 추가 데이터
     finish_yn: data.finish_yn || 0,
 
     // 공개 + 공개 일시에 비공개로 변경 불가능
-    isVisibilityLock: (data.finish_yn === 1 && data.show_yn === 1 )? true : false,
+    isVisibilityLock: data.finish_yn === 1 && data.show_yn === 1 ? true : false,
   }
 }
 
@@ -370,29 +378,31 @@ export const bridgeWithdrawDataToWithdrawItems = (data: any[], page: number = 1)
 
 export function getChangeNameTag(script: string, charName: string) {
   let changeScript = ''
-  const userName = useAccountStore.getState().isLogin ?
-    useAccountStore.getState().data?.persona || useAccountStore.getState().data?.nick_nm || '정보없음'
-    :
-    '아무개'
+  const userName = useAccountStore.getState().isLogin
+    ? useAccountStore.getState().data?.persona || useAccountStore.getState().data?.nick_nm || '정보없음'
+    : '아무개'
 
-  changeScript = script.replaceAll('{{character}}', charName).replaceAll('{{user}}', userName).replaceAll('{{char}}', charName)
+  changeScript = script
+    .replaceAll('{{character}}', charName)
+    .replaceAll('{{user}}', userName)
+    .replaceAll('{{char}}', charName)
   return changeScript
 }
 
 // 이미지 URL 유효성 체크 함수 추가
 export const getValidImageUrl = (url: string | null | undefined): string => {
-  if (!url) return "/images/placeholders/author_default_img.jpg";
-  
+  if (!url) return '/images/placeholders/author_default_img.jpg'
+
   try {
     // URL 유효성 체크 (상대 경로는 그대로 통과, 절대 경로는 유효한 URL인지 확인)
-    if (url.startsWith('/')) return url; // 상대 경로는 그대로 사용
-    new URL(url); // 절대 URL인 경우 유효성 체크
-    return url;
+    if (url.startsWith('/')) return url // 상대 경로는 그대로 사용
+    new URL(url) // 절대 URL인 경우 유효성 체크
+    return url
   } catch (e) {
-    console.warn('Invalid image URL:', url);
-    return "/images/placeholders/author_default_img.jpg";
+    console.warn('Invalid image URL:', url)
+    return '/images/placeholders/author_default_img.jpg'
   }
-};
+}
 
 function getCategory(gender: number) {
   if (gender === 1) {
@@ -403,4 +413,3 @@ function getCategory(gender: number) {
     return 'unspecified'
   }
 }
-
