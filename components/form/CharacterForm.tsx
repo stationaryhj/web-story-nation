@@ -20,9 +20,10 @@ interface CharacterFormProps {
   mode: 'basic' | 'detail' | 'image'
   invalidFields?: { [key: string]: boolean }
   isSubmitting?: boolean
+  privateOpenCharacterCount?: number
 }
 
-export default function CharacterForm({ mode, invalidFields = {}, isSubmitting = false }: CharacterFormProps) {
+export default function CharacterForm({ mode, invalidFields = {}, isSubmitting = false, privateOpenCharacterCount }: CharacterFormProps) {
   const {
     formData,
     setFormField,
@@ -76,6 +77,7 @@ export default function CharacterForm({ mode, invalidFields = {}, isSubmitting =
         availableTags={availableTags}
         isLoadingTags={isLoadingTags}
         invalidFields={invalidFields}
+        privateOpenCharacterCount={privateOpenCharacterCount}
       />
     )
   }

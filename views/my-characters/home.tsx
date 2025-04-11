@@ -31,9 +31,6 @@ export default function MyCharacterPage() {
     }
   }, [inProgressData?.result.err])
 
-  
-
-
   const myCharacters = bridgeCharbotGetListMineDataToCharacter(inProgressData?.chrbotList.data || []).map(char => ({
     ...char,
     creator: {
