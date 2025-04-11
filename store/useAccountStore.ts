@@ -864,7 +864,7 @@ export const useAccountStore = create<AccountState>()(
                     message: '본인인증 시간이 초과되었습니다.' 
                   });
                 }
-              }, 30000); // 30초 타임아웃
+              }, 60000 * 5); // 30초 타임아웃
               
               const messageHandler = async (event: MessageEvent) => {
                 // 메시지 출처 검증 (같은 도메인에서 온 메시지만 처리)
