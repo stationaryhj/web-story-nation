@@ -216,9 +216,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   const [isMoreSidebarOpen, setIsMoreSidebarOpen] = useState(false)
 
   // 캐릭터 이미지
-  const [showImage, setShowImage] = useState(
-    getValidImageUrl(character.imageUrl)
-  )
+  const [showImage, setShowImage] = useState(getValidImageUrl(character.imageUrl))
 
   // 배경 이미지 상태 추가
   const [isBackgroundEnabled, setIsBackgroundEnabled] = useState(true)
@@ -235,7 +233,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   // 채팅 컨테이너 ref
   const chatContainerRef = useRef<HTMLDivElement>(null)
   const toastShownRef = useRef(false)
-
 
   // 메시지 디버깅을 위한 로깅 추가 - 무한 루프 문제 수정
   useEffect(() => {
@@ -359,14 +356,12 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       // 사용 가능한 채팅 모드 중 첫번째 선택 (또는 기본값 2번)
       // const selectedModeId = chatMode && chatMode.length > 0 ? chatMode[0].chat_mode : 2
 
-
       // default selectModeId 변경 ( 04.10 )
       /*
         1. 선택된 캐릭터 기준 성인전용이면 성인모드 선택 ( 4 )
         2. 성인전용이 아니면 스토리모드 선택 ( 2 )
       */
       const selectedModeId = character.isAdult ? 4 : 2
-
 
       console.log('💬 채팅방 초기화 시작 - ID:', character.id, '모드:', selectedModeId)
 
@@ -1254,10 +1249,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           className="flex-1 flex flex-col bg-gradient-to-b from-gray-50 to-white"
           style={{
             minWidth: 0,
-            backgroundImage:
-              isMobile && isBackgroundEnabled
-                ? `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(${showImage || '/images/character1.jpg'})`
-                : 'none',
+            backgroundImage: isMobile && isBackgroundEnabled ? `url(${showImage || '/images/character1.jpg'})` : 'none',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}

@@ -68,6 +68,21 @@ export default function Tutorial({ isOpen, onClose, config }: TutorialProps) {
     }
   }, [isOpen, config.storageKey, onClose])
 
+  // 튜토리얼 활성화 시 스크롤 막기
+  useEffect(() => {
+    if (isOpen) {
+      // 원래 스타일 저장
+      const originalStyle = window.getComputedStyle(document.body).overflow
+      // 스크롤 막기
+      document.body.style.overflow = 'hidden'
+
+      // 컴포넌트 언마운트 시 원래 스타일로 복원
+      return () => {
+        document.body.style.overflow = originalStyle
+      }
+    }
+  }, [isOpen])
+
   useEffect(() => {
     console.log('onClose')
   }, [onClose])

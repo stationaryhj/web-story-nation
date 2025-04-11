@@ -32,6 +32,7 @@ export interface CharacterFormData {
   gender: CharacterGender
   visibility: CharacterVisibility
   examplesVisibility: CharacterVisibility
+  detailVisibility: CharacterVisibility
   rating: CharacterRating
   bio: string
   firstMessage: string
@@ -103,6 +104,7 @@ const defaultFormData: CharacterFormData = {
   gender: 'unspecified',
   visibility: 'private',
   examplesVisibility: 'private',
+  detailVisibility: 'public',
   rating: 'all',
   bio: '',
   firstMessage: '',

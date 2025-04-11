@@ -284,7 +284,7 @@ export default function DetailInfoForm({
 
   // 게시 범위 선택 핸들러 (상세 설명용)
   const handleVisibilitySelect = (visibility: 'public' | 'private') => {
-    setFormField('visibility', visibility)
+    setFormField('detailVisibility', visibility)
   }
 
   // 대화 예시 공개 여부 선택 핸들러
@@ -490,7 +490,7 @@ export default function DetailInfoForm({
               type="button"
               onClick={() => handleVisibilitySelect('private')}
               className={`w-full px-2 sm:px-3 py-1 sm:py-2 text-sm sm:text-base rounded-lg text-center transition-colors ${
-                formData.visibility === 'private'
+                formData.detailVisibility === 'private'
                   ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                   : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
               }`}
@@ -501,7 +501,7 @@ export default function DetailInfoForm({
               type="button"
               onClick={() => handleVisibilitySelect('public')}
               className={`w-full px-2 sm:px-3 py-1 sm:py-2 text-sm sm:text-base rounded-lg text-center transition-colors ${
-                formData.visibility === 'public'
+                formData.detailVisibility === 'public'
                   ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
                   : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
               }`}
