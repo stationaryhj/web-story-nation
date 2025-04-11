@@ -140,6 +140,7 @@ export default function LoginPage() {
           isOpen={showSignup} 
           onClose={handleSignupClose} 
           onSuccess={handleSignupSuccess}
+          state={'signup'}
         />
       )}
     </PageTransition>
