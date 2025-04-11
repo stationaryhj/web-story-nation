@@ -3,7 +3,7 @@
 import { create } from 'zustand'
 import { createApi, contentApi } from '@/services/api'
 import { toast } from 'react-toastify'
-import { bridgeCharacterInProgressToCharacter } from '@/lib/utils/storyNationUtil'
+import { bridgeCharacterInProgressToCharacter, ConversationExampleJSON } from '@/lib/utils/storyNationUtil'
 
 export type CharacterGender = 'male' | 'female' | 'unspecified'
 export type CharacterVisibility = 'public' | 'private'
@@ -11,6 +11,15 @@ export type CharacterRating = 'all' | 'adult'
 
 // 이미지 타입 정의
 export type ImageType = 'normal' | 'adult'
+
+// 대화 예시 데이터 타입 정의
+interface exampleDatas {
+  index: number
+  title: string
+  userMsg: string
+  characterMsg: string
+}
+
 
 // 이미지 인터페이스 정의
 export interface CharacterImage {
@@ -50,7 +59,7 @@ export interface CharacterFormData {
 
   // 상세 설정
   bioDetail: string
-  conversationExamples: Array<ConversationExample>
+  conversationExamples: exampleDatas[]
 
   // 이미지 설정 - 경로만 저장
   imgUrl: string // 기본 이미지 경로
@@ -219,11 +228,14 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         return state
       }
 
-      const newExample: ConversationExample = {
-        id: generateId(),
-        text: '',
-        isEditing: true,
-        visibility: 'private',
+      // 추가되는 새 예제의 인덱스
+      const newIndex = state.formData.conversationExamples.length
+
+      const newExample = {
+        index: newIndex,
+        title: '',
+        userMsg: '',
+        characterMsg: '',
       }
 
       return {

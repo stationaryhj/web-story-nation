@@ -13,6 +13,21 @@ import {
 import { ChatMode } from '@/components/modal/ChatModeModal'
 import { useAccountStore } from '@/store/useAccountStore'
 
+export interface ConversationExampleJSON {
+  text_counts: number[];
+  titles: string[];
+  examples: {
+    example: ExampleData[];
+  }[];
+
+  count: number
+}
+
+interface ExampleData {
+  speaker: string
+  message: string
+}
+
 /**
   get image Uri
  */
@@ -242,6 +257,40 @@ export function bridgeLoginDataToUserInfo(data: LoginResponse | null) {
   }
 }
 
+
+const parseConversationExamples = (exampleText: string) => {
+  // 대화 예시가 없으면 빈 배열 반환
+  if (!exampleText) return []
+
+  return JSON.parse(exampleText) as ConversationExampleJSON
+
+  // // 대화 예시들을 분리 (빈 줄 두 개로 구분)
+  // const examples = exampleText.split('\n\n').filter(ex => ex.trim() !== '')
+
+  // return examples.map((example, index) => {
+  //   // Title 포맷 확인: "Title: 제목\n내용" 형태로 되어 있는지 확인
+  //   const titleMatch = example.match(/^Title:\s*(.+?)\n([\s\S]*)$/)
+  //   let title = ''
+  //   let text = example
+
+  //   if (titleMatch) {
+  //     // Title이 있는 경우, title과 text 분리
+  //     title = titleMatch[1].trim()
+  //     text = titleMatch[2].trim()
+  //   }
+
+  //   // ConversationExample 객체 생성
+  //   return {
+  //     id: `example-${index}-${Math.random().toString(36).substring(2, 11)}`,
+  //     title,
+  //     text,
+  //     visibility: data.example_show_yn === 1 ? 'public' : 'private',
+  //     isEditing: false,
+  //   }
+  // })
+}
+
+
 /**
  * 진행 중인 캐릭터 생성 데이터를 Character 타입으로 변환하는 함수
  * @param data - 진행 중인 캐릭터 생성 데이터
@@ -251,35 +300,7 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
   // 대화 예시를 파싱하는 함수
 
   console.log('data', data)
-  const parseConversationExamples = (exampleText: string) => {
-    // 대화 예시가 없으면 빈 배열 반환
-    if (!exampleText) return []
 
-    // 대화 예시들을 분리 (빈 줄 두 개로 구분)
-    const examples = exampleText.split('\n\n').filter(ex => ex.trim() !== '')
-
-    return examples.map((example, index) => {
-      // Title 포맷 확인: "Title: 제목\n내용" 형태로 되어 있는지 확인
-      const titleMatch = example.match(/^Title:\s*(.+?)\n([\s\S]*)$/)
-      let title = ''
-      let text = example
-
-      if (titleMatch) {
-        // Title이 있는 경우, title과 text 분리
-        title = titleMatch[1].trim()
-        text = titleMatch[2].trim()
-      }
-
-      // ConversationExample 객체 생성
-      return {
-        id: `example-${index}-${Math.random().toString(36).substring(2, 11)}`,
-        title,
-        text,
-        visibility: data.example_show_yn === 1 ? 'public' : 'private',
-        isEditing: false,
-      }
-    })
-  }
 
   return {
     id: data.world_list_detail_chrbot_key?.toString() || '',
