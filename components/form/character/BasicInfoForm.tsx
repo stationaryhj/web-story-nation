@@ -266,7 +266,7 @@ export default function BasicInfoForm({
                 </RequiredLabel>
               </div>
               <div>
-                <p className="text-md dark:text-dark-secondary-500 mb-2">생성 가능한 비공개 캐릭터 {privateOpenCharacterCount} / 3</p>
+                <p className="text-md dark:text-dark-secondary-500 mb-2">생성 가능한 비공개 캐릭터 {3 - privateOpenCharacterCount} / 3</p>
               </div>
             </div>
             <div className="mt-2 grid grid-cols-2 gap-4">
