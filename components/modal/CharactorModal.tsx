@@ -87,10 +87,10 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   }
 
   const exampleDatas = chatBotData?.chrbot?.example ? bridgeExampleData(chatBotData.chrbot.example) : []
-  const isExampleShow = (chatBotData?.chrbot?.example_show_yn === 1 && exampleDatas.length > 0) ? 1 : 0
+  const isExampleShow = chatBotData?.chrbot?.example_show_yn === 1 && exampleDatas.length > 0 ? 1 : 0
 
   const content = getChangeNameTag(chatBotData?.chrbot?.content || '', selectedCharacter?.name || '')
-  const isContentShow = (chatBotData?.chrbot?.content_show_yn === 1 && content !== '') ? 1 : 0
+  const isContentShow = chatBotData?.chrbot?.content_show_yn === 1 && content !== '' ? 1 : 0
 
   useEffect(() => {
     if (chatBotData) {
@@ -249,25 +249,38 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   <div
                     className={`absolute inset-0 flex items-center justify-center bg-secondary-100 dark:bg-dark-secondary-800 transition-opacity duration-300 ${isImageLoaded ? 'opacity-0' : 'opacity-100'}`}
                   >
-                    <div className="w-10 h-10 rounded-full border-2 border-primary-500 border-t-transparent animate-spin"></div>
+                    <div className="w-8 h-8 rounded-full border-2 border-primary-500 border-t-transparent animate-spin"></div>
                   </div>
-                  <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingTop: '100%' }}>
-                    <div className="absolute inset-0 bg-gradient-to-b from-primary-100 via-primary-50/80 to-transparent dark:from-dark-primary-800 dark:via-dark-primary-700/80 dark:to-transparent rounded-2xl opacity-90 z-0"></div>
-                    <Image
-                      src={selectedCharacter.imageUrl}
-                      alt={selectedCharacter.name || '캐릭터 이미지'}
-                      priority
-                      fill
-                      className="transition-opacity duration-300 z-10 opacity-100 drop-shadow-md"
-                      style={{ objectFit: 'contain', objectPosition: 'center' }}
-                      onLoadingComplete={() => setIsImageLoaded(true)}
-                    />
-                    {/* 19세 이상 뱃지 */}
-                    {selectedCharacter.isAdult && (
-                      <div className="absolute z-30 flex items-center" style={{ top: '15px', right: '15px' }}>
-                        <Image src="/images/flames.png" alt="성인인증" width={27.7} height={35.3} />
-                      </div>
-                    )}
+
+                  <div
+                    id="image_container"
+                    className="w-full h-auto max-h-[500px] relative rounded-xl overflow-hidden flex items-center justify-center"
+                  >
+                    <div className="relative">
+                      <Image
+                        src={selectedCharacter.imageUrl}
+                        alt={selectedCharacter.name || '캐릭터 이미지'}
+                        priority
+                        width={400}
+                        height={400}
+                        className="transition-opacity duration-300 z-10 opacity-100 drop-shadow-md rounded-xl"
+                        style={{
+                          objectFit: 'contain',
+                          maxWidth: '100%',
+                          maxHeight: '480px',
+                          width: 'auto',
+                          height: 'auto',
+                        }}
+                        onLoadingComplete={() => setIsImageLoaded(true)}
+                      />
+
+                      {/* 19세 이상 뱃지 - 이미지에 직접 배치 */}
+                      {selectedCharacter.isAdult && (
+                        <div className="absolute z-30 flex items-center" style={{ top: '15px', right: '15px' }}>
+                          <Image src="/images/flames.png" alt="성인인증" width={27.7} height={35.3} />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </>
               )}
@@ -437,7 +450,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
         {/* 모바일 레이아웃 */}
         <div className="md:hidden w-full overflow-y-auto max-h-full">
           {/* 상단: 이미지 섹션 */}
-          <div className="w-full mb-3 relative bg-gradient-to-b from-primary-100 to-primary-50 dark:from-dark-primary-900 dark:to-dark-primary-800 flex-shrink-0 max-h-[40vh] overflow-hidden">
+          <div className="w-full mb-3 relative bg-gradient-to-b from-primary-100 to-primary-50 dark:from-dark-primary-900 dark:to-dark-primary-800 flex-shrink-0 overflow-hidden">
             {selectedCharacter.imageUrl && (
               <>
                 <div
@@ -445,22 +458,36 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                 >
                   <div className="w-8 h-8 rounded-full border-2 border-primary-500 border-t-transparent animate-spin"></div>
                 </div>
-                <div className="relative w-full" style={{ paddingTop: '100%' }}>
-                  <div className="absolute inset-0 bg-gradient-to-b from-primary-100 via-primary-50/80 to-transparent dark:from-dark-primary-800 dark:via-dark-primary-700/80 dark:to-transparent rounded-md opacity-90 z-0"></div>
-                  <Image
-                    src={selectedCharacter.imageUrl}
-                    alt={selectedCharacter.name || '캐릭터 이미지'}
-                    fill
-                    priority
-                    className={`transition-opacity duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'} drop-shadow-md z-10`}
-                    style={{ objectFit: 'contain', objectPosition: 'center' }}
-                    onLoadingComplete={() => setIsImageLoaded(true)}
-                  />
-                  {selectedCharacter.isAdult && (
-                    <div className="absolute z-30 flex items-center" style={{ top: '15px', right: '15px' }}>
-                      <Image src="/images/flames.png" alt="성인인증" width={27.7} height={35.3} />
-                    </div>
-                  )}
+
+                <div
+                  id="mobile_image_container"
+                  className="w-full h-auto max-h-[40vh] relative flex items-center justify-center p-4 bg-gradient-to-b from-primary-100 via-primary-50/80 to-transparent dark:from-dark-primary-800 dark:via-dark-primary-700/80 dark:to-transparent"
+                >
+                  <div className="relative">
+                    <Image
+                      src={selectedCharacter.imageUrl}
+                      alt={selectedCharacter.name || '캐릭터 이미지'}
+                      priority
+                      width={300}
+                      height={300}
+                      className={`transition-opacity duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'} drop-shadow-md z-10 rounded-xl`}
+                      style={{
+                        objectFit: 'contain',
+                        maxWidth: '100%',
+                        maxHeight: 'calc(40vh - 40px)',
+                        width: 'auto',
+                        height: 'auto',
+                      }}
+                      onLoadingComplete={() => setIsImageLoaded(true)}
+                    />
+
+                    {/* 19세 이상 뱃지 - 이미지에 직접 배치 */}
+                    {selectedCharacter.isAdult && (
+                      <div className="absolute z-30 flex items-center" style={{ top: '15px', right: '15px' }}>
+                        <Image src="/images/flames.png" alt="성인인증" width={27.7} height={35.3} />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </>
             )}
