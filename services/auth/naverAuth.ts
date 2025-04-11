@@ -324,7 +324,7 @@ export class NaverAuthService extends BaseAuthService {
         
         // 임시 데이터 삭제
         localStorage.removeItem('naver_login_timeout');
-        localStorage.removeItem('social_login_state');
+        // localStorage.removeItem('social_login_state');
         localStorage.removeItem('social_login_type');
         localStorage.removeItem('naver_callback_processing'); // 처리 상태 플래그 제거
         

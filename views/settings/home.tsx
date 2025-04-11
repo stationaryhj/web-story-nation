@@ -55,10 +55,12 @@ export default function SettingsForm() {
   const { data: userInfo, writerInfo, fetchWriterInfo, logout, getCoinSum, uploadProfileImage } = useAccountStore()
   const { getBankList } = useBankStore()
 
+  const login_sns_state = localStorage.getItem('social_login_state') || ''
+
   // 사용자 정보 상태
   const [profile, setProfile] = useState({
     nickname: userInfo?.nick_nm || '',
-    platform: getPlatform(Number(userInfo?.sns_type)) || '',
+    platform: getPlatform(JSON.parse(login_sns_state || '{}')?.snstype || 0) || '',
     minor: userInfo?.minor || 0,
     intro: userInfo?.intro || '',
 

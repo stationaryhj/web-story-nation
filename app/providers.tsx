@@ -41,6 +41,22 @@ export default function Providers({ children }: { children: ReactNode }) {
     }
 
     hydrateStore()
+
+    // 카카오톡 내장 브라우저 감지
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isKakaoBrowser = userAgent.indexOf('kakaotalk') > -1;
+    
+    if (isKakaoBrowser) {
+      // 현재 URL 저장 (로그인 후 돌아올 URL)
+      const returnUrl = encodeURIComponent(window.location.href);
+      
+      // 모바일 기기 확인 및 적절한 외부 브라우저 열기
+      if (/iPhone|iPad|iPod/.test(userAgent)) {
+        // Safari로 직접 열기
+      } else {
+        window.location.href = `intent://${window.location.host}${window.location.pathname}#Intent;scheme=https;package=com.android.chrome;end`;
+      }
+    }
   }, [])
 
   // 다크모드 초기화
