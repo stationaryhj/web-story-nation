@@ -75,6 +75,13 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
       return false
     }
 
+    // 8자리 완성 여부 확인 (최종 제출 또는 포커스 아웃 시)
+    if (value.length > 0 && value.length < 8) {
+      console.log('Incomplete birthdate (less than 8 digits)')
+      setBirthError('생년월일 8자리를 모두 입력해주세요.')
+      return false
+    }
+
     // 숫자가 한 자리라도 입력된 경우에만 검사
     if (value.length > 0) {
       // 연도 검사 (1900년 이상)

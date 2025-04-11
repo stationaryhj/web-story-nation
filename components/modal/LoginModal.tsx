@@ -276,6 +276,14 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               </div>
             </button>
           </div>
+          <button
+            onClick={() => setShowSignup(true)}
+            className="mt-4 flex w-full h-12 items-center justify-center rounded-full bg-gray-100 py-1 font-medium text-gray-700 shadow transition-colors hover:bg-gray-200"
+          >
+            <div className="flex items-center justify-center gap-2">
+              <span>간편 회원가입</span>
+            </div>
+          </button>
           {/* 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
