@@ -198,15 +198,17 @@ export default function ImageUploadForm({
               },
             })
 
-            console.log(isNormalImage, isAdultImage)
-
+            // 이미지 타입에 따라 적절한 상태 업데이트 함수 호출
             if (isNormalImage) {
               if (isAdultImage) {
-                setAdultNormalImage(s3FilePath)
+                // 성인 기본 이미지 (성인모드-정상모드)
+                setNormalImage(s3FilePath)
               } else {
+                // 전체이용가 이미지
                 setNormalImage(s3FilePath)
               }
             } else {
+              // 성인 전용 이미지 (짜릿 모드)
               setAdultImage(s3FilePath)
             }
 
