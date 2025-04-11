@@ -111,8 +111,6 @@ export default function DetailInfoForm({
     // 스크롤 이전 위치 저장
     const startPosition = window.scrollY
 
-    console.log('[스크롤] 스크롤 시작:', startPosition)
-
     // 스크롤 대상 찾기: conversation-examples
     const conversationExamples = document.getElementById('scrollRef')
     const targetElement = conversationExamples || document.body
@@ -133,7 +131,6 @@ export default function DetailInfoForm({
 
       if (isAtBottom || Math.abs(currentPosition - startPosition) > scrollThreshold) {
         // 스크롤이 완료되었거나 충분히 이동했으면 튜토리얼 표시
-        console.log('[스크롤] 스크롤 완료 감지, 튜토리얼 표시')
         setShowTutorial(true)
         tutorialShownRef.current = true
         return true
@@ -166,7 +163,6 @@ export default function DetailInfoForm({
 
     // 2초 타임아웃 (최종 안전장치) - 데스크탑에서 스크롤 이벤트가 발생하지 않는 경우 대비
     setTimeout(() => {
-      console.log('[스크롤] 타임아웃, 튜토리얼 강제 표시')
       setShowTutorial(true)
       tutorialShownRef.current = true
       window.removeEventListener('scroll', handleScroll)
@@ -183,7 +179,6 @@ export default function DetailInfoForm({
       const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
 
       if (!tutorialCompleted && !tutorialShownRef.current) {
-        console.log('[대화 예시] 튜토리얼 시작 - 하단으로 스크롤')
         scrollAndShowTutorial()
       } else {
         // 자동 스크롤만 수행
@@ -200,7 +195,6 @@ export default function DetailInfoForm({
     if (formData.conversationExamples.length === 1 && !tutorialShownRef.current) {
       const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
       if (!tutorialCompleted) {
-        console.log('[튜토리얼] 대화 예시 발견, 튜토리얼 준비')
         scrollAndShowTutorial()
       }
     }

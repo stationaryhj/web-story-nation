@@ -76,8 +76,6 @@ export default function Card({
     }
   }
 
-  console.log('isCharacterRankingSidebar', isCharacterRankingSidebar)
-
   // 이미지 로드 에러 핸들러
   const handleImageError = () => {
     setImageError(true)

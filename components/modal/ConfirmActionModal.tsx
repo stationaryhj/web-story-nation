@@ -60,9 +60,11 @@ export default function ConfirmActionModal({
       size="sm"
     >
       {typeof description === 'string' ? (
-        <p className="text-secondary-800 dark:text-dark-secondary-200">{description}</p>
+        <div className="flex flex-col gap-2 justify-center items-center px-8 pb-4">
+          <p className="text-center text-secondary-800 dark:text-dark-secondary-200">{description}</p>
+        </div>
       ) : (
-        description
+        <div className="flex flex-col gap-2 justify-center items-center px-8 pb-4 text-center">{description}</div>
       )}
     </BaseModal>
   )
