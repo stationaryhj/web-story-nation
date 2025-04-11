@@ -647,7 +647,8 @@ export const useAccountStore = create<AccountState>()(
               data: result.data, 
               loading: false 
             });
-            
+
+            await get().updateUserInfoFromUserInfo()
             await get().fetchWriterInfo();
             
             // 성공 콜백 호출
