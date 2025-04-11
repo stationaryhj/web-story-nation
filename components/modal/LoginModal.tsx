@@ -44,7 +44,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       clearTimeout(parseInt(timeoutId))
       localStorage.removeItem('naver_login_timeout')
     }
-    localStorage.removeItem('social_login_state')
+    // localStorage.removeItem('social_login_state')
     localStorage.removeItem('social_login_type')
 
     // 콜백 처리 상태 초기화
@@ -197,7 +197,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   // 회원가입 성공 시 모달 닫기
   const handleSignupSuccess = () => {
     // 임시 저장 데이터 정리
-    localStorage.removeItem('social_login_state')
+    // localStorage.removeItem('social_login_state')
     localStorage.removeItem('social_login_type')
 
     setShowSignup(false)

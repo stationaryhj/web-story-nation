@@ -240,7 +240,7 @@ export class AuthManager {
         
         // 모든 임시 데이터 삭제
         localStorage.removeItem('signup_data');
-        localStorage.removeItem('social_login_state');
+        // localStorage.removeItem('social_login_state');
         localStorage.removeItem('social_login_type');
         this.clearSocialAuthInfo();
         
@@ -322,7 +322,7 @@ export class AuthManager {
       
       // 로그인 성공 시에만 인증 정보와 로컬 스토리지 데이터 초기화
       if (result.success) {
-        localStorage.removeItem('social_login_state');
+        // localStorage.removeItem('social_login_state');
         localStorage.removeItem('social_login_type');
         localStorage.removeItem('social_login_in_progress');
         this.clearSocialAuthInfo();

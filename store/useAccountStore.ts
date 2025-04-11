@@ -574,7 +574,7 @@ export const useAccountStore = create<AccountState>()(
             await get().fetchWriterInfo();
             
             // 로그인 성공 시 임시 데이터 삭제
-            localStorage.removeItem('social_login_state');
+            // localStorage.removeItem('social_login_state');
             
             // 로그인 성공 콜백 호출
             if (onLoginSuccess) {
@@ -597,7 +597,7 @@ export const useAccountStore = create<AccountState>()(
               }));
               
               // 로그인용 임시 데이터는 삭제 (회원가입에 필요한 데이터만 유지)
-              localStorage.removeItem('social_login_state');
+              // localStorage.removeItem('social_login_state');
               
               // 회원가입 모달 표시 요청
               onSignupRequired();
@@ -613,7 +613,7 @@ export const useAccountStore = create<AccountState>()(
               }));
               
               // 로그인용 임시 데이터는 삭제 (회원가입에 필요한 데이터만 유지)
-              localStorage.removeItem('social_login_state');
+              // localStorage.removeItem('social_login_state');
               
               window.location.href = `/register?state=${stateParam}`;
               return false;
