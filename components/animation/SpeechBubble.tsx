@@ -36,7 +36,7 @@ export const SpeechBubble = ({ text, className = '', position = 'center' }: Spee
       <div
         className={`absolute -bottom-2 ${positionStyles[position]} w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white dark:border-t-gray-800`}
       />
-      <p className="text-primary-500 font-medium">{text}</p>
+      <p className="text-primary-500 font-medium text-center">{text}</p>
     </motion.div>
   )
 }
