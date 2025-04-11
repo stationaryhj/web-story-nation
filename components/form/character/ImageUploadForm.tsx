@@ -287,7 +287,7 @@ export default function ImageUploadForm({
         </div>
       </div>
       {/* 이미지 그리드 */}
-      <div className="flex">
+      <div className="flex justify-center ">
         {/* 이미지 표시 - 전체 이용가인 경우 */}
         {formData.rating === 'all' && (
           <div className="flex flex-col justify-between min-w-[150px] md:min-w-[300px]">
@@ -313,7 +313,7 @@ export default function ImageUploadForm({
               </div>
             ) : (
               <label
-                className={`block aspect-square rounded-lg border-2 border-dashed ${
+                className={`block aspect-square rounded-lg border-2 border-dashed mx-auto w-full ${
                   invalidFields?.image
                     ? 'border-red-500 bg-red-50 dark:border-red-500/70 dark:bg-red-950/20'
                     : 'border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500'
@@ -362,7 +362,7 @@ export default function ImageUploadForm({
                 </div>
               ) : (
                 <label
-                  className={`block aspect-square rounded-lg border-2 border-dashed ${
+                  className={`block aspect-square rounded-lg border-2 border-dashed mx-auto w-full ${
                     invalidFields?.image
                       ? 'border-red-500 bg-red-50 dark:border-red-500/70 dark:bg-red-950/20'
                       : 'border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500'
@@ -415,7 +415,7 @@ export default function ImageUploadForm({
                 </div>
               ) : (
                 <label
-                  className={`block aspect-square rounded-lg border-2 border-dashed ${
+                  className={`block aspect-square rounded-lg border-2 border-dashed mx-auto w-full ${
                     invalidFields?.image
                       ? 'border-red-500 bg-red-50 dark:border-red-500/70 dark:bg-red-950/20'
                       : 'border-secondary-300 dark:border-dark-secondary-300/20 hover:border-primary-500 dark:hover:border-dark-primary-500'
