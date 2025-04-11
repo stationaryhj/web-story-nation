@@ -450,7 +450,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
         {/* 모바일 레이아웃 */}
         <div className="md:hidden w-full overflow-y-auto max-h-full">
           {/* 상단: 이미지 섹션 */}
-          <div className="w-full mb-3 relative bg-gradient-to-b from-primary-100 to-primary-50 dark:from-dark-primary-900 dark:to-dark-primary-800 flex-shrink-0 overflow-hidden">
+          <div className="w-full mb-3 relative flex-shrink-0 overflow-hidden">
             {selectedCharacter.imageUrl && (
               <>
                 <div
@@ -461,7 +461,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
 
                 <div
                   id="mobile_image_container"
-                  className="w-full h-auto max-h-[40vh] relative flex items-center justify-center p-4 bg-gradient-to-b from-primary-100 via-primary-50/80 to-transparent dark:from-dark-primary-800 dark:via-dark-primary-700/80 dark:to-transparent"
+                  className="w-full h-auto max-h-[40vh] relative flex items-center justify-center"
                 >
                   <div className="relative">
                     <Image
