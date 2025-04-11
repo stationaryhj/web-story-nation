@@ -10,7 +10,14 @@ import CharacterForm from '@/components/form/CharacterForm'
 import { toast } from 'react-toastify'
 import { useModalStore } from '@/store/useStoreModal'
 import { useAccountStore } from '@/store/useAccountStore'
+import { GetCreateChatBotListMine } from '@/services/hooks/DataListManager'
+
 export default function EditCharacterPage() {
+  const myNickName = useAccountStore.getState().data?.nick_nm
+  const { data: inProgressData, refetch: refetchInProgress } = GetCreateChatBotListMine(myNickName || '', 1, 50)
+  const privateOpenCharacterCount = inProgressData?.chrbotList.data.filter(
+    char => char.finish_yn === 1 && char.show_yn === 0).length || 0
+
   const { openModal, closeModal } = useModalStore()
   const isAdult = useAccountStore(state => state.isAdult)
 
@@ -270,6 +277,7 @@ export default function EditCharacterPage() {
                   mode={activeTab}
                   invalidFields={invalidFields}
                   isSubmitting={isSubmitting}
+                  privateOpenCharacterCount={privateOpenCharacterCount}
                 />
               </FadeIn>
             </div>

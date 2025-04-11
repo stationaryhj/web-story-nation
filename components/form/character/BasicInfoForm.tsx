@@ -24,6 +24,7 @@ interface BasicInfoFormProps {
   isLoadingTags: boolean
   onValidationChange?: (isValid: boolean) => void
   invalidFields?: { [key: string]: boolean }
+  privateOpenCharacterCount?: number
 }
 
 export default function BasicInfoForm({
@@ -38,6 +39,7 @@ export default function BasicInfoForm({
   isLoadingTags,
   onValidationChange,
   invalidFields = {},
+  privateOpenCharacterCount = 0,
 }: BasicInfoFormProps) {
   const [visibleWarnigModal, setVisibleWarnigModal] = useState(false)
   const [customTagInput, setCustomTagInput] = useState('')
@@ -95,6 +97,11 @@ export default function BasicInfoForm({
     // 이미 공개된 캐릭터라면 비공개로 변경 불가능
     if (formData.isVisibilityLock) {
       toast.error('공개된 캐릭터는 비공개로 전환할 수 없어요!')
+      return
+    }
+
+    if(visibility === 'private' && privateOpenCharacterCount >= 3) {
+      console.log('더이상 만들지 못함!!!!!! ')
       return
     }
 
@@ -259,7 +266,7 @@ export default function BasicInfoForm({
                 </RequiredLabel>
               </div>
               <div>
-                <p className="text-md dark:text-dark-secondary-500 mb-2">생성 가능한 비공개 캐릭터 0 / 3</p>
+                <p className="text-md dark:text-dark-secondary-500 mb-2">생성 가능한 비공개 캐릭터 {privateOpenCharacterCount} / 3</p>
               </div>
             </div>
             <div className="mt-2 grid grid-cols-2 gap-4">
