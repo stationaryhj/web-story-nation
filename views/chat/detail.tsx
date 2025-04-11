@@ -117,7 +117,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   }))
 
   // 주석 해제
-  const first_talk = charbotData?.first_talk ? getChangeNameTag(charbotData?.first_talk, charbotData?.nick_nm) : ''
+  const first_talk = charbotData?.first_talk ? getChangeNameTag(charbotData?.first_talk, charbotData?.title) : ''
 
   // 모바일 환경 감지
   const [isMobile, setIsMobile] = useState(false)

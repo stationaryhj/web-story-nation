@@ -37,12 +37,19 @@ export default function MyEarningsView() {
   const { data: userInfo, writerInfo, fetchWriterInfo } = useAccountStore()
   const { openModal } = useModalStore()
 
+  // 이번달/지난달 선택을 위한 탭 상태
+  const [selectedTab, setSelectedTab] = useState<'current' | 'last'>('current')
+
   // 월별 수익 내역 ( 1: 이번달, 2: 지난달 )
   const { data: monthlyIncomeV1 } = GetMonthlyIncome(2)
   const { data: currentMonthIncome } = GetMonthlyIncome(1)
 
   // 수익 내역
-  const { data: settlementListData, isLoading: settlementListLoading } = GetSettlementList(1, currentPage, 50)
+  const { data: settlementListData, isLoading: settlementListLoading } = GetSettlementList(
+    selectedTab === 'current' ? 2 : 1, 
+    currentPage, 
+    50
+  )
 
   // 출금 상태
   const { data: writerWithdrawStatus, refetch: writerWithdrawStatusRefetch } = GetWriterWithdrawStatus()
@@ -73,9 +80,6 @@ export default function MyEarningsView() {
   const [accountNo1, setAccountNo1] = useState('')
   const [accountNo2, setAccountNo2] = useState('')
   const [name, setName] = useState('')
-
-  // 이번달/지난달 선택을 위한 탭 상태
-  const [selectedTab, setSelectedTab] = useState<'current' | 'last'>('current')
 
   // 이번달 수익
   const currentMonthEarnings = currentMonthIncome?.monthlyIncome || 0
@@ -158,6 +162,15 @@ export default function MyEarningsView() {
       }
     }
   }, [hasMore, settlementListLoading])
+
+
+  useEffect(() => {
+    // 수익 탭 변경시 수익 내역 리스트 초기화
+    setEarningItems([])
+    setCurrentPage(1)
+    setHasMore(true)
+  }, [selectedTab])
+
 
   // 추가 아이템 로드 함수
   const loadMoreItems = useCallback(() => {
