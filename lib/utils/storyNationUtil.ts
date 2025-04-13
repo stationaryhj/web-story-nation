@@ -362,6 +362,7 @@ export const parseConversationExamples = (exampleText: string) => {
  */
 export function bridgeCharacterInProgressToCharacter(data: any) {
   // 대화 예시를 파싱하는 함수
+  console.log('bridgeCharacterInProgressToCharacter >> ', data)
 
   return {
     id: data.world_list_detail_chrbot_key?.toString() || '',
