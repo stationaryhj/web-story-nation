@@ -195,17 +195,6 @@ export default function PaymentModal({
                 className="border border-secondary-200 dark:border-dark-secondary-300/20 rounded-lg"
               ></div>
 
-              {/* 테스트 카드 정보 */}
-              <div className="p-3 bg-gray-50 dark:bg-gray-800/30 rounded-lg text-xs text-secondary-500 dark:text-dark-secondary-400">
-                <p className="font-medium mb-1">테스트 카드 정보</p>
-                <ul className="space-y-1">
-                  <li>• 카드번호: 4000 0000 0000 0000</li>
-                  <li>• 만료일: 12/25</li>
-                  <li>• CVC: 123</li>
-                  <li>• 비밀번호: 아무 6자리 숫자</li>
-                </ul>
-              </div>
-
               <div className="flex space-x-3">
                 <button
                   onClick={onClose}
