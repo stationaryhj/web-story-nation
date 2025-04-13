@@ -31,9 +31,8 @@ export default function CharacterForm({ mode, invalidFields = {}, isSubmitting =
     removeHashtag,
     addConversationExample,
     updateConversationExample,
+    updateConversationExampleTitle,
     removeConversationExample,
-    setConversationExampleEditMode,
-    setConversationExampleVisibility,
     setNormalImage,
     setAdultImage,
     setAdultNormalImage,
@@ -90,9 +89,7 @@ export default function CharacterForm({ mode, invalidFields = {}, isSubmitting =
         addConversationExample={addConversationExample}
         updateConversationExample={updateConversationExample}
         removeConversationExample={removeConversationExample}
-        setConversationExampleEditMode={setConversationExampleEditMode}
-        setConversationExampleVisibility={setConversationExampleVisibility}
-        setConversationExampleTitle={setFormField}
+        updateConversationExampleTitle={updateConversationExampleTitle}
       />
     )
   }

@@ -16,7 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { bridgeCharbotDataToCharacter, getChangeNameTag } from '@/lib/utils/storyNationUtil'
+import { bridgeCharbotDataToCharacter, getChangeNameTag, parseConversationExamples, exampleDatas } from '@/lib/utils/storyNationUtil'
 import BaseModal from './BaseModal'
 import { ReqGetChatBot } from '@/services/hooks/DataListManager'
 import { Character } from '@/store/useStoreData'
@@ -86,7 +86,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
     }
   }
 
-  const exampleDatas = chatBotData?.chrbot?.example ? bridgeExampleData(chatBotData.chrbot.example) : []
+  const exampleDatas = chatBotData?.chrbot?.example ? parseConversationExamples(chatBotData.chrbot.example) : []
   const isExampleShow = chatBotData?.chrbot?.example_show_yn === 1 && exampleDatas.length > 0 ? 1 : 0
 
   const content = getChangeNameTag(chatBotData?.chrbot?.content || '', selectedCharacter?.name || '')
@@ -351,7 +351,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   대화 예시
                 </h3>
                 <div className="space-y-4">
-                  {exampleDatas.map((data: any, index: number) => (
+                  {exampleDatas.map((data: exampleDatas, index: number) => (
                     <div
                       key={index}
                       className="border-b border-secondary-100 dark:border-dark-secondary-800 last:border-0 pb-4 last:pb-0"
@@ -365,12 +365,12 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                             <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
                           </div>
                           <div className="p-2 bg-secondary-50 dark:bg-dark-secondary-800/50 rounded-lg text-sm">
-                            {getChangeNameTag(data.Character, selectedCharacter.name)}
+                            {getChangeNameTag(data.characterMsg, selectedCharacter.name)}
                           </div>
                         </div>
                         <div className="flex items-start justify-end space-x-2">
                           <div className="p-2 bg-primary-50 dark:bg-dark-primary-900/30 rounded-lg text-sm text-end">
-                            {getChangeNameTag(data.User, selectedCharacter.name)}
+                            {getChangeNameTag(data.userMsg, selectedCharacter.name)}
                           </div>
                         </div>
                       </div>
@@ -575,12 +575,12 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                             <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
                           </div>
                           <div className="p-2 bg-secondary-50 dark:bg-dark-secondary-800/50 rounded-lg text-sm">
-                            {data.Character}
+                            {data.characterMsg}
                           </div>
                         </div>
                         <div className="flex items-start justify-end space-x-2">
                           <div className="p-2 bg-primary-50 dark:bg-dark-primary-900/30 rounded-lg text-sm text-end">
-                            {data.User}
+                            {data.userMsg}
                           </div>
                         </div>
                       </div>
