@@ -13,14 +13,47 @@ import {
 import { ChatMode } from '@/components/modal/ChatModeModal'
 import { useAccountStore } from '@/store/useAccountStore'
 
+// 백엔드 서버가 가지고있는 데이터
 export interface ConversationExampleJSON {
   text_counts: number[];
   titles: string[];
   examples: {
     example: ExampleData[];
   }[];
+}
 
-  count: number
+export interface exampleDatas {
+  index: number
+  title: string
+  userMsg: string
+  characterMsg: string
+  textLength: number
+}
+
+export const exampleDatasToConversationJson = (data: exampleDatas[]) => {
+  const rValue: ConversationExampleJSON = {
+    text_counts: [],
+    titles: [],
+    examples: [],
+  }
+
+  data.forEach((exampleData) => {
+    rValue.text_counts.push(exampleData.textLength || 0);
+    rValue.titles.push(exampleData.title || `대화 예시 ${exampleData.index + 1}`);
+    rValue.examples.push({
+      example: [
+        {
+          speaker: "{{char}}",
+          message: exampleData.characterMsg || ""
+        },
+        {
+          speaker: "{{user}}",
+          message: exampleData.userMsg || ""
+        }
+      ]
+    });
+  });
+  return rValue;
 }
 
 interface ExampleData {
@@ -258,11 +291,42 @@ export function bridgeLoginDataToUserInfo(data: LoginResponse | null) {
 }
 
 
-const parseConversationExamples = (exampleText: string) => {
+export const parseConversationExamples = (exampleText: string) => {
   // 대화 예시가 없으면 빈 배열 반환
   if (!exampleText) return []
 
-  return JSON.parse(exampleText) as ConversationExampleJSON
+  
+  
+  try{
+    let dataList: exampleDatas[] = []
+    const parseData = JSON.parse(exampleText) as ConversationExampleJSON
+
+    console.log('💬 @@ exampleText @@ :: ', parseData)
+    for(let i = 0; i < parseData.text_counts.length; i++) {
+      const index = i
+      const title = parseData.titles[i]
+      const userMsg = parseData.examples[i].example.find(item => item.speaker === '{{user}}')?.message || ''
+      const characterMsg = parseData.examples[i].example.find(item => item.speaker === '{{char}}')?.message || ''
+      const length = parseData.text_counts[i]
+
+      if(userMsg.length > 0 || characterMsg.length > 0) {
+        const data: exampleDatas = {
+          index: index,
+          title: title,
+          userMsg: userMsg,
+          characterMsg: characterMsg,
+          textLength: length,
+        }
+  
+        dataList.push(data)
+      }
+    }
+    return dataList
+  }
+  catch(e){
+    return []
+  }
+  
 
   // // 대화 예시들을 분리 (빈 줄 두 개로 구분)
   // const examples = exampleText.split('\n\n').filter(ex => ex.trim() !== '')
@@ -298,9 +362,6 @@ const parseConversationExamples = (exampleText: string) => {
  */
 export function bridgeCharacterInProgressToCharacter(data: any) {
   // 대화 예시를 파싱하는 함수
-
-  console.log('data', data)
-
 
   return {
     id: data.world_list_detail_chrbot_key?.toString() || '',

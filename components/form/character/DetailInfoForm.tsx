@@ -10,7 +10,7 @@ import RatingSelect from './RatingSelect'
 import Tutorial from '@/components/tutorial/Tutorial'
 import BaseModal from '@/components/modal/BaseModal'
 import { toast } from 'react-toastify'
-import { ConversationExampleJSON } from '@/lib/utils/storyNationUtil'
+import { exampleDatas } from '@/lib/utils/storyNationUtil'
 
 const createCharacterScenario = {
   storageKey: 'detail-info-tutorial-completed',
@@ -26,7 +26,7 @@ const createCharacterScenario = {
     {
       id: 'character-name-button',
       html: `
-              <p>버튼을 클릭하면<span class="text-yellow-300 font-semibold">캐릭터 이름({{character}})</span>을 추가할 수 있어요!</p>
+              <p>버튼을 클릭하면<span class="text-yellow-300 font-semibold">캐릭터 이름({{char}})</span>을 추가할 수 있어요!</p>
             `,
       textPosition: 'top' as const,
     },
@@ -65,11 +65,9 @@ interface DetailInfoFormProps {
   formData: any
   setFormField: (name: string, value: any) => void
   addConversationExample: () => void
-  updateConversationExample: (id: string, text: string) => void
-  removeConversationExample: (id: string) => void
-  setConversationExampleEditMode: (id: string, isEditing: boolean) => void
-  setConversationExampleVisibility: (id: string, visibility: 'public' | 'private') => void
-  setConversationExampleTitle: (id: string, title: string) => void
+  updateConversationExample: (data: exampleDatas) => void
+  removeConversationExample: (id: number) => void
+  updateConversationExampleTitle: (id: number, title: string) => void
   onValidationChange?: (isValid: boolean) => void
 }
 
@@ -80,55 +78,18 @@ type EnhancedConversationExample = ConversationExample & {
   title?: string
 }
 
-
-interface exampleDatas {
-  index: number
-  title: string
-  userMsg: string
-  characterMsg: string
-}
-
-
-const bridgeConversationExampleJSONToConversationExample = (data : ConversationExampleJSON) => {
-  console.log('data :: ', data)
-
-  if(!data || Object.keys(data).length === 0) {
-    return []
-  }
-
-  if(data?.titles?.length === 0 || data?.examples?.length === 0) {
-    return []
-  }
-
-  const titles = data.titles
-  const conversationExamples = data.examples.map((example, index) => ({
-    index: index,
-    title: titles[index],
-    userMsg: example.example.find(item => item.speaker === '{{user}}')?.message || '',
-    characterMsg: example.example.find(item => item.speaker === '{{char}}')?.message || ''
-  }))
-  console.log('conversationExamples :: ', conversationExamples)
-  return conversationExamples
-}
-
-
 export default function DetailInfoForm({
   formData,
   setFormField,
   addConversationExample,
   updateConversationExample,
   removeConversationExample,
-  setConversationExampleEditMode,
-  setConversationExampleVisibility,
-  setConversationExampleTitle,
+  updateConversationExampleTitle,
   onValidationChange,
 }: DetailInfoFormProps) {
 
-
-  console.log('conversationExamples :: ', formData.conversationExamples)
-
-  // 현재 선택된 입력 필드 (user 또는 character)
-  const [activeField, setActiveField] = useState<{ id: string; field: 'user' | 'character' } | null>(null)
+    // 현재 선택된 입력 필드 (user 또는 character)
+  const [activeField, setActiveField] = useState<{ id: number; field: 'user' | 'character' } | null>(null)
   const [showTutorial, setShowTutorial] = useState(false)
   const [totalMessageLength, setTotalMessageLength] = useState(0) // 전체 메시지 길이
   const [remainingChars, setRemainingChars] = useState(1500) // 남은 글자 수
@@ -146,11 +107,9 @@ export default function DetailInfoForm({
 
   // 삭제 확인 모달 상태
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [deleteTargetId, setDeleteTargetId] = useState<string>('')
+  const [deleteTargetId, setDeleteTargetId] = useState<number>(0)
 
-  const exampleDatas = bridgeConversationExampleJSONToConversationExample(formData.conversationExamples || {}) as exampleDatas[]
-  console.log('exampleDatas ::::: ', exampleDatas)
-
+  const exampleDatas = formData.conversationExamples
 
   // 디바운스된 토스트 알림 함수
   const showDebouncedToast = (message: string) => {
@@ -172,8 +131,8 @@ export default function DetailInfoForm({
       return 0
     }
 
-    exampleDatas.forEach(data => {
-      total += data.userMsg.length + data.characterMsg.length
+    exampleDatas.forEach((data: exampleDatas) => {
+      total += data.textLength
     })
 
     return total
@@ -339,11 +298,6 @@ export default function DetailInfoForm({
   const handleExamplesVisibilitySelect = (visibility: 'public' | 'private') => {
     // 대화 예시 전체의 공개 여부를 설정
     setFormField('examplesVisibility', visibility)
-
-    // 모든 대화 예시에 동일한 가시성 설정
-    formData.conversationExamples.forEach((example: ConversationExample) => {
-      setConversationExampleVisibility(example.id, visibility)
-    })
   }
 
   // 이용등급 선택 핸들러
@@ -363,59 +317,46 @@ export default function DetailInfoForm({
   }
 
   // 대화 예시 제목 변경 핸들러
-  const handleExampleTitleChange = (id: string, title: string) => {
-    setTitles(prev => ({ ...prev, [id]: title }))
-    setConversationExampleTitle(id, title)
+  const handleExampleTitleChange = (id: number, title: string) => {
+    updateConversationExampleTitle(id, title)
   }
 
-  // 대화 예시 텍스트 변경 핸들러 (사용자 메시지)
-  const handleUserMessageChange = (id: string, message: string) => {
-    // 기존 메시지 길이 계산
-    const oldMessage = userMessages[id] || ''
-    const lengthDiff = message.length - oldMessage.length
+  // 대화 예시 텍스트 변경 핸들러 - new
+  const handleMessageChange = (id: number, msg: string, isUser: boolean) => {
+    let totalMsgLength = 0
+    formData.conversationExamples.map((data: exampleDatas) => {
+      totalMsgLength += data.userMsg.length + data.characterMsg.length
+    })
 
-    // 길이 제한 확인
-    if (totalMessageLength + lengthDiff > 1500) {
+    const findData = formData.conversationExamples.find((find: exampleDatas) => find.index === id)
+    if(!findData) {
+      return
+    }
+
+    if(isUser) {
+      totalMsgLength -= findData.userMsg.length
+    } else {
+      totalMsgLength -= findData.characterMsg.length
+    }
+
+    if((totalMsgLength + msg.length) > 1500) {
       showDebouncedToast('전체 대화 예시는 1500자를 초과할 수 없습니다.')
       return
     }
 
-    setUserMessages(prev => ({ ...prev, [id]: message }))
 
-    // 기존 대화 예시 형식으로 변환하여 저장
-    const combinedText = `User: ${message}\nCharacter: ${characterMessages[id] || ''}`
-    updateConversationExample(id, combinedText)
-
-    // 전체 길이 업데이트
-    setTotalMessageLength(prev => prev + lengthDiff)
-    setRemainingChars(prev => prev - lengthDiff)
-  }
-
-  // 대화 예시 텍스트 변경 핸들러 (캐릭터 메시지)
-  const handleCharacterMessageChange = (id: string, message: string) => {
-    // 기존 메시지 길이 계산
-    const oldMessage = characterMessages[id] || ''
-    const lengthDiff = message.length - oldMessage.length
-
-    // 길이 제한 확인
-    if (totalMessageLength + lengthDiff > 1500) {
-      showDebouncedToast('전체 대화 예시는 1500자를 초과할 수 없습니다.')
-      return
+    if(isUser) {
+      findData.userMsg = msg
+    } else {
+      findData.characterMsg = msg
     }
-
-    setCharacterMessages(prev => ({ ...prev, [id]: message }))
-
-    // 기존 대화 예시 형식으로 변환하여 저장
-    const combinedText = `User: ${userMessages[id] || ''}\nCharacter: ${message}`
-    updateConversationExample(id, combinedText)
-
-    // 전체 길이 업데이트
-    setTotalMessageLength(prev => prev + lengthDiff)
-    setRemainingChars(prev => prev - lengthDiff)
+    findData.textLength = findData.userMsg.length + findData.characterMsg.length
+    updateConversationExample(findData)
   }
+
 
   // 커서 관련 공통 함수
-  const handleSpecialTagInsert = (field: 'user' | 'character', id: string, tag: string) => {
+  const handleSpecialTagInsert = (field: 'user' | 'character', id: number, tag: string) => {
     if (!id) return
 
     const inputId = field === 'user' ? `user-message-${id}` : `character-message-${id}`
@@ -427,9 +368,9 @@ export default function DetailInfoForm({
       const newText = input.value.substring(0, startPos) + tag + input.value.substring(endPos)
 
       if (field === 'user') {
-        handleUserMessageChange(id, newText)
+        handleMessageChange(id, newText, true)
       } else {
-        handleCharacterMessageChange(id, newText)
+        handleMessageChange(id, newText, false)
       }
 
       // 커서 위치 업데이트
@@ -450,7 +391,7 @@ export default function DetailInfoForm({
   // 캐릭터 이름 버튼 클릭 핸들러
   const handleCharacterNameClick = () => {
     if (!activeField) return
-    handleSpecialTagInsert(activeField.field, activeField.id, '{{character}}')
+    handleSpecialTagInsert(activeField.field, activeField.id, '{{char}}')
   }
 
   // 사용자 이름 버튼 클릭 핸들러
@@ -460,32 +401,19 @@ export default function DetailInfoForm({
   }
 
   // 대화 예시 삭제 버튼 핸들러
-  const handleDeleteExample = (id: string) => {
+  const handleDeleteExample = (id: number) => {
     setDeleteTargetId(id)
     setIsDeleteModalOpen(true)
   }
 
   // 대화 예시 삭제 확인
   const confirmDeleteExample = () => {
-    if (deleteTargetId) {
+    if (deleteTargetId !== undefined) {
       removeConversationExample(deleteTargetId)
-
-      // 로컬 상태에서도 삭제
-      setUserMessages(prev => {
-        const newMessages = { ...prev }
-        delete newMessages[deleteTargetId]
-        return newMessages
-      })
-
-      setCharacterMessages(prev => {
-        const newMessages = { ...prev }
-        delete newMessages[deleteTargetId]
-        return newMessages
-      })
 
       // 모달 닫기
       setIsDeleteModalOpen(false)
-      setDeleteTargetId('')
+      setDeleteTargetId(0)
     }
   }
 
@@ -494,24 +422,6 @@ export default function DetailInfoForm({
     return `${current}/${max}`
   }
 
-  // 대화 예시 텍스트 파싱 헬퍼 함수 (상태 변경 없음)
-  const parseConversationExampleText = (text: string) => {
-    let userMsg = ''
-    let characterMsg = ''
-
-    const lines = text.split('\n').filter(line => line.trim() !== '')
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i]
-      if (line.startsWith('User:')) {
-        userMsg = line.substring(5).trim()
-      } else if (line.startsWith('Character:')) {
-        characterMsg = line.substring(10).trim()
-      }
-    }
-
-    return { userMsg, characterMsg }
-  }
 
   return (
     <>
@@ -634,7 +544,7 @@ export default function DetailInfoForm({
                 대화 예시가 없습니다. 아래 버튼을 클릭하여 추가해주세요.
               </div>
             ) : (
-              exampleDatas.map((data) => (
+              exampleDatas.map((data: exampleDatas) => (
                 <div
                   key={data.index}
                   className="relative bg-secondary-50 dark:bg-dark-secondary-800/5 p-3 sm:p-4 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10"
@@ -675,7 +585,7 @@ export default function DetailInfoForm({
                       <button
                         id="delete-chat-example"
                         type="button"
-                        onClick={() => handleDeleteExample(data.index.toString())}
+                        onClick={() => handleDeleteExample(data.index)}
                         className="p-1 sm:p-1.5 text-red-500 hover:text-red-700 focus:outline-none"
                         title="대화 예시 삭제"
                       >
@@ -698,7 +608,7 @@ export default function DetailInfoForm({
                       type="text"
                       id={`example-title-${data.index}`}
                       value={data.title || ''}
-                      onChange={e => handleExampleTitleChange(data.index.toString(), e.target.value)}
+                      onChange={e => handleExampleTitleChange(data.index, e.target.value)}
                       placeholder="대화 예시 제목을 입력하세요"
                       className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 text-sm"
                       maxLength={25}
@@ -718,8 +628,8 @@ export default function DetailInfoForm({
                     <textarea
                       id={`user-message-${data.index}`}
                       value={data.userMsg || ''}
-                      onChange={e => handleUserMessageChange(data.index.toString(), e.target.value)}
-                      onFocus={() => setActiveField({ id: data.index.toString(), field: 'user' })}
+                      onChange={e => handleMessageChange(data.index, e.target.value, true)}
+                      onFocus={() => setActiveField({ id: data.index, field: 'user' })}
                       placeholder="유저 대화 내용을 입력하세요"
                       rows={2}
                       className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none text-sm"
@@ -739,8 +649,8 @@ export default function DetailInfoForm({
                     <textarea
                       id={`character-message-${data.index}`}
                       value={data.characterMsg || ''}
-                      onChange={e => handleCharacterMessageChange(data.index.toString(), e.target.value)}
-                      onFocus={() => setActiveField({ id: data.index.toString(), field: 'character' })}
+                      onChange={e => handleMessageChange(data.index, e.target.value, false)}
+                      onFocus={() => setActiveField({ id: data.index, field: 'character' })}
                       placeholder="캐릭터 대화 내용을 입력하세요"
                       rows={2}
                       className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none text-sm"
