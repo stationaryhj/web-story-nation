@@ -3,7 +3,7 @@
 import { create } from 'zustand'
 import { createApi, contentApi } from '@/services/api'
 import { toast } from 'react-toastify'
-import { bridgeCharacterInProgressToCharacter, ConversationExampleJSON, exampleDatas, exampleDatasToConversationJson } from '@/lib/utils/storyNationUtil'
+import { bridgeCharacterInProgressToCharacter, exampleDatas, exampleDatasToConversationJson } from '@/lib/utils/storyNationUtil'
 
 export type CharacterGender = 'male' | 'female' | 'unspecified'
 export type CharacterVisibility = 'public' | 'private'
@@ -58,8 +58,6 @@ export interface CharacterFormData {
 
   // API 호환성 속성
   world_list_detail_chrbot_key?: string
-
-  finishYn?: number
   isVisibilityLock?: boolean
 
   // 추가 속성을 위한 인덱스 시그니처
@@ -129,8 +127,6 @@ const defaultFormData: CharacterFormData = {
   conversationExamples: [],
   imgUrl: '',
   imgUrlNsfw: '',
-
-  finishYn: 0,
   isVisibilityLock: false,
 }
 
@@ -380,12 +376,14 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
   },
 
   saveInProgress: async (finishYn = 0) => {
+    
     try {
       set({ isSaving: true })
 
       const { formData } = get()
+      console.log('formData : ', formData)
 
-      const isLock = formData.finishYn === 1 && formData.visibility === 'public'
+      const isLock = formData.finish_yn === 1 && formData.visibility === 'public'
 
       // 폼 데이터에서 API 요청에 필요한 데이터 추출
       const payload = {
@@ -418,9 +416,10 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
               : 0
             : 0,
 
-        finish_yn: formData.finishYn ? formData.finishYn : finishYn,
+        finish_yn: formData.finish_yn ? formData.finish_yn : finishYn,
         isVisibilityLock: isLock,
       }
+
 
       // API 호출
       const response = await createApi.SaveInProgress(
@@ -440,6 +439,8 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         payload.finish_yn
       )
 
+
+      
       
 
       if (!response.data || (response.data.result && response.data.result.err !== 0)) {

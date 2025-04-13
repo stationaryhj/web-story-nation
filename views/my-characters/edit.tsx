@@ -169,7 +169,7 @@ export default function EditCharacterPage() {
         return
       }
 
-      if (formData.finishYn === 0 && formData.visibility === 'public') {
+      if (formData.finish_yn === 0 && formData.visibility === 'public') {
         openModal('confirmAction', {
           title: '캐릭터 공개 시 주의사항',
           description: '한 번 공개한 캐릭터는 비공개로 전환할 수 없어요!',

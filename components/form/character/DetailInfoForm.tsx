@@ -357,10 +357,14 @@ export default function DetailInfoForm({
 
   // 커서 관련 공통 함수
   const handleSpecialTagInsert = (field: 'user' | 'character', id: number, tag: string) => {
-    if (!id) return
+    console.log('handleSpecialTagInsert >> ', field, id, tag)
+
+    if (id === undefined) return
 
     const inputId = field === 'user' ? `user-message-${id}` : `character-message-${id}`
     const input = document.getElementById(inputId) as HTMLTextAreaElement
+
+    console.log('inputId >> ', inputId)
 
     if (input) {
       const startPos = input.selectionStart || 0
@@ -384,6 +388,8 @@ export default function DetailInfoForm({
 
   // 상황 설명 버튼 클릭 핸들러
   const handleContextInfoClick = () => {
+    console.log('handleContextInfoClick >> ', activeField?.field, activeField?.id)
+
     if (!activeField) return
     handleSpecialTagInsert(activeField.field, activeField.id, '**')
   }
