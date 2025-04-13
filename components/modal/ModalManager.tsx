@@ -27,7 +27,7 @@ export default function ModalManager() {
   }
 
   if (modalType === 'signup') {
-    return <SignupModal isOpen={isOpen} onClose={closeModal} {...modalProps} />
+    return <SignupModal isOpen={isOpen} onClose={closeModal} {...modalProps} state={'signup'} />
   }
 
   if (modalType === 'confirmAction') {
