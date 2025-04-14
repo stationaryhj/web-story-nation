@@ -117,7 +117,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   }))
 
   // 주석 해제
-  const first_talk = charbotData?.first_talk ? getChangeNameTag(charbotData?.first_talk, charbotData?.nick_nm) : ''
+  const first_talk = charbotData?.first_talk ? getChangeNameTag(charbotData?.first_talk, charbotData?.title) : ''
 
   // 모바일 환경 감지
   const [isMobile, setIsMobile] = useState(false)
@@ -1013,7 +1013,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
               <Gift className="text-sm md:text-base w-4 h-4 md:w-6 md:h-6" />
             </button>
             <span className="ml-1 text-sm font-semibold text-gray-700">
-              {Number(accountData?.coin_free) + Number(accountData?.coin_register) || 0}
+              {Number(accountData?.coin_free || 0) + Number(accountData?.coin_register || 0) || 0}
             </span>
           </div>
 

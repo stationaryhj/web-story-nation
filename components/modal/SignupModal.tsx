@@ -17,9 +17,10 @@ interface SignupModalProps {
   isOpen: boolean
   onClose: () => void
   onSuccess?: () => void
+  state: 'signup' | 'reward'
 }
 
-export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalProps) {
+export default function SignupModal({ isOpen, onClose, onSuccess, state = 'signup' }: SignupModalProps) {
   const router = useRouter()
   const [nickname, setNickname] = useState('')
   const [birthdate, setBirthdate] = useState('')
@@ -186,7 +187,8 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
   // 완료 화면에서 확인 버튼 클릭 시 로그인 페이지로 이동
   const handleCompleteConfirm = () => {
     onClose()
-    router.push('/')
+    
+    // router.push('/')
   }
 
   // 회원가입 제출
@@ -496,7 +498,7 @@ export default function SignupModal({ isOpen, onClose, onSuccess }: SignupModalP
     >
       <div className="relative overflow-hidden">
         <AnimatePresence mode="wait">
-          {isCompleted ? (
+          {state === 'reward' ? (
             <motion.div
               key="completion"
               initial={{ opacity: 0 }}

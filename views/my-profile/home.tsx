@@ -2,25 +2,20 @@
 
 import {
   faArrowLeft,
-  faCheck,
   faChevronDown,
   faChevronRight,
   faCircleUser,
-  faCopy,
   faImage,
   faTrash,
-  faXmark,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useAccountStore } from '@/store/useStoreData'
-import { bridgeLoginDataToUserInfo } from '@/lib/utils/storyNationUtil'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { BaseButton } from '@/components/elements/button/BaseButton'
-import { useSettingsStore } from '@/store/useStoreSettings'
 
 export default function MyAccountView() {
   const router = useRouter()
@@ -560,9 +555,6 @@ export default function MyAccountView() {
           로그아웃
         </button>
       </div>
-
-      {/* react-toastify 컨테이너 */}
-      <ToastContainer position="top-center" autoClose={3000} />
     </div>
   )
 }

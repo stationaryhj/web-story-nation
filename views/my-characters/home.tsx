@@ -54,10 +54,10 @@ export default function MyCharacterPage() {
   const handleEditClick = (character: Character) => {
     console.log('character :: ', character)
 
-    if(character.block_type === 1) {
-      // 신고된놈
-      return
-    }
+    // if(character.block_type === 1) {
+    //   // 신고된놈
+    //   return
+    // }
 
     router.push(`/my-characters/edit/${character.id}`)
   }

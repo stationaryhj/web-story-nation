@@ -1,18 +1,12 @@
 'use client'
 
-import {
-  faArrowLeft,
-  faChevronRight,
-  faCircleUser,
-  faImage,
-  faTrash,
-} from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeft, faChevronRight, faCircleUser, faImage, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { useAccountStore } from '@/store/useStoreData'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import { useSettingsStore } from '@/store/useStoreSettings'
@@ -82,16 +76,12 @@ export default function SettingsForm() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const profileImage = getImageUri(userInfo?.profile_url) || null
 
-
   // 은행 리스트 가져오기
   useEffect(() => {
     getBankList().catch(error => {
       console.error('은행 리스트를 가져오는 중 오류 발생:', error)
     })
   }, [getBankList])
-
-  
-
 
   // 닉네임이 원래 닉네임과 같은지 확인
   useEffect(() => {
@@ -123,7 +113,6 @@ export default function SettingsForm() {
       setIsNicknameChanged(true)
     }
   }, [profile.nickname, originalNickname])
-
 
   // 닉네임 중복 체크 핸들러
   const handleDuplicateCheck = async () => {
@@ -168,7 +157,7 @@ export default function SettingsForm() {
 
       // API 호출 및 펜 차감 로직
       const isSuccess = await useAccountStore.getState().editNickname(profile.nickname)
-      
+
       if (isSuccess) {
         setOriginalNickname(profile.nickname)
         // setIsNicknameVerified(true)
@@ -355,7 +344,7 @@ export default function SettingsForm() {
       const reader = new FileReader()
       reader.onloadend = async () => {
         // upload
-        await handleImageUpS3(file, reader);
+        await handleImageUpS3(file, reader)
 
         // const imageUrl = reader.result as string
         // setProfile(prev => ({ ...prev, profileImage: imageUrl }))
@@ -397,7 +386,6 @@ export default function SettingsForm() {
 
   // 탭 변경 핸들러
   const handleTabChange = (tab: 'support' | 'terms' | 'privacy' | 'paid' | 'policy') => {
-
     // 각 탭에 따라 다른 페이지로 이동
     switch (tab) {
       case 'support':
@@ -417,7 +405,6 @@ export default function SettingsForm() {
         break
     }
   }
-
 
   // 본인 인증 핸들러
   const handleAdultVerification = async () => {
@@ -770,9 +757,6 @@ export default function SettingsForm() {
         onCancel={handleNicknameCancel}
         originalNickname={originalNickname}
       />
-
-      {/* react-toastify 컨테이너 */}
-      <ToastContainer position="top-center" autoClose={3000} />
     </>
   )
 }

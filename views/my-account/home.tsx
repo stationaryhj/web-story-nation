@@ -37,12 +37,19 @@ export default function MyEarningsView() {
   const { data: userInfo, writerInfo, fetchWriterInfo } = useAccountStore()
   const { openModal } = useModalStore()
 
+  // 이번달/지난달 선택을 위한 탭 상태
+  const [selectedTab, setSelectedTab] = useState<'current' | 'last'>('current')
+
   // 월별 수익 내역 ( 1: 이번달, 2: 지난달 )
   const { data: monthlyIncomeV1 } = GetMonthlyIncome(2)
   const { data: currentMonthIncome } = GetMonthlyIncome(1)
 
   // 수익 내역
-  const { data: settlementListData, isLoading: settlementListLoading } = GetSettlementList(1, currentPage, 50)
+  const { data: settlementListData, isLoading: settlementListLoading } = GetSettlementList(
+    selectedTab === 'current' ? 2 : 1,
+    currentPage,
+    50
+  )
 
   // 출금 상태
   const { data: writerWithdrawStatus, refetch: writerWithdrawStatusRefetch } = GetWriterWithdrawStatus()
@@ -65,6 +72,7 @@ export default function MyEarningsView() {
       date: string
       amount: number
       status: string
+      uniqueId?: string
     }>
   >([])
 
@@ -73,9 +81,6 @@ export default function MyEarningsView() {
   const [accountNo1, setAccountNo1] = useState('')
   const [accountNo2, setAccountNo2] = useState('')
   const [name, setName] = useState('')
-
-  // 이번달/지난달 선택을 위한 탭 상태
-  const [selectedTab, setSelectedTab] = useState<'current' | 'last'>('current')
 
   // 이번달 수익
   const currentMonthEarnings = currentMonthIncome?.monthlyIncome || 0
@@ -99,11 +104,21 @@ export default function MyEarningsView() {
       try {
         // 응답 구조에 맞게 데이터 처리
         const newItems = bridgeIncomeDataToEarningItems(settlementListData.IncomeList.data || [], currentPage * 50)
+        // 각 항목에 선택된 탭 정보를 추가하여 고유한 키 생성
+        const itemsWithUniqueIds = newItems.map(item => ({
+          ...item,
+          uniqueId: `${selectedTab}-${item.id}`, // 탭 유형을 키에 포함하여 고유성 보장
+        }))
 
         if (currentPage === 1) {
-          setEarningItems(newItems)
+          setEarningItems(itemsWithUniqueIds)
         } else {
-          setEarningItems(prev => [...prev, ...newItems])
+          setEarningItems(prev => {
+            // 중복 항목을 필터링
+            const existingIds = new Set(prev.map(item => item.uniqueId))
+            const filteredNewItems = itemsWithUniqueIds.filter(item => !existingIds.has(item.uniqueId))
+            return [...prev, ...filteredNewItems]
+          })
         }
 
         // 페이지네이션 정보 추출
@@ -116,14 +131,19 @@ export default function MyEarningsView() {
         console.error('수익 내역 데이터 처리 오류:', error)
       }
     }
-  }, [settlementListData, settlementListLoading, currentPage])
+  }, [settlementListData, settlementListLoading, currentPage, selectedTab])
 
   // 출금 내역 데이터 로드 및 처리
   useEffect(() => {
     if (withdrawRequestList?.withdrawrequest?.data && !withdrawRequestListLoading) {
       try {
         const newItems = bridgeWithdrawDataToWithdrawItems(withdrawRequestList.withdrawrequest.data)
-        setWithdrawItems(newItems)
+        // 각 항목에 고유 ID 추가
+        const itemsWithUniqueIds = newItems.map((item, index) => ({
+          ...item,
+          uniqueId: `withdraw-${item.id}-${index}`, // 인덱스를 추가하여 혹시 모를 중복 방지
+        }))
+        setWithdrawItems(itemsWithUniqueIds)
       } catch (error) {
         console.error('출금 내역 데이터 처리 오류:', error)
       }
@@ -158,6 +178,13 @@ export default function MyEarningsView() {
       }
     }
   }, [hasMore, settlementListLoading])
+
+  useEffect(() => {
+    // 수익 탭 변경시 수익 내역 리스트 초기화
+    setEarningItems([])
+    setCurrentPage(1)
+    setHasMore(true)
+  }, [selectedTab])
 
   // 추가 아이템 로드 함수
   const loadMoreItems = useCallback(() => {
@@ -384,12 +411,12 @@ export default function MyEarningsView() {
               <h2 className="text-lg font-semibold">수익 요약</h2>
             </div>
 
-            <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-              <div className="text-gray-700 flex items-center justify-start gap-2">
-                <span>총 수익</span>
+            <div className="flex justify-between mb-4 px-3 py-5 bg-gray-50 rounded-lg">
+              <div className="text-black flex items-center justify-start gap-2">
+                <span className="font-bold text-xl">최근 2개월 누적 수익</span>
                 <Tooltip
                   content={`
-                    <div>
+                    <div style="padding: 5px;">
                       <p><strong>총 수익 = 직접 수익 + 개인 후원 + 캐릭터 후원</strong></p>
                       <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(229, 231, 235, 0.5);">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
@@ -401,14 +428,9 @@ export default function MyEarningsView() {
                           <strong>${formatPen(lastMonthEarnings)} 펜</strong>
                         </div>
                       </div>
-                      <ul style="margin-top: 12px;">
-                        <li>직접 수익: 자신의 캐릭터에서 발생한 수익</li>
-                        <li>개인 후원: 개인 후원으로 받은 금액</li>
-                        <li>캐릭터 후원: 캐릭터를 통해 후원 받은 금액</li>
-                      </ul>
                     </div>
                   `}
-                  position="bottom"
+                  position="top"
                   allowHtml={true}
                   offset={[0, 5]}
                   animation="scale"
@@ -456,7 +478,7 @@ export default function MyEarningsView() {
                 <div className="py-4 text-center text-gray-500">로딩 중...</div>
               ) : earningItems.length > 0 ? (
                 earningItems.map(item => (
-                  <div key={item.id} className="py-3 flex justify-between">
+                  <div key={item.uniqueId || `${selectedTab}-${item.id}`} className="py-3 flex justify-between">
                     <div>
                       <div className="text-sm text-gray-500">{item.date}</div>
                       <div className="font-medium">{item.description}</div>
@@ -495,7 +517,7 @@ export default function MyEarningsView() {
             ) : withdrawItems.length > 0 ? (
               <div className="divide-y divide-gray-200">
                 {withdrawItems.map(request => (
-                  <div key={request.id} className="py-3 flex justify-between">
+                  <div key={request.uniqueId || `withdraw-${request.id}`} className="py-3 flex justify-between">
                     <div className="text-sm text-gray-500">{request.date}</div>
                     <div className="flex items-center font-medium">
                       {formatPen(request.amount)}{' '}
@@ -529,7 +551,6 @@ export default function MyEarningsView() {
       />
 
       {/* react-toastify 컨테이너 */}
-      <ToastContainer position="top-center" autoClose={3000} />
     </div>
   )
 }

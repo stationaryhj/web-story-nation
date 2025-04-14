@@ -22,6 +22,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [showSignup, setShowSignup] = useState(false)
   const [loading, setLoading] = useState(false)
   const [isNewUserMode, setIsNewUserMode] = useState(false)
+  const [isReward, setIsReward] = useState(false)
   // 이벤트 처리 중인지 추적하는 ref (중복 메시지 처리 방지)
   const processingCallback = useRef(false)
 
@@ -156,6 +157,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
   const handleSignupClose = () => {
     setShowSignup(false)
+    onClose()
   }
 
   const { guestLogin } = useAccountStore()
@@ -199,9 +201,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     // 임시 저장 데이터 정리
     // localStorage.removeItem('social_login_state')
     localStorage.removeItem('social_login_type')
-
-    setShowSignup(false)
-    onClose()
+    setIsReward(true)
+    // setShowSignup(false)
+    // onClose()
   }
 
   const handleNewUserClick = () => {
@@ -287,7 +289,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             </div>
           </div> */}
 
-          {/* <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} /> */}
+          <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} />
 
           {/* 신규 가입 모드일 때만 약관 동의 문구 표시 */}
 
@@ -298,7 +300,14 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       </BaseModal>
 
       {/* 회원가입 모달 - isOpen 조건만 체크하여 로그인 모달과 독립적으로 표시 */}
-      {showSignup && <SignupModal isOpen={isOpen} onClose={handleSignupClose} onSuccess={handleSignupSuccess} />}
+      {showSignup && (
+        <SignupModal
+          isOpen={isOpen}
+          onClose={handleSignupClose}
+          onSuccess={handleSignupSuccess}
+          state={isReward ? 'reward' : 'signup'}
+        />
+      )}
     </>
   )
 }

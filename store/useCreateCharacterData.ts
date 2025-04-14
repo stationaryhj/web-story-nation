@@ -3,7 +3,7 @@
 import { create } from 'zustand'
 import { createApi, contentApi } from '@/services/api'
 import { toast } from 'react-toastify'
-import { bridgeCharacterInProgressToCharacter } from '@/lib/utils/storyNationUtil'
+import { bridgeCharacterInProgressToCharacter, exampleDatas, exampleDatasToConversationJson } from '@/lib/utils/storyNationUtil'
 
 export type CharacterGender = 'male' | 'female' | 'unspecified'
 export type CharacterVisibility = 'public' | 'private'
@@ -50,7 +50,7 @@ export interface CharacterFormData {
 
   // 상세 설정
   bioDetail: string
-  conversationExamples: Array<ConversationExample>
+  conversationExamples: exampleDatas[]
 
   // 이미지 설정 - 경로만 저장
   imgUrl: string // 기본 이미지 경로
@@ -58,8 +58,6 @@ export interface CharacterFormData {
 
   // API 호환성 속성
   world_list_detail_chrbot_key?: string
-
-  finishYn?: number
   isVisibilityLock?: boolean
 
   // 추가 속성을 위한 인덱스 시그니처
@@ -94,10 +92,9 @@ interface CreateCharacterStore {
 
   // 대화 예시 관련 함수들
   addConversationExample: () => void
-  updateConversationExample: (id: string, text: string) => void
-  removeConversationExample: (id: string) => void
-  setConversationExampleEditMode: (id: string, isEditing: boolean) => void
-  setConversationExampleVisibility: (id: string, visibility: CharacterVisibility) => void
+  updateConversationExample: (data: exampleDatas) => void
+  updateConversationExampleTitle: (id: number, title: string) => void
+  removeConversationExample: (id: number) => void
 
   // 이미지 관련 함수들
   setNormalImage: (path: string) => void
@@ -130,8 +127,6 @@ const defaultFormData: CharacterFormData = {
   conversationExamples: [],
   imgUrl: '',
   imgUrlNsfw: '',
-
-  finishYn: 0,
   isVisibilityLock: false,
 }
 
@@ -212,66 +207,68 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
   },
 
   // 대화 예시 함수들
-  addConversationExample: () =>
-    set(state => {
-      // 최대 3개까지만 추가 가능
-      if (state.formData.conversationExamples.length >= 3) {
-        return state
+  addConversationExample: () => {
+    if (get().formData.conversationExamples.length >= 3) {
+      return
+    }
+
+    let addIndex = get().formData.conversationExamples.length
+    for(let i = 0; i < get().formData.conversationExamples.length; i++) {
+      const beforeData = get().formData.conversationExamples[i]
+      const index = i
+      
+      if(beforeData.index !== index) {
+        addIndex = index
+        break
       }
+    }
 
-      const newExample: ConversationExample = {
-        id: generateId(),
-        text: '',
-        isEditing: true,
-        visibility: 'private',
-      }
+    const newExample = {
+      index: addIndex,
+      title: '',
+      userMsg: '',
+      characterMsg: '',
+      textLength: 0,
+    }
 
-      return {
-        formData: {
-          ...state.formData,
-          conversationExamples: [...state.formData.conversationExamples, newExample],
-        },
-      }
-    }),
-
-  updateConversationExample: (id, text) =>
     set(state => ({
       formData: {
         ...state.formData,
-        conversationExamples: state.formData.conversationExamples.map(ex => (ex.id === id ? { ...ex, text } : ex)),
+        conversationExamples: [...state.formData.conversationExamples, newExample],
       },
-    })),
+    }))
+  },
 
-  removeConversationExample: id =>
+  removeConversationExample: (id) => {
     set(state => ({
       formData: {
         ...state.formData,
-        conversationExamples: state.formData.conversationExamples.filter(ex => ex.id !== id),
+        conversationExamples: state.formData.conversationExamples.filter(ex => ex.index !== id),
       },
-    })),
+    }))
+  },
 
-  setConversationExampleEditMode: (id, isEditing) =>
+  updateConversationExample: (data) => {
     set(state => ({
       formData: {
         ...state.formData,
-        conversationExamples: state.formData.conversationExamples.map(ex => (ex.id === id ? { ...ex, isEditing } : ex)),
+        conversationExamples: state.formData.conversationExamples.map(ex => (ex.index === data.index) ? data : ex),
       },
-    })),
+    }))
+  },
 
-  setConversationExampleVisibility: (id, visibility) =>
+  updateConversationExampleTitle: (id, title) => {
     set(state => ({
       formData: {
         ...state.formData,
-        conversationExamples: state.formData.conversationExamples.map(ex =>
-          ex.id === id ? { ...ex, visibility } : ex
-        ),
+        conversationExamples: state.formData.conversationExamples.map(ex => (ex.index === id) ? { ...ex, title } : ex),
       },
-    })),
-
+    }))
+  },
+  
   // 이미지 관련 함수들
   setNormalImage: (path: string) =>
     set(state => {
-      console.log('setNormalImage :: ', path)
       return {
         formData: {
           ...state.formData,
@@ -379,14 +376,14 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
   },
 
   saveInProgress: async (finishYn = 0) => {
+    
     try {
       set({ isSaving: true })
 
       const { formData } = get()
+      console.log('formData : ', formData)
 
-      console.log('formData :: ', formData)
-
-      const isLock = formData.finishYn === 1 && formData.visibility === 'public'
+      const isLock = formData.finish_yn === 1 && formData.visibility === 'public'
 
       // 폼 데이터에서 API 요청에 필요한 데이터 추출
       const payload = {
@@ -403,7 +400,7 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         // 대화 예시 - 없는 경우 빈 문자열 전달
         example:
           formData.conversationExamples && formData.conversationExamples.length > 0
-            ? formData.conversationExamples.map(example => example.text).join('\n\n')
+            ? JSON.stringify(exampleDatasToConversationJson(formData.conversationExamples))
             : '',
         // 성인 등급 설정
         nsfw: formData.rating === 'adult' ? 1 : 0,
@@ -419,9 +416,10 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
               : 0
             : 0,
 
-        finish_yn: formData.finishYn ? formData.finishYn : finishYn,
+        finish_yn: formData.finish_yn ? formData.finish_yn : finishYn,
         isVisibilityLock: isLock,
       }
+
 
       // API 호출
       const response = await createApi.SaveInProgress(
@@ -440,6 +438,10 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         payload.example_show_yn,
         payload.finish_yn
       )
+
+
+      
+      
 
       if (!response.data || (response.data.result && response.data.result.err !== 0)) {
         throw new Error(response.data?.result?.msg || '저장에 실패했습니다.')

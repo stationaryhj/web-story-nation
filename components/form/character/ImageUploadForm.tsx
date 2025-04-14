@@ -338,7 +338,7 @@ export default function ImageUploadForm({
 
         {/* 이미지 표시 - 성인 전용인 경우 */}
         {formData.rating === 'adult' && isAdultModeEnabled && (
-          <div className="flex flex-col md:flex-row gap-6 md:gap-12 w-full items-center">
+          <div className="flex flex-col md:flex-row gap-6 md:gap-12 w-full items-center justify-center">
             <div className="flex flex-col justify-between w-[300px] max-w-full">
               {/* 기본 이미지 섹션 */}
               <div className="text-center">
