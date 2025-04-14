@@ -72,9 +72,9 @@ export function getImageUri(url: string | undefined | null): string {
 
   try {
     if (url.indexOf('kr/') > -1) {
-      return url.replace('kr/', 'https://universestationery.s3.amazonaws.com/')
+      return url.replace('kr/', 'https://d287ta38o0t5x8.cloudfront.net/')
     } else if (url.indexOf('image/') > -1) {
-      return 'https://universestationery-en.s3.us-east-1.amazonaws.com/' + url
+      return 'https://d2gimcyf1gz7jq.cloudfront.net/' + url
     }
 
     return url
