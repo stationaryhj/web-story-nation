@@ -57,6 +57,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [reportSubmitted, setReportSubmitted] = useState(false)
 
+  const isMobile = window.innerWidth < 768
   const variant = modalProps?.variant || 'default'
 
   const {
@@ -330,7 +331,8 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
         </div>
 
         {/* PC 레이아웃 우측 섹션 */}
-        <div className="md:w-[60%] h-full flex flex-col relative">
+        <div className={`${isMobile ? 'hidden' : 'md:w-[60%] h-full flex flex-col relative'}`}>
+        {/* <div className="md:w-[60%] h-full flex flex-col relative"> */}
           <div className="overflow-y-auto pb-20">
             <div className="p-5">
               {/* 첫 번째 섹션: 캐릭터 소개 */}
@@ -576,12 +578,12 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                                 <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
                               </div>
                               <div className="p-2 bg-secondary-50 dark:bg-dark-secondary-800/50 rounded-lg text-sm whitespace-pre-wrap break-words">
-                                {data.characterMsg}
+                                {getChangeNameTag(data.characterMsg, selectedCharacter.name)}
                               </div>
                             </div>
                             <div className="flex items-start justify-end space-x-2">
                               <div className="p-2 bg-primary-50 dark:bg-dark-primary-900/30 rounded-lg text-sm text-end whitespace-pre-wrap break-words">
-                                {data.userMsg}
+                                {getChangeNameTag(data.userMsg, selectedCharacter.name)}
                               </div>
                             </div>
                           </div>
