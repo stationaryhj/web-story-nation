@@ -16,7 +16,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { bridgeCharbotDataToCharacter, getChangeNameTag, parseConversationExamples, exampleDatas } from '@/lib/utils/storyNationUtil'
+import {
+  bridgeCharbotDataToCharacter,
+  getChangeNameTag,
+  parseConversationExamples,
+  exampleDatas,
+} from '@/lib/utils/storyNationUtil'
 import BaseModal from './BaseModal'
 import { ReqGetChatBot } from '@/services/hooks/DataListManager'
 import { Character } from '@/store/useStoreData'
@@ -238,9 +243,9 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
           </div>
         </div>
       </div>
-      <div className="flex flex-col md:flex-row overflow-auto max-h-[78vh]">
+      <div className="flex flex-col md:flex-row h-[calc(90vh-68px)] overflow-hidden">
         {/* PC 레이아웃 */}
-        <div className="hidden md:block md:w-[40%] p-5 overflow-y-auto max-h-full">
+        <div className="hidden md:block md:w-[40%] p-5 overflow-y-auto h-full">
           <div className="flex flex-col items-start">
             {/* 이미지 영역 */}
             <div className="relative mb-6 w-full flex items-center justify-center">
@@ -331,119 +336,125 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
             </div>
           </div>
         </div>
-        <div className="hidden md:block md:w-[60%] overflow-y-auto max-h-full">
-          <div className="p-5 space-y-4">
-            {/* 첫 번째 섹션: 캐릭터 소개 */}
-            {isContentShow == 1 && (
-              <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm mb-4 border border-secondary-100 dark:border-dark-secondary-800/30">
-                <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
-                  <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
-                  상세 설명
-                </h3>
-                <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed">{content}</p>
-              </div>
-            )}
-            {/* 대화 예시 섹션 */}
-            {isExampleShow == 1 && (
-              <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm mb-4 border border-secondary-100 dark:border-dark-secondary-800/30">
-                <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
-                  <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
-                  대화 예시
-                </h3>
-                <div className="space-y-4">
-                  {exampleDatas.map((data: exampleDatas, index: number) => (
-                    <div
-                      key={index}
-                      className="border-b border-secondary-100 dark:border-dark-secondary-800 last:border-0 pb-4 last:pb-0"
-                    >
-                      <h4 className="text-sm font-medium text-secondary-800 dark:text-dark-secondary-200 mb-2">
-                        {data.title}
-                      </h4>
-                      <div className="space-y-2">
-                        <div className="flex items-start space-x-2">
-                          <div className="w-6 h-6 rounded-full bg-secondary-100 dark:bg-dark-secondary-700 flex items-center justify-center flex-shrink-0 text-secondary-500">
-                            <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
-                          </div>
-                          <div className="p-2 bg-secondary-50 dark:bg-dark-secondary-800/50 rounded-lg text-sm">
-                            {getChangeNameTag(data.characterMsg, selectedCharacter.name)}
-                          </div>
-                        </div>
-                        <div className="flex items-start justify-end space-x-2">
-                          <div className="p-2 bg-primary-50 dark:bg-dark-primary-900/30 rounded-lg text-sm text-end">
-                            {getChangeNameTag(data.userMsg, selectedCharacter.name)}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+        <div className="md:w-[60%] h-full flex flex-col relative">
+          <div className="overflow-y-auto pb-20">
+            <div className="p-5">
+              {/* 첫 번째 섹션: 캐릭터 소개 */}
+              {isContentShow == 1 && (
+                <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm mb-4 border border-secondary-100 dark:border-dark-secondary-800/30">
+                  <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
+                    <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
+                    상세 설명
+                  </h3>
+                  <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed whitespace-pre-wrap break-words">
+                    {content}
+                  </p>
                 </div>
-              </div>
-            )}
-
-            {/* 세 번째 섹션: 첫 메시지 */}
-            <div className="bg-white dark:from-dark-secondary-800/50 dark:to-dark-primary-900/30 rounded-lg p-5 shadow-sm border border-secondary-100 dark:border-dark-secondary-800/30">
-              <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 flex items-center">
-                <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>첫 메시지
-              </h3>
-              <div className="flex flex-col justify-between">
-                <div className="p-4 flex flex-col justify-between bg-white/80 dark:bg-dark-secondary-900/50 rounded-lg">
-                  <div>
-                    {mockFirstMessage.situation && (
-                      <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mb-2 italic">
-                        {mockFirstMessage.situation}
-                      </p>
-                    )}
-                    <div className="flex items-start mb-6">
-                      <div className="relative flex-shrink-0 mr-3">
-                        {/* 캐릭터 프로필 이미지 */}
-                        <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-200 dark:border-primary-800 shadow-sm">
-                          {selectedCharacter.imageUrl ? (
-                            <Image
-                              src={selectedCharacter.imageUrl}
-                              alt={selectedCharacter.name || '캐릭터'}
-                              width={40}
-                              height={40}
-                              className="w-full h-full"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
-                              <FontAwesomeIcon icon={faUser} className="text-primary-500 dark:text-primary-400" />
+              )}
+              {/* 대화 예시 섹션 */}
+              {isExampleShow == 1 && (
+                <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm mb-4 border border-secondary-100 dark:border-dark-secondary-800/30">
+                  <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
+                    <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
+                    대화 예시
+                  </h3>
+                  <div className="space-y-4">
+                    {exampleDatas.map((data: exampleDatas, index: number) => (
+                      <div
+                        key={index}
+                        className="border-b border-secondary-100 dark:border-dark-secondary-800 last:border-0 pb-4 last:pb-0"
+                      >
+                        <h4 className="text-sm font-medium text-secondary-800 dark:text-dark-secondary-200 mb-2">
+                          {data.title}
+                        </h4>
+                        <div className="space-y-2">
+                          <div className="flex items-start space-x-2">
+                            <div className="w-6 h-6 rounded-full bg-secondary-100 dark:bg-dark-secondary-700 flex items-center justify-center flex-shrink-0 text-secondary-500">
+                              <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
                             </div>
-                          )}
+                            <div className="p-2 break-words whitespace-pre-wrap overflow-hidden bg-secondary-50 dark:bg-dark-secondary-800/50 rounded-lg text-sm whitespace-pre-wrap break-words">
+                              {getChangeNameTag(data.characterMsg, selectedCharacter.name)}
+                            </div>
+                          </div>
+                          <div className="flex justify-end space-x-2">
+                            <div className="p-2 break-words whitespace-pre-wrap overflow-hidden bg-primary-50 dark:bg-dark-primary-900/30 rounded-lg text-sm text-start">
+                              {getChangeNameTag(data.userMsg, selectedCharacter.name)}
+                            </div>
+                          </div>
                         </div>
-
-                        {/* 온라인 상태 표시 (녹색 점) */}
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-dark-background"></div>
                       </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-                      {/* 말풍선 */}
-                      <div className="relative max-w-[85%]">
-                        {/* 캐릭터 이름 */}
-                        <div className="text-xs font-medium text-primary-600 dark:text-primary-400 mb-1">
-                          {selectedCharacter.name || '캐릭터'}
+              {/* 세 번째 섹션: 첫 메시지 */}
+              <div className="bg-white dark:from-dark-secondary-800/50 dark:to-dark-primary-900/30 rounded-lg p-5 shadow-sm border border-secondary-100 dark:border-dark-secondary-800/30">
+                <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 flex items-center">
+                  <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>첫 메시지
+                </h3>
+                <div className="flex flex-col justify-between">
+                  <div className="p-4 flex flex-col bg-white/80 dark:bg-dark-secondary-900/50 rounded-lg">
+                    <div>
+                      {mockFirstMessage.situation && (
+                        <p className="text-xs text-secondary-500 dark:text-dark-secondary-400 mb-2 italic">
+                          {mockFirstMessage.situation}
+                        </p>
+                      )}
+                      <div className="flex items-start mb-6">
+                        <div className="relative flex-shrink-0 mr-3">
+                          {/* 캐릭터 프로필 이미지 */}
+                          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-200 dark:border-primary-800 shadow-sm">
+                            {selectedCharacter.imageUrl ? (
+                              <Image
+                                src={selectedCharacter.imageUrl}
+                                alt={selectedCharacter.name || '캐릭터'}
+                                width={40}
+                                height={40}
+                                className="w-full h-full"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
+                                <FontAwesomeIcon icon={faUser} className="text-primary-500 dark:text-primary-400" />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* 온라인 상태 표시 (녹색 점) */}
+                          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-dark-background"></div>
                         </div>
 
-                        {/* 말풍선 내용 */}
-                        <div className="bg-primary-50 dark:bg-primary-900/30 text-secondary-800 dark:text-secondary-200 p-3 rounded-lg rounded-tl-none shadow-sm border border-primary-100 dark:border-primary-800/50">
-                          <p className="text-sm leading-relaxed">
-                            {getChangeNameTag(selectedCharacter?.first_talk || '', selectedCharacter.name)}
-                          </p>
+                        {/* 말풍선 */}
+                        <div className="relative max-w-[85%]">
+                          {/* 캐릭터 이름 */}
+                          <div className="text-xs font-medium text-primary-600 dark:text-primary-400 mb-1">
+                            {selectedCharacter.name || '캐릭터'}
+                          </div>
+
+                          {/* 말풍선 내용 */}
+                          <div className="bg-primary-50 dark:bg-primary-900/30 text-secondary-800 dark:text-secondary-200 p-3 rounded-lg rounded-tl-none shadow-sm border border-primary-100 dark:border-primary-800/50">
+                            <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                              {getChangeNameTag(selectedCharacter?.first_talk || '', selectedCharacter.name)}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                  <div>
-                    <button
-                      onClick={handleStartChat}
-                      className="w-full flex items-center justify-center rounded-lg bg-primary-500 px-6 py-4 font-medium text-white transition-all hover:bg-primary-600 dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600"
-                    >
-                      <FontAwesomeIcon icon={faComment} className="mr-2" />
-                      대화 시작하기
-                    </button>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* 대화 시작 버튼 - 항상 하단에 고정 */}
+          <div className="p-4 bg-white dark:bg-dark-background-light absolute bottom-0 left-0 right-0 w-full">
+            <button
+              onClick={handleStartChat}
+              className="w-full flex items-center justify-center rounded-lg bg-primary-500 px-6 py-4 font-medium text-white transition-all hover:bg-primary-600 dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600"
+            >
+              <FontAwesomeIcon icon={faComment} className="mr-2" />
+              대화 시작하기
+            </button>
           </div>
         </div>
 
@@ -547,7 +558,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
                   상세 설명
                 </h3>
-                <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed">
+                <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed whitespace-pre-wrap break-words">
                   {content || '설명이 없습니다.'}
                 </p>
               </div>
@@ -574,12 +585,12 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                           <div className="w-6 h-6 rounded-full bg-secondary-100 dark:bg-dark-secondary-700 flex items-center justify-center flex-shrink-0 text-secondary-500">
                             <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
                           </div>
-                          <div className="p-2 bg-secondary-50 dark:bg-dark-secondary-800/50 rounded-lg text-sm">
+                          <div className="p-2 bg-secondary-50 dark:bg-dark-secondary-800/50 rounded-lg text-sm whitespace-pre-wrap break-words">
                             {data.characterMsg}
                           </div>
                         </div>
                         <div className="flex items-start justify-end space-x-2">
-                          <div className="p-2 bg-primary-50 dark:bg-dark-primary-900/30 rounded-lg text-sm text-end">
+                          <div className="p-2 bg-primary-50 dark:bg-dark-primary-900/30 rounded-lg text-sm text-end whitespace-pre-wrap break-words">
                             {data.userMsg}
                           </div>
                         </div>
@@ -619,7 +630,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                     {selectedCharacter.name || '캐릭터'}
                   </div>
                   <div className="bg-primary-50 dark:bg-primary-900/30 text-secondary-800 dark:text-secondary-200 p-3 rounded-lg rounded-tl-none shadow-sm border border-primary-100 dark:border-primary-800/50">
-                    <p className="text-sm leading-relaxed">
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
                       {getChangeNameTag(selectedCharacter?.first_talk || '', selectedCharacter.name)}
                     </p>
                   </div>
