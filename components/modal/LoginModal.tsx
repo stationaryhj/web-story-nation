@@ -288,7 +288,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             </div>
           </div> */}
 
-          {/* <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} /> */}
+          <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} />
 
           {/* 신규 가입 모드일 때만 약관 동의 문구 표시 */}
 
@@ -299,7 +299,14 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       </BaseModal>
 
       {/* 회원가입 모달 - isOpen 조건만 체크하여 로그인 모달과 독립적으로 표시 */}
-      {showSignup && <SignupModal isOpen={isOpen} onClose={handleSignupClose} onSuccess={handleSignupSuccess} state={isReward ? 'reward' : 'signup'} />}
+      {showSignup && (
+        <SignupModal
+          isOpen={isOpen}
+          onClose={handleSignupClose}
+          onSuccess={handleSignupSuccess}
+          state={isReward ? 'reward' : 'signup'}
+        />
+      )}
     </>
   )
 }
