@@ -16,14 +16,11 @@ export function ToastPortal() {
   return createPortal(
     <ToastContainer
       position="top-center"
-      autoClose={3000}
+      autoClose={2500}
       hideProgressBar={false}
       newestOnTop={false}
       closeOnClick
       rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
       theme="light"
       style={{ zIndex: 999999 }}
     />,

@@ -46,8 +46,15 @@ export default function ButtonTabs({
   const [activeTabId, setActiveTabId] = useState(initialTabId)
   const [selectedTags, setSelectedTags] = useState<string[]>(tagsParam ? tagsParam.split('&') : [])
 
-  // 탭 컨테이너에 대한 ref - 타입 수정
-  const tabsRef = useRef<Array<HTMLButtonElement | null>>([])
+  // 탭 컨테이너에 대한 ref 배열 생성 (React 19 호환)
+  const tabsRef = useRef<(HTMLButtonElement | null)[]>([])
+
+  // ref 배열 초기화
+  useEffect(() => {
+    // 탭 개수만큼 배열 초기화
+    tabsRef.current = tabsRef.current.slice(0, tabs.length)
+  }, [tabs.length])
+
   const [indicatorStyle, setIndicatorStyle] = useState({
     left: 0,
     width: 0,
@@ -164,8 +171,11 @@ export default function ButtonTabs({
           {tabs.map((tab, index) => (
             <button
               key={tab.id}
-              ref={el => {
-                tabsRef.current[index] = el
+              ref={element => {
+                // React 19 방식으로 ref 설정
+                if (element) {
+                  tabsRef.current[index] = element
+                }
               }}
               className={cn(
                 'py-2 px-1 text-sm sm:text-sm md:text-lg font-bold whitespace-nowrap transition-colors relative',
