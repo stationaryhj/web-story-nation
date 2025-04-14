@@ -11,6 +11,7 @@ import { Tag } from '@/store/useCreateCharacterData'
 import ConfirmActionModal from '../../modal/ConfirmActionModal'
 import { toast } from 'react-toastify'
 import RatingSelect from './RatingSelect'
+import { useModalStore } from '@/store/useStoreModal'
 
 interface BasicInfoFormProps {
   formData: any
@@ -45,6 +46,7 @@ export default function BasicInfoForm({
   const [customTagInput, setCustomTagInput] = useState('')
   const { isAdult } = useAccountStore()
   const isAdultModeEnabled = isAdult()
+  const { openModal } = useModalStore()
 
   // 태그 데이터 로드
   useEffect(() => {
@@ -111,9 +113,10 @@ export default function BasicInfoForm({
   // 이용등급 선택 핸들러
   const handleRatingSelect = (rating: 'all' | 'adult') => {
     if (rating === 'adult' && !isAdultModeEnabled) {
-      setVisibleWarnigModal(true)
+      openModal('adultVerification')
       return
     }
+
     setFormField('rating', rating)
   }
 

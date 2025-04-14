@@ -6,7 +6,7 @@ import PageTransition from '@/components/motion/PageTransition';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState, Suspense } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faArrowLeft, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
 import { settlementApi } from '@/services/api/storyNationApi';
 import { useAccountStore } from '@/store/useAccountStore';
@@ -20,9 +20,14 @@ function PaymentSuccessContent() {
   const [error, setError] = useState<string | null>(null);
   const { updateAccountData, data: accountData } = useAccountStore()
 
+  const [success, setSuccess] = useState<boolean>(false);
+  const [resultMsg, setResultMsg] = useState<string | null>(null);
+  
+
   const paymentKey = searchParams?.get('paymentKey');
   const orderId = searchParams?.get('orderId');
   const amount = searchParams?.get('amount');
+
 
   useEffect(() => {
     if (!paymentKey || !orderId || !amount) {
@@ -62,6 +67,12 @@ function PaymentSuccessContent() {
         if(response.data.result.err === 0) {
           const {coin_user, coin_free, coin_register} = response.data as ConfirmTossPaymentResponse
           updateAccountData(coin_free, accountData?.coin_free_dt || 0, coin_register, coin_user)
+          setResultMsg('주문이 성공적으로 처리되었습니다.')
+          setSuccess(true)
+        }
+        else {
+          setResultMsg(response.data.result.msg)
+          setSuccess(false)
         }
         
         setIsLoading(false);
@@ -98,12 +109,18 @@ function PaymentSuccessContent() {
   return (
     <div className="max-w-md mx-auto bg-white dark:bg-dark-background-light rounded-xl shadow-md p-6">
       <div className="text-center mb-6">
-        <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-          <FontAwesomeIcon icon={faCheckCircle} className="text-green-500 text-3xl" />
-        </div>
-        <h2 className="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">결제가 완료되었습니다</h2>
+        {success ?
+          <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FontAwesomeIcon icon={faCheckCircle} className="text-green-500 text-3xl" />
+          </div>
+          :
+          <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FontAwesomeIcon icon={faExclamationTriangle} className="text-red-500 text-3xl" />
+          </div>
+        }
+        <h2 className="text-2xl font-bold text-green-600 dark:text-green-400 mb-2">{success ? '결제가 완료되었습니다' : '결제에 실패했습니다'}</h2>
         <p className="text-secondary-600 dark:text-dark-secondary-500">
-          주문이 성공적으로 처리되었습니다.
+          {resultMsg}
         </p>
       </div>
 

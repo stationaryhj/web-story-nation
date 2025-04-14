@@ -73,18 +73,6 @@ import { settlementApi } from '@/services/api/storyNationApi'
 import PaymentModal from '@/components/modal/PaymentModal'
 import { ReqGetCoinChargeUseHistory } from '@/services/hooks/DataListManager'
 
-// 더미 거래 내역 데이터
-const transactions = [
-  { id: 1, date: '2023-12-01', type: '충전', amount: 520, details: '펜 패키지 구매' },
-  { id: 2, date: '2023-12-02', type: '사용', amount: -20, details: '캐릭터 대화' },
-  { id: 3, date: '2023-12-03', type: '사용', amount: -15, details: '캐릭터 대화' },
-  { id: 4, date: '2023-12-04', type: '사용', amount: -25, details: '이미지 생성' },
-  { id: 5, date: '2023-12-05', type: '충전', amount: 900, details: '펜 패키지 구매' },
-  { id: 6, date: '2023-12-06', type: '사용', amount: -30, details: '캐릭터 대화' },
-  { id: 7, date: '2023-12-07', type: '사용', amount: -40, details: '캐릭터 대화' },
-  { id: 8, date: '2023-12-08', type: '보너스', amount: 100, details: '출석 보상' },
-]
-
 export default function ShopRecharge() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'recharge' | 'history'>('recharge')
@@ -532,7 +520,7 @@ export default function ShopRecharge() {
         </div>
       </div>
 
-      <PaymentModal
+    <PaymentModal
         isOpen={isPaymentModalOpen}
         onClose={() => setIsPaymentModalOpen(false)}
         amount={paymentAmount}
