@@ -532,31 +532,48 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 모드 선택 핸들러 업데이트
   const handleModeSelect = (mode: ChatMode) => {
-    // 이전 모드와 다른 경우에만 처리
-    if (currentModeId !== mode.id) {
-      // 재화(펜) 부족 여부 확인
-      const requiredPens = mode.penCost
-      const availablePens = useAccountStore.getState().getCoinSum()
+    if(currentModeId === mode.id) {
+      closeModal()
+      return
+    }
 
-      if (availablePens < requiredPens) {
-        // 재화 부족 시 모달 표시
-        openModal('confirmAction', {
-          title: '펜 부족',
-          description: `이 모드를 사용하려면 ${requiredPens}개의 펜이 필요합니다. 현재 보유한 펜: ${availablePens}개`,
-          onConfirm: () => {
-            // 충전 페이지로 이동하는 로직 추가 가능
-            router.push('/shop-recharge')
-          },
-          confirmText: '충전하기',
-          cancelText: '취소',
-          confirmButtonClass: 'bg-primary-500 hover:bg-primary-600 text-white',
+    // 재화(펜) 부족 여부 확인
+    const requiredPens = mode.penCost
+    const availablePens = useAccountStore.getState().getCoinSum()
+
+    if (availablePens < requiredPens) {
+      // 재화 부족 시 모달 표시
+      openModal('confirmAction', {
+        title: '펜 부족',
+        description: `이 모드를 사용하려면 ${requiredPens}개의 펜이 필요합니다. 현재 보유한 펜: ${availablePens}개`,
+        onConfirm: () => {
+          // 충전 페이지로 이동하는 로직 추가 가능
+          router.push('/shop-recharge')
+        },
+        confirmText: '충전하기',
+        cancelText: '취소',
+        confirmButtonClass: 'bg-primary-500 hover:bg-primary-600 text-white',
+      })
+      return
+    }
+
+    if(mode.id === 3 || mode.id === 4) {
+      // user 의 성인 유무 확인
+      if(!userIsAdult) return
+
+      // 캐릭터 성인 유무 확인
+      if(charbotData?.nsfw === 0) {
+        toast.error('성인 캐릭터는 성인 모드로만 이용할 수 있습니다.', {
+          toastId: 'adult-error',
         })
         return
       }
-
-      setCurrentModeId(mode.id)
-      updateChatMode(mode.id)
     }
+
+
+    setCurrentModeId(mode.id)
+    updateChatMode(mode.id)
+
 
     // 모달 닫기
     closeModal()
@@ -568,7 +585,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
     try {
       // Provider의 메서드를 사용하여 마지막 AI 메시지 새로고침
+      setIsWaitingForAI(true)
       await refreshLastAIMessage(chat)
+      setIsWaitingForAI(false)
     } catch (error) {
       console.error('메시지 새로고침 중 오류:', error)
       setError('메시지 새로고침에 실패했습니다. 다시 시도해주세요.')
@@ -684,6 +703,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 채팅 초기화 모달 열기
   const handleOpenResetChatModal = () => {
+    if(isWaitingForAI) return
     setShowResetChatModal(true)
   }
 
@@ -1371,6 +1391,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                           {isLastAiMessage && (
                             <button
                               onClick={handleRefreshLastAIMessage}
+                              disabled={isWaitingForAI}
                               className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-violet-50 flex items-center justify-center text-violet-500 hover:text-violet-600 hover:bg-violet-100 transition-colors mr-1.5 shadow-sm"
                               title="응답 새로고침"
                             >
@@ -1379,6 +1400,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                           )}
                           <button
                             onClick={() => handleDeleteLastAIMessage(chat)}
+                            disabled={isWaitingForAI}
                             className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-red-50 flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-100 transition-colors shadow-sm"
                             title="응답 삭제"
                           >
@@ -1400,7 +1422,10 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
               <button
                 id="message-input"
                 type="button"
-                onClick={() => setMessage(prevMessage => prevMessage + '**')}
+                onClick={(e) => {
+                  setMessage(prevMessage => prevMessage + '**')
+                  document.getElementById('chat-input')?.focus();
+                }}
                 className="w-12 h-12 flex items-center justify-center rounded-full transition-colors bg-gray-100 text-gray-500 hover:bg-gray-200 mr-2"
                 disabled={isWaitingForAI}
               >
@@ -1409,6 +1434,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
               <div className="flex-1 relative">
                 <input
+                  id="chat-input"
                   type="text"
                   value={message}
                   onChange={e => setMessage(e.target.value)}

@@ -46,7 +46,7 @@ export default function MyEarningsView() {
 
   // 수익 내역
   const { data: settlementListData, isLoading: settlementListLoading } = GetSettlementList(
-    selectedTab === 'current' ? 2 : 1,
+    selectedTab === 'current' ? 1 : 2,
     currentPage,
     50
   )

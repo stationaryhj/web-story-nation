@@ -114,6 +114,8 @@ export default function PaymentModal({
         },
       })
 
+      console.log('paymentResult', paymentResult)
+
       // 결제 성공 시 콜백 호출
       if (onSuccess) {
         onSuccess(paymentResult)
