@@ -213,31 +213,31 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
       {/* 모달 헤더 */}
       <div className="sticky top-0 z-[102] bg-white dark:bg-dark-background-light border-b border-secondary-100 dark:border-dark-secondary-800">
         <div className="flex items-center justify-between py-4 px-4">
-          <h1 className="text-xl font-bold text-secondary-900 dark:text-dark-secondary-100">
+          <h1 className="text-md md:text-xl font-bold text-secondary-900 dark:text-dark-secondary-100">
             {selectedCharacter.name || '이름 없음'}
           </h1>
           <div className="flex items-center gap-2">
             {variant === 'default' ? (
               <button
                 onClick={handleReport}
-                className="w-9 h-9 rounded-full bg-secondary-100 dark:bg-dark-secondary-800 text-secondary-500 dark:text-dark-secondary-400 hover:bg-secondary-200 dark:hover:bg-dark-secondary-700 transition-colors flex items-center justify-center"
+                className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-secondary-100 dark:bg-dark-secondary-800 text-secondary-500 dark:text-dark-secondary-400 hover:bg-secondary-200 dark:hover:bg-dark-secondary-700 transition-colors flex items-center justify-center"
               >
-                <Siren className="h-4 w-4" />
+                <Siren className="h-4 w-4 md:h-6 md:w-6" />
               </button>
             ) : (
               <button
                 onClick={handleCreateCharacter}
-                className="w-9 h-9 rounded-full bg-secondary-100 dark:bg-dark-secondary-800 text-secondary-500 dark:text-dark-secondary-400 hover:bg-secondary-200 dark:hover:bg-dark-secondary-700 transition-colors flex items-center justify-center"
+                className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-secondary-100 dark:bg-dark-secondary-800 text-secondary-500 dark:text-dark-secondary-400 hover:bg-secondary-200 dark:hover:bg-dark-secondary-700 transition-colors flex items-center justify-center"
               >
-                <FontAwesomeIcon icon={faUserEdit} className="h-4 w-4" />
+                <FontAwesomeIcon icon={faUserEdit} className="h-4 w-4 md:h-6 md:w-6" />
               </button>
             )}
             <div>
               <button
                 onClick={handleClose}
-                className="w-9 h-9 rounded-full bg-secondary-100 dark:bg-dark-secondary-800 text-secondary-500 dark:text-dark-secondary-400 hover:bg-secondary-200 dark:hover:bg-dark-secondary-700 transition-colors flex items-center justify-center"
+                className="w-7 h-7 md:w-9 md:h-9 rounded-full bg-secondary-100 dark:bg-dark-secondary-800 text-secondary-500 dark:text-dark-secondary-400 hover:bg-secondary-200 dark:hover:bg-dark-secondary-700 transition-colors flex items-center justify-center"
               >
-                <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
+                <FontAwesomeIcon icon={faTimes} className="h-4 w-4 md:h-6 md:w-6" />
               </button>
             </div>
           </div>
@@ -259,23 +259,15 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
 
                   <div
                     id="image_container"
-                    className="w-full h-auto max-h-[500px] relative rounded-xl overflow-hidden flex items-center justify-center"
+                    className="w-full h-[500px] relative rounded-xl overflow-hidden flex items-center justify-center bg-secondary-50 dark:bg-dark-secondary-900/30"
                   >
-                    <div className="relative">
+                    <div className="relative w-full h-full">
                       <Image
                         src={selectedCharacter.imageUrl}
                         alt={selectedCharacter.name || '캐릭터 이미지'}
                         priority
-                        width={400}
-                        height={400}
+                        fill
                         className="transition-opacity duration-300 z-10 opacity-100 drop-shadow-md rounded-xl"
-                        style={{
-                          objectFit: 'contain',
-                          maxWidth: '100%',
-                          maxHeight: '480px',
-                          width: 'auto',
-                          height: 'auto',
-                        }}
                         onLoadingComplete={() => setIsImageLoaded(true)}
                       />
 
@@ -336,6 +328,8 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
             </div>
           </div>
         </div>
+
+        {/* PC 레이아웃 우측 섹션 */}
         <div className="md:w-[60%] h-full flex flex-col relative">
           <div className="overflow-y-auto pb-20">
             <div className="p-5">
@@ -459,187 +453,185 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
         </div>
 
         {/* 모바일 레이아웃 */}
-        <div className="md:hidden w-full overflow-y-auto max-h-full">
-          {/* 상단: 이미지 섹션 */}
-          <div className="w-full mb-6 relative flex-shrink-0 overflow-hidden">
-            {selectedCharacter.imageUrl && (
-              <>
-                <div
-                  className={`absolute inset-0 flex items-center justify-center bg-secondary-100 dark:bg-dark-secondary-800 transition-opacity duration-300 ${isImageLoaded ? 'opacity-0' : 'opacity-100'}`}
-                >
-                  <div className="w-8 h-8 rounded-full border-2 border-primary-500 border-t-transparent animate-spin"></div>
+        <div className="md:hidden w-full h-full relative">
+          <div className="absolute inset-0 flex flex-col">
+            <div className="flex-1 overflow-y-auto pb-20">
+              <div className="p-5 space-y-4">
+                {/* 이미지 영역 */}
+                <div className="relative mb-6 w-full flex items-center justify-center">
+                  {selectedCharacter.imageUrl && (
+                    <>
+                      <div
+                        className={`absolute inset-0 flex items-center justify-center bg-secondary-100 dark:bg-dark-secondary-800 transition-opacity duration-300 ${isImageLoaded ? 'opacity-0' : 'opacity-100'}`}
+                      >
+                        <div className="w-8 h-8 rounded-full border-2 border-primary-500 border-t-transparent animate-spin"></div>
+                      </div>
+
+                      <div
+                        id="mobile_image_container"
+                        className="w-full h-[350px] relative rounded-xl overflow-hidden flex items-center justify-center bg-secondary-50 dark:bg-dark-secondary-900/30"
+                      >
+                        <div className="relative w-full h-full">
+                          <Image
+                            src={selectedCharacter.imageUrl}
+                            alt={selectedCharacter.name || '캐릭터 이미지'}
+                            priority
+                            fill
+                            className="transition-opacity duration-300 z-10 opacity-100 drop-shadow-md rounded-xl"
+                            style={{
+                              objectFit: 'fill',
+                            }}
+                            onLoadingComplete={() => setIsImageLoaded(true)}
+                          />
+
+                          {/* 19세 이상 뱃지 - 이미지에 직접 배치 */}
+                          {selectedCharacter.isAdult && (
+                            <div className="absolute z-30 flex items-center" style={{ top: '15px', right: '15px' }}>
+                              <Image src="/images/flames.png" alt="성인인증" width={27.7} height={35.3} />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
 
-                <div
-                  id="mobile_image_container"
-                  className="w-full h-auto max-h-[40vh] relative flex items-center justify-center p-2"
-                >
-                  <div className="relative p-2">
-                    <Image
-                      src={selectedCharacter.imageUrl}
-                      alt={selectedCharacter.name || '캐릭터 이미지'}
-                      priority
-                      width={300}
-                      height={300}
-                      className={`transition-opacity duration-300 ${isImageLoaded ? 'opacity-100' : 'opacity-0'} drop-shadow-md z-10 rounded-xl`}
-                      style={{
-                        objectFit: 'contain',
-                        maxWidth: '100%',
-                        maxHeight: 'calc(40vh - 40px)',
-                        width: 'auto',
-                        height: 'auto',
-                      }}
-                      onLoadingComplete={() => setIsImageLoaded(true)}
-                    />
-
-                    {/* 19세 이상 뱃지 - 이미지에 직접 배치 */}
-                    {selectedCharacter.isAdult && (
-                      <div className="absolute z-30 flex items-center" style={{ top: '15px', right: '15px' }}>
-                        <Image src="/images/flames.png" alt="성인인증" width={27.7} height={35.3} />
-                      </div>
-                    )}
+                {/* 좋아요 & 댓글 수 */}
+                <div className="flex justify-end items-end w-full mb-6 gap-6">
+                  <div
+                    className="flex items-center space-x-2 cursor-pointer transition-colors hover:text-red-600"
+                    onClick={handleLike}
+                  >
+                    <FontAwesomeIcon icon={faHeart} className="h-5 w-5 text-red-500" />
+                    <span className="text-secondary-700 dark:text-dark-secondary-300">
+                      {selectedCharacter.likeCount || 0}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <FontAwesomeIcon icon={faMessage} className="h-5 w-5 text-primary-500" />
+                    <span className="text-secondary-700 dark:text-dark-secondary-300">
+                      {selectedCharacter.commentCount || 0}
+                    </span>
                   </div>
                 </div>
-              </>
-            )}
-          </div>
 
-          {/* 하단: 캐릭터 정보 및 콘텐츠 */}
-          <div className="flex flex-col gap-4">
-            {/* 좋아요 & 댓글 수 */}
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 cursor-pointer" onClick={handleLike}>
-                <FontAwesomeIcon icon={faHeart} className="h-5 w-5 text-red-500" />
-                <span className="text-secondary-700 dark:text-dark-secondary-300">
-                  {selectedCharacter.likeCount || 0}
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <FontAwesomeIcon icon={faMessage} className="h-5 w-5 text-primary-500" />
-                <span className="text-secondary-700 dark:text-dark-secondary-300">
-                  {selectedCharacter.commentCount || 0}
-                </span>
-              </div>
-            </div>
-
-            {/* 해시태그 */}
-            <div className="flex flex-wrap gap-2">
-              {selectedCharacter.hashtags?.slice(0, 5).map((tag: string, index: number) => (
-                <span
-                  key={`tag-${index}`}
-                  className="rounded-full bg-primary-50 px-2.5 py-0.5 text-xs text-primary-700 dark:bg-dark-primary-900 dark:text-dark-primary-300"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-
-            {/* 캐릭터 소개 */}
-            <div className="w-full bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-dark-primary-900/70 dark:to-dark-secondary-900/70 rounded-lg border border-secondary-100 dark:border-dark-secondary-800/30">
-              <div className="p-4">
-                <h3 className="text-base font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-secondary-700 dark:from-dark-primary-300 dark:to-dark-secondary-300">
-                    캐릭터 소개
-                  </span>
-                </h3>
-                <p className="text-secondary-800 dark:text-dark-secondary-200 text-sm leading-relaxed whitespace-pre-wrap break-words">
-                  {getChangeNameTag(
-                    selectedCharacter.detailDescription || selectedCharacter.description || '',
-                    selectedCharacter.name
-                  )}
-                </p>
-              </div>
-            </div>
-
-            {/* 상세 설명 */}
-            {isContentShow == 1 && (
-              <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm border border-secondary-100 dark:border-dark-secondary-800/30">
-                <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
-                  <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
-                  상세 설명
-                </h3>
-                <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed whitespace-pre-wrap break-words">
-                  {content || '설명이 없습니다.'}
-                </p>
-              </div>
-            )}
-
-            {/* 대화 예시 */}
-            {isExampleShow == 1 && (
-              <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm border border-secondary-100 dark:border-dark-secondary-800/30">
-                <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
-                  <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
-                  대화 예시
-                </h3>
-                <div className="space-y-4">
-                  {exampleDatas.map((data: any, index: number) => (
-                    <div
-                      key={index}
-                      className="border-b border-secondary-100 dark:border-dark-secondary-800 last:border-0 pb-4 last:pb-0"
+                {/* 해시태그 */}
+                <div className="flex flex-wrap justify-start gap-2 mb-4">
+                  {selectedCharacter.hashtags?.slice(0, 7).map((tag: string, index: number) => (
+                    <span
+                      key={`tag-${index}`}
+                      className="rounded-full bg-primary-50 px-3 py-1 text-sm text-primary-700 dark:bg-dark-primary-900 dark:text-dark-primary-300"
                     >
-                      <h4 className="text-sm font-medium text-secondary-800 dark:text-dark-secondary-200 mb-2">
-                        {data.title}
-                      </h4>
-                      <div className="space-y-2">
-                        <div className="flex items-start space-x-2">
-                          <div className="w-6 h-6 rounded-full bg-secondary-100 dark:bg-dark-secondary-700 flex items-center justify-center flex-shrink-0 text-secondary-500">
-                            <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
-                          </div>
-                          <div className="p-2 bg-secondary-50 dark:bg-dark-secondary-800/50 rounded-lg text-sm whitespace-pre-wrap break-words">
-                            {data.characterMsg}
-                          </div>
-                        </div>
-                        <div className="flex items-start justify-end space-x-2">
-                          <div className="p-2 bg-primary-50 dark:bg-dark-primary-900/30 rounded-lg text-sm text-end whitespace-pre-wrap break-words">
-                            {data.userMsg}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                      {tag}
+                    </span>
                   ))}
                 </div>
-              </div>
-            )}
 
-            {/* 첫 메시지 */}
-            <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm border border-secondary-100 dark:border-dark-secondary-800/30">
-              <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
-                <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>첫 메시지
-              </h3>
-              <div className="flex items-start mb-4">
-                <div className="relative flex-shrink-0 mr-3">
-                  <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-200 dark:border-primary-800 shadow-sm">
-                    {selectedCharacter.imageUrl ? (
-                      <Image
-                        src={selectedCharacter.imageUrl}
-                        alt={selectedCharacter.name || '캐릭터'}
-                        width={40}
-                        height={40}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
-                        <FontAwesomeIcon icon={faUser} className="text-primary-500 dark:text-primary-400" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-dark-background"></div>
-                </div>
-                <div className="relative max-w-[85%]">
-                  <div className="text-xs font-medium text-primary-600 dark:text-primary-400 mb-1">
-                    {selectedCharacter.name || '캐릭터'}
-                  </div>
-                  <div className="bg-primary-50 dark:bg-primary-900/30 text-secondary-800 dark:text-secondary-200 p-3 rounded-lg rounded-tl-none shadow-sm border border-primary-100 dark:border-primary-800/50">
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-                      {getChangeNameTag(selectedCharacter?.first_talk || '', selectedCharacter.name)}
+                {/* 간략한 캐릭터 설명 */}
+                <div className="w-full mt-4 bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-dark-primary-900/70 dark:to-dark-secondary-900/70 rounded-lg border border-secondary-100 dark:border-dark-secondary-800/30">
+                  <div className="p-4">
+                    <h3 className="text-base font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
+                      <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-secondary-700 dark:from-dark-primary-300 dark:to-dark-secondary-300">
+                        캐릭터 소개
+                      </span>
+                    </h3>
+                    <p className="text-secondary-800 dark:text-dark-secondary-200 text-sm leading-relaxed whitespace-pre-wrap break-words">
+                      {getChangeNameTag(selectedCharacter.description || '', selectedCharacter.name)}
                     </p>
                   </div>
                 </div>
+
+                {/* 상세 설명 */}
+                {isContentShow == 1 && (
+                  <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm border border-secondary-100 dark:border-dark-secondary-800/30">
+                    <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
+                      <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
+                      상세 설명
+                    </h3>
+                    <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed whitespace-pre-wrap break-words">
+                      {content}
+                    </p>
+                  </div>
+                )}
+
+                {/* 대화 예시 */}
+                {isExampleShow == 1 && (
+                  <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm border border-secondary-100 dark:border-dark-secondary-800/30">
+                    <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
+                      <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
+                      대화 예시
+                    </h3>
+                    <div className="space-y-4">
+                      {exampleDatas.map((data: any, index: number) => (
+                        <div
+                          key={index}
+                          className="border-b border-secondary-100 dark:border-dark-secondary-800 last:border-0 pb-4 last:pb-0"
+                        >
+                          <h4 className="text-sm font-medium text-secondary-800 dark:text-dark-secondary-200 mb-2">
+                            {data.title}
+                          </h4>
+                          <div className="space-y-2">
+                            <div className="flex items-start space-x-2">
+                              <div className="w-6 h-6 rounded-full bg-secondary-100 dark:bg-dark-secondary-700 flex items-center justify-center flex-shrink-0 text-secondary-500">
+                                <FontAwesomeIcon icon={faUser} className="w-3 h-3" />
+                              </div>
+                              <div className="p-2 bg-secondary-50 dark:bg-dark-secondary-800/50 rounded-lg text-sm whitespace-pre-wrap break-words">
+                                {data.characterMsg}
+                              </div>
+                            </div>
+                            <div className="flex items-start justify-end space-x-2">
+                              <div className="p-2 bg-primary-50 dark:bg-dark-primary-900/30 rounded-lg text-sm text-end whitespace-pre-wrap break-words">
+                                {data.userMsg}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 첫 메시지 */}
+                <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm border border-secondary-100 dark:border-dark-secondary-800/30">
+                  <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
+                    <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>첫 메시지
+                  </h3>
+                  <div className="flex items-start mb-4">
+                    <div className="relative flex-shrink-0 mr-3">
+                      <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-200 dark:border-primary-800 shadow-sm">
+                        {selectedCharacter.imageUrl ? (
+                          <Image
+                            src={selectedCharacter.imageUrl}
+                            alt={selectedCharacter.name || '캐릭터'}
+                            width={40}
+                            height={40}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-primary-100 dark:bg-primary-900 flex items-center justify-center">
+                            <FontAwesomeIcon icon={faUser} className="text-primary-500 dark:text-primary-400" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-dark-background"></div>
+                    </div>
+                    <div className="relative max-w-[85%]">
+                      <div className="text-xs font-medium text-primary-600 dark:text-primary-400 mb-1">
+                        {selectedCharacter.name || '캐릭터'}
+                      </div>
+                      <div className="bg-primary-50 dark:bg-primary-900/30 text-secondary-800 dark:text-secondary-200 p-3 rounded-lg rounded-tl-none shadow-sm border border-primary-100 dark:border-primary-800/50">
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+                          {getChangeNameTag(selectedCharacter?.first_talk || '', selectedCharacter.name)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* 대화 시작 버튼 */}
-            <div className="sticky bottom-0 left-0 right-0 bg-white p-2 dark:bg-dark-background-light border-t border-secondary-100 dark:border-dark-secondary-800 z-[103] md:static md:p-0 md:bg-transparent md:border-0">
+            {/* 대화 시작 버튼 - 모바일 */}
+            <div className="absolute bottom-0 left-0 right-0 bg-white p-2 dark:bg-dark-background-light border-t border-secondary-100 dark:border-dark-secondary-800 z-[103]">
               <button
                 onClick={handleStartChat}
                 className="w-full flex items-center justify-center rounded-lg bg-primary-500 px-6 py-3.5 font-medium text-white transition-colors hover:bg-primary-600 dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600 shadow-sm"
