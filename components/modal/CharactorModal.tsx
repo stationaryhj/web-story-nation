@@ -243,9 +243,9 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
           </div>
         </div>
       </div>
-      <div className="flex flex-col md:flex-row h-[calc(90vh-68px)] overflow-hidden">
+      <div className="flex flex-col md:flex-row h-[calc(90vh-88px)] overflow-hidden">
         {/* PC 레이아웃 */}
-        <div className="hidden md:block md:w-[40%] p-5 overflow-y-auto h-full">
+        <div className="hidden md:block md:w-[40%] p-5 h-full">
           <div className="flex flex-col items-start">
             {/* 이미지 영역 */}
             <div className="relative mb-6 w-full flex items-center justify-center">
