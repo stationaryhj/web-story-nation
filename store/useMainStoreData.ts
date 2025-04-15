@@ -151,8 +151,6 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
     isSlide: boolean = false
   ) => {
     try {
-      console.log('UpdateRankingTopCharacter 호출됨')
-
       // 직접 데이터 가져오기 (이 경우 contentApi.GetTop10Ranking API를 사용하므로 UpdateharactersPaging 재사용 불가)
       const data = await queryClient.fetchQuery({
         queryKey: ['rankingCharacters', countryCode, ranking_type, gender, isSlide],

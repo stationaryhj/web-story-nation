@@ -9,6 +9,8 @@ import { AnimatePresence } from 'framer-motion'
 import type { ReactNode } from 'react'
 import { useState, useEffect } from 'react'
 import { InitDataLoader } from '@/app/providers/InitDataLoader'
+import app from '@/app/firebase'
+import { getAnalytics, logEvent } from 'firebase/analytics'
 
 import { API_URL, CHAT_URL } from '@/services/api/storyNationApi'
 import { useAccountStore } from '@/store/useStoreData'
@@ -94,6 +96,30 @@ export default function Providers({ children }: { children: ReactNode }) {
   // 스켈레톤 테마 색상 설정
   const skeletonBaseColor = mounted && isDarkMode ? '#1E293B' : '#E5E7EB'
   const skeletonHighlightColor = mounted && isDarkMode ? '#334155' : '#F3F4F6'
+
+  // Firebase Analytics 초기화
+  useEffect(() => {
+    if (typeof window !== 'undefined' && mounted) {
+      try {
+        console.log('Initializing Firebase Analytics in Providers...');
+        const analytics = getAnalytics(app);
+        
+        // 앱 시작 이벤트 로깅
+        logEvent(analytics, 'app_start', {
+          app_version: process.env.NEXT_PUBLIC_APP_VERSION || '0.2.0',
+          platform: 'web'
+        });
+
+        if (process.env.NODE_ENV === 'development') {
+          // @ts-ignore
+          window.FIREBASE_ANALYTICS_DEBUG_MODE = true;
+          console.log('Firebase Analytics initialized in debug mode');
+        }
+      } catch (error) {
+        console.error('Firebase Analytics initialization error:', error);
+      }
+    }
+  }, [mounted]);
 
   const DevNote = () => {
     return (
