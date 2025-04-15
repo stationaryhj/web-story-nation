@@ -258,9 +258,10 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                     <div className="w-8 h-8 rounded-full border-2 border-primary-500 border-t-transparent animate-spin"></div>
                   </div>
 
+                  {/* PC 이미지 컨테이너 */}
                   <div
                     id="image_container"
-                    className="w-full h-[500px] relative rounded-xl overflow-hidden flex items-center justify-center bg-secondary-50 dark:bg-dark-secondary-900/30"
+                    className="w-full aspect-[3/4] relative rounded-xl overflow-hidden flex items-center justify-center bg-secondary-50 dark:bg-dark-secondary-900/30"
                   >
                     <div className="relative w-full h-full">
                       <Image
@@ -270,6 +271,10 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                         fill
                         className="transition-opacity duration-300 z-10 opacity-100 drop-shadow-md rounded-xl"
                         onLoadingComplete={() => setIsImageLoaded(true)}
+                        style={{
+                          objectFit: 'cover',
+                          objectPosition: 'center center'
+                        }}
                       />
 
                       {/* 19세 이상 뱃지 - 이미지에 직접 배치 */}
@@ -469,9 +474,10 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                         <div className="w-8 h-8 rounded-full border-2 border-primary-500 border-t-transparent animate-spin"></div>
                       </div>
 
+                      {/* 모바일 이미지 컨테이너 */}
                       <div
                         id="mobile_image_container"
-                        className="w-full h-[350px] relative rounded-xl overflow-hidden flex items-center justify-center bg-secondary-50 dark:bg-dark-secondary-900/30"
+                        className="w-full aspect-[3/4] relative rounded-xl overflow-hidden flex items-center justify-center bg-secondary-50 dark:bg-dark-secondary-900/30"
                       >
                         <div className="relative w-full h-full">
                           <Image
@@ -481,7 +487,8 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                             fill
                             className="transition-opacity duration-300 z-10 opacity-100 drop-shadow-md rounded-xl"
                             style={{
-                              objectFit: 'fill',
+                              objectFit: 'cover',
+                              objectPosition: 'center center'
                             }}
                             onLoadingComplete={() => setIsImageLoaded(true)}
                           />
