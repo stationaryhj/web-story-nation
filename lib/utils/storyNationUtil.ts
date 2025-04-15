@@ -301,7 +301,6 @@ export const parseConversationExamples = (exampleText: string) => {
     let dataList: exampleDatas[] = []
     const parseData = JSON.parse(exampleText) as ConversationExampleJSON
 
-    console.log('💬 @@ exampleText @@ :: ', parseData)
     for(let i = 0; i < parseData.text_counts.length; i++) {
       const index = i
       const title = parseData.titles[i]

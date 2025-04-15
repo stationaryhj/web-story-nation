@@ -93,7 +93,7 @@ const CHAT_URL =
     ? process.env.NEXT_PUBLIC_STORYNATION_PROD_CHAT_URL
     : process.env.NEXT_PUBLIC_STORYNATION_CHAT_URL
 
-// const CHAT_URL = process.env.NEXT_PUBLIC_STORYNATION_CHAT_URL
+// const CHAT_URL = process.env.NEXT_PUBLIC_STORYNATION_PROD_CHAT_URL
 
 // API 인스턴스 생성
 const api = createApiInstance(API_URL || '')
