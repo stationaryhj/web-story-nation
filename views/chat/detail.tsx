@@ -71,6 +71,7 @@ const customChatModes: ChatMode[] = [
     discount: 0,
     original_coin: 0,
     isShow: true,
+    isAdult: false,
   },
   {
     id: 2,
@@ -82,6 +83,7 @@ const customChatModes: ChatMode[] = [
     discount: 0,
     original_coin: 0,
     isShow: true,
+    isAdult: false,
   },
   {
     id: 3,
@@ -93,6 +95,7 @@ const customChatModes: ChatMode[] = [
     discount: 0,
     original_coin: 0,
     isShow: true,
+    isAdult: true,
   },
   {
     id: 4,
@@ -104,6 +107,7 @@ const customChatModes: ChatMode[] = [
     discount: 0,
     original_coin: 0,
     isShow: true,
+    isAdult: true,
   },
 ]
 
@@ -562,7 +566,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       if(!userIsAdult) return
 
       // 캐릭터 성인 유무 확인
-      if(charbotData?.nsfw === 0) {
+      if(charbotData?.nsfw !== 1) {
         toast.error('성인 캐릭터는 성인 모드로만 이용할 수 있습니다.', {
           toastId: 'adult-error',
         })
@@ -1014,6 +1018,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             onClick={() =>
               openModal('chatMode', {
                 currentModeId: currentModeId,
+                nsfw: charbotData?.nsfw,
                 onSelectMode: handleModeSelect,
               })
             }
@@ -1103,6 +1108,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             <h3 className="text-lg font-semibold mb-4">채팅 모드 선택</h3>
             <div className="space-y-3">
               {chatMode.map((mode, index) => {
+                if(charbotData?.nsfw !== 1) {
+                  if(mode.chat_mode === 3 || mode.chat_mode === 4) return null
+                }
                 const chatMode = bridgeChatModeDataToChatMode(mode, customChatModes[index])
                 if (!chatMode.isShow) return null
                 return (
@@ -1423,7 +1431,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                 id="message-input"
                 type="button"
                 onClick={(e) => {
-                  setMessage(prevMessage => prevMessage + '**')
+                  setMessage(prevMessage => prevMessage + '*')
                   document.getElementById('chat-input')?.focus();
                 }}
                 className="w-12 h-12 flex items-center justify-center rounded-full transition-colors bg-gray-100 text-gray-500 hover:bg-gray-200 mr-2"

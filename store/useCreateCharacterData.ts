@@ -403,7 +403,7 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
             ? JSON.stringify(exampleDatasToConversationJson(formData.conversationExamples))
             : '',
         // 성인 등급 설정
-        nsfw: formData.rating === 'adult' ? 1 : 0,
+        nsfw: formData.rating === 'adult' ? 1 : 2,
         // 게시범위 (공개=1, 비공개=0)
         show_yn: formData.visibility === 'public' ? 1 : 0,
         // 상세설명 (공개=1, 비공개=0)
