@@ -50,6 +50,7 @@ export default function SettingsForm() {
   const { getBankList } = useBankStore()
 
   const login_sns_state = localStorage.getItem('social_login_state') || ''
+  const miner = userInfo?.minor || 0
 
   // 사용자 정보 상태
   const [profile, setProfile] = useState({
@@ -529,10 +530,14 @@ export default function SettingsForm() {
               <h2 className="text-lg font-semibold">계정 정보</h2>
               <button
                 onClick={handleAdultVerification}
-                className="sm:flex-shrink-0 px-4 py-3 bg-primary-500 text-white rounded-lg whitespace-nowrap hover:bg-primary-700"
-                disabled={profile.minor > 0}
+                className={`sm:flex-shrink-0 px-4 py-3 rounded-lg whitespace-nowrap ${
+                  miner === 0 ? 'bg-primary-500 text-white hover:bg-primary-700' :
+                  'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  
+                }`}
+                disabled={miner > 0}
               >
-                본인 인증
+                {miner === 0 ? '본인 인증' : miner === 1 ? '청소년 인증 완료' : '성인 인증 완료'}
               </button>
             </div>
 

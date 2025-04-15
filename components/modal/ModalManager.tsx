@@ -54,6 +54,7 @@ export default function ModalManager() {
   if (modalType === 'chatMode') {
     return (
       <ChatModeModal
+        nsfw={modalProps?.nsfw || 0}
         isOpen={isOpen}
         onClose={closeModal}
         currentModeId={modalProps?.currentModeId || 1}

@@ -17,12 +17,14 @@ export interface ChatMode {
   discount: number
   original_coin: number
   isShow: boolean
+  isAdult: boolean
 }
 
 interface ChatModeModalProps {
   isOpen: boolean
   onClose: () => void
   currentModeId: number
+  nsfw: number
   onSelectMode: (mode: ChatMode) => void
 }
 
@@ -37,6 +39,7 @@ const customChatModes: ChatMode[] = [
     discount: 0,
     original_coin: 0,
     isShow: true,
+    isAdult: false,
   },
   {
     id: 2,
@@ -48,6 +51,7 @@ const customChatModes: ChatMode[] = [
     discount: 0,
     original_coin: 0,
     isShow: true,
+    isAdult: false,
   },
   {
     id: 3,
@@ -59,6 +63,7 @@ const customChatModes: ChatMode[] = [
     discount: 0,
     original_coin: 0,
     isShow: true,
+    isAdult: true,
   },
   {
     id: 4,
@@ -70,12 +75,15 @@ const customChatModes: ChatMode[] = [
     discount: 0,
     original_coin: 0,
     isShow: true,
+    isAdult: true,
   },
 ]
 
-export default function ChatModeModal({ isOpen, onClose, currentModeId, onSelectMode }: ChatModeModalProps) {
+export default function ChatModeModal({ isOpen, onClose, currentModeId, nsfw, onSelectMode }: ChatModeModalProps) {
   const { chatMode } = useChatModeStore()
   const chatModes = chatMode.map((mode, index) => bridgeChatModeDataToChatMode(mode, customChatModes[index]))
+  console.log('nsfw :::: ', nsfw)
+  console.log(chatModes)
 
   return (
     <BaseModal
@@ -93,74 +101,79 @@ export default function ChatModeModal({ isOpen, onClose, currentModeId, onSelect
         <ul className="divide-y divide-secondary-100 dark:divide-dark-secondary-800">
           {chatModes
             .filter(mode => mode.isShow)
-            .map(mode => (
-              <li
-                key={mode.id}
-                className={`px-4 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-secondary-50 dark:hover:bg-dark-secondary-800/30 ${
-                  currentModeId === mode.id ? 'bg-primary-50 dark:bg-dark-primary-900/30' : ''
-                }`}
-                onClick={() => onSelectMode(mode)}
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center">
-                      <span
-                        className={`flex items-center text-sm sm:text-base font-medium ${
-                          currentModeId === mode.id
-                            ? 'text-primary-700 dark:text-dark-primary-400'
-                            : 'text-secondary-900 dark:text-dark-secondary-200'
-                        }`}
-                      >
-                        <FontAwesomeIcon
-                          icon={mode.icon}
-                          className="mr-2 text-xs sm:text-sm"
-                          style={{
-                            color:
-                              currentModeId === mode.id ? 'var(--color-primary-600)' : 'var(--color-secondary-500)',
-                          }}
-                        />
-                        {mode.name}
-                      </span>
-                      {currentModeId === mode.id && (
-                        <FontAwesomeIcon
-                          icon={faCheckCircle}
-                          className="ml-2 text-primary-600 dark:text-dark-primary-500"
-                          size="sm"
-                        />
-                      )}
+            .map((mode) => {
+              if(nsfw !== 1){
+                if(mode.id === 3 || mode.id === 4) return null
+              }
+              return (
+                <li
+                  key={mode.id}
+                  className={`px-4 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-secondary-50 dark:hover:bg-dark-secondary-800/30 ${
+                    currentModeId === mode.id ? 'bg-primary-50 dark:bg-dark-primary-900/30' : ''
+                  }`}
+                  onClick={() => onSelectMode(mode)}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center">
+                        <span
+                          className={`flex items-center text-sm sm:text-base font-medium ${
+                            currentModeId === mode.id
+                              ? 'text-primary-700 dark:text-dark-primary-400'
+                              : 'text-secondary-900 dark:text-dark-secondary-200'
+                          }`}
+                        >
+                          <FontAwesomeIcon
+                            icon={mode.icon}
+                            className="mr-2 text-xs sm:text-sm"
+                            style={{
+                              color:
+                                currentModeId === mode.id ? 'var(--color-primary-600)' : 'var(--color-secondary-500)',
+                            }}
+                          />
+                          {mode.name}
+                        </span>
+                        {currentModeId === mode.id && (
+                          <FontAwesomeIcon
+                            icon={faCheckCircle}
+                            className="ml-2 text-primary-600 dark:text-dark-primary-500"
+                            size="sm"
+                          />
+                        )}
+                      </div>
+                      <p className="mt-1 text-xs sm:text-sm text-secondary-600 dark:text-dark-secondary-400">
+                        {mode.description}
+                      </p>
+                      <div className="mt-1 sm:mt-2 text-[10px] sm:text-xs text-secondary-500 dark:text-dark-secondary-500">
+                        <span className="mr-2">{mode.ai}</span>
+                      </div>
                     </div>
-                    <p className="mt-1 text-xs sm:text-sm text-secondary-600 dark:text-dark-secondary-400">
-                      {mode.description}
-                    </p>
-                    <div className="mt-1 sm:mt-2 text-[10px] sm:text-xs text-secondary-500 dark:text-dark-secondary-500">
-                      <span className="mr-2">{mode.ai}</span>
+                    <div className="flex-shrink-0 sm:ml-4">
+                      <div className="flex items-center bg-primary-100 dark:bg-dark-primary-900/60 px-2 sm:px-3 py-1 rounded-full">
+                        <span className="text-primary-700 dark:text-dark-primary-400 font-medium flex items-center text-xs sm:text-sm">
+                          <Image src="/images/pen/pen_primary.svg" alt="pen" width={11} height={11} className="mr-1" />
+                          {mode.penCost}
+                        </span>
+                        <span className="ml-1 text-[10px] sm:text-xs text-primary-600 dark:text-dark-primary-500">
+                          {' '}
+                          / 메시지
+                        </span>
+                        {mode.discount > 0 && (
+                          <div className="ml-1.5 flex items-center">
+                            <span className="text-[10px] sm:text-xs text-green-500 font-medium">
+                              {mode.discount}% 할인
+                            </span>
+                            <span className="ml-1 text-[10px] sm:text-xs text-gray-400 line-through">
+                              {mode.original_coin}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex-shrink-0 sm:ml-4">
-                    <div className="flex items-center bg-primary-100 dark:bg-dark-primary-900/60 px-2 sm:px-3 py-1 rounded-full">
-                      <span className="text-primary-700 dark:text-dark-primary-400 font-medium flex items-center text-xs sm:text-sm">
-                        <Image src="/images/pen/pen_primary.svg" alt="pen" width={11} height={11} className="mr-1" />
-                        {mode.penCost}
-                      </span>
-                      <span className="ml-1 text-[10px] sm:text-xs text-primary-600 dark:text-dark-primary-500">
-                        {' '}
-                        / 메시지
-                      </span>
-                      {mode.discount > 0 && (
-                        <div className="ml-1.5 flex items-center">
-                          <span className="text-[10px] sm:text-xs text-green-500 font-medium">
-                            {mode.discount}% 할인
-                          </span>
-                          <span className="ml-1 text-[10px] sm:text-xs text-gray-400 line-through">
-                            {mode.original_coin}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </li>
-            ))}
+                </li>
+              )
+            })}
         </ul>
       </div>
     </BaseModal>
