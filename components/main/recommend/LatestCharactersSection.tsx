@@ -17,7 +17,7 @@ const LatestCharactersSection = memo(() => {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-secondary-900 dark:text-dark-secondary-700 relative inline-block">
-            지금 막 올라온 캐릭터
+            🌱지금 막 올라온 캐릭터🌱
           </h2>
           <button
             onClick={() => setIsNewCharacterSidebarOpen(true)}

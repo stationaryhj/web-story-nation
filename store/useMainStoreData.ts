@@ -16,38 +16,39 @@ interface ModuleTitle {
 
 export const moduleForTitleData: { [key: number]: ModuleTitle } = {
   1: {
-    title: `아이돌 스캔들의 주인공들`,
-    subTitle: `캐릭터와 채팅하고 오리지널 스토리도 읽어보세요!`,
+    title: `최신 오리지널 캐릭터!`,
+    subTitle: `스네가 직접 만든 고퀄 캐릭터를 만나보세요 :)`,
   },
   2: {
-    title: `남친 삼고픈 '진짜' 알파메일`,
-    subTitle: '깊은 대화로 그 남자의 숨겨진 매력을 발견하세요!',
+    title: `화제의 캐릭터와 대화 해 보세요!`,
+    subTitle: '어디에서도 할 수 없었던 대화를 나눠보세요!',
   },
   3: {
-    title: '취향저격 판타지 캐릭터!',
-    subTitle: '독특한 세계관 속 로맨스와 모험이 펼쳐집니다:)',
+    title: '스네Pick 캐릭터를 만나보세요!',
+    subTitle: '재미보장! 스네가 선정한 캐릭터를 만나보세요!',
   },
   4: {
-    title: '평범한 고등학생은 없습니다.',
-    subTitle: '일진녀부터 마법사까지... 누구랑 엮일래?',
+    title: '짜릿한 대화를 즐겨보세요!',
+    subTitle: '짜릿모드로 필터없는 채팅을 즐겨보세요!',
   },
   5: {
-    title: '1분만에 손절? 레전드 소개팅!',
-    subTitle: '상상도 못한 매칭, 레전드 썰 제조기 등장',
+    title: '2D 남주모음.ZIP',
+    subTitle: '깊은 대화로 그 남자의 숨겨진 매력을 발견하세요!',
   },
   6: {
-    title: '최신 오리지널 캐릭터!',
-    subTitle: '스네가 직접 만든 고퀄 캐릭터를 만나보세요 :)',
+    title: '천상계 여신을 모아봤다',
+    subTitle: '당신과 그녀, 둘 만의 은밀한 이야기를 즐겨보세요!',
   },
   7: {
-    title: '당신을 사로잡을 여신들',
-    subTitle: '당신과 그녀, 둘 만의 은밀한 이야기를 즐겨보세요!',
+    title: '취향저격 판타지 캐릭터!',
+    subTitle: '독특한 세계관 속 로맨스와 모험이 펼쳐집니다.',
   },
   8: {
-    title: '지금 막 올라온 캐릭터',
-    subTitle: '당신과 그녀, 둘 만의 은밀한 이야기를 즐겨보세요!',
+    title: '🌱지금 막 올라온 캐릭터🌱',
+    subTitle: '',
   },
 }
+
 
 // 싱글톤 queryClient 생성 (최초 한 번만 생성)
 const queryClient = new QueryClient({
