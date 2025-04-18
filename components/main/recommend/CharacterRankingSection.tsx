@@ -28,13 +28,13 @@ const genderOptions = [
 const getRankingUpdateMessage = (tabId: string) => {
   switch (tabId) {
     case 'realtime':
-      return `${Math.floor(Math.random() * 60)}분 전 업데이트`
+      return '지금 인기 있는 캐릭터를 만나보세요!'
     case 'daily':
-      return '매일 밤 12시 업데이트'
+      return '매일 밤 00시 업데이트'
     case 'weekly':
-      return '매주 월요일 00시 업데이트'
+      return '매주 월요일 업데이트'
     case 'monthly':
-      return '매월 1일 00시 업데이트'
+      return '매월 1일 업데이트'
     default:
       return ''
   }
@@ -79,7 +79,7 @@ const CharacterRankingSection = memo(() => {
         <div className="mb-6">
           <div className="flex justify-between items-center mb-4 z-[1000]">
             <h2 className="text-2xl font-bold text-secondary-900 dark:text-dark-secondary-700 relative inline-block">
-              캐릭터 랭킹
+              🏆캐릭터 랭킹
             </h2>
             <button
               onClick={() => setIsCharacterRankingSidebarOpen(true)}

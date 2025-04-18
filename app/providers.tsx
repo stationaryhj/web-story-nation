@@ -106,7 +106,7 @@ export default function Providers({ children }: { children: ReactNode }) {
         
         // 앱 시작 이벤트 로깅
         logEvent(analytics, 'app_start', {
-          app_version: process.env.NEXT_PUBLIC_APP_VERSION || '0.2.0',
+          app_version: process.env.NEXT_PUBLIC_APP_VERSION || '0.2.2',
           platform: 'web'
         });
 
