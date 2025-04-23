@@ -64,6 +64,17 @@ const createApiInstance = (baseURL: string) => {
     },
     error => {
       if (error.response) {
+        // 401 에러 처리 - 인증 만료 시 메인 페이지로 리다이렉트
+        if (error.response.status === 401) {
+          console.log('인증이 만료되었습니다. 메인 페이지로 이동합니다.')
+          // 브라우저 환경인 경우에만 리다이렉트 실행
+          if (typeof window !== 'undefined') {
+            useAccountStore.getState().logout()
+            window.location.href = '/'
+          }
+          return Promise.reject(error.response.data)
+        }
+        
         console.error('API Error:', error.response.data)
         return Promise.reject(error.response.data)
       } else if (error.request) {
