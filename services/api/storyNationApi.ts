@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useAccountStore } from '@/store/useStoreData'
+import { useModalStore } from '@/store/useStoreModal'
 
 import type {
   ApiResponse,
@@ -66,12 +67,30 @@ const createApiInstance = (baseURL: string) => {
       if (error.response) {
         // 401 에러 처리 - 인증 만료 시 메인 페이지로 리다이렉트
         if (error.response.status === 401) {
-          console.log('인증이 만료되었습니다. 메인 페이지로 이동합니다.')
-          // 브라우저 환경인 경우에만 리다이렉트 실행
-          if (typeof window !== 'undefined') {
-            useAccountStore.getState().logout()
-            window.location.href = '/'
-          }
+          const { openModal, closeModal } = useModalStore.getState()
+          openModal('confirmAction', {
+            title: '토큰 만료',
+            description: `토큰이 만료 되었습니다. 다시 로그인 해주세요.`,
+            onConfirm: async () => {
+              useAccountStore.getState().logout()
+              closeModal()
+
+              if (typeof window !== 'undefined') {
+                window.location.href = '/'
+              }
+            },
+            onCancel: () => {
+              useAccountStore.getState().logout()
+              closeModal()
+
+              if (typeof window !== 'undefined') {
+                window.location.href = '/'
+              }
+            },
+            confirmText: '확인',
+            cancelText: '취소',
+            confirmButtonClass: 'bg-primary-500 hover:bg-primary-600 text-white',
+          })
           return Promise.reject(error.response.data)
         }
         
