@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { useAccountStore } from '@/store/useStoreData'
 import { useModalStore } from '@/store/useStoreModal'
+import { useSettingsStore } from '@/store/useStoreSettings'
 
 import type {
   ApiResponse,
@@ -308,14 +309,20 @@ export const contentApi = {
    * 현재 new 로 사용중
    */
   GetTop10: async (): Promise<ApiResponse<CharbotTop10Response>> => {
-    return api.post('/api/charbot/rcmnd/top10')
+    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
+    return api.post('/api/charbot/rcmnd/top10', {
+      safety,
+    })
   },
 
   /**
    * Top10 New
    */
   GetTop10New: async (): Promise<ApiResponse<CharbotTop10NewResponse>> => {
-    return api.post('/api/charbot/rcmnd/top10')
+    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
+    return api.post('/api/charbot/rcmnd/top10', {
+      safety
+    })
   },
 
   /**
@@ -332,11 +339,13 @@ export const contentApi = {
     gender: number,
     module_type: number
   ): Promise<ApiResponse> => {
+    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
     return api.post('/api/charbot/rcmnd/ranking/top10', {
       countryCode,
       module_type,
       ranking_type,
       gender,
+      safety,
     })
   },
 
@@ -353,10 +362,12 @@ export const contentApi = {
       countryCode: string,
       ranking_type: number,
     ): Promise<ApiResponse<GetTop10RankingCreaterResponse>> => {
+      const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
       return api.post('/api/charbot/rcmnd/ranking/top10', {
         countryCode,
         module_type: 3,
         ranking_type,
+        safety,
       })
     },
 
@@ -378,12 +389,14 @@ export const contentApi = {
     paginate: number,
     gender: number
   ): Promise<ApiResponse<GetTop10RankingResponse>> => {
+    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
     return api.post('/api/charbot/rcmnd/getlist', {
       module_id,
       ranking_type,
       page,
       paginate,
       gender,
+      safety,
     })
   },
 
@@ -405,6 +418,7 @@ export const contentApi = {
     paginate: number,
     countryCode: string = 'KR'
   ): Promise<ApiResponse<CharbotSearchResponse>> => {
+    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
     return api.post('/api/charbot/getlist', {
       type,
       chrbot_tag_keys,
@@ -412,7 +426,8 @@ export const contentApi = {
       order,
       page,
       paginate,
-      countryCode
+      countryCode,
+      safety,
     })
   },
 
@@ -480,11 +495,13 @@ export const contentApi = {
    * @param page 페이지
    */
   GetSearch: async (search: string, order: number, paginate: number, page: number): Promise<ApiResponse<GetSearchResponse>> => {
+    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
     return api.post('/api/charbot/search', {
       search,
       order,
       paginate,
       page,
+      safety,
     })
   },
 
@@ -495,10 +512,12 @@ export const contentApi = {
    * @param paginate 페이지 당 아이템 수
    */
     GetCreateChatBotList: async (target_nick_nm: string, page: number, paginate: number): Promise<ApiResponse<GetSearchResponse>> => {
+      const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
       return api.post('/api/charbot/getlist/user', {
         target_nick_nm,
         page,
         paginate,
+        safety,
       })
     },
 
@@ -717,6 +736,15 @@ export const contentApi = {
     return api.post('api/apple/get/token', {
       code,
       redirect_uri,
+    })
+  },
+
+  // safety Filter
+  SetSafetyMode: async (safety: number): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/safety', {
+      safety,
     })
   },
 }
@@ -1154,3 +1182,17 @@ export const createApi = {
 
 
 export { setAuthToken, API_URL, CHAT_URL }
+
+
+export const getWebConfig = async (): Promise<ApiResponse> => {
+  const path = 'https://sps-download.s3.ap-northeast-2.amazonaws.com/space_play_en/config/web/config_web.json'
+  return axios.get(path)
+}
+
+export const getWebNotice = async (): Promise<ApiResponse> => {
+  const path = 'https://sps-download.s3.ap-northeast-2.amazonaws.com/space_play_en/contents_config/contents_config.json'
+  return axios.get(path)
+}
+
+
+

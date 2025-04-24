@@ -8,6 +8,7 @@ import { useEffect, useRef } from 'react'
 import { useCharacterGridStoreData } from '@/store/useCharacterGridStoreData'
 import { useRouter } from 'next/navigation'
 import { useAccountStore } from '@/store/useStoreData'
+import { useSettingsStore } from '@/store/useStoreSettings'
 import { useModalStore } from '@/store/useStoreModal'
 
 interface CharacterGridSectionProps {
@@ -24,12 +25,13 @@ export default function CharacterGridSection({
   const router = useRouter()
   const isLogin = useAccountStore(state => state.isLogin)
   const openModal = useModalStore(state => state.openModal)
+  const { isAdultModeEnabled } = useSettingsStore()
 
   // 초기화 완료 체크를 위한 ref
   const isInitialized = useRef(false)
 
   // 캐릭터 그리드 스토어 가져오기
-  const { characters, isLoading, isEmpty, error, changeCategory, updateTags } = useCharacterGridStoreData()
+  const { characters, isLoading, isEmpty, error, changeCategory, updateTags, reload } = useCharacterGridStoreData()
 
   // 카테고리 정보 가져오기
   // const categoryInfo = CATEGORIES.find(cat => cat.id === categoryId)
@@ -77,6 +79,10 @@ export default function CharacterGridSection({
       updateTags(selectedTags)
     }
   }, [selectedTags, updateTags, categoryId])
+
+  useEffect(() => {
+    reload()
+  }, [isAdultModeEnabled, reload])
 
   if (categoryId === 'all') {
     return null // all 카테고리는 RecommendSection에서 처리

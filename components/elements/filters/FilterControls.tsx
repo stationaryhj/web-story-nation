@@ -7,6 +7,7 @@ import { useCharacterGridStoreData } from '@/store/useCharacterGridStoreData'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faRotate, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { Clock, Flame } from 'lucide-react'
+import { useSettingsStore } from '@/store/useStoreSettings'
 
 // 필터 컨트롤 컴포넌트 타입 정의
 interface FilterControlsProps {
@@ -20,6 +21,8 @@ interface FilterControlsProps {
  * - 태그 필터
  */
 export default function FilterControls({ categoryId }: FilterControlsProps) {
+  const { isAdultModeEnabled } = useSettingsStore()
+
   // 초기화 여부를 추적하는 ref
   const isInitialized = useRef(false)
 
@@ -107,6 +110,15 @@ export default function FilterControls({ categoryId }: FilterControlsProps) {
       changeCategory(categoryId.toString())
     }
   }, [categoryId, changeCategory])
+
+  useEffect(() => {
+    console.log('isAdultModeEnabled >>> ', isAdultModeEnabled)
+    if(!isAdultModeEnabled) {
+      handleNsfwChange(2)
+    }
+
+    setIsDropdownOpen(false)
+  }, [isAdultModeEnabled])
 
   // 정렬 변경 핸들러
   const handleOrderChange = useCallback(
@@ -231,24 +243,29 @@ export default function FilterControls({ categoryId }: FilterControlsProps) {
             >
               전체 이용가
             </button>
-            <button
-              className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
-                filter.nsfw === 1 ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400' : ''
-              }`}
-              onClick={() => handleNsfwChange(1)}
-              disabled={isLoading}
-            >
-              <span className="inline-flex items-center">짜릿모드 가능</span>
-            </button>
-            <button
-              className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
-                filter.nsfw === 3 ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400' : ''
-              }`}
-              onClick={() => handleNsfwChange(3)}
-              disabled={isLoading}
-            >
-              이용등급 전체
-            </button>
+
+            {isAdultModeEnabled && (
+              <div>
+                <button
+                  className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
+                  filter.nsfw === 1 ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400' : ''
+                }`}
+                onClick={() => handleNsfwChange(1)}
+                disabled={isLoading}
+              >
+                <span className="inline-flex items-center">짜릿모드 가능</span>
+              </button>
+              <button
+                className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
+                  filter.nsfw === 3 ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400' : ''
+                }`}
+                onClick={() => handleNsfwChange(3)}
+                disabled={isLoading}
+              >
+                이용등급 전체
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -416,24 +433,28 @@ export default function FilterControls({ categoryId }: FilterControlsProps) {
                       >
                         전체 이용가
                       </button>
-                      <button
-                        className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
-                          filter.nsfw === 1 ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400' : ''
-                        }`}
-                        onClick={() => handleNsfwChange(1)}
-                        disabled={isLoading}
-                      >
-                        <span className="inline-flex items-center">짜릿모드 가능</span>
-                      </button>
-                      <button
-                        className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
-                          filter.nsfw === 3 ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400' : ''
-                        }`}
-                        onClick={() => handleNsfwChange(3)}
-                        disabled={isLoading}
-                      >
-                        이용등급 전체
-                      </button>
+                      {isAdultModeEnabled && (
+                        <>  
+                          <button
+                            className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
+                              filter.nsfw === 1 ? 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400' : ''
+                            }`}
+                            onClick={() => handleNsfwChange(1)}
+                            disabled={isLoading}
+                          >
+                            <span className="inline-flex items-center">짜릿모드 가능</span>
+                          </button>
+                          <button
+                            className={`block w-full text-left px-3 md:px-4 py-1.5 md:py-2 text-xs md:text-sm hover:bg-gray-100 dark:hover:bg-dark-background-lighter ${
+                              filter.nsfw === 3 ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400' : ''
+                            }`}
+                            onClick={() => handleNsfwChange(3)}
+                            disabled={isLoading}
+                          >
+                            이용등급 전체
+                          </button>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>

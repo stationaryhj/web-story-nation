@@ -75,8 +75,9 @@ export function getImageUri(url: string | undefined | null): string {
       return url.replace('kr/', 'https://d287ta38o0t5x8.cloudfront.net/')
     } else if (url.indexOf('image/') > -1) {
       return 'https://d2gimcyf1gz7jq.cloudfront.net/' + url
+    } else if (url.indexOf('promotion/') > -1) {
+      return  'https://d287ta38o0t5x8.cloudfront.net/' + url
     }
-
     return url
   } catch (error) {
     console.error('Error processing image URL:', error)

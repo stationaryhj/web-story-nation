@@ -44,21 +44,28 @@ const SimpleToggle = ({
 }) => {
   return (
     <div className="flex items-center">
-      <FontAwesomeIcon icon={faFire} className="text-red-500 dark:text-dark-primary-500 mr-2" />
       <span className="hidden md:flex items-center py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors mr-2">
-        짜릿모드
+        세이프티 필터
       </span>
       <button
         onClick={onToggle}
-        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-          isOn ? 'bg-primary-500 dark:bg-dark-primary-500' : 'bg-secondary-200 dark:bg-dark-secondary-700'
-        }`}
+        className={`w-20 relative flex items-center justify-between rounded-full bg-black transition-colors focus:outline-none p-1`}
       >
-        <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-            isOn ? 'translate-x-6' : 'translate-x-1'
-          }`}
-        />
+        {!isOn ? (
+          <>
+            <span className="text-white font-bold text-md mr-2 ml-2">ON</span>
+            <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
+              <img src="/images/sft_icon_on.png" alt="Safety On" className="w-4 h-4" />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="w-6 h-6 rounded-full bg-[#636363] flex items-center justify-center">
+              <img src="/images/sft_icon_off.png" alt="Safety Off" className="w-4 h-4" />
+            </div>
+            <span className="text-[#636363] font-bold text-md mr-2 ml-2">OFF</span>
+          </>
+        )}
       </button>
     </div>
   )
@@ -66,12 +73,13 @@ const SimpleToggle = ({
 
 export default function Header() {
   const { isDarkMode, toggleDarkMode } = useThemeStore()
+  const { isAdultModeEnabled, changeAdultMode } = useSettingsStore()
   const [mounted, setMounted] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const pathname = usePathname()
   const [activeLink, setActiveLink] = useState('/')
   const { openModal } = useModalStore()
-  const { isLogin, logout } = useAccountStore()
+  const { isLogin, logout, isAdult } = useAccountStore()
   const router = useRouter()
 
   // 네비게이션 링크 (아이콘 추가)
@@ -114,14 +122,23 @@ export default function Header() {
     }
   }, [isDarkMode, mounted])
 
-  // 클라이언트 사이드 렌더링 전에는 아이콘 표시하지 않음
-  const themeIcon = mounted ? (isDarkMode ? faSun : faMoon) : null
-  const themeText = mounted ? (isDarkMode ? '라이트 모드' : '다크 모드') : '테마 모드'
-
   const onClickSettingLink = () => {
     if (isLogin) {
       router.push('/settings')
     } else {
+      openModal('login')
+    }
+  }
+
+  const handleAdultModeToggle = async () => {
+    if(isLogin) {
+      if(isAdult()) {
+        await changeAdultMode()
+      } else {
+        openModal('adultVerification')
+      }
+    }
+    else {
       openModal('login')
     }
   }
@@ -174,11 +191,11 @@ export default function Header() {
 
           <div className="flex items-center md:space-x-4 gap-1">
             {/* 짜릿모드 토글 - 모든 화면에서 표시 */}
-            {/* {mounted && (
+            {mounted && (
               <div>
                 <SimpleToggle isOn={isAdultModeEnabled} onToggle={handleAdultModeToggle} />
               </div>
-            )} */}
+            )}
 
             {/* 다크모드 토글 버튼 - 모바일에서는 숨김 */}
             {/* {mounted && (
