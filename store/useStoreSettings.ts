@@ -11,8 +11,10 @@ export interface UserSettings {
 interface SettingsStore {
   settings: UserSettings
   isAdultModeEnabled: boolean
+  setAdlultMode: (isAdultModeValue: number) => void
   enableAdultMode: () => boolean
   toggleAdultMode: () => boolean
+  changeAdultMode: () => void
 }
 
 // 기본 설정 값
@@ -23,9 +25,13 @@ const defaultSettings: UserSettings = {
 // Zustand 스토어 생성
 export const useSettingsStore = create<SettingsStore>()(
   persist(
-    set => ({
+    (set, get) => ({
       settings: defaultSettings,
-      isAdultModeEnabled: useAccountStore.getState().isAdult(),
+      isAdultModeEnabled: false,
+
+      setAdlultMode: (isAdultModeValue: number) => {
+        set({ isAdultModeEnabled: isAdultModeValue === 0 })
+      },
 
       // 로그인 상태에 따라 성인 모드 활성화 처리
       enableAdultMode: () => {
@@ -39,6 +45,14 @@ export const useSettingsStore = create<SettingsStore>()(
         // 테스트를 위해 로그인 체크 임시 비활성화
         set(state => ({ isAdultModeEnabled: !state.isAdultModeEnabled }))
         return true
+      },
+
+      changeAdultMode: async () => {
+        const success = await useAccountStore.getState().updateSafetyMode(get().isAdultModeEnabled ? 1 : 0)
+
+        if (success) {
+          set(state => ({ isAdultModeEnabled: !state.isAdultModeEnabled }))
+        }
       },
     }),
     {

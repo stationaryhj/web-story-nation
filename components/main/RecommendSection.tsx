@@ -20,20 +20,11 @@ interface RecommendSectionProps {
 export default function RecommendSection({ onSearchTrigger }: RecommendSectionProps) {
   // 짜릿모드 상태 가져오기
   const { isAdultModeEnabled } = useSettingsStore()
-  const { initialize } = useRecommendSectionStoreData()
+  const { invalidateData } = useRecommendSectionStoreData()
 
   // 짜릿모드 변경 시 데이터 다시 로드
   useEffect(() => {
-    // 실시간, 전체
-    // UpdateRankingTopCharacter('KR', 4, 4, false)
-
-    // 주간
-    // UpdateRankingTopCreater('KR', 2, false)
-
-    // 일간, 전체
-    // UpdateLatestCharacters(1, 4, false)
-
-    initialize()
+    invalidateData()
   }, [isAdultModeEnabled])
 
   return (

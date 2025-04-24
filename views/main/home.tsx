@@ -4,6 +4,7 @@ import Footer from '@/components/common/footer'
 import Header from '@/components/common/header'
 import PageTransition from '@/components/motion/PageTransition'
 import { useStoreData } from '@/store/useStoreData'
+import { useSettingsStore } from '@/store/useStoreSettings'
 import { useState, useEffect } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import SearchBar from '@/components/elements/searchBar/SearchBar'
@@ -39,6 +40,7 @@ export default function Home() {
   const [isCharacterRankingSidebarOpen, setIsCharacterRankingSidebarOpen] = useState(false)
   const [isAuthorRankingSidebarOpen, setIsAuthorRankingSidebarOpen] = useState(false)
   const [isNewCharacterSidebarOpen, setIsNewCharacterSidebarOpen] = useState(false)
+
 
   useEffect(() => {
     // 페이지 로드 시 모든 캐릭터 데이터 미리 로드

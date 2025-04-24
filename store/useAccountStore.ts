@@ -6,6 +6,7 @@ import { OAUTH_PROVIDERS } from '@/types/login'
 import { contentApi, createApi, settlementApi } from '@/services/api'
 import axios from 'axios'
 import { authService } from '@/services/auth'
+import { useSettingsStore } from '@/store/useStoreSettings'
 
 // 환경 변수에서 리다이렉트 URI 가져오기
 const REDIRECT_URI = process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URI
@@ -48,6 +49,7 @@ interface AccountState {
   getCoinSum: () => number
   UpdateFreePen: () => Promise<boolean>
   uploadProfileImage: (imageUrl: string) => void
+  updateSafetyMode: (safety: number) => Promise<boolean>
 }
 
 // 네트워크 에러 타입 정의
@@ -236,6 +238,24 @@ export const useAccountStore = create<AccountState>()(
       error: null,
       isInitialized: false,
 
+      updateSafetyMode: async (safety: number) => {
+        const response = await contentApi.SetSafetyMode(safety)
+        if (response.data.result.err === 0) {
+          set((state) => {
+            if (!state.data) return state
+            return {
+              ...state,
+              data: {
+                ...state.data,
+                safety,
+              }
+            }
+          })
+          return true
+        }
+        return false
+      },
+
       UpdateFreePen: async () => {
         const response = await settlementApi.UseFreePen()
         if (response.data && response.data.result && response.data.result.err === 0) {
@@ -391,10 +411,15 @@ export const useAccountStore = create<AccountState>()(
                   // 타입에 없는 속성은 타입 단언 또는 옵셔널 체이닝으로 처리
                   intro: (userInfoResponse.data as any).intro || currentData.intro,
                   profile_url: (userInfoResponse.data as any).profile_url || currentData.profile_url,
-                  image_url: (userInfoResponse.data as any).image_url || currentData.image_url
+                  image_url: (userInfoResponse.data as any).image_url || currentData.image_url,
+                  safety: userInfoResponse.data.safety || currentData.safety,
                 }
               })
             }
+
+
+            // 성인 모드 확인
+            useSettingsStore.getState().setAdlultMode(userInfoResponse.data.safety)
             return true
           }
           return false
@@ -448,6 +473,8 @@ export const useAccountStore = create<AccountState>()(
               data: result.data,
               loading: false,
             })
+
+            useSettingsStore.getState().setAdlultMode(result.data.safety)
 
             // userinfo2 데이터 업데이트
             await get().updateUserInfoFromUserInfo2()
@@ -675,6 +702,7 @@ export const useAccountStore = create<AccountState>()(
       logout: () => {
         // 인증 서비스를 사용하여 로그아웃
         authService.logout();
+        useSettingsStore.getState().setAdlultMode(1)
         set({ isLogin: false, data: null, writerInfo: null, isInitialized: false });
       },
 

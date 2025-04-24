@@ -53,6 +53,7 @@ interface CharacterGridActions {
   updateFilter: (newFilter: Partial<Filter>) => Promise<void>
   updateTags: (tagIds: string[]) => Promise<void>
   loadMore: () => Promise<void>
+  reload: () => Promise<void>
   reset: () => void
 }
 
@@ -87,6 +88,79 @@ export const useCharacterGridStoreData = create<CharacterGridStore>((set, get) =
 
   // 데이터 없음 플래그
   isEmpty: false,
+
+  reload: async () => {
+    try {
+      // 캐릭터 데이터 로드
+      const { currentCategory, filter } = get()
+      const categoryIdNum = CATEGORIES.find(cat => cat.id === currentCategory)?.type || 1
+      const response = await contentApi.GetList(
+        currentCategory === 'all' ? 'recommend' : categoryIdNum.toString(),
+        '', // 태그 초기화 (빈 문자열)
+        filter.nsfw,
+        filter.order,
+        1, // 페이지 1로 초기화
+        10 // 한 번에 가져올 아이템 수
+      )
+
+      const data = response?.data
+
+      if (data?.chrbotList?.data && data.chrbotList.data.length > 0) {
+        // ModuleCharacter 형식으로 변환
+        const moduleData = data.chrbotList.data.map(item => ({
+          world_list_detail_chrbot_key: item.world_list_detail_chrbot_key,
+          title: item.title,
+          intro: item.intro,
+          img_url: item.img_url,
+          img_web_url: item.img_web_url || item.img_url,
+          lv: item.lv,
+          tags: item.tags,
+          chat_cnt: item.chat_cnt,
+          msg_cnt: item.msg_cnt,
+          like_cnt: item.like_cnt,
+          create_dt: item.create_dt,
+          nick_nm: item.nick_nm,
+          nsfw: item.nsfw,
+          module_id: 0,
+          sort: 0,
+        }))
+
+        // Character 형식으로 변환
+        const newCharacters = bridgeCharacterDataToCharacter(moduleData)
+
+        // 상태 업데이트
+        set({
+          characters: newCharacters,
+          pagination: {
+            page: 1,
+            total: data.chrbotList.total || 0,
+            hasMore: data.chrbotList.current_page < data.chrbotList.last_page,
+          },
+          isLoading: false,
+          isEmpty: false,
+        })
+      } else {
+        // 데이터가 없는 경우
+        set({
+          characters: [],
+          pagination: {
+            page: 1,
+            total: 0,
+            hasMore: false,
+          },
+          isLoading: false,
+          isEmpty: true,
+        })
+      }
+    } catch (error) {
+      console.error('카테고리 변경 후 데이터 로드 중 오류 발생:', error)
+      set({
+        isLoading: false,
+        error: error as Error,
+        isEmpty: true,
+      })
+    }
+  },
 
   /**
    * 카테고리 변경 및 데이터 초기화

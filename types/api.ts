@@ -41,6 +41,7 @@ export interface LoginResponse {
   user_property: string;
   writerchk: number;
   intro?: string;
+  safety?: number;
   result: ApiResult;
 }
 
@@ -67,6 +68,7 @@ export interface UserInfoResponse {
   persona: string;
   persona_gender: number;
   result: ApiResult;
+  safety: number;
 }
 
 
@@ -797,6 +799,10 @@ export interface ChatFreePenResponse {
 export interface InitChatResponse {
   arrangePrompt: string;
   prompt_key: string;
+  result: ApiResult;
+}
+
+export interface SetSafetyModeResponse {
   result: ApiResult;
 }
 

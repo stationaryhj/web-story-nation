@@ -11,6 +11,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useAccountStore } from '@/store/useAccountStore'
 import { useModalStore } from '@/store/useStoreModal'
 import { useSearchStore } from '@/store/useSearchStore'
+import { useSettingsStore } from '@/store/useStoreSettings'
 
 type Props = {}
 
@@ -45,6 +46,8 @@ export default function searchPage({}: Props) {
 
   // 모바일 모드 감지
   const [isMobile, setIsMobile] = useState(false)
+
+  const { isAdultModeEnabled } = useSettingsStore()
 
   // 무한 스크롤을 위한 옵저버 ref
   const observerRef = useRef<IntersectionObserver | null>(null)
@@ -81,7 +84,7 @@ export default function searchPage({}: Props) {
     if (initialQuery) {
       search()
     }
-  }, [initialQuery, initialOption, initialPage, setSearchQuery, setSearchOption, setCurrentPage, search])
+  }, [initialQuery, initialOption, initialPage, setSearchQuery, setSearchOption, setCurrentPage, search, isAdultModeEnabled])
 
   // URL 쿼리 파라미터 변경 함수
   const updateUrlParams = (query: string, option: string, page = 1) => {

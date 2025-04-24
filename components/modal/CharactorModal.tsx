@@ -21,6 +21,7 @@ import {
   getChangeNameTag,
   parseConversationExamples,
   exampleDatas,
+  getImageUri,
 } from '@/lib/utils/storyNationUtil'
 import BaseModal from './BaseModal'
 import { ReqGetChatBot } from '@/services/hooks/DataListManager'
@@ -199,6 +200,11 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
     onClose()
   }
 
+  const handleSelectCreator = () => {
+    router.push(`/author/${selectedCharacter?.creator.nickname}`)
+    onClose()
+  }
+
   if (!selectedCharacter) return null
 
   return (
@@ -289,7 +295,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
               )}
             </div>
             {/* 좋아요 & 댓글 수 */}
-            <div className="flex justify-end items-end w-full mb-6 gap-6">
+            {/* <div className="flex justify-end items-end w-full mb-6 gap-6">
               <div
                 className="flex items-center space-x-2 cursor-pointer transition-colors hover:text-red-600"
                 onClick={handleLike}
@@ -304,6 +310,44 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                 <span className="text-secondary-700 dark:text-dark-secondary-300">
                   {selectedCharacter.commentCount || 0}
                 </span>
+              </div>
+            </div> */}
+
+            <div className="flex justify-between items-center w-full mb-6">
+              {/* 작가 이름 (왼쪽) */}
+              <div className="flex items-center cursor-pointer" onClick={handleSelectCreator}>
+                {/* 작가 섬네일 */}
+                <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center mr-2">
+                  <Image
+                    src={getImageUri(selectedCharacter.creator.profileImageUrl)}
+                    alt={selectedCharacter.creator.nickname || "작가 이미지"}
+                    width={32}
+                    height={32}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+                <span className="text-secondary-700 dark:text-dark-secondary-300 font-medium">
+                  {selectedCharacter.creator.nickname || "작가명"}
+                </span>
+              </div>
+              
+              {/* 기존 좋아요/댓글 카운트 (오른쪽) */}
+              <div className="flex items-end gap-6">
+                <div
+                  className="flex items-center space-x-2 cursor-pointer transition-colors hover:text-red-600"
+                  onClick={handleLike}
+                >
+                  <FontAwesomeIcon icon={faHeart} className="h-5 w-5 text-red-500" />
+                  <span className="text-secondary-700 dark:text-dark-secondary-300">
+                    {selectedCharacter.likeCount || 0}
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <FontAwesomeIcon icon={faMessage} className="h-5 w-5 text-primary-500" />
+                  <span className="text-secondary-700 dark:text-dark-secondary-300">
+                    {selectedCharacter.commentCount || 0}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -506,7 +550,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                 </div>
 
                 {/* 좋아요 & 댓글 수 */}
-                <div className="flex justify-end items-end w-full mb-6 gap-6">
+                {/* <div className="flex justify-end items-end w-full mb-6 gap-6">
                   <div
                     className="flex items-center space-x-2 cursor-pointer transition-colors hover:text-red-600"
                     onClick={handleLike}
@@ -521,6 +565,44 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                     <span className="text-secondary-700 dark:text-dark-secondary-300">
                       {selectedCharacter.commentCount || 0}
                     </span>
+                  </div>
+                </div> */}
+
+                <div className="flex justify-between items-center w-full mb-6">
+                  {/* 작가 이름 (왼쪽) */}
+                  <div className="flex items-center cursor-pointer" onClick={handleSelectCreator}>
+                    {/* 작가 섬네일 */}
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center mr-2">
+                      <Image
+                        src={getImageUri(selectedCharacter.creator.profileImageUrl)}
+                        alt={selectedCharacter.creator.nickname || "작가 이미지"}
+                        width={32}
+                        height={32}
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                    <span className="text-secondary-700 dark:text-dark-secondary-300 font-medium">
+                      {selectedCharacter.creator.nickname || "작가명"}
+                    </span>
+                  </div>
+                  
+                  {/* 기존 좋아요/댓글 카운트 (오른쪽) */}
+                  <div className="flex items-end gap-6">
+                    <div
+                      className="flex items-center space-x-2 cursor-pointer transition-colors hover:text-red-600"
+                      onClick={handleLike}
+                    >
+                      <FontAwesomeIcon icon={faHeart} className="h-5 w-5 text-red-500" />
+                      <span className="text-secondary-700 dark:text-dark-secondary-300">
+                        {selectedCharacter.likeCount || 0}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <FontAwesomeIcon icon={faMessage} className="h-5 w-5 text-primary-500" />
+                      <span className="text-secondary-700 dark:text-dark-secondary-300">
+                        {selectedCharacter.commentCount || 0}
+                      </span>
+                    </div>
                   </div>
                 </div>
 

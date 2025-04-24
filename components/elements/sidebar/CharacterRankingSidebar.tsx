@@ -36,9 +36,19 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
 
   const { rankingCharactersSlide, UpdateRankingTopCharacter } = useRecommendSectionStoreData()
 
+  // useEffect(() => {
+  //   UpdateRankingTopCharacter('KR', 4, 4, true)
+  // }, [])
+  // 사이드바가 열릴 때마다 데이터 새로 가져오기
   useEffect(() => {
-    UpdateRankingTopCharacter('KR', 4, 4, true)
-  }, [])
+    if (isOpen) {
+      // 사이드바가 열릴 때마다 데이터 새로고침
+      const topid = activeTab === 'realtime' ? 4 : activeTab === 'daily' ? 1 : activeTab === 'weekly' ? 2 : 3
+      UpdateRankingTopCharacter('KR', topid, Number(selectedGender.value), true)
+      setIsLoading(true)
+    }
+  }, [isOpen, activeTab, selectedGender]) // isOpen이 바뀔 때마다 실행
+
 
   // 랭킹 데이터 가져오기
   useEffect(() => {
@@ -100,7 +110,7 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
             />
           </div>
         </div>
-      </div>
+    </div>
 
       {/* 컨텐츠 영역 */}
       <div className="px-4 py-6">

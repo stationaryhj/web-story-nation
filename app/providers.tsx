@@ -4,16 +4,17 @@ import { SkeletonThemeProvider } from '@/components/elements/skeleton'
 import ModalManager from '@/components/modal/ModalManager'
 import { useThemeStore } from '@/store/useStoreData'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AnimatePresence } from 'framer-motion'
 import type { ReactNode } from 'react'
 import { useState, useEffect } from 'react'
 import { InitDataLoader } from '@/app/providers/InitDataLoader'
 import app from '@/app/firebase'
 import { getAnalytics, logEvent } from 'firebase/analytics'
+import { useMainConfigStore } from '@/store/useMainConfigStore'
 
-import { API_URL, CHAT_URL } from '@/services/api/storyNationApi'
-import { useAccountStore } from '@/store/useStoreData'
+import NoticeModal from '@/components/modal/NoticeModal'
+import { PromotionItem } from '@/types/provider'
+import InspectionPage from '@/components/inspection'
 
 export default function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -29,7 +30,12 @@ export default function Providers({ children }: { children: ReactNode }) {
   )
   const { isDarkMode } = useThemeStore()
   const [mounted, setMounted] = useState(false)
-  const { isLogin, data } = useAccountStore()
+  const { webConfig, activeNotices, fetchAllConfig, closeNotice } = useMainConfigStore()
+
+  const [isNoticeModalOpen, setIsNoticeModalOpen] = useState(false)
+  const [notice, setNotice] = useState<PromotionItem | null>(null)
+
+  const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false)
 
   // 컴포넌트가 마운트되었는지 확인
   useEffect(() => {
@@ -59,7 +65,16 @@ export default function Providers({ children }: { children: ReactNode }) {
         window.location.href = `intent://${window.location.host}${window.location.pathname}#Intent;scheme=https;package=com.android.chrome;end`;
       }
     }
+
+    fetchAllConfig()
   }, [])
+
+  useEffect(() => {
+    if (activeNotices?.length > 0) {
+      setNotice(activeNotices[0])
+      setIsNoticeModalOpen(true)
+    }
+  }, [activeNotices])
 
   // 다크모드 초기화
   useEffect(() => {
@@ -121,41 +136,12 @@ export default function Providers({ children }: { children: ReactNode }) {
     }
   }, [mounted]);
 
-  const DevNote = () => {
-    return (
-      <div className="fixed top-0 left-0 bg-black/40 text-white text-bold p-4 shadow-lg z-50 rounded text-xs pointer-events-none">
-        <b>CURRENT</b>
-        <p>API_URL: {API_URL}</p>
-        <p>CHAT_URL: {CHAT_URL}</p>
-
-        <br />
-        <pre>
-          GUEST LOGIN
-          <br />
-          release : bslive1, bslive2, bslive1
-          <br />
-          dev : BS1, BS2, BS3, 천마신군
-        </pre>
-        <br />
-
-        <pre>
-          IS LOGIN : {isLogin ? 'true' : 'false'}
-          <br />
-          {isLogin && (
-            <>
-              NICKNAME : {data?.nick_nm}
-              <br />
-            </>
-          )}
-        </pre>
-      </div>
-    )
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
-      {/* <ReactQueryDevtools initialIsOpen={false} /> */}
-      <div
+      {webConfig?.ispm ? (
+        <InspectionPage />
+      ): (
+        <div
         className="relative w-full h-full mobile-scroll-container"
         style={{
           width: '100%',
@@ -179,6 +165,17 @@ export default function Providers({ children }: { children: ReactNode }) {
           </InitDataLoader>
         </SkeletonThemeProvider>
       </div>
+      )}      
+      {notice && (
+        <NoticeModal 
+          isOpen={isNoticeModalOpen} 
+          notice={notice} 
+          onClose={() => {
+            setIsNoticeModalOpen(false)
+            closeNotice(notice.key)
+          }} 
+        />
+      )}
     </QueryClientProvider>
   )
 }
