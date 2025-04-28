@@ -112,9 +112,13 @@ export default function FilterControls({ categoryId }: FilterControlsProps) {
   }, [categoryId, changeCategory])
 
   useEffect(() => {
-    console.log('isAdultModeEnabled >>> ', isAdultModeEnabled)
     if(!isAdultModeEnabled) {
       handleNsfwChange(2)
+    }
+    else {
+      if(isInitialized.current) {
+        handleNsfwChange(3)
+      }
     }
 
     setIsDropdownOpen(false)
