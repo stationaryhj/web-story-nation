@@ -43,6 +43,8 @@ import Tutorial from '@/components/tutorial/Tutorial'
 import ResetChatModal from '@/components/modal/ResetChatModal'
 import { toast } from 'react-toastify'
 
+import BigImageModal from '@/components/modal/BigImageModal'
+
 interface ChatDetailClientProps {
   characterId: string
   charbotData: ChrbotData | null
@@ -125,6 +127,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 모바일 환경 감지
   const [isMobile, setIsMobile] = useState(false)
+
+  const [isBigImageModalOpen, setIsBigImageModalOpen] = useState(false)
+  const [bigImageUrl, setBigImageUrl] = useState('')
 
   useEffect(() => {
     const checkIsMobile = () => {
@@ -687,12 +692,15 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     const imageUrl = showImage
 
     // a 태그를 생성하여 다운로드 링크로 사용
-    const link = document.createElement('a')
-    link.href = imageUrl
-    link.download = `${character.name}-image.jpg`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    // const link = document.createElement('a')
+    // link.href = imageUrl
+    // link.download = `${character.name}-image.jpg`
+    // document.body.appendChild(link)
+    // link.click()
+    // document.body.removeChild(link)
+
+    setIsBigImageModalOpen(true)
+    setBigImageUrl(imageUrl)
   }
 
   // 모바일에서 프로필 이미지 클릭 시 모달 표시 함수
@@ -1549,6 +1557,13 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         onClose={handleCloseResetChatModal}
         onConfirm={handleConfirmResetChat}
       />
+
+      {isBigImageModalOpen && 
+        <BigImageModal
+          isOpen={isBigImageModalOpen} imgUrl={bigImageUrl} onClose={() => setIsBigImageModalOpen(false) }
+        />
+      }
+      
     </div>
   )
 }
