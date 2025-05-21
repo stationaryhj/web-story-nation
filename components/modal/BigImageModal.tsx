@@ -1,5 +1,7 @@
 'use client'
 
+import { faTimes } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 export default function BigImageModal({isOpen, imgUrl, onClose}: {isOpen: boolean, imgUrl: string, onClose: () => void}) {
   const handleClose = () => {
@@ -22,6 +24,16 @@ export default function BigImageModal({isOpen, imgUrl, onClose}: {isOpen: boolea
         }}
       >
         <Image src={imgUrl} alt="big image" fill className="object-contain" />
+
+        <div className={`relative flex justify-end p-3 pb-0 flex-shrink-0`}>
+          <button
+            onClick={onClose}
+            className="text-white transition-colors hover:text-secondary-700 dark:text-dark-secondary-400 dark:hover:text-dark-secondary-300 "
+            aria-label="닫기"
+          >
+            <FontAwesomeIcon icon={faTimes} className="h-8 w-8" />
+          </button>
+        </div>
       </div>
     </div>
   )
