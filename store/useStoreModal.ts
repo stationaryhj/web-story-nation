@@ -10,6 +10,7 @@ type ModalType =
   | 'slippage'
   | 'liquidity'
   | 'character'
+  | 'characterOpen'
   | 'login'
   | 'signup'
   | 'confirmAction'

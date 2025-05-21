@@ -1,5 +1,6 @@
 'use client'
 
+import { useSearchParams } from 'next/navigation'
 import { SkeletonThemeProvider } from '@/components/elements/skeleton'
 import ModalManager from '@/components/modal/ModalManager'
 import { useThemeStore } from '@/store/useStoreData'
@@ -15,8 +16,14 @@ import { useMainConfigStore } from '@/store/useMainConfigStore'
 import NoticeModal from '@/components/modal/NoticeModal'
 import { PromotionItem } from '@/types/provider'
 import InspectionPage from '@/components/inspection'
+import { useModalStore } from '@/store/useStoreModal'
 
 export default function Providers({ children }: { children: ReactNode }) {
+  const { openModal } = useModalStore()
+  
+  const searchParams = useSearchParams()
+  const linkChrbot_key = searchParams.get('chrbot_key')
+
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -70,11 +77,17 @@ export default function Providers({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    if (activeNotices?.length > 0) {
+    if (!linkChrbot_key && activeNotices?.length > 0) {
       setNotice(activeNotices[0])
       setIsNoticeModalOpen(true)
     }
   }, [activeNotices])
+
+  useEffect(() => {
+    if (linkChrbot_key) {
+      openModal('characterOpen', { chatBotKey: linkChrbot_key })
+    }
+  }, [linkChrbot_key])
 
   // 다크모드 초기화
   useEffect(() => {

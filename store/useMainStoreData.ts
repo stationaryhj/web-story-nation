@@ -156,7 +156,8 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
       const data = await queryClient.fetchQuery({
         queryKey: ['rankingCharacters', countryCode, ranking_type, gender, isSlide],
         queryFn: async () => {
-          const response = await contentApi.GetTop10Ranking(countryCode, ranking_type, gender, 2)
+          // const response = await contentApi.GetTop10Ranking(countryCode, ranking_type, gender, 2)
+          const response = await contentApi.GetListRcmnd(9, ranking_type, 1, 50, gender) as any
           const moduleCharacters = response.data?.module_9.map((item: ModuleCharacter) => ({
             world_list_detail_chrbot_key: item.world_list_detail_chrbot_key,
             title: item.title,
@@ -200,8 +201,9 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
       const data = await queryClient.fetchQuery({
         queryKey: ['rankingCreaters', countryCode, ranking_type],
         queryFn: async () => {
-          const response = await contentApi.GetTop10RankingCreater(countryCode, ranking_type)
-          const moduleCreaters = response.data?.module_10.map(item => ({
+          // const response = await contentApi.GetTop10RankingCreater(countryCode, ranking_type)
+          const response = await contentApi.GetListRcmnd(10, ranking_type, 1, 200, 0) as any
+          const moduleCreaters = response.data?.module_10.map((item: any) => ({
             intro: item.intro || '',
             module_id: item.module_id,
             module_type: item.module_type,
