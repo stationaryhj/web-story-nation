@@ -7,7 +7,7 @@ import { useThemeStore } from '@/store/useStoreData'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AnimatePresence } from 'framer-motion'
 import type { ReactNode } from 'react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { InitDataLoader } from '@/app/providers/InitDataLoader'
 import app from '@/app/firebase'
 import { getAnalytics, logEvent } from 'firebase/analytics'
@@ -18,12 +18,24 @@ import { PromotionItem } from '@/types/provider'
 import InspectionPage from '@/components/inspection'
 import { useModalStore } from '@/store/useStoreModal'
 
+// SearchParamsHandler 컴포넌트로 분리하여 useSearchParams 로직 처리
+function SearchParamsHandler() {
+  const { openModal } = useModalStore()
+  const searchParams = useSearchParams()
+  const linkChrbot_key = searchParams.get('chrbot_key')
+  
+  useEffect(() => {
+    if (linkChrbot_key) {
+      openModal('characterOpen', { chatBotKey: linkChrbot_key })
+    }
+  }, [linkChrbot_key, openModal])
+  
+  return null
+}
+
 export default function Providers({ children }: { children: ReactNode }) {
   const { openModal } = useModalStore()
   
-  const searchParams = useSearchParams()
-  const linkChrbot_key = searchParams.get('chrbot_key')
-
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -77,17 +89,11 @@ export default function Providers({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    if (!linkChrbot_key && activeNotices?.length > 0) {
+    if (activeNotices?.length > 0) {
       setNotice(activeNotices[0])
       setIsNoticeModalOpen(true)
     }
   }, [activeNotices])
-
-  useEffect(() => {
-    if (linkChrbot_key) {
-      openModal('characterOpen', { chatBotKey: linkChrbot_key })
-    }
-  }, [linkChrbot_key])
 
   // 다크모드 초기화
   useEffect(() => {
@@ -151,6 +157,11 @@ export default function Providers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
+      {/* useSearchParams 부분을 Suspense로 감싸서 처리 */}
+      <Suspense fallback={null}>
+        <SearchParamsHandler />
+      </Suspense>
+      
       {webConfig?.ispm ? (
         <InspectionPage />
       ): (
