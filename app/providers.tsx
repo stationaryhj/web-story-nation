@@ -20,22 +20,24 @@ import { useModalStore } from '@/store/useStoreModal'
 
 // SearchParamsHandler 컴포넌트로 분리하여 useSearchParams 로직 처리
 function SearchParamsHandler() {
-  const { openModal } = useModalStore()
+  const { openModal, setChrbotKey } = useModalStore()
   const searchParams = useSearchParams()
   const linkChrbot_key = searchParams.get('chrbot_key')
   
   useEffect(() => {
+    // 스토어에 chrbotKey 값 저장
+    setChrbotKey(linkChrbot_key)
+    
     if (linkChrbot_key) {
       openModal('characterOpen', { chatBotKey: linkChrbot_key })
     }
-  }, [linkChrbot_key, openModal])
+  }, [linkChrbot_key, openModal, setChrbotKey])
   
   return null
 }
 
 export default function Providers({ children }: { children: ReactNode }) {
-  const { openModal } = useModalStore()
-  
+  const { chrbotKey } = useModalStore() // 스토어에서 값 가져오기
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -81,7 +83,9 @@ export default function Providers({ children }: { children: ReactNode }) {
       if (/iPhone|iPad|iPod/.test(userAgent)) {
         // Safari로 직접 열기
       } else {
-        window.location.href = `intent://${window.location.host}${window.location.pathname}#Intent;scheme=https;package=com.android.chrome;end`;
+        // window.location.href = `intent://${window.location.host}${window.location.pathname}#Intent;scheme=https;package=com.android.chrome;end`;
+        const fullPath = window.location.pathname + window.location.search;
+        window.location.href = `intent://${window.location.host}${fullPath}#Intent;scheme=https;package=com.android.chrome;end`;
       }
     }
 
@@ -89,11 +93,11 @@ export default function Providers({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    if (activeNotices?.length > 0) {
+    if (!chrbotKey && activeNotices?.length > 0) {
       setNotice(activeNotices[0])
       setIsNoticeModalOpen(true)
     }
-  }, [activeNotices])
+  }, [activeNotices, chrbotKey])
 
   // 다크모드 초기화
   useEffect(() => {
@@ -190,7 +194,7 @@ export default function Providers({ children }: { children: ReactNode }) {
         </SkeletonThemeProvider>
       </div>
       )}      
-      {notice && (
+      {!chrbotKey && notice && (
         <NoticeModal 
           isOpen={isNoticeModalOpen} 
           notice={notice} 

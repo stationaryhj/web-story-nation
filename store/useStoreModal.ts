@@ -22,6 +22,7 @@ type ModalType =
   | 'bankInfo'
 
 interface ModalState {
+  chrbotKey: string | null
   isOpen: boolean
   modalType: ModalType | null
   openModal: (type: ModalType, props?: Record<string, any>) => void
@@ -29,9 +30,11 @@ interface ModalState {
   modalProps: any
   selectedCharacter: Character | null
   setSelectedCharacter: (character: Character | null) => void
+  setChrbotKey: (key: string | null) => void
 }
 
 export const useModalStore = create<ModalState>(set => ({
+  chrbotKey: null,
   isOpen: false,
   modalType: null,
   openModal: (type, props) => set({ isOpen: true, modalType: type, modalProps: props }),
@@ -39,4 +42,5 @@ export const useModalStore = create<ModalState>(set => ({
   modalProps: {},
   selectedCharacter: null,
   setSelectedCharacter: character => set({ selectedCharacter: character }),
+  setChrbotKey: key => set({ chrbotKey: key }),
 }))
