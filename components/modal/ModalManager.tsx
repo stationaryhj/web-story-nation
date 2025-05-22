@@ -10,7 +10,7 @@ import NotificationSidebar from './NotificationSidebar'
 import AdultVerificationModal from './AdultVerificationModal'
 import ChatModeModal from './ChatModeModal'
 import BankInfoModal from './BankInfoModal'
-import CharactorOpenModal from './CharactorOpenModal'
+// import CharactorOpenModal from './CharactorOpenModal'
 
 export default function ModalManager() {
   const { isOpen, modalType, closeModal, modalProps } = useModalStore()
@@ -23,9 +23,9 @@ export default function ModalManager() {
     return <CharactorModal isOpen={isOpen} onClose={closeModal} {...modalProps} />
   }
 
-  if (modalType === 'characterOpen') {
-    return <CharactorOpenModal isOpen={isOpen} onClose={closeModal} {...modalProps} />
-  }
+  // if (modalType === 'characterOpen') {
+  //   return <CharactorOpenModal isOpen={isOpen} onClose={closeModal} {...modalProps} />
+  // }
 
   if (modalType === 'login') {
     return <LoginModal isOpen={isOpen} onClose={closeModal} {...modalProps} />
