@@ -18,6 +18,8 @@ import { PromotionItem } from '@/types/provider'
 import InspectionPage from '@/components/inspection'
 import { useModalStore } from '@/store/useStoreModal'
 
+import CharactorOpenModal from '@/components/modal/CharactorOpenModal'
+
 // SearchParamsHandler 컴포넌트로 분리하여 useSearchParams 로직 처리
 function SearchParamsHandler() {
   const { openModal, setChrbotKey } = useModalStore()
@@ -28,9 +30,9 @@ function SearchParamsHandler() {
     // 스토어에 chrbotKey 값 저장
     setChrbotKey(linkChrbot_key)
     
-    if (linkChrbot_key) {
-      openModal('characterOpen', { chatBotKey: linkChrbot_key })
-    }
+    // if (linkChrbot_key) {
+    //   openModal('characterOpen', { chatBotKey: linkChrbot_key })
+    // }
   }, [linkChrbot_key, openModal, setChrbotKey])
   
   return null
@@ -57,6 +59,8 @@ export default function Providers({ children }: { children: ReactNode }) {
   const [notice, setNotice] = useState<PromotionItem | null>(null)
 
   const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false)
+
+  const [isCharactorOpenModalOpen, setIsCharactorOpenModalOpen] = useState(false)
 
   // 컴포넌트가 마운트되었는지 확인
   useEffect(() => {
@@ -98,6 +102,12 @@ export default function Providers({ children }: { children: ReactNode }) {
       setIsNoticeModalOpen(true)
     }
   }, [activeNotices, chrbotKey])
+
+  useEffect(() => {
+    if (chrbotKey) {
+      setIsCharactorOpenModalOpen(true)
+    }
+  }, [chrbotKey])
 
   // 다크모드 초기화
   useEffect(() => {
@@ -202,6 +212,16 @@ export default function Providers({ children }: { children: ReactNode }) {
             setIsNoticeModalOpen(false)
             closeNotice(notice.key)
           }} 
+        />
+      )}
+
+      {chrbotKey && (
+        <CharactorOpenModal
+          isOpen={isCharactorOpenModalOpen}
+          chatBotKey={chrbotKey}
+          onClose={() => {
+            setIsCharactorOpenModalOpen(false)
+          }}
         />
       )}
     </QueryClientProvider>
