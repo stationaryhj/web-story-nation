@@ -4,13 +4,19 @@ import React, { useEffect, useRef, useState } from 'react'
 import { faPlus, faUser, faRobot, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import type { ChangeEvent } from 'react'
-import { ConversationExample } from '@/store/useCreateCharacterData'
+import { ConversationExample, useCreateCharacterData } from '@/store/useCreateCharacterData'
 import { useAccountStore } from '@/store/useAccountStore'
 import RatingSelect from './RatingSelect'
 import Tutorial from '@/components/tutorial/Tutorial'
 import BaseModal from '@/components/modal/BaseModal'
 import { toast } from 'react-toastify'
 import { exampleDatas } from '@/lib/utils/storyNationUtil'
+
+
+import LikeForm from './components/detail/like-form'
+
+const MAX_CONTENT_LENGTH = 3500
+const MAX_REMAINING_LENGTH = 1500
 
 const createCharacterScenario = {
   storageKey: 'detail-info-tutorial-completed',
@@ -62,8 +68,8 @@ const createCharacterScenario = {
 }
 
 interface DetailInfoFormProps {
-  formData: any
-  setFormField: (name: string, value: any) => void
+  // formData: any
+  // setFormField: (name: string, value: any) => void
   addConversationExample: () => void
   updateConversationExample: (data: exampleDatas) => void
   removeConversationExample: (id: number) => void
@@ -79,20 +85,22 @@ type EnhancedConversationExample = ConversationExample & {
 }
 
 export default function DetailInfoForm({
-  formData,
-  setFormField,
+  // formData,
+  // setFormField,
   addConversationExample,
   updateConversationExample,
   removeConversationExample,
   updateConversationExampleTitle,
   onValidationChange,
 }: DetailInfoFormProps) {
+  const { formData, setFormField } = useCreateCharacterData()
 
     // 현재 선택된 입력 필드 (user 또는 character)
   const [activeField, setActiveField] = useState<{ id: number; field: 'user' | 'character' } | null>(null)
   const [showTutorial, setShowTutorial] = useState(false)
   const [totalMessageLength, setTotalMessageLength] = useState(0) // 전체 메시지 길이
-  const [remainingChars, setRemainingChars] = useState(1500) // 남은 글자 수
+  const [remainingChars, setRemainingChars] = useState(MAX_REMAINING_LENGTH) // 남은 글자 수
+
 
   // 튜토리얼이 이미 표시된 적이 있는지 추적
   const tutorialShownRef = useRef(false)
@@ -111,6 +119,7 @@ export default function DetailInfoForm({
 
   const exampleDatas = formData.conversationExamples
 
+  
   // 디바운스된 토스트 알림 함수
   const showDebouncedToast = (message: string) => {
     if (toastDebounceRef.current) {
@@ -144,7 +153,7 @@ export default function DetailInfoForm({
   useEffect(() => {
     const total = calculateTotalMessageLength()
     setTotalMessageLength(total)
-    setRemainingChars(1500 - total)
+    setRemainingChars(MAX_REMAINING_LENGTH - total)
   }, [formData.conversationExamples])
 
   // 스크롤 후 튜토리얼 표시 함수
@@ -241,53 +250,15 @@ export default function DetailInfoForm({
     }
   }, [exampleDatas])
 
-  // 사용자 및 캐릭터 메시지 상태 관리
-  const [userMessages, setUserMessages] = useState<{ [key: string]: string }>({})
-  const [characterMessages, setCharacterMessages] = useState<{ [key: string]: string }>({})
-  const [titles, setTitles] = useState<{ [key: string]: string }>({})
 
   // 유효성 검사
   useEffect(() => {
     if (onValidationChange) {
       // 상세 정보 탭은 bioDetail만 필수
-      const isValid = !!formData.bioDetail?.trim()
-      onValidationChange(isValid)
+      // const isValid = !!formData.bioDetail?.trim()
+      // onValidationChange(isValid)
     }
   }, [formData, onValidationChange])
-
-  // 대화 예시 데이터에서 사용자 및 캐릭터 메시지 초기화 (렌더링과 별개로 처리)
-  // useEffect(() => {
-  //   const newUserMessages: { [key: string]: string } = { ...userMessages }
-  //   const newCharacterMessages: { [key: string]: string } = { ...characterMessages }
-  //   let messagesUpdated = false
-
-  //   formData.conversationExamples.forEach((example: ConversationExample) => {
-  //     if (!newUserMessages[example.id] || !newCharacterMessages[example.id]) {
-  //       const { userMsg, characterMsg } = parseConversationExampleText(example.text)
-
-  //       if (!newUserMessages[example.id]) {
-  //         newUserMessages[example.id] = userMsg
-  //         messagesUpdated = true
-  //       }
-
-  //       if (!newCharacterMessages[example.id]) {
-  //         newCharacterMessages[example.id] = characterMsg
-  //         messagesUpdated = true
-  //       }
-
-  //       if (!titles[example.id]) {
-  //         titles[example.id] = (example as EnhancedConversationExample).title || ''
-  //         messagesUpdated = true
-  //       }
-  //     }
-  //   })
-
-  //   if (messagesUpdated) {
-  //     setUserMessages(newUserMessages)
-  //     setCharacterMessages(newCharacterMessages)
-  //     setTitles(titles)
-  //   }
-  // }, [formData.conversationExamples])
 
   // 게시 범위 선택 핸들러 (상세 설명용)
   const handleVisibilitySelect = (visibility: 'public' | 'private') => {
@@ -308,11 +279,18 @@ export default function DetailInfoForm({
     setFormField('rating', rating)
   }
 
-  // 상세 설명 입력 변경 핸들러
-  const handleBioDetailChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+
+  const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value
-    if (value.length <= 3500) {
-      setFormField('bioDetail', value)
+    if (value.length <= MAX_CONTENT_LENGTH) {
+      setFormField('content', value)
+    }
+  }
+
+  const handleContentPublicChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value
+    if (value.length <= MAX_CONTENT_LENGTH) {
+      setFormField('content_public', value)
     }
   }
 
@@ -339,8 +317,8 @@ export default function DetailInfoForm({
       totalMsgLength -= findData.characterMsg.length
     }
 
-    if((totalMsgLength + msg.length) > 1500) {
-      showDebouncedToast('전체 대화 예시는 1500자를 초과할 수 없습니다.')
+    if((totalMsgLength + msg.length) > MAX_REMAINING_LENGTH) {
+      showDebouncedToast(`전체 대화 예시는 ${MAX_REMAINING_LENGTH}자를 초과할 수 없습니다.`)
       return
     }
 
@@ -436,53 +414,65 @@ export default function DetailInfoForm({
 
         {/* 상세 설명 */}
         <div>
-          <div className="flex justify-between items-start mb-2">
+          <div className="flex justify-between items-start mb-6">
             <div>
               <h3 className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">상세 설명</h3>
               <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">
                 성격, 외모, 상황 등의 정보를 알려주세요!
               </p>
             </div>
+          </div>
+
+          {/* 공개설명 */}
+          <div className='flex flex-col gap-4'>
+            <div>
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <h3 className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">공개 설명</h3>
+                </div>
+                <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
+                  {formatTextLength(formData.content_public.length, MAX_CONTENT_LENGTH)}
+                </span>
+              </div>
+              <textarea
+                id="content-public"
+                value={formData.content_public}
+                onChange={handleContentPublicChange}
+                placeholder='독자에게 공개되고 AI에게 전송되는 프롬프트에요 :) 캐릭터를 자세히 설명해 주세요!'
+                rows={4}
+                className="w-full px-4 py-3 rounded-lg text-sm sm:text-base border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
+                maxLength={MAX_CONTENT_LENGTH}
+              />
+            </div>
+
+            {/* 비공개설명 */}
+            <div>
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <h3 className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">비공개 설명</h3>
+                </div>
+                <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
+                  {formatTextLength(formData.content.length, MAX_CONTENT_LENGTH)}
+                </span>
+              </div>
+              <textarea
+                id="content"
+                value={formData.content}
+                onChange={handleContentChange}
+                placeholder='AI에게만 전송되는 비밀 프롬프트에요 :) 작가님만의 비법 프롬프트를 입력해 보세요!'
+                rows={4}
+                className="w-full px-4 py-3 rounded-lg text-sm sm:text-base border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
+                maxLength={MAX_CONTENT_LENGTH}
+              />
+            </div>
+          </div>
+
+          <div className="mt-4 flex justify-end items-center">
             <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-              {formatTextLength(formData.bioDetail.length, 3500)}
+            전체 상세 설명 글자수: 0/{MAX_CONTENT_LENGTH}(남은 글자 수: {MAX_CONTENT_LENGTH}자)
+              {/* 전체 대화 예시 글자 수: {totalMessageLength}/1500 (남은 글자 수: {remainingChars}자) */}
             </span>
           </div>
-
-          {/* 상세 설명 공개/비공개 선택 버튼 */}
-          <div id="visibility-buttons" className="grid grid-cols-2 gap-4 w-full sm:w-1/2 md:w-1/3 mb-4">
-            <button
-              type="button"
-              onClick={() => handleVisibilitySelect('private')}
-              className={`w-full px-2 sm:px-3 py-1 sm:py-2 text-sm sm:text-base rounded-lg text-center transition-colors ${
-                formData.detailVisibility === 'private'
-                  ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                  : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-              }`}
-            >
-              상세 설명 비공개
-            </button>
-            <button
-              type="button"
-              onClick={() => handleVisibilitySelect('public')}
-              className={`w-full px-2 sm:px-3 py-1 sm:py-2 text-sm sm:text-base rounded-lg text-center transition-colors ${
-                formData.detailVisibility === 'public'
-                  ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                  : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-              }`}
-            >
-              상세 설명 공개
-            </button>
-          </div>
-
-          <textarea
-            id="bio-detail"
-            value={formData.bioDetail}
-            onChange={handleBioDetailChange}
-            placeholder='예시) 유키는 차가운 첫인상을 가진 고등학교 3학년으로 공부와 운동 모두 뛰어난 완벽주의자다. 겉으로는 "귀찮게 하지마" 라며 주변을 밀어내지만 사실은 누구보다 친구들의 사소한 행동도 기억하며 배려하는 속 깊은 성격을 가졌다.'
-            rows={4}
-            className="w-full px-4 py-3 rounded-lg text-sm sm:text-base border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
-            maxLength={3500}
-          />
         </div>
 
         {/* 구분선 */}
@@ -670,10 +660,13 @@ export default function DetailInfoForm({
           {/* 전체 대화 예시 글자 수 표시 */}
           <div className="mt-4 flex justify-end items-center">
             <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-              전체 대화 예시 글자 수: {totalMessageLength}/1500 (남은 글자 수: {remainingChars}자)
+              전체 대화 예시 글자 수: {totalMessageLength}/{MAX_REMAINING_LENGTH} (남은 글자 수: {remainingChars}자)
             </span>
           </div>
         </div>
+
+
+        <LikeForm />
       </div>
       <Tutorial
         isOpen={showTutorial}

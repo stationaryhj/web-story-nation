@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowUp, faRotate } from '@fortawesome/free-solid-svg-icons'
+import { useRecommendSectionStoreData, moduleForTitleData } from '@/store/useMainStoreData'
 import CardGrid from '@/components/elements/card/CardGrid'
 import BaseSidebar from './BaseSidebar'
-import { useRecommendSectionStoreData, moduleForTitleData } from '@/store/useMainStoreData'
 
 interface NewCharacterSidebarProps {
   isOpen: boolean
@@ -14,14 +14,17 @@ interface NewCharacterSidebarProps {
 }
 
 export default function LatestCharacterSidebar({ isOpen, onClose, moduleId }: NewCharacterSidebarProps) {
+  const contentRef = useRef<HTMLDivElement>(null)
+
+  const { modules_sumSlide, UpdateLatestCharactersPaging, ClearLatestCharactersSlide } = useRecommendSectionStoreData()
+
   const [isLoading, setIsLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState<string>('')
-  const contentRef = useRef<HTMLDivElement>(null)
-  const { modules_sumSlide, UpdateLatestCharactersPaging, ClearLatestCharactersSlide } = useRecommendSectionStoreData()
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     if (isOpen && moduleId) {
-      UpdateLatestCharactersPaging(moduleId, 1, 1, 50)
+      UpdateLatestCharactersPaging(moduleId, 1, currentPage, 50)
     } else {
       ClearLatestCharactersSlide()
     }

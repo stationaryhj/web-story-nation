@@ -4,7 +4,7 @@
 import { CardTransition } from '@/components/motion/PageTransition'
 import type { Character } from '@/store/useStoreData'
 import { useModalStore } from '@/store/useStoreModal'
-import { faPencilAlt, faTrash, faLock, faFire } from '@fortawesome/free-solid-svg-icons'
+import { faPencilAlt, faTrash, faLock, faFire, faImages, faImage } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
 import React, { useEffect, useState } from 'react'
@@ -36,7 +36,7 @@ export default function Card({
   isSidebar = false,
   isCharacterRankingSidebar = false,
 }: CardProps) {
-  const { name, description, imageUrl, commentCount, hashtags, isAdult, creator } = character
+  const { name, subject, description, imageUrl, commentCount, hashtags, isAdult, creator } = character
   const { openModal, setSelectedCharacter } = useModalStore()
   const [isMobile, setIsMobile] = useState(false)
   const [imageError, setImageError] = React.useState(false)
@@ -129,19 +129,6 @@ export default function Card({
               onError={handleImageError}
             />
 
-            {isTemp && (
-              <div className="absolute top-3 left-3 bg-black/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-                임시저장
-              </div>
-            )}
-
-            {isLocked && (
-              <div className="absolute top-3 left-3 bg-red-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-                <FontAwesomeIcon icon={faLock} className="mr-1" />
-                <div>비공개</div>
-              </div>
-            )}
-
             {/* 그라데이션 오버레이 */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent"></div>
 
@@ -163,7 +150,7 @@ export default function Card({
 
           {/* 콘텐츠 영역 */}
           <div className="flex-1 px-3 pt-2">
-            <h3 className="font-bold text-secondary-900 dark:text-dark-secondary-700 text-base truncate">{name}</h3>
+            <h3 className="font-bold text-secondary-900 dark:text-dark-secondary-700 text-base truncate">{subject || name}</h3>
 
             {/* 캐릭터 설명 - 최대 2줄 */}
             <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 my-1.5">
@@ -201,6 +188,136 @@ export default function Card({
               <span className="ml-1.5 text-xs text-secondary-500 dark:text-dark-secondary-500 truncate max-w-[100px]">
                 {creator?.nickname || '익명'}
               </span>
+            </div>
+          </div>
+
+          <div className='absolute top-2 right-2 flex items-center gap-4 text-black z-10'>
+            {character.multi_image_count > 0 &&
+              <div className='flex items-center justify-center gap-1'>
+                <FontAwesomeIcon icon={faImage} className='text-[14px] md:text-[18px]' />
+                <span className="text-[14px] md:text-[18px]">{character.multi_image_count || 0}</span>
+              </div>
+            }
+
+            {character.likeability_yn === 1 &&
+              <div className='flex items-center justify-center gap-1'>
+                <Image src="/images/icons/like_icon_pink.png" alt="레벨 아이콘" width={isMobile ? 14 : 18} height={isMobile ? 14 : 18} />
+                <span className="text-[14px] md:text-[18px]">Lv.{character.likeability_max_lv || 0}</span>
+              </div>
+            }
+          </div>
+        </div>
+      </CardTransition>
+    )
+  }
+
+
+  if(variant === 'my-character') {
+    return (
+      <CardTransition index={Math.min(index, 5)}>
+        <div
+          className="group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-dark-background-light dark:border dark:border-dark-secondary-200/10 cursor-pointer"
+          onClick={handleCardClick}
+        >
+          <div className="block">
+            <div className="relative aspect-[3/4] overflow-hidden rounded-t-xl">
+  
+              {/* 성인 컨텐츠 표시 */}
+              {isAdult && !isSidebar && (
+                <div className="absolute top-2 right-2 md:top-[15px] md:right-[15px] z-[40] flex items-center justify-center">
+                  <Image
+                    src="/images/flames.png"
+                    alt="성인인증"
+                    width={isMobile ? 18.5 : 27.7}
+                    height={isMobile ? 23 : 35.3}
+                  />
+                </div>
+              )}
+  
+              <Image
+                src={imageUrl}
+                alt={`${name} 캐릭터 이미지`}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                onError={handleImageError}
+              />
+  
+              {/* 그라데이션 오버레이 */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent"></div>
+  
+              {isTemp && (
+                <div className="absolute top-3 left-3 bg-black/60 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                  임시저장
+                </div>
+              )}
+  
+              {isLocked && (
+                <div className="absolute bottom-2 right-2 bg-orange-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                  <FontAwesomeIcon icon={faLock} />
+                  <span className="ml-1 font-black">비공개</span>
+                </div>
+              )}
+            </div>
+  
+            <div className="p-4">
+              <h3 className="font-bold text-secondary-900 dark:text-dark-secondary-700 mb-1 truncate group-hover:text-primary-600 dark:group-hover:text-dark-primary-600 transition-colors">
+                {subject || name}
+              </h3>
+  
+              <div className="mb-2 flex flex-wrap gap-1">
+                {hashtags?.slice(0, 3).map((tag, index) => (
+                  <span
+                    key={`${character.id}-tag-${tag}-${index}`}
+                    className="text-xs text-primary-500 dark:text-dark-primary-600 bg-primary-50 dark:bg-dark-primary-100/10 px-2 py-0.5 rounded-full"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+  
+              <p className="text-xs text-secondary-600 dark:text-dark-secondary-500 mb-1 line-clamp-2 h-8 group-hover:text-secondary-800 dark:group-hover:text-dark-secondary-400 transition-colors">
+                {getChangeNameTag(description || '', name)}
+              </p>
+
+              {/* 캐릭터 만들기 에서 내 작가 이름은 일단 숨김 */}
+              {/* <div className="flex items-center">
+                <div className="w-5 h-5 rounded-full bg-secondary-200 dark:bg-dark-secondary-300 flex items-center justify-center overflow-hidden">
+                  {creator?.profileImageUrl ? (
+                    <Image
+                      src={creator.profileImageUrl}
+                      alt={`${creator.nickname} 프로필 이미지`}
+                      width={20}
+                      height={20}
+                      className="object-cover"
+                    />
+                  ) : (
+                    <span className="text-[8px] text-secondary-500 dark:text-dark-secondary-400">
+                      {creator?.nickname?.charAt(0) || '?'}
+                    </span>
+                  )}
+                </div>
+                <span className="ml-1 text-xs text-secondary-500 dark:text-dark-secondary-500 truncate max-w-[80px]">
+                  {creator?.nickname || '익명'}
+                </span>
+              </div> */}
+  
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <button
+                  onClick={handleEditClick}
+                  className="py-1.5 px-2 bg-secondary-100 hover:bg-secondary-200 text-secondary-700 text-xs rounded flex items-center justify-center transition-colors dark:bg-dark-secondary-100/10 dark:hover:bg-dark-secondary-100/20 dark:text-dark-secondary-500"
+                >
+                  <FontAwesomeIcon icon={faPencilAlt} className="mr-1" />
+                  수정
+                </button>
+                <button
+                  onClick={handleDeleteClick}
+                  className="py-1.5 px-2 bg-red-50 hover:bg-red-100 text-red-600 text-xs rounded flex items-center justify-center transition-colors dark:bg-red-900/10 dark:hover:bg-red-900/20 dark:text-red-400"
+                >
+                  <FontAwesomeIcon icon={faTrash} className="mr-1" />
+                  삭제
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -250,22 +367,27 @@ export default function Card({
             {/* 그라데이션 오버레이 */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent"></div>
 
-            {isTemp && (
-              <div className="absolute top-3 left-3 bg-black/60 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-                임시저장
-              </div>
-            )}
+            <div className='absolute bottom-2 left-2 flex items-center justify-center gap-1 md:gap-4 text-white z-10'>
+              {/* 갤러리 아이콘 */}
+              {character.multi_image_count > 0 &&
+                <div className='flex items-center justify-center gap-1'>
+                  <FontAwesomeIcon icon={faImage} className='text-[14px] md:text-[20px]' />
+                  <span className="text-[14px] md:text-[20px]">{character.multi_image_count || 0}</span>
+                </div>
+              }
 
-            {isLocked && (
-              <div className="absolute bottom-4 left-4 bg-orange-500/90 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-                <FontAwesomeIcon icon={faLock} />
-                <span className="ml-1 font-black">비공개</span>
-              </div>
-            )}
+              {/* Level */}
+              {character.likeability_yn === 1 &&
+                <div className='flex items-center justify-center gap-1'>
+                  <Image src="/images/icons/like_icon_white.png" alt="레벨 아이콘" width={isMobile ? 14 : 20} height={isMobile ? 14 : 20} />
+                  <span className="text-[14px] md:text-[20px]">Lv.{character.likeability_max_lv || 0}</span>
+                </div>
+              }
+            </div>
 
             {/* 댓글 수 표시 - 이미지 우측 하단으로 이동 */}
             {!isCharacterRankingSidebar && (
-              <div className="absolute bottom-[10px] right-[10px] flex md:bottom-[15] md:right-4 items-center gap-[1px] md:gap-[3px] text-white z-10">
+              <div className="absolute bottom-2 right-2 gap-1 flex items-center text-white z-10">
                 <Image
                   src="/images/comment_black.png"
                   alt="댓글 아이콘"
@@ -279,7 +401,7 @@ export default function Card({
 
           <div className="p-4">
             <h3 className="font-bold text-secondary-900 dark:text-dark-secondary-700 mb-1 truncate group-hover:text-primary-600 dark:group-hover:text-dark-primary-600 transition-colors">
-              {name}
+              {subject || name}
             </h3>
 
             <div className="mb-2 flex flex-wrap gap-1">
@@ -316,27 +438,6 @@ export default function Card({
                 {creator?.nickname || '익명'}
               </span>
             </div>
-
-            {/* variant에 따라 다른 하단 영역 렌더링 */}
-            {variant === 'default' ? null : ( // 기본 카드 - 작성자 정보와 댓글 수
-              // 내 캐릭터 카드 - 수정/삭제 버튼
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                <button
-                  onClick={handleEditClick}
-                  className="py-1.5 px-2 bg-secondary-100 hover:bg-secondary-200 text-secondary-700 text-xs rounded flex items-center justify-center transition-colors dark:bg-dark-secondary-100/10 dark:hover:bg-dark-secondary-100/20 dark:text-dark-secondary-500"
-                >
-                  <FontAwesomeIcon icon={faPencilAlt} className="mr-1" />
-                  수정
-                </button>
-                <button
-                  onClick={handleDeleteClick}
-                  className="py-1.5 px-2 bg-red-50 hover:bg-red-100 text-red-600 text-xs rounded flex items-center justify-center transition-colors dark:bg-red-900/10 dark:hover:bg-red-900/20 dark:text-red-400"
-                >
-                  <FontAwesomeIcon icon={faTrash} className="mr-1" />
-                  삭제
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>

@@ -20,6 +20,7 @@ type ModalType =
   | 'chatMode'
   | 'report'
   | 'bankInfo'
+  | 'charactorgallery'
 
 interface ModalState {
   chrbotKey: string | null

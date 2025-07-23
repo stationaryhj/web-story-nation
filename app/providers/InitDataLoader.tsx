@@ -5,6 +5,7 @@ import { useCoinStore, useChatModeStore } from '@/store/useStoreData';
 import { useQuery } from '@tanstack/react-query';
 import { CoinListResponse, CharbotChatModeResponse } from '@/types/api';
 import { settlementApi, contentApi } from '@/services/api/storyNationApi';
+import { useAccountStore } from '@/store/useAccountStore';
 
 interface InitDataLoaderProps {
   children: React.ReactNode;
@@ -50,6 +51,19 @@ export function InitDataLoader({ children }: InitDataLoaderProps) {
   } = useQuery<CharbotChatModeResponse>({
     queryKey: ['chatMode'],
     queryFn: async () => {
+
+      // const { isLogin } = useAccountStore.getState()
+      // if(!isLogin) {
+      //   return {
+      //     chat_mode: [],
+      //     result: {
+      //       err: 0,
+      //       msg: '로그인 필요',
+      //     }
+      //   } as CharbotChatModeResponse;
+      // }
+      
+
       const response = await contentApi.GetChatMode();
       return response.data as CharbotChatModeResponse;
     },

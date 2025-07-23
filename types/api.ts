@@ -125,6 +125,7 @@ export type GetTop10RankingCreaterResponse = {
 export interface ModuleCharacterCharacter {
   world_list_detail_chrbot_key: number;
   title: string;
+  subject: string;
   intro: string;
   img_url: string;
   img_web_url: string;
@@ -139,6 +140,9 @@ export interface ModuleCharacterCharacter {
   module_id: number;
   sort: number;
   module_type: number;
+  likeability_max_lv: number;
+  likeability_yn: number;
+  multi_image_count: number;
 }
 
 
@@ -146,6 +150,7 @@ export interface ModuleCharacterCharacter {
 export interface ModuleCharacter {
   world_list_detail_chrbot_key: number;
   title: string;
+  subject?: string;
   intro: string;
   img_url: string;
   img_web_url: string;
@@ -159,6 +164,9 @@ export interface ModuleCharacter {
   nsfw: number;
   module_id: number;
   sort: number;
+  likeability_max_lv: number;
+  likeability_yn: number;
+  multi_image_count: number;
 }
 
 // Module Creater
@@ -234,6 +242,10 @@ export interface CharbotData {
   tags: string;
   title: string;
   world_list_detail_chrbot_key: number;
+  subject?: string;
+  likeability_max_lv: number;
+  likeability_yn: number;
+  multi_image_count: number;
 }
 
 // Charbot Response
@@ -247,6 +259,7 @@ export interface ChrbotData {
   chat_cnt: number;
   comment_cnt: number;
   content: string;
+  content_public: string;
   content_show_yn: number;
   countryCode: string;
   create_dt: string;
@@ -274,6 +287,11 @@ export interface ChrbotData {
   world_key: number;
   world_list_detail_chrbot_key: number;
   world_list_detail_key: number;
+  likeability_max_lv?: number;
+  likeability_yn?: number;
+  multi_image_count?: number;
+  subject?: string;
+  writer_note: string;
 }
 
 
@@ -375,18 +393,24 @@ export interface CharbotMineData {
   img_web_url: string;
   intro: string;
   like_cnt: number;
+  likeability_max_lv: number;
+  likeability_yn: number;
   msg_cnt: number;
+  multi_image_count: number;
   nsfw: number;
   show_yn: number;
+  subject?: string;
   tags: string;
   title: string;
   world_list_detail_chrbot_key: number;
+  writer_note?: string;
 }
 
-// Charbot Inprogress Response
+
 export interface CharbotInprogressResponse {
   chrbot: CharbotInprogressData;
   charbot_tag: Array<CharbotTagData>;
+  private_cnt: number;
   result: ApiResult;
 }
 
@@ -395,6 +419,7 @@ export interface CharbotInprogressData {
   chat_cnt: number;
   comment_cnt: number;
   content: string;
+  content_public: string;
   content_show_yn: number;
   countryCode: string;
   create_dt: string;
@@ -409,10 +434,17 @@ export interface CharbotInprogressData {
   img_web_url: string;
   intro: string;
   like_cnt: number;
+  likeabilities: any[];             // 호감도 속성 ( 새로 추가 )
+  likeability_max_lv: number;       // 호감도 최대 레벨
+  likeability_yn: number;           // 호감도 활성화 여부 ( 0 : 비활성화, 1 : 활성화 )
   msg_cnt: number;
+  multi_image_count: number;        // 이미지 개수 ( 새로 추가 )
+  multi_images: any[];              // 이미지 목록 ( 새로 추가 )
   nsfw: number;
+  property: string;                 // 캐봇의 속성이 있다면 저장 : 기타설정들 ( 새로 추가 )
   show_yn: number;
   sort: number;
+  subject?: string;                  // 제목
   tags: string;
   title: string;
   update_dt: string;
@@ -420,6 +452,7 @@ export interface CharbotInprogressData {
   world_key: number;
   world_list_detail_chrbot_key: number;
   world_list_detail_key: number;
+  writer_note: string;
 }
 
 export interface CharbotTagData {
@@ -728,6 +761,11 @@ export interface GetPresignedUrlResponse {
   presignedUrl: string;
 }
 
+export interface GetPresignedUrlMultiResponse {
+  result: ApiResult;
+  files: any[];
+}
+
 
 // WithdrawRequestListResponse
 export interface WithdrawRequestListResponse {
@@ -834,3 +872,16 @@ export const SocialLoginTypes = {
 } as const;
 
 export type SocialLoginType = typeof SocialLoginTypes[keyof typeof SocialLoginTypes];
+
+
+
+export interface MultiImageStructure {
+  idx: number
+  chrbot_multi_image_key: number
+  world_list_detail_chrbot_key: number
+  lv: number
+  img_url: string
+  rules: string
+  show_yn: number
+  default_yn: number
+} 

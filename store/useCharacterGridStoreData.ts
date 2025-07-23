@@ -123,6 +123,9 @@ export const useCharacterGridStoreData = create<CharacterGridStore>((set, get) =
           nsfw: item.nsfw,
           module_id: 0,
           sort: 0,
+          likeability_max_lv: item.likeability_max_lv,
+          likeability_yn: item.likeability_yn,
+          multi_image_count: item.multi_image_count,
         }))
 
         // Character 형식으로 변환
@@ -220,6 +223,9 @@ export const useCharacterGridStoreData = create<CharacterGridStore>((set, get) =
           nsfw: item.nsfw,
           module_id: 0,
           sort: 0,
+          likeability_max_lv: item.likeability_max_lv,
+          likeability_yn: item.likeability_yn,
+          multi_image_count: item.multi_image_count,
         }))
 
         // Character 형식으로 변환
@@ -316,6 +322,9 @@ export const useCharacterGridStoreData = create<CharacterGridStore>((set, get) =
           nsfw: item.nsfw,
           module_id: 0,
           sort: 0,
+          likeability_max_lv: item.likeability_max_lv,
+          likeability_yn: item.likeability_yn,
+          multi_image_count: item.multi_image_count,
         }))
 
         // Character 형식으로 변환
@@ -409,6 +418,9 @@ export const useCharacterGridStoreData = create<CharacterGridStore>((set, get) =
           nsfw: item.nsfw,
           module_id: 0,
           sort: 0,
+          likeability_max_lv: item.likeability_max_lv,
+          likeability_yn: item.likeability_yn,
+          multi_image_count: item.multi_image_count,
         }))
 
         // Character 형식으로 변환
@@ -490,6 +502,9 @@ export const useCharacterGridStoreData = create<CharacterGridStore>((set, get) =
           nsfw: item.nsfw,
           module_id: 0,
           sort: 0,
+          likeability_max_lv: item.likeability_max_lv,
+          likeability_yn: item.likeability_yn,
+          multi_image_count: item.multi_image_count,
         }))
 
         // Character 형식으로 변환

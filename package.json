@@ -38,6 +38,7 @@
     "lightweight-charts": "^4.2.2",
     "lucide-react": "^0.485.0",
     "next": "15.1.5",
+    "pako": "^2.1.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-intersection-observer": "^9.15.0",

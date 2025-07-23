@@ -10,6 +10,8 @@ import NotificationSidebar from './NotificationSidebar'
 import AdultVerificationModal from './AdultVerificationModal'
 import ChatModeModal from './ChatModeModal'
 import BankInfoModal from './BankInfoModal'
+import GalleryModal from './GalleryModal'
+
 // import CharactorOpenModal from './CharactorOpenModal'
 
 export default function ModalManager() {
@@ -77,6 +79,10 @@ export default function ModalManager() {
         onBankInfoChange={modalProps?.onBankInfoChange || (() => {})}
       />
     )
+  }
+
+  if (modalType === 'charactorgallery') {
+    return <GalleryModal isOpen={isOpen} onClose={closeModal} />
   }
 
   return null

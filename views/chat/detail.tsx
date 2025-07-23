@@ -939,6 +939,13 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     router.push('/shop-recharge')
   }
 
+
+  const handleOpenGallery = () => {
+    console.log('handleOpenGallery')
+    // setSelectedCharacter(character as Character)
+    // openModal('charactorgallery')
+  }
+
   // 나머지 UI 부분은 이전과 동일하게 유지
   return (
     <div className="flex flex-col h-screen max-h-screen w-full bg-gray-50">
@@ -1259,10 +1266,32 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
               onClick={handleSaveImage}
             />
 
+            {/* 레벨 버튼 */}
+            
+
+            {/* 갤러리 버튼 */}
+            <div className='absolute top-2 right-2 flex items-center justify-center gap-4 z-30'>
+              <button
+                onClick={e => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleOpenGallery()
+                }}
+                className='text-white text-xs px-2 py-1 rounded-full'>
+                <div className='grid grid-cols-1 gap-2'>
+                  <FontAwesomeIcon icon={faImage} className='text-[14px] md:text-[20px]' />
+                  <span className="text-[14px] md:text-[20px]">{character.multi_image_count || 0}</span>
+                </div>
+              </button>
+            </div>
+
             {/* 이미지 저장 버튼 - 호버 시에만 표시 */}
             <div
               className="absolute bottom-16 right-4 bg-black/70 rounded-full p-3 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity z-30"
-              onClick={handleSaveImage}
+              onClick={e => {
+                e.stopPropagation()
+                handleSaveImage()
+              }}
               title="이미지 저장하기"
             >
               <FontAwesomeIcon icon={faDownload} className="text-white text-lg" />
@@ -1290,6 +1319,28 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             backgroundPosition: 'center',
           }}
         >
+          {/* 상단 버튼 */}
+          <div className='relative'>
+            {/* 모바일 전용 갤러리 버튼 */}
+            {isMobile &&
+              <div className='absolute top-2 right-2 flex items-center justify-center gap-4 z-30 border rounded'>
+                <button
+                  onClick={e => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    handleOpenGallery()
+                  }}
+                  className='text-white text-xs px-2 py-1 rounded-full'>
+                  <div className='grid grid-cols-1 gap-2'>
+                    <FontAwesomeIcon icon={faImage} className='text-[14px] md:text-[20px]' />
+                    <span className="text-[14px] md:text-[20px]">{character.multi_image_count || 0}</span>
+                  </div>
+                </button>
+              </div>
+            }
+          </div>
+
+
           {/* 연결 상태 표시 */}
           {!isConnected && !isConnecting && (
             <div className="bg-red-50 p-3 border-b border-red-100 flex flex-col items-center md:flex-row md:justify-between gap-2">
@@ -1433,6 +1484,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
           {/* 메시지 입력 */}
           <div className="bg-white p-4 border-t border-gray-200 shadow-sm">
+            
             <form onSubmit={handleSendMessage} className="flex items-center max-w-3xl mx-auto">
               {/* 상황 설명 버튼 (별표 아이콘) */}
               <button

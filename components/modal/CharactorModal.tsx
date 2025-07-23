@@ -10,6 +10,7 @@ import {
   faUser,
   faPlus,
   faUserEdit,
+  faImage,
 } from '@fortawesome/free-solid-svg-icons'
 import { Siren } from 'lucide-react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -68,35 +69,11 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
     refetch,
   } = ReqGetChatBot(Number(selectedCharacter?.id))
 
-  const bridgeExampleData = (exampleData: string) => {
-    try {
-      if (!exampleData) return []
-
-      // JSON 파싱
-      const parsedData = JSON.parse(exampleData)
-      const { titles, examples } = parsedData
-
-      return examples.map((item: any, index: number) => {
-        const title = titles[index] || `대화 예시 ${index + 1}`
-        const user = item.example.find((msg: any) => msg.speaker === '{{user}}')?.message || ''
-        const character = item.example.find((msg: any) => msg.speaker === '{{char}}')?.message || ''
-
-        return {
-          title,
-          User: user,
-          Character: character,
-        }
-      })
-    } catch (error) {
-      console.error('대화 예시 파싱 에러:', error)
-      return []
-    }
-  }
 
   const exampleDatas = chatBotData?.chrbot?.example ? parseConversationExamples(chatBotData.chrbot.example) : []
   const isExampleShow = chatBotData?.chrbot?.example_show_yn === 1 && exampleDatas.length > 0 ? 1 : 0
 
-  const content = getChangeNameTag(chatBotData?.chrbot?.content || '', selectedCharacter?.name || '')
+  const content = getChangeNameTag(chatBotData?.chrbot?.content_public || '', selectedCharacter?.name || '')
   const isContentShow = chatBotData?.chrbot?.content_show_yn === 1 && content !== '' ? 1 : 0
 
   useEffect(() => {
@@ -205,6 +182,12 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
     onClose()
   }
 
+  const handleOpenGallery = () => {
+    console.log('handleOpenGallery')
+    // onClose()
+    // openModal('charactorgallery')
+  }
+
   if (!selectedCharacter) return null
 
   return (
@@ -221,7 +204,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
       <div className="sticky top-0 z-[102] bg-white dark:bg-dark-background-light border-b border-secondary-100 dark:border-dark-secondary-800">
         <div className="flex items-center justify-between py-4 px-4">
           <h1 className="text-md md:text-xl font-bold text-secondary-900 dark:text-dark-secondary-100">
-            {selectedCharacter.name || '이름 없음'}
+            {selectedCharacter.subject || selectedCharacter.name}
           </h1>
           <div className="flex items-center gap-2">
             {variant === 'default' ? (
@@ -289,6 +272,35 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                           <Image src="/images/flames.png" alt="성인인증" width={27.7} height={35.3} />
                         </div>
                       )}
+
+                      {/* 갤러리 버튼 */}
+                      <div className='absolute bottom-2 left-2 flex items-center justify-center gap-4 z-30'>
+                        {selectedCharacter.multi_image_count > 0 &&
+                          <button
+                            onClick={handleOpenGallery}
+                            className='text-white text-xs px-2 py-1 rounded-full bg-gray-500/50'>
+                            <div className='flex items-center justify-center gap-2'>
+                              <FontAwesomeIcon icon={faImage} className='text-[14px] md:text-[20px]' />
+                              <span className="text-[14px] md:text-[20px]">{selectedCharacter.multi_image_count || 0}</span>
+                            </div>
+                          </button>
+                        }
+
+                        {/* Level */}
+                        {selectedCharacter.likeability_yn === 1 &&
+                          <div className='flex items-center justify-center gap-2 text-white text-xs px-2 py-1 rounded-full bg-gray-500/50'>
+                            <Image
+                              src="/images/icons/like_icon_white.png"
+                              alt="레벨 아이콘"
+                              width={isMobile ? 14 : 20}
+                              height={isMobile ? 14 : 20}
+                              className='p-0 m-0'
+                            />
+                            <span className="text-[14px] md:text-[20px]">Lv.{selectedCharacter.likeability_max_lv || 0}</span>
+                          </div>
+                        }
+                      </div>
+
                     </div>
                   </div>
                 </>
@@ -488,6 +500,20 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   </div>
                 </div>
               </div>
+
+              {/* 네 번째 섹션: 작가의 말 */}
+              {selectedCharacter.writer_note && selectedCharacter.writer_note.length > 0 && (
+              <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm mb-4 border border-secondary-100 dark:border-dark-secondary-800/30">
+                <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
+                  <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
+                  작가의 말
+                </h3>
+                <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed whitespace-pre-wrap break-words">
+                {selectedCharacter.writer_note}
+                </p>
+              </div>
+              )}
+
             </div>
           </div>
 
@@ -543,6 +569,34 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                               <Image src="/images/flames.png" alt="성인인증" width={27.7} height={35.3} />
                             </div>
                           )}
+
+                          {/* 갤러리 버튼 */}
+                          <div className='absolute bottom-2 left-2 flex items-center justify-center gap-4 z-30'>
+                            {selectedCharacter.multi_image_count > 0 &&
+                              <button
+                                onClick={handleOpenGallery}
+                                className='text-white text-xs px-2 py-1 rounded-full bg-gray-500/50'>
+                                <div className='flex items-center justify-center gap-2'>
+                                  <FontAwesomeIcon icon={faImage} className='text-[14px] md:text-[20px]' />
+                                  <span className="text-[14px] md:text-[20px]">{selectedCharacter.multi_image_count || 0}</span>
+                                </div>
+                              </button>
+                            }
+
+                            {/* Level */}
+                            {selectedCharacter.likeability_yn === 1 &&
+                              <div className='flex items-center justify-center gap-2 text-white text-xs px-2 py-1 rounded-full bg-gray-500/50'>
+                                <Image
+                                  src="/images/icons/like_icon_white.png"
+                                  alt="레벨 아이콘"
+                                  width={isMobile ? 14 : 20}
+                                  height={isMobile ? 14 : 20}
+                                  className='p-0 m-0'
+                                />
+                                <span className="text-[14px] md:text-[20px]">Lv.{selectedCharacter.likeability_max_lv || 0}</span>
+                              </div>
+                            }
+                          </div>
                         </div>
                       </div>
                     </>
@@ -718,6 +772,19 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                     </div>
                   </div>
                 </div>
+
+                              {/* 네 번째 섹션: 작가의 말 */}
+                {selectedCharacter.writer_note && selectedCharacter.writer_note.length > 0 && (
+                <div className="bg-white dark:bg-dark-secondary-900/30 rounded-lg p-5 shadow-sm mb-4 border border-secondary-100 dark:border-dark-secondary-800/30">
+                  <h3 className="text-lg font-semibold text-secondary-900 dark:text-dark-secondary-100 mb-3 flex items-center">
+                    <span className="w-1.5 h-5 bg-primary-500 rounded-full mr-2 inline-block"></span>
+                    작가의 말
+                  </h3>
+                  <p className="text-secondary-700 dark:text-dark-secondary-300 text-sm leading-relaxed whitespace-pre-wrap break-words">
+                  {selectedCharacter.writer_note}
+                  </p>
+                </div>
+                )}
               </div>
             </div>
 

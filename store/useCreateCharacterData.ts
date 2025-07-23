@@ -4,6 +4,8 @@ import { create } from 'zustand'
 import { createApi, contentApi } from '@/services/api'
 import { toast } from 'react-toastify'
 import { bridgeCharacterInProgressToCharacter, exampleDatas, exampleDatasToConversationJson } from '@/lib/utils/storyNationUtil'
+import type { LikeAbilityData, MultiImageData } from '@/services/define'
+
 
 export type CharacterGender = 'male' | 'female' | 'unspecified'
 export type CharacterVisibility = 'public' | 'private'
@@ -39,6 +41,7 @@ export interface Tag {
 export interface CharacterFormData {
   // 기본 설정
   name: string
+  subject: string
   gender: CharacterGender
   visibility: CharacterVisibility
   rating: CharacterRating
@@ -49,7 +52,9 @@ export interface CharacterFormData {
   detailVisibility: CharacterVisibility
 
   // 상세 설정
-  bioDetail: string
+  content: string
+  content_public: string
+
   conversationExamples: exampleDatas[]
 
   // 이미지 설정 - 경로만 저장
@@ -60,6 +65,18 @@ export interface CharacterFormData {
   world_list_detail_chrbot_key?: string
   isVisibilityLock?: boolean
 
+  likeability_yn?: number
+  likeabilities?: LikeAbilityData[]
+  likeability_max_lv?: number
+
+
+  // 멀티이미지
+  multi_image_count: number
+  multi_images: MultiImageData[]
+  property: string
+
+  writer_note: string
+
   // 추가 속성을 위한 인덱스 시그니처
   [key: string]: any
 }
@@ -67,7 +84,7 @@ export interface CharacterFormData {
 // CreateCharacterStore 인터페이스 정의
 interface CreateCharacterStore {
   // 현재 활성화된 탭
-  activeTab: 'basic' | 'detail' | 'image'
+  activeTab: 'basic' | 'detail' | 'image' | 'last'
 
   // 폼 데이터
   formData: CharacterFormData
@@ -85,7 +102,7 @@ interface CreateCharacterStore {
   error: any
 
   // 함수들
-  setActiveTab: (tab: 'basic' | 'detail' | 'image') => void
+  setActiveTab: (tab: 'basic' | 'detail' | 'image' | 'last') => void
   setFormField: <K extends keyof CharacterFormData>(field: K, value: CharacterFormData[K]) => void
   addHashtag: (tag: string) => Promise<boolean>
   removeHashtag: (tag: string) => Promise<boolean>
@@ -105,8 +122,30 @@ interface CreateCharacterStore {
   fetchInProgressData: (characterId: number | null) => Promise<void>
   fetchTagList: () => Promise<void>
   saveInProgress: (finishYn?: number) => Promise<boolean>
+  saveMultiImages: () => Promise<boolean>
   saveHashtags: () => Promise<boolean>
+  saveProperty: () => Promise<boolean>
   resetForm: () => void
+  
+
+
+
+  // 호감도
+  updateLikeAbilityData: (data: LikeAbilityData) => void
+  updateLikeAbilityLevel: (lv: number) => void
+
+  // 멀티이미지 관련
+  updateMultiImageDatas: (data: MultiImageData[]) => void
+  updateMultiImageData: (data: any) => void
+  addMultiImageDatas: (data: MultiImageData[]) => void
+
+  deleteMultiImageData: (idx: number, lv: number, chrbot_multi_image_key: number, img_url: string) => void
+  changeMultiImageShow: (idx: number, lv: number, chrbot_multi_image_key: number, img_url: string) => void
+  changeMultiImageDefault: (idx: number, lv: number, chrbot_multi_image_key: number, img_url: string) => void
+  changeMultiImageRules: (idx: number, lv: number, chrbot_multi_image_key: number, img_url: string, rules: string) => void
+  changeMultiImageImage: (idx: number, lv: number, chrbot_multi_image_key: number, img_url: string, url_path: string) => void
+
+  checkValidData: (type: 'basic' | 'detail' | 'image' | 'last') => boolean
 }
 
 // 고유 ID 생성 함수
@@ -115,19 +154,32 @@ const generateId = () => Math.random().toString(36).substring(2, 11)
 // 기본값 정의
 const defaultFormData: CharacterFormData = {
   name: '',
+  subject: '',
   gender: 'unspecified',
   visibility: 'private',
   examplesVisibility: 'private',
   detailVisibility: 'public',
   rating: 'all',
   bio: '',
+  content: '',
+  content_public: '',
+  
   firstMessage: '',
   hashtags: [],
-  bioDetail: '',
   conversationExamples: [],
   imgUrl: '',
   imgUrlNsfw: '',
   isVisibilityLock: false,
+
+  likeability_yn: 0,
+  likeabilities: [],
+  likeability_max_lv: 0,
+
+  multi_image_count: 0,
+  multi_images: [],
+  property: '',
+
+  writer_note: '',
 }
 
 // CreateCharacterStore 생성
@@ -265,7 +317,297 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
       },
     }))
   },
-  
+
+  updateLikeAbilityData: (data: LikeAbilityData) => {
+    console.log('변경 전 데이타 :: ', get().formData.likeabilities)
+
+    set(state => ({
+      formData: {
+        ...state.formData,
+        likeabilities: state.formData.likeabilities?.map(item => item.lv === data.lv ? data : item) || [],
+      },
+    }))
+
+    console.log('변경 후 데이타 :: ', get().formData.likeabilities)
+  },
+
+
+  updateLikeAbilityLevel: (lv: number) => {
+    const currentMaxLv = get().formData.likeability_max_lv || 0
+    const beforeLikeabilities = get().formData.likeabilities || []
+    
+    // ✅ 최대 레벨 설정
+    set(state => ({
+      formData: {
+        ...state.formData,
+        likeability_max_lv: lv,
+      },
+    }))
+
+    // 레벨 변경 후 데이터 추가
+    // 레벨 변경되는 값을 본 뒤 기존 데이터는 남겨두고
+    // 레벨이 전보다 높아졌으면 빈 데이터를 추가
+    // 레벨이 전보다 낮아졌으면 데이터 삭제
+
+    let newLikeabilities = [...beforeLikeabilities]
+
+    if (lv > currentMaxLv) {
+      for (let i = currentMaxLv + 1; i <= lv; i++) {
+        const existingItem = newLikeabilities.find(item => item.lv === i)
+        if (!existingItem) {
+          newLikeabilities.push({
+            lv: i,
+            features: '',
+            lv_name: ``,
+            rules: '',
+            world_list_detail_chrbot_key: Number(get().formData.world_list_detail_chrbot_key) || 0,
+          })
+        }
+      }
+    } else if (lv < currentMaxLv) {
+      newLikeabilities = newLikeabilities.filter(item => item.lv <= lv)
+    }
+
+    // ✅ 레벨 순서로 정렬
+    newLikeabilities.sort((a, b) => a.lv - b.lv)
+
+    // ✅ 상태 업데이트
+    set(state => ({
+      formData: {
+        ...state.formData,
+        likeabilities: newLikeabilities,
+      },
+    }))
+  },
+
+
+  // 멀티이미지 관련
+  updateMultiImageData: (data: MultiImageData) => {
+    set(state => ({
+      formData: {
+        ...state.formData,
+        multi_images: state.formData.multi_images.map(item => item.chrbot_multi_image_key === data.chrbot_multi_image_key ? data : item),
+      },
+    }))
+    console.log('updateMultiImageData :: ' , get().formData.multi_images)
+  },
+
+  updateMultiImageDatas: (data: MultiImageData[]) => {
+    set(state => ({
+      formData: {
+        ...state.formData,
+        multi_images: data,
+      },
+    }))
+  },
+
+
+  addMultiImageDatas: (data: MultiImageData[]) => {
+    set(state => ({
+      formData: {
+        ...state.formData,
+        multi_images: [...state.formData.multi_images, ...data],
+      },
+    }))
+  },
+
+
+  deleteMultiImageData: (idx: number, lv: number, chrbot_multi_image_key: number, img_url: string) => {
+    const deleteData = get().formData.multi_images.find(
+      (item) => item.img_url === img_url &&
+      item.lv === lv &&
+      item.chrbot_multi_image_key === chrbot_multi_image_key &&
+      item.idx === idx
+    )
+    
+    set(state => ({
+      formData: {
+        ...state.formData,
+        multi_images: state.formData.multi_images.filter(
+          (item) => item !== deleteData),
+      },
+    }))
+  },
+
+
+
+  changeMultiImageShow: (idx: number, lv: number, chrbot_multi_image_key: number, img_url: string) => {
+    const changeData = get().formData.multi_images.find(
+      (item) => item.img_url === img_url &&
+      item.lv === lv &&
+      item.chrbot_multi_image_key === chrbot_multi_image_key &&
+      item.idx === idx
+    )
+
+    set(state => ({
+      formData: {
+        ...state.formData,
+        multi_images: state.formData.multi_images.map(item => item === changeData ? { ...item, show_yn: item.show_yn === 1 ? 0 : 1 } : item),
+      },
+    }))
+  },
+
+  changeMultiImageDefault: (idx: number, lv: number, chrbot_multi_image_key: number, img_url: string) => {
+    const changeData = get().formData.multi_images.find(
+      (item) => item.img_url === img_url &&
+      item.lv === lv &&
+      item.chrbot_multi_image_key === chrbot_multi_image_key &&
+      item.idx === idx
+    )
+
+
+    // 해당 레벨의 모든 데이터의 default_yn을 0으로 변경
+    const changeDatas = get().formData.multi_images.filter((item) => item.lv === lv)
+    changeDatas.forEach((item) => {
+			if (item.default_yn === 1) {
+				get().updateMultiImageData({
+					...item,
+					default_yn: 0
+				})
+			}
+		})
+
+    set(state => ({
+      formData: {
+        ...state.formData,
+        multi_images: state.formData.multi_images.map(item => item === changeData ? { ...item, default_yn: item.default_yn === 1 ? 0 : 1 } : item),
+      },
+    }))
+
+    set(state => ({
+      formData: {
+        ...state.formData,
+        multi_images: state.formData.multi_images.map(item => item === changeData ? { ...item, default_yn: item.default_yn === 1 ? 0 : 1 } : item),
+      },
+    }))
+  },
+
+
+  changeMultiImageRules: (idx: number, lv: number, chrbot_multi_image_key: number, img_url: string, rules: string) => {
+    const changeData = get().formData.multi_images.find(
+      (item) => item.img_url === img_url &&
+      item.lv === lv &&
+      item.chrbot_multi_image_key === chrbot_multi_image_key &&
+      item.idx === idx
+    )
+
+    set(state => ({
+      formData: {
+        ...state.formData,
+        multi_images: state.formData.multi_images.map(item => item === changeData ? { ...item, rules: rules } : item),
+      },
+    }))
+  },
+
+
+  changeMultiImageImage: (idx: number, lv: number, chrbot_multi_image_key: number, img_url: string, url_path: string) => {
+    const changeData = get().formData.multi_images.find(
+      (item) => item.img_url === img_url &&
+      item.lv === lv &&
+      item.chrbot_multi_image_key === chrbot_multi_image_key &&
+      item.idx === idx
+    )
+
+    set(state => ({
+      formData: {
+        ...state.formData,
+        multi_images: state.formData.multi_images.map(item => item === changeData ? { ...item, img_url: url_path } : item),
+      },
+    }))
+  },
+
+
+  checkValidData: (type: 'basic' | 'detail' | 'image' | 'last') => {
+    const { formData } = get()
+    const nextTab = type
+    const currentTab = get().activeTab
+
+    /**
+     * 현재 탭 상황을 체크 type이 전단계로 가려고하면 통과
+     */
+    switch(currentTab) {
+      case 'basic':
+        {
+          if(formData.imgUrl === '') {
+            console.log('@@@@ imgUrl :: ', formData.imgUrl)
+            return false
+          }
+          if(formData.name.trim() === '') {
+            console.log('@@@@ name :: ', formData.name)
+            return false
+          }
+          if(formData.bio.trim() === '') {
+            console.log('@@@@ bio :: ', formData.bio)
+            return false
+          }
+          if(formData.firstMessage.trim() === '') {
+            console.log('@@@@ firstMessage :: ', formData.firstMessage)
+            return false
+          }
+          if(formData.hashtags.length === 0) {
+            console.log('@@@@ hashtags :: ', formData.hashtags)
+            return false
+          }
+        }
+        break;
+
+      case 'detail':
+        {
+          if(nextTab === 'basic') return true
+
+          if(formData.likeability_yn === 1) {
+            if(formData.likeabilities && formData.likeabilities.length !== 0) {
+              for(const item of formData.likeabilities) {
+                if(item.lv_name.trim() === '') {
+                  return false
+                }
+                if(item.features.trim() === '') {
+                  return false
+                }
+                if(item.rules.trim() === '') {
+                  return false
+                }
+              }
+            }
+          }
+        }
+        break;
+
+      case 'image':
+        {
+          if(nextTab === 'basic') return true
+          if(nextTab === 'detail') return true
+
+          console.log('@@@@ formData.multi_images :: ', formData.multi_images)
+
+          if(formData.multi_images.length !== 0) {
+            let checkImages: any[] = []
+
+            if(formData.likeability_yn === 1) {
+              checkImages = formData.multi_images.filter(item => item.lv > 0)
+            }
+            else {
+              checkImages = formData.multi_images.filter(item => item.lv === 0)
+            }
+            
+            for(const item of checkImages) {
+              if(item.default_yn !== 1) {
+                if(item.img_url.trim() !== '') {
+                  if(item.rules.trim() === '') {
+                    return false
+                  }
+                }
+              }
+            }
+          }
+        }
+        break;
+    }
+    
+    return true
+  },
+
+
   // 이미지 관련 함수들
   setNormalImage: (path: string) =>
     set(state => {
@@ -381,8 +723,6 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
       set({ isSaving: true })
 
       const { formData } = get()
-      console.log('formData : ', formData)
-
       const isLock = formData.finish_yn === 1 && formData.visibility === 'public'
 
       // 폼 데이터에서 API 요청에 필요한 데이터 추출
@@ -393,10 +733,12 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         // 성인 이미지 URL (있는 경우에만 포함)
         img_url_nsfw: formData.imgUrlNsfw || '',
         title: formData.name || '',
+        subject: formData.subject || '',
         gender: formData.gender === 'male' ? 1 : formData.gender === 'female' ? 2 : 0,
         intro: formData.bio || '',
         first_talk: formData.firstMessage || '',
-        content: formData.bioDetail || '',
+        content: formData.content || '',
+        content_public: formData.content_public || '',
         // 대화 예시 - 없는 경우 빈 문자열 전달
         example:
           formData.conversationExamples && formData.conversationExamples.length > 0
@@ -417,32 +759,49 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
             : 0,
 
         finish_yn: formData.finish_yn ? formData.finish_yn : finishYn,
+
+        likeability_yn: formData.likeability_yn || 0,
+        likeabilities: formData.likeabilities || [],
         isVisibilityLock: isLock,
+
+        writer_note: formData.writer_note || '',
       }
 
-
-      // API 호출
-      const response = await createApi.SaveInProgress(
-        payload.world_list_detail_chrbot_key,
-        payload.img_url,
-        payload.title,
-        payload.gender,
-        payload.intro,
-        payload.first_talk,
-        payload.content,
-        payload.example,
-        payload.nsfw,
-        payload.img_url_nsfw,
-        payload.show_yn,
-        payload.content_show_yn,
-        payload.example_show_yn,
-        payload.finish_yn
-      )
-
-
+      const jsonData = JSON.stringify(payload.likeabilities)
+      const pako = require('pako');
+		  const gzip = pako.gzip(jsonData)  // ✅ gzip 압축 사용
+      const imageFile = new File([gzip], 'multiimage.txt', {
+        type: 'application/gzip',
+      });
       
+      // ✅ Postman과 똑같이 FormData로 전체 변경
+      const apiFormData = new FormData()
+      {
+        // 모든 필드를 FormData에 추가 (Postman과 동일하게)
+        apiFormData.append('world_list_detail_chrbot_key', payload.world_list_detail_chrbot_key)
+        apiFormData.append('content', payload.content)
+        apiFormData.append('content_public', payload.content_public)
+        apiFormData.append('content_show_yn', payload.content_show_yn.toString())
+        apiFormData.append('example', payload.example)
+        apiFormData.append('example_show_yn', payload.example_show_yn.toString())
+        apiFormData.append('finish_yn', payload.finish_yn.toString())
+        apiFormData.append('first_talk', payload.first_talk)
+        apiFormData.append('gender', payload.gender.toString())
+        apiFormData.append('image', imageFile)  // ✅ File 객체로 추가
+        apiFormData.append('img_url', payload.img_url)
+        apiFormData.append('img_url_nsfw', payload.img_url_nsfw)
+        apiFormData.append('intro', payload.intro)
+        apiFormData.append('likeability_yn', payload.likeability_yn.toString())
+        apiFormData.append('nsfw', payload.nsfw.toString())
+        apiFormData.append('show_yn', payload.show_yn.toString())
+        apiFormData.append('subject', payload.subject)
+        apiFormData.append('title', payload.title)
+        apiFormData.append('writer_note', payload.writer_note)
+      }
       
 
+      // API 호출 (FormData 전송)
+      const response = await createApi.SaveInProgressFormData(apiFormData)
       if (!response.data || (response.data.result && response.data.result.err !== 0)) {
         throw new Error(response.data?.result?.msg || '저장에 실패했습니다.')
       }
@@ -464,6 +823,17 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         }
       }
 
+
+      // property 저장
+      if(finishYn === 1) {
+        try {
+          await get().saveProperty()
+        } catch (propertyError) {
+          console.error('property 저장 실패:', propertyError)
+        }
+      }
+      
+
       return true
     } catch (error) {
       console.error('저장 실패:', error)
@@ -473,6 +843,78 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
     } finally {
       set({ isSaving: false })
     }
+  },
+
+
+  saveProperty: async () => {
+    interface PropertyData {
+      img_selected_key: number
+      img_selected_url: string
+      img_public_key: number[]
+    }
+
+    const { formData } = get()
+
+    if(formData.multi_images.length === 0) {
+      return false
+    }
+
+    const _img_public_key = formData.multi_images
+    .filter(item => (item.show_yn === 1 && item.chrbot_multi_image_key > 0))
+    .map(item => item.chrbot_multi_image_key)
+
+    const propertyData: PropertyData = {
+      img_selected_key: formData.multi_images[0].chrbot_multi_image_key || 0,
+      img_selected_url: formData.multi_images[0].img_url || '',
+      img_public_key: _img_public_key,
+    }
+
+    console.log('saveProperty :: ' , propertyData)
+
+    const apiFormData = new FormData()
+    {
+      // 모든 필드를 FormData에 추가 (Postman과 동일하게)
+      apiFormData.append('world_list_detail_chrbot_key', formData.world_list_detail_chrbot_key || '')
+      apiFormData.append('property', JSON.stringify(propertyData) || '')
+    }
+
+    const response = await createApi.SaveInProgressFormData(apiFormData)
+    if (!response.data || (response.data.result && response.data.result.err !== 0)) {
+      throw new Error(response.data?.result?.msg || '저장에 실패했습니다.')
+    }
+
+    return true
+  },
+
+
+  saveMultiImages: async () => {
+    console.log('saveMultiImages')
+    
+    const { formData } = get()
+    const multiImagesWithIdx = formData.multi_images.map(item => ({
+      ...item,
+      idx: item.idx !== undefined ? item.idx : 0  // idx가 없으면 0으로 초기화
+    }))
+
+    const jsonData = JSON.stringify(multiImagesWithIdx)
+    const pako = require('pako');
+    const gzip = pako.gzip(jsonData)  // ✅ gzip 압축 사용
+    const imageFile = new File([gzip], 'multiimage.txt', {
+      type: 'application/gzip',
+    });
+
+    const apiFormData = new FormData()
+    {
+      apiFormData.append('world_list_detail_chrbot_key', formData.world_list_detail_chrbot_key || '')
+      apiFormData.append('likeability_yn', formData.likeability_yn?.toString() || '')
+      apiFormData.append('image', imageFile)  // ✅ File 객체로 추가
+    }
+    const response = await createApi.SaveMultiImageData(apiFormData)
+    if (!response.data || (response.data.result && response.data.result.err !== 0)) {
+      throw new Error(response.data?.result?.msg || '저장에 실패했습니다.')
+    }
+    
+    return true
   },
 
   saveHashtags: async () => {
@@ -535,7 +977,7 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
 }))
 
 // 폼 유효성 검사 함수
-export const isFormValid = (formData: CharacterFormData, tab: 'basic' | 'detail' | 'image'): boolean => {
+export const isFormValid = (formData: CharacterFormData, tab: 'basic' | 'detail' | 'image' | 'last'): boolean => {
   if (tab === 'image') {
     // 기본 정보 필드 검증
     const basicInfoValid = !!(

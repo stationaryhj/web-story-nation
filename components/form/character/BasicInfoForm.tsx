@@ -1,52 +1,48 @@
 'use client'
 
 import React, { useEffect, useMemo, useState } from 'react'
-import { faCheck, faPlus } from '@fortawesome/free-solid-svg-icons'
+import Image from 'next/image'
+import { Trash2, ArrowRight } from 'lucide-react'
+import { faCheck, faPlus, faUpload } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import type { ChangeEvent } from 'react'
-
 import { RequiredLabel } from '../CharacterForm'
 import { useAccountStore } from '@/store/useAccountStore'
+import { useModalStore } from '@/store/useStoreModal'
+import { useCreateCharacterData } from '@/store/useCreateCharacterData'
 import { Tag } from '@/store/useCreateCharacterData'
 import ConfirmActionModal from '../../modal/ConfirmActionModal'
 import { toast } from 'react-toastify'
 import RatingSelect from './RatingSelect'
-import { useModalStore } from '@/store/useStoreModal'
+
+import { contentApi } from '@/services/api'
+import { getImageUri, uploadImages } from '@/lib/utils/storyNationUtil'
+
+const MAX_FIRST_MESSAGE_LENGTH = 700
 
 interface BasicInfoFormProps {
-  formData: any
-  setFormField: (name: string, value: any) => void
-  addHashtag: (tag: string) => Promise<boolean>
-  removeHashtag: (tag: string) => Promise<boolean>
-  addCustomTag: (tag: string) => Promise<boolean>
-  fetchTagList: () => Promise<void>
-  saveHashtags: () => Promise<boolean>
   availableTags: Tag[]
   isLoadingTags: boolean
-  onValidationChange?: (isValid: boolean) => void
   invalidFields?: { [key: string]: boolean }
   privateOpenCharacterCount?: number
+  onValidationChange?: (isValid: boolean) => void
 }
 
 export default function BasicInfoForm({
-  formData,
-  setFormField,
-  addHashtag,
-  removeHashtag,
-  addCustomTag,
-  fetchTagList,
-  saveHashtags,
   availableTags,
   isLoadingTags,
-  onValidationChange,
   invalidFields = {},
   privateOpenCharacterCount = 0,
+  onValidationChange,
 }: BasicInfoFormProps) {
+  const { formData, setFormField, addHashtag, removeHashtag, saveHashtags, fetchTagList } = useCreateCharacterData()
+  const { isAdult } = useAccountStore()
+  const { openModal } = useModalStore()
+
   const [visibleWarnigModal, setVisibleWarnigModal] = useState(false)
   const [customTagInput, setCustomTagInput] = useState('')
-  const { isAdult } = useAccountStore()
   const isAdultModeEnabled = isAdult()
-  const { openModal } = useModalStore()
+
 
   // 태그 데이터 로드
   useEffect(() => {
@@ -84,7 +80,9 @@ export default function BasicInfoForm({
 
     // 글자 수 제한 검사
     if (name === 'name' && value.length > 25) return
-    if ((name === 'bio' || name === 'firstMessage') && value.length > 80) return
+    if (name === 'subject' && value.length > 25) return
+    if (name === 'bio' && value.length > 80) return
+    if (name === 'firstMessage' && value.length > MAX_FIRST_MESSAGE_LENGTH) return
 
     setFormField(name as any, value)
   }
@@ -148,7 +146,7 @@ export default function BasicInfoForm({
   // 사용자 정의 태그 추가 핸들러
   const handleAddCustomTag = async () => {
     if (customTagInput.trim()) {
-      const success = await addCustomTag(customTagInput.trim())
+      const success = await addHashtag(customTagInput.trim())
       if (success) {
         setCustomTagInput('') // 성공 시 입력 필드 초기화
       }
@@ -167,6 +165,45 @@ export default function BasicInfoForm({
     if (e.key === 'Enter') {
       e.preventDefault()
       handleAddCustomTag()
+    }
+  }
+
+
+  const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // 파일 크기 확인 (10MB 이하)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('파일 크기는 10MB 이하여야 합니다')
+      return
+    }
+
+    try {
+      const extension = file.name.split('.').pop()?.toLowerCase()
+      const contentType = file.type
+
+      if (!contentType.startsWith('image/')) {
+        toast.error('이미지 파일만 업로드할 수 있습니다')
+        return
+      }
+
+      const presignedResponse = await contentApi.GetPresignedUrl(file.name, `.${extension || 'jpg'}`, 5)
+      if (presignedResponse.data.result.err !== 0 || !presignedResponse.data.presignedUrl) {
+        throw new Error('이미지 업로드를 위한 URL을 받아오지 못했습니다')
+      }
+
+      const presignedUrl = presignedResponse.data.presignedUrl
+      const s3FilePath = presignedResponse.data.path
+
+
+      await uploadImages(file, presignedUrl)
+      console.log('완료')
+
+      setFormField('imgUrl', s3FilePath)
+    }
+    catch(error) {
+      console.error(error)
     }
   }
 
@@ -191,6 +228,62 @@ export default function BasicInfoForm({
       <div className="space-y-8">
         {/* 기본 설정 */}
         <div className="space-y-6">
+          {/* 기본이미지 */}
+          <div className="flex flex-col justify-center w-full">
+
+            <RequiredLabel>
+              <label className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
+                기본 이미지
+              </label>
+            </RequiredLabel>
+
+            <div className="relative aspect-[3/4] rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500 w-full md:max-w-[300px] mx-auto">
+              
+              {/* 이미지 표시 */}
+              {formData.imgUrl ? (
+                <label className="cursor-pointer block">
+                  <Image
+                    src={getImageUri(formData.imgUrl)}
+                    alt="캐릭터 일반 이미지"
+                    fill
+                    className="object-cover"
+                  />
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => handleImageUpload(e)}
+                    className="hidden"
+                  />
+                </label>
+              ) : (
+                <label
+                  className={`relative aspect-[3/4] rounded-lg overflow-hidden w-full md:max-w-[300px] mx-auto
+                    ${
+                    'border-secondary-300 dark:border-dark-secondary-300/20'
+                    // 'border-red-500 bg-red-50 dark:border-red-500/70 dark:bg-red-950/20'
+                    }
+                  cursor-pointer`}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => handleImageUpload(e)}
+                    className="hidden"
+                  />
+                  <div className="h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center">
+                    <FontAwesomeIcon icon={faUpload} className="w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2" />
+                    <span className="text-xs sm:text-sm">{formData.imgUrl ? '이미지 교체' : '이미지 업로드'}</span>
+                  </div>
+                </label>
+              )}
+            </div>
+
+            <div className="flex justify-center items-center">
+              <span className="text-xs text-secondary-500 dark:text-dark-secondary-500 mt-2">*초상권, 저작권 침해 이미지는 통보 없이 삭제될 수 있습니다.</span>
+            </div>
+          </div>
+
           {/* 이용등급 */}
           <RatingSelect rating={formData.rating} onRatingSelect={handleRatingSelect} />
 
@@ -207,6 +300,32 @@ export default function BasicInfoForm({
               value={formData.name}
               onChange={handleInputChange}
               placeholder="캐릭터의 이름을 입력하세요"
+              className={`mt-1 block w-full rounded-lg border ${
+                invalidFields.name
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                  : 'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
+              } px-4 py-3 text-secondary-900 placeholder-secondary-400 focus:outline-none focus:ring-1 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500`}
+              maxLength={25}
+            />
+          </div>
+
+
+          {/* 제목 */}
+          <div>
+            <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1">
+                <div className="text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
+                  <p className="font-bold">제목(선택)</p>
+                  <p className="text-xs text-secondary-400 dark:text-dark-secondary-400">캐릭터 목록에서 이름 대신 출력되는 제목이에요!</p>
+                </div>
+              </div>
+            </div>
+            <input
+              type="text"
+              name="subject"
+              value={formData.subject}
+              onChange={handleInputChange}
+              placeholder="제목을 입력하세요. 예) 영화관 데이트"
               className={`mt-1 block w-full rounded-lg border ${
                 invalidFields.name
                   ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
@@ -382,7 +501,7 @@ export default function BasicInfoForm({
               </RequiredLabel>
 
               <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-                {formData.firstMessage.length}/80
+                {formData.firstMessage.length}/{MAX_FIRST_MESSAGE_LENGTH}
               </span>
             </div>
             <p className="text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2">
@@ -400,7 +519,7 @@ export default function BasicInfoForm({
                   ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                   : 'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
               } dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none`}
-              maxLength={80}
+              maxLength={MAX_FIRST_MESSAGE_LENGTH}
             />
           </div>
 
