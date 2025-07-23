@@ -915,9 +915,16 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 text-red-600">
           <p>{error}</p>
         </div>
-        <BaseButton color="primary" onClick={() => router.refresh()}>
-          다시 시도
-        </BaseButton>
+
+        <div className='flex gap-2'>
+          <BaseButton color="primary" onClick={() => router.refresh()}>
+            다시 시도
+          </BaseButton>
+
+          <BaseButton color="primary" onClick={() => router.push('/')}>
+            첫 화면으로
+          </BaseButton>
+        </div>
       </div>
     )
   }

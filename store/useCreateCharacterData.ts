@@ -462,8 +462,6 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
       item.idx === idx
     )
 
-    console.log('@@@@ changeMultiImageDefault :: ', changeData)
-
 
     // 해당 레벨의 모든 데이터의 default_yn을 0으로 변경
     const changeDatas = get().formData.multi_images.filter((item) => item.lv === lv)

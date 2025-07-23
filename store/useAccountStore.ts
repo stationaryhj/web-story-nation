@@ -7,6 +7,7 @@ import { contentApi, createApi, settlementApi } from '@/services/api'
 import axios from 'axios'
 import { authService } from '@/services/auth'
 import { useSettingsStore } from '@/store/useStoreSettings'
+import { useChatModeStore } from '@/store/useStoreData'
 
 // 환경 변수에서 리다이렉트 URI 가져오기
 const REDIRECT_URI = process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URI
@@ -304,6 +305,12 @@ export const useAccountStore = create<AccountState>()(
             set({ writerInfo: response.data.book_writer })
           } else {
             console.error('작가 정보 가져오기 실패:', response.data?.result?.msg)
+          }
+
+          const responseChatMode = await contentApi.GetChatMode();
+
+          if(responseChatMode.data.result.err === 0) {
+            useChatModeStore.getState().setChatMode(responseChatMode.data.chat_mode)
           }
         } catch (error) {
           console.error('작가 정보 요청 중 오류 발생:', error)

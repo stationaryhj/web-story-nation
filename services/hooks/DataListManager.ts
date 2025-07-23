@@ -207,17 +207,17 @@ export const ReqGetCoinList = () => {
   return { data, isLoading, error, refetch }
 }
 
-export const ReqGetChatMode = () => {
-  const { data, isLoading, error, refetch } = useQuery<CharbotChatModeResponse>({
-    queryKey: ['chatMode'],
-    queryFn: async () => {
-      const response = await contentApi.GetChatMode()
-      return response.data as CharbotChatModeResponse
-    },
-  })
+// export const ReqGetChatMode = () => {
+//   const { data, isLoading, error, refetch } = useQuery<CharbotChatModeResponse>({
+//     queryKey: ['chatMode'],
+//     queryFn: async () => {
+//       const response = await contentApi.GetChatMode()
+//       return response.data as CharbotChatModeResponse
+//     },
+//   })
 
-  return { data, isLoading, error, refetch }
-}
+//   return { data, isLoading, error, refetch }
+// }
 
 export const ReqGetChatBot = (world_list_detail_chrbot_key: number) => {
   const { data, isLoading, error, refetch } = useQuery<CharbotResponse>({

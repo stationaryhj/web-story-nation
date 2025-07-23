@@ -120,6 +120,14 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               await useAccountStore.getState().updateUserInfoFromUserInfo2()
               await useAccountStore.getState().fetchWriterInfo()
 
+              const { data, logout } = useAccountStore.getState()
+              if(data && data.user_block_type === 1) {
+                toast.error('정지된 계정입니다.')
+                logout()
+                onClose()
+                return
+              }
+
               // 성공 시에만 모달 닫기
               onClose()
             }
