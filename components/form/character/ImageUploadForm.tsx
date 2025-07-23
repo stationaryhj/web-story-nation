@@ -1,90 +1,12 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
-import Image from 'next/image'
-// import pako from 'pako'
-
-import { toast } from 'react-toastify'
-import { MultiImageStructure } from '@/types/api'
+import React from 'react'
 import { useCreateCharacterData } from '@/store/useCreateCharacterData'
-
 import AddImageSection from './components/image/add-image-section'
 
 
-interface ImageUploadFormProps {
-  setFormField: (name: string, value: any) => void
-  setNormalImage: (path: string) => void
-  setAdultImage: (path: string) => void
-  setAdultNormalImage: (path: string) => void
-  onValidationChange?: (isValid: boolean) => void
-  invalidFields?: { [key: string]: boolean }
-  isSubmitting?: boolean
-}
-
-export default function ImageUploadForm({
-  setFormField,
-  setNormalImage,
-  setAdultImage,
-  setAdultNormalImage,
-  onValidationChange,
-  invalidFields,
-  isSubmitting,
-}: ImageUploadFormProps) {
+export default function ImageUploadForm() {
   const { formData } = useCreateCharacterData()
-  const toastShownRef = useRef(false)
-
-  // 제출 시도 시 유효성 검사 실패하면 toast 메시지 표시
-  useEffect(() => {
-    if (isSubmitting && invalidFields && 'image' in invalidFields && invalidFields.image && !toastShownRef.current) {
-      // 토스트 메시지가 이미 표시되었음을 표시
-      toastShownRef.current = true
-
-      if (formData.rating === 'adult') {
-        if (!formData.imgUrl && !formData.imgUrlNsfw) {
-          toast.error('기본 이미지와 짜릿 모드 이미지를 모두 업로드해주세요.')
-        } else if (!formData.imgUrl) {
-          toast.error('기본 이미지를 업로드해주세요.')
-        } else if (!formData.imgUrlNsfw) {
-          toast.error('짜릿 모드 이미지를 업로드해주세요.')
-        }
-      } else {
-        toast.error('캐릭터 이미지를 업로드해주세요.')
-      }
-    }
-
-    // isSubmitting이 false로 바뀌면 토스트 표시 상태 초기화
-    if (!isSubmitting) {
-      toastShownRef.current = false
-    }
-  }, [isSubmitting, invalidFields, formData.rating, formData.imgUrlNsfw])
-
-  // 유효성 검사
-  useEffect(() => {
-    if (onValidationChange) {
-      // 이미지 탭 유효성 검사
-      let isValid = false
-
-      // 이용등급에 따른 필수 이미지 확인
-      if (formData.rating === 'adult') {
-        // 성인 등급: imgNormal(기본 이미지)와 imgUrlNsfw(짜릿 모드 이미지) 모두 필요
-        isValid = !!(formData.imgUrl && formData.imgUrlNsfw)
-      } else {
-        // 전체 이용가: imgUrl(기본 이미지)만 필요
-        isValid = !!formData.imgUrl
-      }
-
-      // 유효성 검사 결과 전달
-      onValidationChange(isValid)
-
-      // 유효하지 않으면 invalidFields 업데이트 (props로 전달받은 경우)
-      if (invalidFields && typeof invalidFields === 'object') {
-        if ('image' in invalidFields) {
-          invalidFields.image = !isValid
-        }
-      }
-    }
-  }, [formData.rating, formData.imgUrl, formData.imgUrlNsfw, onValidationChange, invalidFields])
-
 
   return (
     <div className="space-y-6">

@@ -78,14 +78,7 @@ export default function CharacterForm({ mode, invalidFields = {}, isSubmitting =
 
   if (mode === 'image') {
     return (
-      <ImageUploadForm
-        setFormField={setFormField}
-        setNormalImage={setNormalImage}
-        setAdultImage={setAdultImage}
-        setAdultNormalImage={setAdultNormalImage}
-        invalidFields={invalidFields}
-        isSubmitting={isSubmitting}
-      />
+      <ImageUploadForm />
     )
   }
 
@@ -94,10 +87,6 @@ export default function CharacterForm({ mode, invalidFields = {}, isSubmitting =
     return (
       <LastInfoForm
         setFormField={setFormField}
-        addConversationExample={addConversationExample}
-        updateConversationExample={updateConversationExample}
-        removeConversationExample={removeConversationExample}
-        updateConversationExampleTitle={updateConversationExampleTitle}
       />
     )
   }

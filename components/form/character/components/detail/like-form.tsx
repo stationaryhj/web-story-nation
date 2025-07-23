@@ -8,7 +8,7 @@ const DEFAULT_MAX_LEVEL = 3
 
 
 export default function LikeForm() {
-	const { formData, setFormField, updateLikeAbilityLevel } = useCreateCharacterData()
+	const { isVaild, formData, setFormField, updateLikeAbilityLevel } = useCreateCharacterData()
 	const [isLikeabilityLock, setIsLikeabilityLock] = useState(false)
 	
 	const likeSystem = formData.likeability_yn

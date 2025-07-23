@@ -2,7 +2,6 @@
 
 import React, { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
-import { Trash2, ArrowRight } from 'lucide-react'
 import { faCheck, faPlus, faUpload } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import type { ChangeEvent } from 'react'
@@ -13,7 +12,6 @@ import { useCreateCharacterData } from '@/store/useCreateCharacterData'
 import { Tag } from '@/store/useCreateCharacterData'
 import ConfirmActionModal from '../../modal/ConfirmActionModal'
 import { toast } from 'react-toastify'
-import RatingSelect from './RatingSelect'
 
 import { contentApi } from '@/services/api'
 import { getImageUri, uploadImages } from '@/lib/utils/storyNationUtil'
@@ -35,13 +33,12 @@ export default function BasicInfoForm({
   privateOpenCharacterCount = 0,
   onValidationChange,
 }: BasicInfoFormProps) {
-  const { formData, setFormField, addHashtag, removeHashtag, saveHashtags, fetchTagList } = useCreateCharacterData()
+  const { isVaild, formData, setFormField, addHashtag, removeHashtag, saveHashtags, fetchTagList } = useCreateCharacterData()
   const { isAdult } = useAccountStore()
   const { openModal } = useModalStore()
 
   const [visibleWarnigModal, setVisibleWarnigModal] = useState(false)
   const [customTagInput, setCustomTagInput] = useState('')
-  const isAdultModeEnabled = isAdult()
 
 
   // 태그 데이터 로드
@@ -106,16 +103,6 @@ export default function BasicInfoForm({
     }
 
     setFormField('visibility', visibility)
-  }
-
-  // 이용등급 선택 핸들러
-  const handleRatingSelect = (rating: 'all' | 'adult') => {
-    if (rating === 'adult' && !isAdultModeEnabled) {
-      openModal('adultVerification')
-      return
-    }
-
-    setFormField('rating', rating)
   }
 
   // 해시태그 토글 핸들러
@@ -207,6 +194,11 @@ export default function BasicInfoForm({
     }
   }
 
+  
+  useEffect(() => {
+    console.log('@@@@ isVaild :: ', isVaild)
+  }, [isVaild])
+
   return (
     <>
       <ConfirmActionModal
@@ -237,7 +229,12 @@ export default function BasicInfoForm({
               </label>
             </RequiredLabel>
 
-            <div className="relative aspect-[3/4] rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500 w-full md:max-w-[300px] mx-auto">
+            <div
+            className={`relative aspect-[3/4] rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500 w-full md:max-w-[300px] mx-auto ${
+              isVaild && !formData.imgUrl ?
+                'border-red-500 bg-red-50 dark:border-red-500/70 dark:bg-red-950/20' :
+                ''
+            }`}>
               
               {/* 이미지 표시 */}
               {formData.imgUrl ? (
@@ -260,8 +257,10 @@ export default function BasicInfoForm({
                 <label
                   className={`relative aspect-[3/4] rounded-lg overflow-hidden w-full md:max-w-[300px] mx-auto
                     ${
-                    'border-secondary-300 dark:border-dark-secondary-300/20'
-                    // 'border-red-500 bg-red-50 dark:border-red-500/70 dark:bg-red-950/20'
+                      'border-red-500 bg-red-50 dark:border-red-500/70 dark:bg-red-950/20'
+                      // isVaild ?
+                      // 'border-red-500 bg-red-50 dark:border-red-500/70 dark:bg-red-950/20' :
+                      // 'border-secondary-300 dark:border-dark-secondary-300/20'
                     }
                   cursor-pointer`}
                 >
@@ -284,9 +283,6 @@ export default function BasicInfoForm({
             </div>
           </div>
 
-          {/* 이용등급 */}
-          <RatingSelect rating={formData.rating} onRatingSelect={handleRatingSelect} />
-
           {/* 이름 */}
           <div>
             <RequiredLabel>
@@ -301,7 +297,7 @@ export default function BasicInfoForm({
               onChange={handleInputChange}
               placeholder="캐릭터의 이름을 입력하세요"
               className={`mt-1 block w-full rounded-lg border ${
-                invalidFields.name
+                (isVaild && !formData.name)
                   ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                   : 'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
               } px-4 py-3 text-secondary-900 placeholder-secondary-400 focus:outline-none focus:ring-1 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500`}
@@ -327,9 +323,7 @@ export default function BasicInfoForm({
               onChange={handleInputChange}
               placeholder="제목을 입력하세요. 예) 영화관 데이트"
               className={`mt-1 block w-full rounded-lg border ${
-                invalidFields.name
-                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                  : 'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
+                'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
               } px-4 py-3 text-secondary-900 placeholder-secondary-400 focus:outline-none focus:ring-1 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500`}
               maxLength={25}
             />
@@ -480,7 +474,7 @@ export default function BasicInfoForm({
               placeholder="예시)까칠한 뱀파이어"
               rows={2}
               className={`w-full px-4 py-3 rounded-lg border ${
-                invalidFields.bio
+                (isVaild && !formData.bio)
                   ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                   : 'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
               } dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none`}
@@ -515,7 +509,7 @@ export default function BasicInfoForm({
               placeholder="캐릭터가 보내는 첫 메세지를 입력하세요"
               rows={2}
               className={`w-full px-4 py-3 rounded-lg border ${
-                invalidFields.firstMessage
+                (isVaild && !formData.firstMessage)
                   ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
                   : 'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
               } dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none`}
@@ -541,7 +535,7 @@ export default function BasicInfoForm({
             <div className="relative w-full">
               <div
                 className={`flex flex-wrap gap-1.5 items-center w-full px-3 py-2 min-h-[52px] rounded-lg border ${
-                  invalidFields.hashtags
+                (isVaild && formData.hashtags.length === 0)
                     ? 'border-red-500 focus-within:border-red-500 focus-within:ring-red-500'
                     : 'border-secondary-200 focus-within:border-primary-500 focus-within:ring-primary-500'
                 } dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light`}

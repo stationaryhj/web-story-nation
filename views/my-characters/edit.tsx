@@ -11,6 +11,7 @@ import { toast } from 'react-toastify'
 import { useModalStore } from '@/store/useStoreModal'
 import { useAccountStore } from '@/store/useAccountStore'
 import { GetCreateChatBotListMine } from '@/services/hooks/DataListManager'
+import { tree } from 'next/dist/build/templates/app-page'
 
 export default function EditCharacterPage() {
   const myNickName = useAccountStore.getState().data?.nick_nm
@@ -37,6 +38,7 @@ export default function EditCharacterPage() {
     saveInProgress,
     saveMultiImages,
     checkValidData,
+    setVaild,
   } = useCreateCharacterData()
 
   // 유효성 검사 상태
@@ -225,6 +227,8 @@ export default function EditCharacterPage() {
     const isFormValid = checkValidData(type)
 
     if(!isFormValid) {
+      setVaild(true)
+      toast.error('필수값이 입력되지 않았습니다.')
       return
     }
 

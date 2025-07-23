@@ -5,8 +5,6 @@ import { faPlus, faUser, faRobot, faTrashCan } from '@fortawesome/free-solid-svg
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import type { ChangeEvent } from 'react'
 import { ConversationExample, useCreateCharacterData } from '@/store/useCreateCharacterData'
-import { useAccountStore } from '@/store/useAccountStore'
-import RatingSelect from './RatingSelect'
 import Tutorial from '@/components/tutorial/Tutorial'
 import BaseModal from '@/components/modal/BaseModal'
 import { toast } from 'react-toastify'
@@ -15,7 +13,7 @@ import { exampleDatas } from '@/lib/utils/storyNationUtil'
 
 import LikeForm from './components/detail/like-form'
 
-const MAX_CONTENT_LENGTH = 3500
+const MAX_CONTENT_LENGTH = 50
 const MAX_REMAINING_LENGTH = 1500
 
 const createCharacterScenario = {
@@ -68,8 +66,6 @@ const createCharacterScenario = {
 }
 
 interface DetailInfoFormProps {
-  // formData: any
-  // setFormField: (name: string, value: any) => void
   addConversationExample: () => void
   updateConversationExample: (data: exampleDatas) => void
   removeConversationExample: (id: number) => void
@@ -85,15 +81,13 @@ type EnhancedConversationExample = ConversationExample & {
 }
 
 export default function DetailInfoForm({
-  // formData,
-  // setFormField,
   addConversationExample,
   updateConversationExample,
   removeConversationExample,
   updateConversationExampleTitle,
   onValidationChange,
 }: DetailInfoFormProps) {
-  const { formData, setFormField } = useCreateCharacterData()
+  const { isVaild, formData, setFormField } = useCreateCharacterData()
 
     // 현재 선택된 입력 필드 (user 또는 character)
   const [activeField, setActiveField] = useState<{ id: number; field: 'user' | 'character' } | null>(null)
@@ -101,17 +95,13 @@ export default function DetailInfoForm({
   const [totalMessageLength, setTotalMessageLength] = useState(0) // 전체 메시지 길이
   const [remainingChars, setRemainingChars] = useState(MAX_REMAINING_LENGTH) // 남은 글자 수
 
+  const [totalContentChars, setTotalContentChars] = useState(0)
+  const [contentChars, setContentChars] = useState(MAX_CONTENT_LENGTH)
 
   // 튜토리얼이 이미 표시된 적이 있는지 추적
   const tutorialShownRef = useRef(false)
-  // 마지막 대화 예시 요소 참조
-  const lastExampleRef = useRef<HTMLDivElement>(null)
   // toast 알림 디바운스를 위한 타임아웃 참조
   const toastDebounceRef = useRef<NodeJS.Timeout | null>(null)
-
-  // 성인 인증 상태 확인
-  const { isAdult } = useAccountStore()
-  const isAdultModeEnabled = isAdult()
 
   // 삭제 확인 모달 상태
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
@@ -155,6 +145,13 @@ export default function DetailInfoForm({
     setTotalMessageLength(total)
     setRemainingChars(MAX_REMAINING_LENGTH - total)
   }, [formData.conversationExamples])
+
+
+  useEffect(() => {
+    const total = formData.content.length + formData.content_public.length
+    setTotalContentChars(total)
+    setContentChars(MAX_CONTENT_LENGTH - total)
+  }, [formData.content, formData.content_public])
 
   // 스크롤 후 튜토리얼 표시 함수
   const scrollAndShowTutorial = () => {
@@ -224,29 +221,40 @@ export default function DetailInfoForm({
     // 대화 예시 추가
     addConversationExample()
 
+
+    // 튜토리얼 조건을 더 걸어놔야 할것같음.. 현재는 다시 추가할때마다 투토리얼이 표시됨
+    // 현재 조건은 튜토리얼 다시보지 않기를 했을 시에만 !! 혹은 튜토리얼을 보고 언마운트가 안되어있을 경우에만 !!
+
+
     // 약간의 지연 후 스크롤 및 튜토리얼 표시 (DOM 업데이트 대기)
     setTimeout(() => {
-      const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
-
-      if (!tutorialCompleted && !tutorialShownRef.current) {
-        scrollAndShowTutorial()
-      } else {
-        // 자동 스크롤만 수행
-        const conversationExamples = document.getElementById('conversation-examples')
-        if (conversationExamples) {
-          conversationExamples.scrollIntoView({ behavior: 'smooth', block: 'end' })
-        }
+      const conversationExamples = document.getElementById('conversation-examples')
+      if (conversationExamples) {
+        conversationExamples.scrollIntoView({ behavior: 'smooth', block: 'end' })
       }
+      // const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
+
+      // if (!tutorialCompleted && !tutorialShownRef.current) {
+      //   scrollAndShowTutorial()
+      // } else {
+      //   // 자동 스크롤만 수행
+      //   const conversationExamples = document.getElementById('conversation-examples')
+      //   if (conversationExamples) {
+      //     conversationExamples.scrollIntoView({ behavior: 'smooth', block: 'end' })
+      //   }
+      // }
     }, 300)
   }
 
   // 첫 대화 예시가 추가될 때 튜토리얼 표시
   useEffect(() => {
     if (exampleDatas.length === 1 && !tutorialShownRef.current) {
-      const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
-      if (!tutorialCompleted) {
-        scrollAndShowTutorial()
-      }
+      setTimeout(() => {
+        const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
+        if (!tutorialCompleted) {
+          scrollAndShowTutorial()
+        }
+      }, 500)
     }
   }, [exampleDatas])
 
@@ -260,38 +268,37 @@ export default function DetailInfoForm({
     }
   }, [formData, onValidationChange])
 
-  // 게시 범위 선택 핸들러 (상세 설명용)
-  const handleVisibilitySelect = (visibility: 'public' | 'private') => {
-    setFormField('detailVisibility', visibility)
-  }
-
   // 대화 예시 공개 여부 선택 핸들러
   const handleExamplesVisibilitySelect = (visibility: 'public' | 'private') => {
     // 대화 예시 전체의 공개 여부를 설정
     setFormField('examplesVisibility', visibility)
   }
 
-  // 이용등급 선택 핸들러
-  const handleRatingSelect = (rating: 'all' | 'adult') => {
-    if (rating === 'adult' && !isAdultModeEnabled) {
-      return
-    }
-    setFormField('rating', rating)
-  }
-
 
   const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value
-    if (value.length <= MAX_CONTENT_LENGTH) {
-      setFormField('content', value)
+    let totalContentLength = formData.content.length + formData.content_public.length
+    totalContentLength -= formData.content.length
+
+    if((totalContentLength + value.length) > MAX_CONTENT_LENGTH) {
+      showDebouncedToast(`전체 상세 설명 글자수는 ${MAX_CONTENT_LENGTH}자를 초과할 수 없습니다.`)
+      return
     }
+
+    setFormField('content', value)
   }
 
   const handleContentPublicChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value
-    if (value.length <= MAX_CONTENT_LENGTH) {
-      setFormField('content_public', value)
+    let totalContentLength = formData.content.length + formData.content_public.length
+    totalContentLength -= formData.content_public.length
+
+    if((totalContentLength + value.length) > MAX_CONTENT_LENGTH) {
+      showDebouncedToast(`전체 상세 설명 글자수는 ${MAX_CONTENT_LENGTH}자를 초과할 수 없습니다.`)
+      return
     }
+
+    setFormField('content_public', value)
   }
 
   // 대화 예시 제목 변경 핸들러
@@ -441,7 +448,6 @@ export default function DetailInfoForm({
                 placeholder='독자에게 공개되고 AI에게 전송되는 프롬프트에요 :) 캐릭터를 자세히 설명해 주세요!'
                 rows={4}
                 className="w-full px-4 py-3 rounded-lg text-sm sm:text-base border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
-                maxLength={MAX_CONTENT_LENGTH}
               />
             </div>
 
@@ -462,14 +468,13 @@ export default function DetailInfoForm({
                 placeholder='AI에게만 전송되는 비밀 프롬프트에요 :) 작가님만의 비법 프롬프트를 입력해 보세요!'
                 rows={4}
                 className="w-full px-4 py-3 rounded-lg text-sm sm:text-base border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
-                maxLength={MAX_CONTENT_LENGTH}
               />
             </div>
           </div>
 
           <div className="mt-4 flex justify-end items-center">
             <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-            전체 상세 설명 글자수: 0/{MAX_CONTENT_LENGTH}(남은 글자 수: {MAX_CONTENT_LENGTH}자)
+            전체 상세 설명 글자수: {totalContentChars}/{MAX_CONTENT_LENGTH}(남은 글자 수: {contentChars}자)
               {/* 전체 대화 예시 글자 수: {totalMessageLength}/1500 (남은 글자 수: {remainingChars}자) */}
             </span>
           </div>

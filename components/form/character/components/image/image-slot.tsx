@@ -20,7 +20,7 @@ interface ImageSlotProps {
 export default function ImageSlot({ 
 	data,
 }: ImageSlotProps) {
-	const { deleteMultiImageData, changeMultiImageShow, changeMultiImageDefault, changeMultiImageRules, changeMultiImageImage } = useCreateCharacterData()
+	const { isVaild, deleteMultiImageData, changeMultiImageShow, changeMultiImageDefault, changeMultiImageRules, changeMultiImageImage } = useCreateCharacterData()
 
 	const _chrbot_multi_image_key = data.chrbot_multi_image_key
 	const _imageUrl = data.img_url
@@ -140,7 +140,11 @@ export default function ImageSlot({
 			<div className='flex-1 flex flex-col gap-2'>
 				<div className='flex-1 flex-shrink-0 relative'>
 					<textarea 
-						className='w-full h-full p-2 border border-secondary-200 rounded-md resize-none text-sm'
+						className={`w-full h-full p-2 border rounded-md resize-none text-sm ${
+							!_isDefault && isVaild && _rules.length === 0 ?
+								'border-red-500 bg-red-50' :
+								'border-secondary-300 dark:border-dark-secondary-300/20'
+						}`}
 						placeholder={_isDefault ? DEFAULT_DESCRIPTION : PLACEHOLDER}
 						onChange={e => handleChangeRules(e)}
 						value={_isDefault ? '' : _rules || ''}

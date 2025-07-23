@@ -98,10 +98,15 @@ interface CreateCharacterStore {
   isSaving: boolean
   isSavingTags: boolean
 
+
+  // vaild 상태
+  isVaild: boolean
+
   // 에러 상태
   error: any
 
   // 함수들
+  setVaild: (vaild: boolean) => void
   setActiveTab: (tab: 'basic' | 'detail' | 'image' | 'last') => void
   setFormField: <K extends keyof CharacterFormData>(field: K, value: CharacterFormData[K]) => void
   addHashtag: (tag: string) => Promise<boolean>
@@ -193,9 +198,11 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
   isSaving: false,
   isSavingTags: false,
   error: null,
+  isVaild: false,
 
   // 상태 변경 함수들
-  setActiveTab: tab => set({ activeTab: tab }),
+  setVaild: (vaild: boolean) => set({ isVaild: vaild }),
+  setActiveTab: tab => set({ activeTab: tab, isVaild: false }),
 
   setFormField: (field, value) =>
     set(state => ({
@@ -454,6 +461,8 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
       item.chrbot_multi_image_key === chrbot_multi_image_key &&
       item.idx === idx
     )
+
+    console.log('@@@@ changeMultiImageDefault :: ', changeData)
 
 
     // 해당 레벨의 모든 데이터의 default_yn을 0으로 변경
@@ -973,6 +982,7 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
     set({
       formData: { ...defaultFormData },
       error: null,
+      isVaild: false,
     }),
 }))
 

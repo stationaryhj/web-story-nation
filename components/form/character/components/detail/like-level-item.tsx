@@ -19,6 +19,9 @@ const renderLevel = ( props: {
 	rows: number,
 	onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void,
 }) => {
+	const { isVaild } = useCreateCharacterData()
+
+	console.log('@@@@ isVaild :: ', isVaild)
 
 	return(
 		<div>
@@ -29,7 +32,11 @@ const renderLevel = ( props: {
 				</span>
 			</div>
 			<textarea
-				className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 text-sm resize-none"
+				className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm resize-none ${
+					isVaild && props.value.length === 0 ?
+						'border-red-500 bg-red-50' :
+						'border-secondary-300 dark:border-dark-secondary-300/20'
+				}`}
 				id={props.title}
 				value={props.value}
 				placeholder={props.placeholder}
@@ -44,7 +51,7 @@ const renderLevel = ( props: {
 
 export default function LikeLevelItem(props: LikeLevelItemProps) {
 	const { data } = props
-	const { updateLikeAbilityData } = useCreateCharacterData()
+	const { isVaild, updateLikeAbilityData } = useCreateCharacterData()
 
 	const lv = data.lv || 0
 	const world_list_detail_chrbot_key = data.world_list_detail_chrbot_key || 0
