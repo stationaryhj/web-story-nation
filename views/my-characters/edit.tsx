@@ -27,14 +27,16 @@ export default function EditCharacterPage() {
   const router = useRouter()
   const {
     activeTab,
-    setActiveTab,
     formData,
-    resetForm,
-    fetchInProgressData,
-    saveInProgress,
     isLoadingData,
     isSaving,
     error: storeError,
+    setActiveTab,
+    resetForm,
+    fetchInProgressData,
+    saveInProgress,
+    saveMultiImages,
+    checkValidData,
   } = useCreateCharacterData()
 
   // 유효성 검사 상태
@@ -97,18 +99,6 @@ export default function EditCharacterPage() {
     }
   }, [formData.hashtags])
 
-  const handleSaveToNextStep = async () => {
-    if (activeTab === 'basic') {
-      await saveInProgress()
-      setActiveTab('detail')
-    } else if (activeTab === 'detail') {
-      await saveInProgress()
-      setActiveTab('image')
-    } else if (activeTab === 'image') {
-      // 최종 완료 처리
-      handleSubmit()
-    }
-  }
 
   // 폼 제출 핸들러
   const handleSubmit = async () => {
@@ -212,6 +202,36 @@ export default function EditCharacterPage() {
     }
   }, [])
 
+  const handleSaveToNextStep = async () => {
+    console.log('handleSaveToNextStep')
+
+    if (activeTab === 'basic') {
+      await saveInProgress()
+      handleNextStep('detail')
+    } else if (activeTab === 'detail') {
+      await saveInProgress()
+      handleNextStep('image')
+    } else if (activeTab === 'image') {
+      await saveMultiImages()
+      handleNextStep('last')
+    }
+    else if (activeTab === 'last') {
+      // 최종 완료 처리
+      handleSubmit()
+    }
+  }
+
+  const handleNextStep = (type: 'basic' | 'detail' | 'image' | 'last') => {
+    const isFormValid = checkValidData(type)
+
+    if(!isFormValid) {
+      return
+    }
+
+    setActiveTab(type)
+  }
+
+
   if (isLoadingData) {
     return (
       <div className="min-h-screen bg-secondary-50 dark:bg-dark-background flex items-center justify-center">
@@ -230,42 +250,55 @@ export default function EditCharacterPage() {
     )
   }
 
+
   return (
     <div className="min-h-screen bg-secondary-50 dark:bg-dark-background pb-20">
       <SectionTransition>
         <div className="container mx-auto px-4 py-8">
           <div className="bg-white dark:bg-dark-background-light rounded-xl shadow-sm overflow-hidden">
             {/* 상단 탭 네비게이션 */}
-            <div className="border-b border-secondary-200 dark:border-dark-secondary-200/10 flex">
+            <div className="border-b border-secondary-200 dark:border-dark-secondary-200/10 flex"
+              style={{ wordBreak: 'keep-all' }}
+            >
               <button
-                className={`flex-1 py-4 px-6 text-center ${
+                className={`flex-1 py-4 px-2 text-center ${
                   activeTab === 'basic'
                     ? 'bg-primary-50 dark:bg-dark-primary-900/10 text-primary-600 dark:text-dark-primary-500 font-medium'
                     : 'text-secondary-500 dark:text-dark-secondary-500'
                 }`}
-                onClick={() => setActiveTab('basic')}
+                onClick={() => handleNextStep('basic')}
               >
-                기본설정
+                <p>기본 프로필</p>
               </button>
               <button
-                className={`flex-1 py-4 px-6 text-center ${
+                className={`flex-1 py-4 px-2 text-center ${
                   activeTab === 'detail'
                     ? 'bg-primary-50 dark:bg-dark-primary-900/10 text-primary-600 dark:text-dark-primary-500 font-medium'
                     : 'text-secondary-500 dark:text-dark-secondary-500'
                 }`}
-                onClick={() => setActiveTab('detail')}
+                onClick={() => handleNextStep('detail')}
               >
-                상세설정
+                <p>고급 설정</p>
               </button>
               <button
-                className={`flex-1 py-4 px-6 text-center ${
+                className={`flex-1 py-4 px-2 text-center ${
                   activeTab === 'image'
                     ? 'bg-primary-50 dark:bg-dark-primary-900/10 text-primary-600 dark:text-dark-primary-500 font-medium'
                     : 'text-secondary-500 dark:text-dark-secondary-500'
                 }`}
-                onClick={() => setActiveTab('image')}
+                onClick={() => handleNextStep('image')}
               >
-                이미지
+                <p>멀티 이미지</p>
+              </button>
+              <button
+                className={`flex-1 py-4 px-2 text-center ${
+                  activeTab === 'last'
+                    ? 'bg-primary-50 dark:bg-dark-primary-900/10 text-primary-600 dark:text-dark-primary-500 font-medium'
+                    : 'text-secondary-500 dark:text-dark-secondary-500'
+                }`}
+                onClick={() => handleNextStep('last')}
+              >
+                <p>마무리 설정</p>
               </button>
             </div>
 
@@ -302,10 +335,11 @@ export default function EditCharacterPage() {
                     : 'bg-primary-300 text-white cursor-not-allowed dark:bg-dark-primary-800 dark:text-dark-secondary-300'
                 }`}
               >
-                {isSaving ? '저장 중...' : activeTab === 'image' ? '완료' : '다음'}
+                {isSaving ? '저장 중...' : activeTab === 'last' ? '완료' : '다음'}
               </button>
             </div>
           </div>
+
           <div id="scrollRef"></div>
         </div>
       </SectionTransition>

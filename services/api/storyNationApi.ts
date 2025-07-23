@@ -45,7 +45,12 @@ import type {
   NicknmChangeResponse,
   ChatFreePenResponse,
   UserInfoResponse,
+  GetPresignedUrlMultiResponse,
 } from '../../types/api'
+
+
+import type { PriSignedUrlInfo } from '@/services/define'
+
 
 // API 기본 설정
 const createApiInstance = (baseURL: string) => {
@@ -111,13 +116,13 @@ const createApiInstance = (baseURL: string) => {
 }
 
 // 환경에 따른 API URL 설정
-const API_URL = process.env.NODE_ENV === 'production' ?
-  process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL :
-  process.env.NEXT_PUBLIC_STORYNATION_API_URL;
+// const API_URL = process.env.NODE_ENV === 'production' ?
+//   process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL :
+//   process.env.NEXT_PUBLIC_STORYNATION_API_URL;
 
 // release
 // const API_URL = process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL;
-// const API_URL = process.env.NEXT_PUBLIC_STORYNATION_API_URL
+const API_URL = process.env.NEXT_PUBLIC_STORYNATION_API_URL
 
 const CHAT_URL =
   process.env.NODE_ENV === 'production'
@@ -690,6 +695,15 @@ export const contentApi = {
     })
   },
 
+  GetPresignedUrlMulti: async (type: 6, files: any): Promise<ApiResponse<GetPresignedUrlMultiResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('api/s3/presignedurl/multiple', {
+      files: JSON.stringify(files),
+      type,
+    })
+  },
+
   // 닉네임 변경
   NicknmChange: async (nick_nm: string): Promise<ApiResponse<NicknmChangeResponse>> => {
     const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
@@ -1066,41 +1080,33 @@ export const createApi = {
     })
   },
 
-  // 현재 작업중인 캐봇 저장
-  SaveInProgress: async (
-    world_list_detail_chrbot_key: string,
-    img_url: string,
-    title: string,
-    gender: number,
-    intro: string,
-    first_talk: string,
-    content: string,
-    example: string,
-    nsfw: number,
-    img_url_nsfw: string,
-    show_yn: number,
-    content_show_yn: number,
-    example_show_yn: number,
-    finish_yn: number,
-    countryCode: string = 'KR'
-  ): Promise<ApiResponse> => {
-    return api.post('/api/charbot/inprogress/save', {
-      world_list_detail_chrbot_key,
-      img_url,
-      title,
-      gender,
-      intro,
-      first_talk,
-      content,
-      example,
-      nsfw,
-      img_url_nsfw,
-      img_web_url : img_url,
-      show_yn,
-      finish_yn,
-      content_show_yn,
-      example_show_yn,
-      countryCode,
+  // 현재 작업중인 캐봇 저장 (FormData 방식)
+  SaveInProgressFormData: async (formData: FormData): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    
+    // ✅ FormData 전송을 위한 axios 설정 (Content-Type 제거)
+    return api.post('/api/charbot/inprogress/save', formData, {
+      headers: {
+        'Authorization': account_token,
+        'X-Web-Access': true,
+        'Content-Type': 'multipart/form-data',  // ✅ 기본 JSON Content-Type 제거
+      }
+    })
+  },
+
+
+  /**
+   * 멀티 이미지 업로드
+   */
+  SaveMultiImageData: async (formData: FormData): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/charbot/inprogress/save/multiimagedata', formData, {
+      headers: {
+        'Authorization': account_token,
+        'X-Web-Access': true,
+        'Content-Type': 'multipart/form-data',
+      }
     })
   },
 
@@ -1178,6 +1184,8 @@ export const createApi = {
     api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/writerinfo')
   }
+
+
 }
 
 

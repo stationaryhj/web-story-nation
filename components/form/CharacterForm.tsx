@@ -6,6 +6,7 @@ import { useCreateCharacterData } from '@/store/useCreateCharacterData'
 import BasicInfoForm from './character/BasicInfoForm'
 import DetailInfoForm from './character/DetailInfoForm'
 import ImageUploadForm from './character/ImageUploadForm'
+import LastInfoForm from './character/LastInfoForm'
 
 // 필수 입력값 표시 컴포넌트 - 공통 컴포넌트로 export
 export const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
@@ -17,7 +18,7 @@ export const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
 
 interface CharacterFormProps {
   formType: 'create' | 'edit'
-  mode: 'basic' | 'detail' | 'image'
+  mode: 'basic' | 'detail' | 'image' | 'last'
   invalidFields?: { [key: string]: boolean }
   isSubmitting?: boolean
   privateOpenCharacterCount?: number
@@ -25,10 +26,7 @@ interface CharacterFormProps {
 
 export default function CharacterForm({ mode, invalidFields = {}, isSubmitting = false, privateOpenCharacterCount }: CharacterFormProps) {
   const {
-    formData,
     setFormField,
-    addHashtag,
-    removeHashtag,
     addConversationExample,
     updateConversationExample,
     updateConversationExampleTitle,
@@ -37,7 +35,6 @@ export default function CharacterForm({ mode, invalidFields = {}, isSubmitting =
     setAdultImage,
     setAdultNormalImage,
     fetchTagList,
-    saveHashtags,
     availableTags,
     isLoadingTags,
   } = useCreateCharacterData()
@@ -60,19 +57,6 @@ export default function CharacterForm({ mode, invalidFields = {}, isSubmitting =
   if (mode === 'basic') {
     return (
       <BasicInfoForm
-        formData={formData}
-        setFormField={setFormField}
-        addCustomTag={addHashtag}
-        addHashtag={async (tag: string) => {
-          return await addHashtag(tag)
-        }}
-        removeHashtag={async (tag: string) => {
-          return await removeHashtag(tag)
-        }}
-        fetchTagList={fetchTagList}
-        saveHashtags={async () => {
-          return await saveHashtags()
-        }}
         availableTags={availableTags}
         isLoadingTags={isLoadingTags}
         invalidFields={invalidFields}
@@ -84,8 +68,6 @@ export default function CharacterForm({ mode, invalidFields = {}, isSubmitting =
   if (mode === 'detail') {
     return (
       <DetailInfoForm
-        formData={formData}
-        setFormField={setFormField}
         addConversationExample={addConversationExample}
         updateConversationExample={updateConversationExample}
         removeConversationExample={removeConversationExample}
@@ -97,13 +79,25 @@ export default function CharacterForm({ mode, invalidFields = {}, isSubmitting =
   if (mode === 'image') {
     return (
       <ImageUploadForm
-        formData={formData}
         setFormField={setFormField}
         setNormalImage={setNormalImage}
         setAdultImage={setAdultImage}
         setAdultNormalImage={setAdultNormalImage}
         invalidFields={invalidFields}
         isSubmitting={isSubmitting}
+      />
+    )
+  }
+
+
+  if(mode === 'last') {
+    return (
+      <LastInfoForm
+        setFormField={setFormField}
+        addConversationExample={addConversationExample}
+        updateConversationExample={updateConversationExample}
+        removeConversationExample={removeConversationExample}
+        updateConversationExampleTitle={updateConversationExampleTitle}
       />
     )
   }

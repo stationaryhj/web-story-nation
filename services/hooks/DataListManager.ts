@@ -304,47 +304,47 @@ export const ReqGetInquiryList = (page: number, paginate: number) => {
 }
 
 // SaveInProgress API 호출을 위한 함수 추가
-export const ReqSaveCreateChatBotInProgress = async (payload: {
-  world_list_detail_chrbot_key: string
-  img_url: string
-  title: string
-  gender: number
-  intro: string
-  first_talk: string
-  content: string
-  example: string
-  nsfw: number
-  img_url_nsfw: string
-  img_web_url: string
-  show_yn: number
-  content_show_yn: number
-  example_show_yn: number
-  finish_yn: number
-}) => {
-  try {
-    const response = await createApi.SaveInProgress(
-      payload.world_list_detail_chrbot_key,
-      payload.img_url,
-      payload.title,
-      payload.gender,
-      payload.intro,
-      payload.first_talk,
-      payload.content,
-      payload.example,
-      payload.nsfw,
-      payload.img_url_nsfw,
-      payload.show_yn,
-      payload.content_show_yn,
-      payload.example_show_yn,
-      payload.finish_yn,
-    )
+// export const ReqSaveCreateChatBotInProgress = async (payload: {
+//   world_list_detail_chrbot_key: string
+//   img_url: string
+//   title: string
+//   gender: number
+//   intro: string
+//   first_talk: string
+//   content: string
+//   example: string
+//   nsfw: number
+//   img_url_nsfw: string
+//   img_web_url: string
+//   show_yn: number
+//   content_show_yn: number
+//   example_show_yn: number
+//   finish_yn: number
+// }) => {
+//   try {
+//     const response = await createApi.SaveInProgress(
+//       payload.world_list_detail_chrbot_key,
+//       payload.img_url,
+//       payload.title,
+//       payload.gender,
+//       payload.intro,
+//       payload.first_talk,
+//       payload.content,
+//       payload.example,
+//       payload.nsfw,
+//       payload.img_url_nsfw,
+//       payload.show_yn,
+//       payload.content_show_yn,
+//       payload.example_show_yn,
+//       payload.finish_yn,
+//     )
 
-    return { data: response.data, error: null }
-  } catch (error) {
-    console.error('SaveInProgress API 호출 오류:', error)
-    return { data: null, error }
-  }
-}
+//     return { data: response.data, error: null }
+//   } catch (error) {
+//     console.error('SaveInProgress API 호출 오류:', error)
+//     return { data: null, error }
+//   }
+// }
 
 export const GetTagList = () => {
   const { data, isLoading, error, refetch } = useQuery<TagListResponse>({

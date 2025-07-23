@@ -6,6 +6,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 export interface Character {
   id: string
   name: string
+  subject?: string
   description: string
   detailDescription?: string
   example?: string
@@ -28,6 +29,10 @@ export interface Character {
   finish_yn?: number | 0
   show_yn?: number | any
   block_type?: number | any
+  likeability_max_lv?: number | any
+  likeability_yn?: number | any
+  multi_image_count?: number | any
+  writer_note?: string | any
 }
 
 // 스토어 타입 정의
@@ -121,6 +126,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '1',
     name: '에단 카터',
+    subject: '미식축구도, 사랑도 전력 질주가 원칙. 목표는 단 하나, 내 심장을 터치다운하는 것.',
     description: '미식축구도, 사랑도 전력 질주가 원칙. 목표는 단 하나, 내 심장을 터치다운하는 것.',
     imageUrl: getRandomImage(),
     commentCount: 151,
@@ -141,6 +147,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '2',
     name: '리아 김',
+    subject: '낮에는 평범한 대학생, 밤에는 사이버 세계의 정의를 실현하는 비밀 요원.',
     description: '한국계 미국인 천재 해커. 낮에는 평범한 대학생, 밤에는 사이버 세계의 정의를 실현하는 비밀 요원.',
     imageUrl: getRandomImage(),
     commentCount: 89,
@@ -161,6 +168,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '3',
     name: '마르코 발렌티',
+    subject: '이탈리아 출신의 미스터리한 셰프. 그의 요리에는 사람의 마음을 사로잡는 마법 같은 비밀이 있다.',
     description: '이탈리아 출신의 미스터리한 셰프. 그의 요리에는 사람의 마음을 사로잡는 마법 같은 비밀이 있다.',
     imageUrl: getRandomImage(),
     commentCount: 210,
@@ -181,6 +189,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '4',
     name: '아야 나카무라',
+    subject: '도쿄의 밤을 지배하는 언더그라운드 DJ. 음악으로 사람들의 영혼을 움직이는 능력을 가졌다.',
     description: '도쿄의 밤을 지배하는 언더그라운드 DJ. 음악으로 사람들의 영혼을 움직이는 능력을 가졌다.',
     imageUrl: getRandomImage(),
     commentCount: 175,
@@ -201,6 +210,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '5',
     name: '알렉산더 볼코프',
+    subject: '전직 러시아 특수부대 요원. 과거의 그림자에서 벗어나 평범한 삶을 꿈꾸지만, 과거는 그를 쉽게 놓아주지 않는다.',
     description:
       '전직 러시아 특수부대 요원. 과거의 그림자에서 벗어나 평범한 삶을 꿈꾸지만, 과거는 그를 쉽게 놓아주지 않는다.',
     imageUrl: getRandomImage(),
@@ -222,6 +232,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '6',
     name: '엘리자베스 파커',
+    subject: '뉴욕의 야심 찬 패션 디자이너. 화려한 패션계의 이면에 숨겨진 어두운 비밀을 파헤친다.',
     description: '뉴욕의 야심 찬 패션 디자이너. 화려한 패션계의 이면에 숨겨진 어두운 비밀을 파헤친다.',
     imageUrl: getRandomImage(),
     commentCount: 98,
@@ -242,6 +253,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '7',
     name: '미스터리 X',
+    subject: '정체를 알 수 없는 미스터리한 인물. 과거도, 성별도 알려진 바 없지만 놀라운 능력을 가지고 있다.',
     description: '정체를 알 수 없는 미스터리한 인물. 과거도, 성별도 알려진 바 없지만 놀라운 능력을 가지고 있다.',
     imageUrl: getRandomImage(),
     commentCount: 245,
@@ -262,6 +274,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '8',
     name: '제이든 스미스',
+    subject: '성별에 구애받지 않는 자유로운 영혼. 예술과 음악을 통해 자신의 정체성을 표현한다.',
     description: '성별에 구애받지 않는 자유로운 영혼. 예술과 음악을 통해 자신의 정체성을 표현한다.',
     imageUrl: getRandomImage(),
     commentCount: 178,
@@ -284,6 +297,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '9',
     name: '유진 리',
+    subject: '천재적인 프로그래머이자 화이트 해커. 가상 세계에서는 그 누구보다 강력한 존재이다.',
     description: '천재적인 프로그래머이자 화이트 해커. 가상 세계에서는 그 누구보다 강력한 존재이다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
@@ -304,6 +318,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '10',
     name: '다니엘 강',
+    subject: '이중 스파이로 활동하는 국제적인 첩보원. 누구도 그의 진짜 정체성을 알지 못한다.',
     description: '이중 스파이로 활동하는 국제적인 첩보원. 누구도 그의 진짜 정체성을 알지 못한다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
@@ -324,6 +339,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '11',
     name: '마이클 존슨',
+    subject: '유명한 록 밴드의 리더. 음악을 통해 세상을 바꾸려는 뜨거운 열정을 가진 인물.',
     description: '유명한 록 밴드의 리더. 음악을 통해 세상을 바꾸려는 뜨거운 열정을 가진 인물.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
@@ -344,6 +360,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '12',
     name: '토마스 워커',
+    subject: '인류의 미래를 구하기 위해 시간을 여행하는 과학자. 과거를 바꾸면 미래도 바뀐다는 것을 알고 있다.',
     description: '인류의 미래를 구하기 위해 시간을 여행하는 과학자. 과거를 바꾸면 미래도 바뀐다는 것을 알고 있다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
@@ -366,6 +383,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '13',
     name: '소피아 로드리게스',
+    subject: '세계적인 발레리나. 완벽주의적 성격으로 극한의 연습을 거듭하며 자신의 한계를 시험한다.',
     description: '세계적인 발레리나. 완벽주의적 성격으로 극한의 연습을 거듭하며 자신의 한계를 시험한다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
@@ -386,6 +404,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '14',
     name: '에밀리 왕',
+    subject: '화학 재해로 특수한 능력을 갖게 된 과학자. 분자 구조를 변형시키는 능력으로 범죄와 싸운다.',
     description: '화학 재해로 특수한 능력을 갖게 된 과학자. 분자 구조를 변형시키는 능력으로 범죄와 싸운다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
@@ -406,6 +425,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '15',
     name: '나탈리 벤소니',
+    subject: '17세기의 해적선 선장으로 바다의 공포로 불리는 여성. 대양을 항해하며 끝없는 모험을 찾는다.',
     description: '17세기의 해적선 선장으로 바다의 공포로 불리는 여성. 대양을 항해하며 끝없는 모험을 찾는다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
@@ -426,6 +446,7 @@ const dummyCharacters: Array<Character> = [
   {
     id: '16',
     name: '클로이 파크',
+    subject: '천재적인 게임 개발자이자 프로 게이머. 가상 세계와 현실 세계의 경계를 허무는 게임을 개발 중이다.',
     description: '천재적인 게임 개발자이자 프로 게이머. 가상 세계와 현실 세계의 경계를 허무는 게임을 개발 중이다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),

@@ -74,13 +74,13 @@ interface ImageStore {
 
 interface CharacterFormStore {
   // 현재 활성화된 탭
-  activeTab: 'basic' | 'detail' | 'image'
+  activeTab: 'basic' | 'detail' | 'image' | 'last'
 
   // 폼 데이터
   formData: CharacterFormData
 
   // 수정 함수들
-  setActiveTab: (tab: 'basic' | 'detail' | 'image') => void
+  setActiveTab: (tab: 'basic' | 'detail' | 'image' | 'last') => void
   setFormField: <K extends keyof CharacterFormData>(field: K, value: CharacterFormData[K]) => void
   addHashtag: (tag: string) => void
   removeHashtag: (tag: string) => void

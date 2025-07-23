@@ -158,9 +158,12 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
         queryFn: async () => {
           // const response = await contentApi.GetTop10Ranking(countryCode, ranking_type, gender, 2)
           const response = await contentApi.GetListRcmnd(9, ranking_type, 1, 50, gender) as any
+          console.log('@@ response :: ' , response)
+          
           const moduleCharacters = response.data?.module_9.map((item: ModuleCharacter) => ({
             world_list_detail_chrbot_key: item.world_list_detail_chrbot_key,
             title: item.title,
+            subject: item.subject,
             intro: item.intro,
             img_url: item.img_url,
             img_web_url: item.img_web_url || item.img_url,
@@ -174,6 +177,9 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
             nsfw: item.nsfw,
             module_id: item.module_id,
             sort: item.sort,
+            likeability_max_lv: item.likeability_max_lv,
+            likeability_yn: item.likeability_yn,
+            multi_image_count: item.multi_image_count,
           }))
           return bridgeCharacterDataToCharacter(moduleCharacters)
         },
@@ -262,6 +268,7 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
           const moduleCharacters = (response.data?.[moduleKey] as ModuleCharacter[])?.map(item => ({
             world_list_detail_chrbot_key: item.world_list_detail_chrbot_key,
             title: item.title,
+            subject: item.subject,
             intro: item.intro,
             img_url: item.img_url,
             img_web_url: item.img_web_url || item.img_url,
@@ -275,6 +282,9 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
             nsfw: item.nsfw || 0,
             module_id: item.module_id || 0,
             sort: item.sort || 0,
+            likeability_max_lv: item.likeability_max_lv || 0,
+            likeability_yn: item.likeability_yn || 0,
+            multi_image_count: item.multi_image_count || 0,
           }))
           return bridgeCharacterDataToCharacter(moduleCharacters)
         },
@@ -350,6 +360,7 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
           const moduleCharacters = (response.data?.[moduleKey] as ModuleCharacter[])?.map(item => ({
             world_list_detail_chrbot_key: item.world_list_detail_chrbot_key,
             title: item.title,
+            subject: item.subject,
             intro: item.intro,
             img_url: item.img_url,
             img_web_url: item.img_web_url || item.img_url,
@@ -363,6 +374,9 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
             nsfw: item.nsfw || 0,
             module_id: item.module_id || module_id,
             sort: item.sort || 0,
+            likeability_max_lv: item.likeability_max_lv || 0,
+            likeability_yn: item.likeability_yn || 0,
+            multi_image_count: item.multi_image_count || 0,
           }))
           return bridgeCharacterDataToCharacter(moduleCharacters || [])
         },

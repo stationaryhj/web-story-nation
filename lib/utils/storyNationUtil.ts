@@ -129,6 +129,7 @@ export function bridgeTop10DataToModuleCharacter(dataList: Array<ModuleCharacter
     return {
       id: item.world_list_detail_chrbot_key.toString(),
       name: item.title,
+      subject: item.subject,
       description: item.intro,
       imageUrl: getImageUri(item.img_url),
       commentCount: item.msg_cnt,
@@ -145,6 +146,9 @@ export function bridgeTop10DataToModuleCharacter(dataList: Array<ModuleCharacter
         profileImageUrl: null,
         isActive: true,
       },
+      likeability_max_lv: item.likeability_max_lv,
+      likeability_yn: item.likeability_yn,
+      multi_image_count: item.multi_image_count,
     }
   })
 
@@ -169,9 +173,11 @@ export function bridgeModuleCreatorToCharacter(dataList: Array<ModuleCreater>) {
 }
 
 export function bridgeCharbotGetListMineDataToCharacter(dataList: Array<CharbotMineData>) {
+  console.log('bridgeCharbotGetListMineDataToCharacter :: ', dataList)
   const characters = dataList?.map(item => ({
     id: item.world_list_detail_chrbot_key.toString(),
     name: item.title,
+    subject: item.subject,
     description: item.intro,
     imageUrl: getImageUri(item.img_url),
     commentCount: item.msg_cnt,
@@ -188,6 +194,10 @@ export function bridgeCharbotGetListMineDataToCharacter(dataList: Array<CharbotM
     finish_yn: item.finish_yn,
     show_yn: item.show_yn,
     block_type: item.block_type,
+    likeability_max_lv: item.likeability_max_lv,
+    likeability_yn: item.likeability_yn,
+    multi_image_count: item.multi_image_count,
+    writer_note: item.writer_note,
   }))
 
   return characters
@@ -209,6 +219,7 @@ export function bridgeCharacterDataToCharacter(dataList: Array<ModuleCharacter>)
     return {
       id: item.world_list_detail_chrbot_key.toString(),
       name: item.title,
+      subject: item.subject,
       description: item.intro,
       imageUrl: getImageUri(item.img_url),
       commentCount: item.msg_cnt,
@@ -226,6 +237,9 @@ export function bridgeCharacterDataToCharacter(dataList: Array<ModuleCharacter>)
         isActive: true,
       },
       category: 'unspecified' as 'male' | 'female' | 'unspecified',
+      likeability_max_lv: item.likeability_max_lv,
+      likeability_yn: item.likeability_yn,
+      multi_image_count: item.multi_image_count,
     }
   })
 
@@ -236,6 +250,7 @@ export function bridgeCharbotDataToCharacter(data: ChrbotData) {
   return {
     id: data.world_list_detail_chrbot_key.toString(),
     name: data.title,
+    subject: data.subject,
     description: data.intro,
     example: data.example,
     first_talk: data.first_talk,
@@ -253,6 +268,10 @@ export function bridgeCharbotDataToCharacter(data: ChrbotData) {
     },
     likeCount: data.like_cnt,
     category: getCategory(Number(data.gender)),
+    likeability_max_lv: data.likeability_max_lv,
+    likeability_yn: data.likeability_yn,
+    multi_image_count: data.multi_image_count,
+    writer_note: data.writer_note,
   }
 }
 
@@ -367,6 +386,7 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
   return {
     id: data.world_list_detail_chrbot_key?.toString() || '',
     name: data.title || '',
+    subject: data.subject || '',
     gender: getCategory(Number(data.gender)) || 'unspecified',
     bio: data.intro || '',
     firstMessage: data.first_talk || '',
@@ -390,6 +410,17 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
     rating: data.nsfw === 1 ? 'adult' : 'all',
     // 추가 데이터
     finish_yn: data.finish_yn || 0,
+    writer_note: data.writer_note || '',
+
+
+
+    // 추가 ( 2025-07-18 :: 호감도 관련, 이미지 관련, 프로퍼티 )
+    likeabilities: data.likeabilities || [],
+    likeability_max_lv: data.likeability_max_lv || 0,
+    likeability_yn: data.likeability_yn || 0,
+    multi_image_count: data.multi_image_count || 0,
+    multi_images: data.multi_images || [],
+    property: data.property || '',
 
     // 공개 + 공개 일시에 비공개로 변경 불가능
     isVisibilityLock: data.finish_yn === 1 && data.show_yn === 1 ? true : false,
@@ -495,4 +526,80 @@ function getCategory(gender: number) {
   } else {
     return 'unspecified'
   }
+}
+
+
+export async function uploadImages(file: File, presignedUrl: string): Promise<void> {
+  // ✅ Promise로 감싸서 FileReader와 Image 로딩을 기다릴 수 있게 함
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+
+    reader.onload = async event => {
+      const img = new window.Image()
+      img.src = event.target?.result as string
+
+      img.onload = async () => {
+        try {
+          const canvas = document.createElement('canvas')
+          const ctx = canvas.getContext('2d')
+  
+          // 이미지 최대 크기 설정 (가로/세로 최대 1024px)
+          const MAX_SIZE = 1024
+          let width = img.width
+          let height = img.height
+  
+          if (width > height && width > MAX_SIZE) {
+            height = Math.round((height * MAX_SIZE) / width)
+            width = MAX_SIZE
+          } else if (height > MAX_SIZE) {
+            width = Math.round((width * MAX_SIZE) / height)
+            height = MAX_SIZE
+          }
+  
+          canvas.width = width
+          canvas.height = height
+          ctx?.drawImage(img, 0, 0, width, height)
+  
+          // 압축된 이미지를 Blob으로 변환
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8)
+  
+          // Base64 데이터 URL에서 바이너리 데이터 추출
+          const base64Data = dataUrl.split(',')[1]
+          const binaryData = atob(base64Data)
+          const arrayBuffer = new ArrayBuffer(binaryData.length)
+          const uint8Array = new Uint8Array(arrayBuffer)
+  
+          for (let i = 0; i < binaryData.length; i++) {
+            uint8Array[i] = binaryData.charCodeAt(i)
+          }
+  
+          const blob = new Blob([uint8Array], { type: 'image/jpeg' })
+  
+          // S3에 이미지 업로드
+          const result = await fetch(presignedUrl, {
+            method: 'PUT',
+            body: blob,
+            headers: {
+              'Content-Type': 'image/jpeg',
+            },
+          })
+
+          console.log('result :: ', result)
+          
+          // ✅ 업로드 완료 후 resolve 호출
+          resolve()
+        } catch (error) {
+          console.error('이미지 업로드 중 오류:', error)
+          reject(error)
+        }
+      }
+
+      // ✅ 이미지 로딩 실패 시 reject
+      img.onerror = () => reject(new Error('이미지 로딩 실패'))
+    }
+
+    // ✅ FileReader 에러 시 reject
+    reader.onerror = () => reject(new Error('파일 읽기 실패'))
+  })
 }
