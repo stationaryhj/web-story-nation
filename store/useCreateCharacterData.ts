@@ -393,7 +393,11 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
     set(state => ({
       formData: {
         ...state.formData,
-        multi_images: state.formData.multi_images.map(item => item.chrbot_multi_image_key === data.chrbot_multi_image_key ? data : item),
+        multi_images: state.formData.multi_images.map(item =>
+          item.chrbot_multi_image_key === data.chrbot_multi_image_key &&
+          item.lv === data.lv &&
+          item.idx === data.idx
+          ? data : item),
       },
     }))
     console.log('updateMultiImageData :: ' , get().formData.multi_images)
@@ -426,6 +430,18 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
       item.chrbot_multi_image_key === chrbot_multi_image_key &&
       item.idx === idx
     )
+
+    // 디폴트 이미지 삭제 시 디폴트 이미지 설정
+    const isDefaultChange = (deleteData?.default_yn === 1 && deleteData?.lv < 2)
+    if(isDefaultChange) {
+      const defaultData = get().formData.multi_images.filter(filter => filter.lv === lv)
+      if(defaultData && defaultData.length > 0) {
+        get().updateMultiImageData({
+          ...defaultData[0],
+          default_yn: 1
+        })
+      }
+    }
     
     set(state => ({
       formData: {
@@ -463,6 +479,9 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
     )
 
 
+    console.log('@@@@ changeMultiImageDefault :: ', changeData)
+
+
     // 해당 레벨의 모든 데이터의 default_yn을 0으로 변경
     const changeDatas = get().formData.multi_images.filter((item) => item.lv === lv)
     changeDatas.forEach((item) => {
@@ -473,13 +492,6 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
 				})
 			}
 		})
-
-    set(state => ({
-      formData: {
-        ...state.formData,
-        multi_images: state.formData.multi_images.map(item => item === changeData ? { ...item, default_yn: item.default_yn === 1 ? 0 : 1 } : item),
-      },
-    }))
 
     set(state => ({
       formData: {
@@ -654,11 +666,13 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
       const response = await createApi.GetCreateChatBotInProgress(characterId)
 
       if (response.data?.chrbot) {
+
         // 기존 데이터 초기화
         get().resetForm()
 
         // API 데이터 변환
         const characterData = bridgeCharacterInProgressToCharacter(response.data?.chrbot)
+
 
         // 각 필드 설정
         Object.entries(characterData).forEach(([key, value]) => {
@@ -688,6 +702,32 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
             img_web_url: undefined,
           },
         }))
+
+
+        /**
+         * 마이그레이션
+         * 1. 성인용 이미지가 있으면 response.data?.chrbot.img_url_nsfw
+         *  - multi_images 의 0레벨 0인덱스에 넣고 저장 후 img_url_nsfw 삭제
+        **/
+
+        console.log('@@@@ formData.imgUrlNsfw :: ', get().formData.imgUrlNsfw)
+        const isDefaultImage = get().formData.multi_images.filter(item => item.lv === 0 && item.default_yn === 1)
+        
+        if(get().formData.imgUrlNsfw) {
+          const addImageData: MultiImageData = {
+            lv: 0,
+            img_url: get().formData.imgUrlNsfw,
+            chrbot_multi_image_key: 0,
+            idx: 0,
+            default_yn: isDefaultImage.length > 0 ? 0 : 1,
+            rules: 'migration nsfw images',
+            show_yn: 0,
+            world_list_detail_chrbot_key: characterId || 0,
+          }
+
+          get().addMultiImageDatas([addImageData])
+          get().setAdultImage('')
+        }
       }
     } catch (error) {
       console.error('캐릭터 데이터 로딩 실패:', error)
@@ -870,9 +910,13 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
     .filter(item => (item.show_yn === 1 && item.chrbot_multi_image_key > 0))
     .map(item => item.chrbot_multi_image_key)
 
+    const firstOpenImage = formData.multi_images.filter(
+      item => 
+        (item.show_yn === 1 && item.chrbot_multi_image_key > 0))[0]
+
     const propertyData: PropertyData = {
-      img_selected_key: formData.multi_images[0].chrbot_multi_image_key || 0,
-      img_selected_url: formData.multi_images[0].img_url || '',
+      img_selected_key: firstOpenImage.chrbot_multi_image_key || 0,
+      img_selected_url: firstOpenImage.img_url || '',
       img_public_key: _img_public_key,
     }
 
@@ -920,7 +964,9 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
     if (!response.data || (response.data.result && response.data.result.err !== 0)) {
       throw new Error(response.data?.result?.msg || '저장에 실패했습니다.')
     }
-    
+
+
+    // await get().fetchInProgressData(Number(formData.world_list_detail_chrbot_key))
     return true
   },
 
@@ -951,8 +997,6 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         hashtags: formData.hashtags.join(','),
         c_chrbot_tag_key: selectedTagKeys, // 선택된 태그의 키 값들
       }
-
-      console.log('저장할 태그 데이터:', payload)
 
       // API 호출
       const response = await createApi.SaveCreateChatBotTag(

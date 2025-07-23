@@ -1,6 +1,6 @@
 'use client'
 
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import type { PriSignedUrlInfo, MultiImageData } from '@/services/define'
 import { useCreateCharacterData } from '@/store/useCreateCharacterData'
 import { contentApi } from '@/services/api'
@@ -27,6 +27,7 @@ export default function AddImageSection({ selectedLevel }: AddImageSectionProps)
 	const imageDatas = formData.multi_images.filter((item: any) => item.lv === level)
 	const sumImageCount = formData.multi_images?.length || 0
 
+
 	const handleImageUpload = async ( e: ChangeEvent<HTMLInputElement> ) => {
 		const files = e.target.files
 		if(!files) return
@@ -34,6 +35,7 @@ export default function AddImageSection({ selectedLevel }: AddImageSectionProps)
 		let presignedUrlInfo: PresignedUrlInfoCustom[] = []
 		let presignedUrlData: PriSignedUrlInfo[] = []
 		let index = imageDatas.length + 1
+
 		Array.from(files).map(async (file) => {
 			const extension = file.name.split('.').pop()?.toLowerCase()
 			const contentType = file.type
@@ -45,7 +47,7 @@ export default function AddImageSection({ selectedLevel }: AddImageSectionProps)
 				file_name: fileName,
 				file_type: contentType,
 				file: file,
-				path: ''
+				path: '',
 			})
 
 			presignedUrlData.push({
@@ -66,7 +68,6 @@ export default function AddImageSection({ selectedLevel }: AddImageSectionProps)
 
 		const result_files = presignedResponse.data?.files
 
-		// ✅ 모든 업로드 작업을 Promise 배열로 생성
 		const uploadPromises = Array.from(result_files).map(async (_data) => {
 			const {idx, path, presignedUrl} = _data
 
@@ -77,12 +78,8 @@ export default function AddImageSection({ selectedLevel }: AddImageSectionProps)
 			findData.path = path
 		})
 
-		// ✅ 모든 업로드가 완료될 때까지 기다림
 		await Promise.all(uploadPromises)
 		
-		// ✅ 모든 업로드 완료 후 presignedUrlInfo 확인
-		console.log('presignedUrlInfo :: ', presignedUrlInfo)
-
 
 		const newMultiImageDatas: MultiImageData[] = []
 		presignedUrlInfo.map((item) => {
@@ -106,6 +103,7 @@ export default function AddImageSection({ selectedLevel }: AddImageSectionProps)
 		}
 		
 		addMultiImageDatas(newMultiImageDatas)
+		e.target.value = ''
 	}
 
 
