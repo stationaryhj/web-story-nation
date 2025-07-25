@@ -71,8 +71,11 @@ export interface CharacterFormData {
 
 
   // 멀티이미지
+  multi_images_original: MultiImageData[]
+
   multi_image_count: number
   multi_images: MultiImageData[]
+  
   property: string
 
   writer_note: string
@@ -144,7 +147,7 @@ interface CreateCharacterStore {
   updateMultiImageData: (data: any) => void
   addMultiImageDatas: (data: MultiImageData[]) => void
 
-  deleteMultiImageData: (idx: number, lv: number, chrbot_multi_image_key: number, img_url: string) => void
+  deleteMultiImageData: (hash: string, idx: number, lv: number, chrbot_multi_image_key: number, img_url: string) => Promise<void>
   changeMultiImageShow: (idx: number, lv: number, chrbot_multi_image_key: number, img_url: string) => void
   changeMultiImageDefault: (idx: number, lv: number, chrbot_multi_image_key: number, img_url: string) => void
   changeMultiImageRules: (idx: number, lv: number, chrbot_multi_image_key: number, img_url: string, rules: string) => void
@@ -180,8 +183,10 @@ const defaultFormData: CharacterFormData = {
   likeabilities: [],
   likeability_max_lv: 0,
 
+  multi_images_original: [],
   multi_image_count: 0,
   multi_images: [],
+  
   property: '',
 
   writer_note: '',
@@ -423,26 +428,17 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
   },
 
 
-  deleteMultiImageData: (idx: number, lv: number, chrbot_multi_image_key: number, img_url: string) => {
+  deleteMultiImageData: async (hash: string, idx: number, lv: number, chrbot_multi_image_key: number, img_url: string) => {
     const deleteData = get().formData.multi_images.find(
-      (item) => item.img_url === img_url &&
+      (item) => 
+      item.img_url === img_url &&
       item.lv === lv &&
       item.chrbot_multi_image_key === chrbot_multi_image_key &&
       item.idx === idx
     )
 
-    // 디폴트 이미지 삭제 시 디폴트 이미지 설정
-    const isDefaultChange = (deleteData?.default_yn === 1 && deleteData?.lv < 2)
-    if(isDefaultChange) {
-      const defaultData = get().formData.multi_images.filter(filter => filter.lv === lv)
-      if(defaultData && defaultData.length > 0) {
-        get().updateMultiImageData({
-          ...defaultData[0],
-          default_yn: 1
-        })
-      }
-    }
-    
+    const isDefaultChange = (deleteData?.default_yn === 1)
+
     set(state => ({
       formData: {
         ...state.formData,
@@ -450,6 +446,25 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
           (item) => item !== deleteData),
       },
     }))
+    
+
+    if(chrbot_multi_image_key) {
+      const result = await createApi.DeleteMultiImageData(chrbot_multi_image_key)
+      console.log('@@@@ result :: ' , result)
+    }
+    
+
+    // 디폴트 이미지 삭제 시 디폴트 이미지 설정
+    if(isDefaultChange) {
+      const defaultData = get().formData.multi_images.filter(filter => filter.lv === lv)
+      if(defaultData && defaultData.length > 0) {
+        get().updateMultiImageData({
+          ...defaultData[0],
+          default_yn: 1,
+          show_yn: 1
+        })
+      }
+    }
   },
 
 
@@ -478,27 +493,23 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
       item.idx === idx
     )
 
-
-    console.log('@@@@ changeMultiImageDefault :: ', changeData)
-
-
     // 해당 레벨의 모든 데이터의 default_yn을 0으로 변경
     const changeDatas = get().formData.multi_images.filter((item) => item.lv === lv)
-    changeDatas.forEach((item) => {
-			if (item.default_yn === 1) {
-				get().updateMultiImageData({
-					...item,
-					default_yn: 0
-				})
-			}
-		})
+    const beforeDefaultData = changeDatas.find(item => item.default_yn === 1)
+    const afterDefaultData = changeDatas.find(item => item === changeData)
 
-    set(state => ({
-      formData: {
-        ...state.formData,
-        multi_images: state.formData.multi_images.map(item => item === changeData ? { ...item, default_yn: item.default_yn === 1 ? 0 : 1 } : item),
-      },
-    }))
+
+    if(beforeDefaultData) {
+      beforeDefaultData.default_yn = 0
+      beforeDefaultData.show_yn = 0
+      get().updateMultiImageData(beforeDefaultData)
+    }
+
+    if(afterDefaultData) {
+      afterDefaultData.default_yn = 1
+      afterDefaultData.show_yn = 1
+      get().updateMultiImageData(afterDefaultData)
+    }
   },
 
 
@@ -708,25 +719,29 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
          * 마이그레이션
          * 1. 성인용 이미지가 있으면 response.data?.chrbot.img_url_nsfw
          *  - multi_images 의 0레벨 0인덱스에 넣고 저장 후 img_url_nsfw 삭제
+         * 현재 멀티이미지를 추가 후 저장하면 자동으로 img_url_nsfw 필드에 마지막 추가된 이미지가 들어가는 현상이 있음. 왜지?
         **/
 
-        console.log('@@@@ formData.imgUrlNsfw :: ', get().formData.imgUrlNsfw)
+        // console.log('@@@@ formData.imgUrlNsfw :: ', get().formData.imgUrlNsfw)
         const isDefaultImage = get().formData.multi_images.filter(item => item.lv === 0 && item.default_yn === 1)
-        
-        if(get().formData.imgUrlNsfw) {
-          const addImageData: MultiImageData = {
-            lv: 0,
-            img_url: get().formData.imgUrlNsfw,
-            chrbot_multi_image_key: 0,
-            idx: 0,
-            default_yn: isDefaultImage.length > 0 ? 0 : 1,
-            rules: 'migration nsfw images',
-            show_yn: 0,
-            world_list_detail_chrbot_key: characterId || 0,
-          }
 
-          get().addMultiImageDatas([addImageData])
-          get().setAdultImage('')
+        if(get().formData.multi_images.length === 0) {
+          if(get().formData.imgUrlNsfw) {
+            const addImageData: MultiImageData = {
+              lv: 0,
+              img_url: get().formData.imgUrlNsfw,
+              chrbot_multi_image_key: 0,
+              idx: 0,
+              default_yn: isDefaultImage.length > 0 ? 0 : 1,
+              rules: 'migration nsfw images',
+              show_yn: isDefaultImage.length > 0 ? 0 : 1,
+              world_list_detail_chrbot_key: characterId || 0,
+            }
+  
+            get().addMultiImageDatas([addImageData])
+            get().setAdultImage('')
+            await get().saveMultiImages()
+          }
         }
       }
     } catch (error) {
@@ -844,6 +859,7 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
         apiFormData.append('subject', payload.subject)
         apiFormData.append('title', payload.title)
         apiFormData.append('writer_note', payload.writer_note)
+        apiFormData.append('countryCode', 'KR')
       }
       
 
@@ -901,26 +917,38 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
     }
 
     const { formData } = get()
+    // 여기 조건이좀 이상하다.?
+    /**
+     * 1. 멀티이미지가 없으면 저장 안함??
+     * 2. 멀티이미지가 있으면 첫번째 이미지 선택
+    */
 
-    if(formData.multi_images.length === 0) {
-      return false
+    const firstOpenImages = formData.multi_images.filter(item => item.lv === 0 || item.lv === 1)
+
+    let firstOpenImage = null
+    let img_public_keys: number[] = []
+
+    if(firstOpenImages && firstOpenImages.length > 0) {
+      const images = firstOpenImages.filter(item => item.default_yn === 1 || item.show_yn === 1)
+
+      if(images && images.length > 0) {
+        firstOpenImage = images[0]
+      }
     }
 
-    const _img_public_key = formData.multi_images
-    .filter(item => (item.show_yn === 1 && item.chrbot_multi_image_key > 0))
-    .map(item => item.chrbot_multi_image_key)
+    if(formData.multi_images && formData.multi_images.length > 0) {
+      // 공개 이미지 키 추출
+      img_public_keys = formData.multi_images.filter(
+        item => item.show_yn === 1 || (item.default_yn === 1 && item.lv === 0 || item.default_yn === 1 && item.lv === 1)
+      ).map(item => item.chrbot_multi_image_key)
+    }
 
-    const firstOpenImage = formData.multi_images.filter(
-      item => 
-        (item.show_yn === 1 && item.chrbot_multi_image_key > 0))[0]
-
+    console.log('@@@@ firstOpenImage :: ' , firstOpenImage)
     const propertyData: PropertyData = {
-      img_selected_key: firstOpenImage.chrbot_multi_image_key || 0,
-      img_selected_url: firstOpenImage.img_url || '',
-      img_public_key: _img_public_key,
+      img_selected_key: firstOpenImage?.chrbot_multi_image_key || 0,
+      img_selected_url: firstOpenImage?.img_url || '',
+      img_public_key: img_public_keys,
     }
-
-    console.log('saveProperty :: ' , propertyData)
 
     const apiFormData = new FormData()
     {
@@ -942,12 +970,39 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
     console.log('saveMultiImages')
     
     const { formData } = get()
-    const multiImagesWithIdx = formData.multi_images.map(item => ({
-      ...item,
-      idx: item.idx !== undefined ? item.idx : 0  // idx가 없으면 0으로 초기화
+    /*
+      formData.multi_images 와 formData.multi_images_original 비교해서 차이나는 부분만 취합
+    */
+    const multiImagesWithIdx = formData.multi_images.filter(item => {
+      const originalItem = formData.multi_images_original.find(original => 
+        original.idx === item.idx && 
+        original.chrbot_multi_image_key === item.chrbot_multi_image_key &&
+        original.default_yn === item.default_yn &&
+        original.img_url === item.img_url && 
+        original.lv === item.lv && 
+        original.rules === item.rules &&
+        original.show_yn === item.show_yn
+      )
+      return originalItem === undefined
+    })
+
+
+    console.log('@@@@ multiImagesWithIdx :: ' , multiImagesWithIdx)
+
+
+    // 필요한 데이터만 취합해서 gzip
+    const saveDatas = multiImagesWithIdx.map(item => ({
+      idx: item.idx || 0,
+      chrbot_multi_image_key: item.chrbot_multi_image_key || 0,
+      default_yn: item.default_yn,
+      img_url: item.img_url,
+      lv: item.lv,
+      rules: item.rules,
+      show_yn: item.show_yn,
+      world_list_detail_chrbot_key: Number(formData.world_list_detail_chrbot_key),
     }))
 
-    const jsonData = JSON.stringify(multiImagesWithIdx)
+    const jsonData = JSON.stringify(saveDatas)
     const pako = require('pako');
     const gzip = pako.gzip(jsonData)  // ✅ gzip 압축 사용
     const imageFile = new File([gzip], 'multiimage.txt', {
@@ -965,8 +1020,44 @@ export const useCreateCharacterData = create<CreateCharacterStore>((set, get) =>
       throw new Error(response.data?.result?.msg || '저장에 실패했습니다.')
     }
 
+    const multiImageData = response.data.multi_image_data
+    if(multiImageData) {
+      // get().updateMultiImageDatas(multiImageData)
+      set(state => {
+        // ✅ 서버에서 받은 chrbot_multi_image_key로 기존 이미지들 업데이트
+        const updatedMultiImages = state.formData.multi_images.map(existingImage => {
+          // chrbot_multi_image_key가 0인 이미지만 업데이트 대상
+          if (existingImage.chrbot_multi_image_key === 0) {
+            // idx, lv, img_url, rules로 매칭되는 서버 이미지 찾기
+            const matchedServerImage = multiImageData.find((serverImage: any) => 
+              existingImage.idx === serverImage.idx &&
+              existingImage.lv === serverImage.lv &&
+              existingImage.img_url === serverImage.img_url &&
+              existingImage.rules === serverImage.rules
+            )
+            
+            // 매칭된 서버 이미지가 있으면 chrbot_multi_image_key 업데이트
+            if (matchedServerImage) {
+              return {
+                ...existingImage,
+                chrbot_multi_image_key: matchedServerImage.chrbot_multi_image_key
+              }
+            }
+          }
+          
+          return existingImage
+        })
 
-    // await get().fetchInProgressData(Number(formData.world_list_detail_chrbot_key))
+        return {
+          formData: {
+            ...state.formData,
+            multi_images: updatedMultiImages,
+            multi_images_original: updatedMultiImages,
+          },
+        }
+      })
+    }
+
     return true
   },
 

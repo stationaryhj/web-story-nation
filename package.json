@@ -48,6 +48,7 @@
     "swiper": "^11.2.6",
     "tailwind-scrollbar-hide": "^2.0.0",
     "tippy.js": "^6.3.7",
+    "uuid": "^11.1.0",
     "web3": "^4.16.0",
     "zustand": "^4.5.0"
   },

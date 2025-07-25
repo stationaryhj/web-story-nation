@@ -1,10 +1,12 @@
 'use client'
 
+import { v4 as uuidv4 } from 'uuid'
 import { ChangeEvent, useEffect, useState } from 'react'
 import type { PriSignedUrlInfo, MultiImageData } from '@/services/define'
 import { useCreateCharacterData } from '@/store/useCreateCharacterData'
 import { contentApi } from '@/services/api'
 import { uploadImages } from '@/lib/utils/storyNationUtil'
+import { useModalStore } from '@/store/useStoreModal'
 
 import ImageSlot from './image-slot'
 
@@ -21,6 +23,7 @@ interface AddImageSectionProps {
 
 export default function AddImageSection({ selectedLevel }: AddImageSectionProps) {
 	const { formData, addMultiImageDatas } = useCreateCharacterData()
+	const { openModal, closeModal } = useModalStore()
 	const [level] = useState(selectedLevel)
 	const [world_list_detail_chrbot_key] = useState(formData.world_list_detail_chrbot_key || 0)
 
@@ -31,6 +34,22 @@ export default function AddImageSection({ selectedLevel }: AddImageSectionProps)
 	const handleImageUpload = async ( e: ChangeEvent<HTMLInputElement> ) => {
 		const files = e.target.files
 		if(!files) return
+
+		// ✅ 파일 개수 제한 체크
+		const remainingSlots = MAX_IMAGE_COUNT - sumImageCount
+		if (files.length > remainingSlots) {
+			openModal('confirmAction', {
+        title: '확인',
+        description: `이미지는 ${MAX_IMAGE_COUNT}장을 초과해 업로드할 수 없습니다.`,
+        onConfirm: () => {
+					closeModal()
+        },
+        confirmText: '확인',
+        cancelText: '취소',
+      })
+			e.target.value = '' // input 초기화
+			return
+		}
 
 		let presignedUrlInfo: PresignedUrlInfoCustom[] = []
 		let presignedUrlData: PriSignedUrlInfo[] = []
@@ -84,6 +103,9 @@ export default function AddImageSection({ selectedLevel }: AddImageSectionProps)
 		const newMultiImageDatas: MultiImageData[] = []
 		presignedUrlInfo.map((item) => {
 			newMultiImageDatas.push({
+				hash: uuidv4(),
+				isDeleteCondition: true,
+
 				idx: item.idx,
 				chrbot_multi_image_key: 0,
 				default_yn: 0,
@@ -95,12 +117,16 @@ export default function AddImageSection({ selectedLevel }: AddImageSectionProps)
 			})
 		})
 
-		if(level < 2) {
 			const isDefaultImg = imageDatas.find(item => item.default_yn === 1)
+
 			if(!isDefaultImg) {
 				newMultiImageDatas[0].default_yn = 1
-			}	
-		}
+
+				if(level === 0 || level === 1) {
+					newMultiImageDatas[0].show_yn = 1
+				}
+			}
+
 		
 		addMultiImageDatas(newMultiImageDatas)
 		e.target.value = ''
@@ -118,33 +144,40 @@ export default function AddImageSection({ selectedLevel }: AddImageSectionProps)
 			}
 
 			<div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-2'>
-				{imageDatas.map((item) => (
-					<div key={item.img_url + item.idx + item.chrbot_multi_image_key}>
+				{imageDatas.map((item, index) => (
+					<div key={`${item?.hash || ''}_${item.lv}_${item.idx}_${item.chrbot_multi_image_key}_${index}_${item.img_url}`}>
 						<ImageSlot data={item} />
 					</div>
 				))}
       </div>
 			
-			<div className="w-full flex justify-center">
-				<input
-					id={`imageUpload_${level}`}
-					multiple
-					type="file"
-					accept="image/*"
-					onChange={e => handleImageUpload(e)}
-					className="hidden"  // input 숨김
-				/>
-				
+			{sumImageCount < MAX_IMAGE_COUNT &&
+				<div className="w-full flex justify-center">
+					<input
+						id={`imageUpload_${level}`}
+						multiple
+						type="file"
+						accept="image/*"
+						onChange={e => handleImageUpload(e)}
+						className="hidden"  // input 숨김
+						disabled={sumImageCount >= MAX_IMAGE_COUNT}
+					/>
+					
 				<label 
 					htmlFor={`imageUpload_${level}`}
-					className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-md w-full cursor-pointer transition-colors duration-200 flex items-center justify-center"
+					className={`px-4 py-2 rounded-md w-full transition-colors duration-200 flex items-center justify-center ${
+						sumImageCount >= MAX_IMAGE_COUNT 
+							? 'bg-gray-400 cursor-not-allowed text-gray-200' 
+							: 'bg-primary-500 hover:bg-primary-600 text-white cursor-pointer'
+					}`}
 				>
-					<span className="flex items-center justify-center gap-2">
-						이미지 업로드
-						<div className="text-xs text-secondary-400 dark:text-dark-secondary-400">{sumImageCount}/{MAX_IMAGE_COUNT}</div>
-					</span>
-				</label>
-      </div>
+						<span className="flex items-center justify-center gap-2">
+							이미지 업로드
+							<div className="text-xs text-secondary-400 dark:text-dark-secondary-400">{sumImageCount}/{MAX_IMAGE_COUNT}</div>
+						</span>
+					</label>
+				</div>
+			}
     </div>
   )
 }

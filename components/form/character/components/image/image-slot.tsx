@@ -2,15 +2,14 @@
 
 import React from 'react'
 import Image from 'next/image'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getImageUri, uploadImages } from '@/lib/utils/storyNationUtil'
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
 import { contentApi } from '@/services/api'
 import { useCreateCharacterData } from '@/store/useCreateCharacterData'
 import { useModalStore } from '@/store/useStoreModal'
 
-const DEFAULT_DESCRIPTION = '캐릭터가 레벨업을 했을 때 자동으로 해금되는 이미지입니다.'
+const DEFAULT_DESCRIPTION = '캐릭터가 첫 메시지를 보냈을 때 자동으로 해금되는 이미지입니다.'
+const DEFAULT_DESCRIPTION_ETC = '캐릭터가 레벨업을 했을 때 자동으로 해금되는 이미지입니다.'
 const PLACEHOLDER = '공개 조건을 입력하세요.\n예시: {{char}}가 {{user}}에게 인사를 건낸다.'
 
 
@@ -21,9 +20,12 @@ interface ImageSlotProps {
 export default function ImageSlot({ 
 	data,
 }: ImageSlotProps) {
+	
 	const { openModal, closeModal } = useModalStore()
-	const { isVaild, deleteMultiImageData, changeMultiImageShow, changeMultiImageDefault, changeMultiImageRules, changeMultiImageImage } = useCreateCharacterData()
+	const { isVaild, formData, deleteMultiImageData, changeMultiImageShow, changeMultiImageDefault, changeMultiImageRules, changeMultiImageImage } = useCreateCharacterData()
 
+	const _hash = data?.hash || ''
+	const _isDeleteCondition = data?.isDeleteCondition || false
 	const _chrbot_multi_image_key = data.chrbot_multi_image_key
 	const _imageUrl = data.img_url
 	const _rules = data.rules
@@ -33,13 +35,16 @@ export default function ImageSlot({
 	const _show_yn = data.show_yn
 	const _lv = data.lv
 
+	const DefaultDescription = _lv < 2 ? DEFAULT_DESCRIPTION : DEFAULT_DESCRIPTION_ETC
+	const isFinish = formData.finish_yn || 0
+
 	const handleDelete = () => {
 		openModal('confirmAction', {
 			title: '이미지를 삭제할까요?',
 			description: '입력한 내용과 이미지가 모두 삭제되며 복구할 수 없어요',
 			confirmText: '삭제',
 			onConfirm: () => {
-				deleteMultiImageData(_index, _lv, _chrbot_multi_image_key, _imageUrl)
+				deleteMultiImageData(_hash, _index, _lv, _chrbot_multi_image_key, _imageUrl)
 				closeModal()
 			}
 		})
@@ -118,7 +123,7 @@ export default function ImageSlot({
 					alt='이미지' 
 					width={120} 
 					height={120} 
-					className='rounded-lg object-cover outline outline-1 outline-secondary-200 p-2 hover:outline-2 hover:outline-primary-500 transition-all duration-200'
+					className='rounded-lg object-cover outline outline-1 outline-secondary-200 hover:outline-2 hover:outline-primary-500 transition-all duration-200'
 				/>
 			</label>
 
@@ -131,11 +136,11 @@ export default function ImageSlot({
 				}
 
 				{/* show 버튼 */}
-				{!_isDefault &&
+				{(!_isDefault || _lv > 1) &&
 					<button
 						onClick={() => handleChangeShow()}
 						className="absolute top-1 right-1 flex items-center justify-center">
-						<span className='text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm'>
+						<span className={`text-white text-xs px-1 py-1 rounded-full ${_show_yn ? 'backdrop-blur-sm' : 'bg-primary-500'}`}>
 							{_show_yn === 1 ? (
 								<Image src="/images/icons/img_lock_on.png" alt="show" width={18} height={18} />
 							) : (
@@ -155,7 +160,7 @@ export default function ImageSlot({
 								'border-red-500 bg-red-50' :
 								'border-secondary-300 dark:border-dark-secondary-300/20'
 						}`}
-						placeholder={_isDefault ? DEFAULT_DESCRIPTION : PLACEHOLDER}
+						placeholder={_isDefault ? DefaultDescription : PLACEHOLDER}
 						onChange={e => handleChangeRules(e)}
 						value={_isDefault ? '' : _rules || ''}
 						disabled={_isDefault}
@@ -168,20 +173,25 @@ export default function ImageSlot({
 					}
 				</div>
 
-				<div className='flex items-center justify-between gap-2'>
+				<div className='flex items-center justify-between gap-2 w-full'>
 					{/* 삭제 */}
-					{!_chrbot_multi_image_key &&
+
+					<div className='flex items-center justify-start'>
+					{(_isDeleteCondition || isFinish === 0) &&
 						<button className='px-2 bg-primary-500 rounded-full' onClick={() => handleDelete()}>
 							<span className='text-xs text-white p-1'>X</span>
 						</button>
 					}
+					</div>
 
 					{/* 디폴트 변경 */}
+					<div className='flex items-center justify-end'>
 					{!_isDefault &&
 						<button className='px-2 bg-primary-500 rounded-full' onClick={() => handleChangeDefault()}>
 							<span className='text-xs text-white p-1'>기본 이미지로 선택</span>
 						</button>
 					}
+					</div>
 				</div>
 			</div>
 		</div>

@@ -208,14 +208,17 @@ export default function EditCharacterPage() {
     console.log('handleSaveToNextStep')
 
     if (activeTab === 'basic') {
-      await saveInProgress()
-      handleNextStep('detail')
+      const result = handleNextStep('detail')
+      if(result) await saveInProgress()
+
     } else if (activeTab === 'detail') {
-      await saveInProgress()
-      handleNextStep('image')
+      const result = handleNextStep('image')
+      if(result) await saveInProgress()
+
     } else if (activeTab === 'image') {
-      await saveMultiImages()
-      handleNextStep('last')
+      const result = handleNextStep('last')
+      if(result) await saveMultiImages()
+        
     }
     else if (activeTab === 'last') {
       // 최종 완료 처리
@@ -229,10 +232,11 @@ export default function EditCharacterPage() {
     if(!isFormValid) {
       setVaild(true)
       toast.error('필수값이 입력되지 않았습니다.')
-      return
+      return false
     }
 
     setActiveTab(type)
+    return true
   }
 
 

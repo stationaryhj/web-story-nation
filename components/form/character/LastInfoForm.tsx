@@ -60,7 +60,7 @@ const createCharacterScenario = {
 }
 
 
-const MAX_WRITER_NOTE_LENGTH = 3500
+const MAX_WRITER_NOTE_LENGTH = 1000
 
 interface LastInfoFormProps {
   setFormField: (name: string, value: any) => void

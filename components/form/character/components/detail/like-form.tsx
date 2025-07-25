@@ -61,7 +61,7 @@ export default function LikeForm() {
 							: 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
 					} ${isLikeabilityLock ? 'opacity-50 cursor-not-allowed' : ''}`}
 				>
-					비공개
+					OFF
 				</button>
 				<button
 					disabled={isLikeabilityLock}
@@ -73,7 +73,7 @@ export default function LikeForm() {
 							: 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
 					} ${isLikeabilityLock ? 'opacity-50 cursor-not-allowed' : ''}`}
 				>
-					공개
+					ON
 				</button>
 			</div>
 

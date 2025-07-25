@@ -13,7 +13,7 @@ import { exampleDatas } from '@/lib/utils/storyNationUtil'
 
 import LikeForm from './components/detail/like-form'
 
-const MAX_CONTENT_LENGTH = 50
+const MAX_CONTENT_LENGTH = 3500
 const MAX_REMAINING_LENGTH = 1500
 
 const createCharacterScenario = {

@@ -15,6 +15,9 @@ export interface PriSignedUrlInfo {
 
 
 export interface MultiImageData {
+	hash?: string
+	isDeleteCondition?: boolean
+	
 	idx: number
 	chrbot_multi_image_key: number
 	default_yn: number
@@ -23,4 +26,10 @@ export interface MultiImageData {
 	rules: string
 	show_yn: number
 	world_list_detail_chrbot_key: number
+}
+
+
+export interface MultiImageDataCustom extends MultiImageData {
+	hash?: string
+	isDeleteCondition?: boolean
 }

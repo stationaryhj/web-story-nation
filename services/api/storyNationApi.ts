@@ -116,13 +116,13 @@ const createApiInstance = (baseURL: string) => {
 }
 
 // 환경에 따른 API URL 설정
-// const API_URL = process.env.NODE_ENV === 'production' ?
-//   process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL :
-//   process.env.NEXT_PUBLIC_STORYNATION_API_URL;
+const API_URL = process.env.NODE_ENV === 'production' ?
+  process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL :
+  process.env.NEXT_PUBLIC_STORYNATION_API_URL;
 
 // release
 // const API_URL = process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL;
-const API_URL = process.env.NEXT_PUBLIC_STORYNATION_API_URL
+// const API_URL = process.env.NEXT_PUBLIC_STORYNATION_API_URL
 
 const CHAT_URL =
   process.env.NODE_ENV === 'production'
@@ -1110,6 +1110,18 @@ export const createApi = {
         'X-Web-Access': true,
         'Content-Type': 'multipart/form-data',
       }
+    })
+  },
+
+  /**
+   * 멀티 이미지 삭제
+   */
+
+  DeleteMultiImageData: async (chrbot_multi_image_key: number): Promise<ApiResponse> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/charbot/inprogress/delete/multiimagedata', {
+      chrbot_multi_image_key
     })
   },
 

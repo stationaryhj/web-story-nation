@@ -420,6 +420,7 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
     likeability_yn: data.likeability_yn || 0,
     multi_image_count: data.multi_image_count || 0,
     multi_images: data.multi_images || [],
+    multi_images_original: data.multi_images || [],
     property: data.property || '',
 
     // 공개 + 공개 일시에 비공개로 변경 불가능
