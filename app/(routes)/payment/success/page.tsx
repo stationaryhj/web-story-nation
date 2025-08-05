@@ -12,6 +12,9 @@ import { settlementApi } from '@/services/api/storyNationApi';
 import { useAccountStore } from '@/store/useAccountStore';
 import { ConfirmTossPaymentResponse } from '@/types/api';
 
+import { trackEvent } from '@/app/firebase'
+
+
 // 실제 콘텐츠를 처리하는 컴포넌트
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -69,6 +72,10 @@ function PaymentSuccessContent() {
           updateAccountData(coin_free, accountData?.coin_free_dt || 0, coin_register, coin_user)
           setResultMsg('주문이 성공적으로 처리되었습니다.')
           setSuccess(true)
+
+          trackEvent('purchase_success', {
+            value: Number(amount),
+          })
         }
         else {
           setResultMsg(response.data.result.msg)

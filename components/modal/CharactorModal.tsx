@@ -73,8 +73,9 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   const exampleDatas = chatBotData?.chrbot?.example ? parseConversationExamples(chatBotData.chrbot.example) : []
   const isExampleShow = chatBotData?.chrbot?.example_show_yn === 1 && exampleDatas.length > 0 ? 1 : 0
 
-  const content = getChangeNameTag(chatBotData?.chrbot?.content_public || '', selectedCharacter?.name || '')
-  const isContentShow = chatBotData?.chrbot?.content_show_yn === 1 && content !== '' ? 1 : 0
+  const __content = chatBotData?.chrbot?.content_show_yn === 2 ? chatBotData?.chrbot?.content_public || '' : chatBotData?.chrbot?.content || ''
+  const content = getChangeNameTag(__content, selectedCharacter?.name || '')
+  const isContentShow = (chatBotData?.chrbot?.content_show_yn || 0) > 0 && content !== '' ? 1 : 0
 
   useEffect(() => {
     if (chatBotData) {

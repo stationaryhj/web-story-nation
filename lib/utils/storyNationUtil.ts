@@ -383,6 +383,26 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
   // 대화 예시를 파싱하는 함수
   console.log('bridgeCharacterInProgressToCharacter >> ', data)
 
+  let __content = ''
+  let __content_public = ''
+  if(data.content_show_yn === 2) {
+    if(data.content_public) {
+      __content_public = data.content_public
+    }
+
+    if(data.content) {
+      __content = data.content
+    }
+  }
+  else {
+    if(data.content_show_yn === 1) {
+      __content_public = data.content
+    }
+    else {
+      __content = data.content
+    }
+  }
+
   return {
     id: data.world_list_detail_chrbot_key?.toString() || '',
     name: data.title || '',
@@ -390,7 +410,10 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
     gender: getCategory(Number(data.gender)) || 'unspecified',
     bio: data.intro || '',
     firstMessage: data.first_talk || '',
-    bioDetail: data.content || '',
+    content: __content || '',
+    content_public: __content_public || '',
+    content_show_yn: data.content_show_yn || 0,
+
     // 대화 예시 파싱
     conversationExamples: parseConversationExamples(data.example || ''),
     // 태그 처리

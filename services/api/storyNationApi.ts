@@ -583,7 +583,8 @@ export const contentApi = {
   GetChatMode: async (): Promise<ApiResponse<CharbotChatModeResponse>> => {
     const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
     api.defaults.headers.common['Authorization'] = account_token
-    return api.post('/api/charbot/chatmode')
+    // return api.post('/api/charbot/chatmode')
+    return api.post('/api/charbot/chatmode/auth')
   },
 
   /**

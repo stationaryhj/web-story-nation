@@ -65,8 +65,9 @@ export default function CharactorOpenModal({ isOpen, onClose, chatBotKey }: Char
   const exampleDatas = chatBotData?.chrbot?.example ? parseConversationExamples(chatBotData.chrbot.example) : []
   const isExampleShow = chatBotData?.chrbot?.example_show_yn === 1 && exampleDatas.length > 0 ? 1 : 0
 
-  const content = getChangeNameTag(chatBotData?.chrbot?.content_public || '', chatBotData?.chrbot?.title || '')
-  const isContentShow = chatBotData?.chrbot?.content_show_yn === 1 && content !== '' ? 1 : 0
+  const __content = chatBotData?.chrbot?.content_show_yn === 2 ? chatBotData?.chrbot?.content_public || '' : chatBotData?.chrbot?.content || ''
+  const content = getChangeNameTag(__content, chatBotData?.chrbot?.title || '')
+  const isContentShow = (chatBotData?.chrbot?.content_show_yn || 0) > 0 && content !== '' ? 1 : 0
 
   // 모달 열릴 때 이미지 미리 로딩
   useEffect(() => {
