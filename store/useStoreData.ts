@@ -1,6 +1,7 @@
-import { ChatModeData, CoinData, InquiryData } from '@/types/api'
+import { ChatModeData, CoinData, CoinListResponse, InquiryData } from '@/types/api'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
+import { settlementApi } from '@/services/api/storyNationApi'
 
 // 캐릭터 타입 정의
 export interface Character {
@@ -680,15 +681,22 @@ interface CoinStore {
   orderId: string
   setCoinList: (coinList: Array<CoinData>) => void
   setOrderId: (orderId: string) => void
+  initCoinList: () => Promise<void>
 }
 
 export const useCoinStore = create<CoinStore>()(
   persist(
-    set => ({
+    (set, get) => ({
       coinList: [],
       orderId: '',
       setCoinList: (coinList: Array<CoinData>) => set({ coinList }),
       setOrderId: (orderId: string) => set({ orderId }),
+
+      initCoinList: async () => {
+        if(get().coinList.length > 0) return
+        const response = await settlementApi.GetCoinList()
+        set({ coinList: response.data.coinList })
+      }
     }),
     {
       name: 'coin-storage',

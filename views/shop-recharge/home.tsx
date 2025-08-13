@@ -76,7 +76,7 @@ import { ReqGetCoinChargeUseHistory } from '@/services/hooks/DataListManager'
 export default function ShopRecharge() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'recharge' | 'history'>('recharge')
-  const { coinList } = useCoinStore(state => ({ coinList: state.coinList }))
+  const { coinList, initCoinList } = useCoinStore(state => ({ coinList: state.coinList, initCoinList: state.initCoinList }))
   const [isMobile, setIsMobile] = useState(false)
 
   // 모바일 화면 감지
@@ -90,6 +90,7 @@ export default function ShopRecharge() {
 
     // 리사이즈 이벤트 리스너 추가
     window.addEventListener('resize', handleResize)
+    initCoinList()
 
     // 클린업
     return () => {
