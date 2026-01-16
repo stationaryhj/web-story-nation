@@ -1,4 +1,14 @@
 // API 응답 기본 타입
+
+import {
+  ChatbotMultiImageStructure,
+  ChatbotPropertyStructure,
+  ChatImageSaveRequest,
+  ChatLikeabilityData,
+  MultiImageData
+} from '@/services/interface'
+
+
 export interface ApiResponse<T = any> {
   success: boolean;
   data: T;
@@ -14,6 +24,18 @@ export interface GetUuidResponse {
 }
 
 // Response Data
+
+export interface UnlockMultiImageResponse {
+  result: ApiResult;
+  charge_use_key: number;
+  coin: number;
+  coin_free: number;
+  coin_free_dt: string | null;
+  coin_register: number;
+  ranking: boolean;
+}
+
+
 // Login
 export interface LoginResponse {
   access_token: string;
@@ -44,6 +66,30 @@ export interface LoginResponse {
   safety?: number;
   result: ApiResult;
 }
+
+
+export interface GuestLoginResponse extends LoginResponse {
+  api_server?: string
+  chat_address?: string
+  chat_server?: string
+  chat_server_port?: string
+  coin?: number
+  country_code?: string //국가 코드
+  freeCoin?: number //무료 코인 보유량
+  info?: any
+  nsfw?: number
+  token?: string
+  userKey?: number
+  chrbotKey?: string
+}
+
+
+// export function convertToLoginData(guestLoginResponse: GuestLoginResponse): LoginResponse {
+//   let ref: LoginResponse = {
+    
+//   }
+//   return ref;
+// }
 
 // UserInfo Response
 export interface UserInfoResponse {
@@ -623,12 +669,27 @@ export interface ChatMessageResponse {
 }
 
 
-export interface OpenChatResponse {
+export interface OpenChatResponse extends ChatLikeabilityData {
   arrangePrompt: number
   prompt_key: string
   world_list_detail_chrbot: WorldListDetailChrbot;
   summary_position: number
+
+  // 추가
+  chrbot_likeability?: LikeabilityRuleStructure[] | null
+  nsfw_chat: number | 0
+
   result: ApiResult
+}
+
+
+
+
+export interface LikeabilityRuleStructure {
+  lv: number,
+  lv_name: string,
+  features: string,
+  rules: string
 }
 
 
@@ -643,10 +704,14 @@ export interface WorldListDetailChrbot {
   img_url_nsfw: string
   img_web_url: string
   like_cnt: number
+  likeability_max_lv: number
+  likeability_yn: number
   lv: number
   msg_cnt: number
+  multi_image_count: number
   nick_nm: string
   nsfw: number
+  property: string
   tags: string
   title: string
   user_key: number
@@ -845,6 +910,20 @@ export interface SetSafetyModeResponse {
 }
 
 
+export interface ChatSaveResponse {
+  result: ApiResult
+  chrbot_chat: ChatImageSaveRequest
+}
+
+
+export interface ChatLikeabilityResponse {
+  multi_image_data: MultiImageData[]
+  response: string
+  result: ApiResult
+}
+
+export interface ChatLikeabilitySaveResponse extends ChatSaveResponse {}
+
 // API Result
 export type ApiResult = {
   err: number;
@@ -885,3 +964,18 @@ export interface MultiImageStructure {
   show_yn: number
   default_yn: number
 } 
+
+
+
+
+
+
+export interface ChatLikeData {
+  world_list_detail_chrbot_key: number
+  likeability_yn: number
+  likeability_lv: number
+  chatting_room: string
+  persona: string
+  character: string
+  lv_rules: any
+}

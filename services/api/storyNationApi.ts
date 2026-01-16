@@ -6,6 +6,7 @@ import { useSettingsStore } from '@/store/useStoreSettings'
 import type {
   ApiResponse,
   LoginResponse,
+  GuestLoginResponse,
   CharbotTop10Response,
   TagRankingListResponse,
   CharbotSearchResponse,
@@ -46,9 +47,12 @@ import type {
   ChatFreePenResponse,
   UserInfoResponse,
   GetPresignedUrlMultiResponse,
+  UnlockMultiImageResponse,
+  ChatSaveResponse,
+  ChatLikeabilityResponse,
+  ChatLikeabilitySaveResponse
 } from '../../types/api'
-
-
+import { ChatLikeabilityData, requestLikeAbilityData, requestConnectedChatRoomData } from '@/services/interface'
 import type { PriSignedUrlInfo } from '@/services/define'
 
 
@@ -115,22 +119,9 @@ const createApiInstance = (baseURL: string) => {
   return instance
 }
 
-// 환경에 따른 API URL 설정
-const API_URL = process.env.NODE_ENV === 'production' ?
-  process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL :
-  process.env.NEXT_PUBLIC_STORYNATION_API_URL;
 
-// release
-// const API_URL = process.env.NEXT_PUBLIC_STORYNATION_PROD_API_URL;
-// const API_URL = process.env.NEXT_PUBLIC_STORYNATION_API_URL
-
-const CHAT_URL =
-  process.env.NODE_ENV === 'production'
-    ? process.env.NEXT_PUBLIC_STORYNATION_PROD_CHAT_URL
-    : process.env.NEXT_PUBLIC_STORYNATION_CHAT_URL
-
-// const CHAT_URL = process.env.NEXT_PUBLIC_STORYNATION_PROD_CHAT_URL
-// const CHAT_URL = process.env.NEXT_PUBLIC_STORYNATION_CHAT_URL
+const API_URL = process.env.NEXT_PUBLIC_STORYNATION_API_URL;
+const CHAT_URL = process.env.NEXT_PUBLIC_STORYNATION_CHAT_URL
 
 // API 인스턴스 생성
 const api = createApiInstance(API_URL || '')
@@ -659,6 +650,16 @@ export const contentApi = {
     })
   },
 
+  NicknmCheckToGuest: async (nick_nm: string, access_token: string = ''): Promise<ApiResponse> => {
+    const account_token = `Bearer ${access_token}`
+    api.defaults.headers.common['Authorization'] = account_token
+
+    return api.post('/api/nicknmcheck', {
+      nick_nm,
+    })
+  },
+
+
   // 패스인증
   GetPassInfo: async (success_url: string, failed_url: string, mode = 1): Promise<ApiResponse<GetPassInfoResponse>> => {
     const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
@@ -765,6 +766,114 @@ export const contentApi = {
       safety,
     })
   },
+
+  
+  /**
+   * 멀티 이미지 가져오기
+   */
+  GetMultiImageData: async (world_list_detail_chrbot_key: number, likeability_yn: number): Promise<ApiResponse<any>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/charbot/inprogress/get/multiimagedata', {
+      world_list_detail_chrbot_key,
+      likeability_yn,
+    })
+  },
+
+
+  /**
+   * 멀티 이미지 열기
+   */
+  UnlockMultiImage: async (chrbot_chat_key: number, chrbot_multi_image_key: number, multiImageInfoJson: string): Promise<ApiResponse<UnlockMultiImageResponse>> => {
+    // const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    // api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/charbot/chat/unlock', {
+      chrbot_chat_key,
+      chrbot_multi_image_key,
+      multiImageInfoJson,
+    })
+  },
+
+
+  /**
+   * 채팅 이미지 저장
+   */
+  ChatImageSave: async (
+    chrbot_chat_key: number,
+    multiImageInfoJson: string,
+    img_fixed?: number | 0
+  ): Promise<ApiResponse<ChatSaveResponse>> => {
+    return api.post('/api/charbot/chat/save', {
+      chrbot_chat_key,
+      multiImageInfoJson,
+      img_fixed,
+    })
+  },
+
+
+  /**
+   * 호감도 판독기
+   */
+  ChatLikeability: async (requestLikeAbilityData: requestLikeAbilityData): Promise<ApiResponse<ChatLikeabilityResponse>> => {
+  // ChatLikeability: async (
+  //   world_list_detail_chrbot_key: number,   // 캐봇 키
+  //   likeability_yn: number,                 // 호감도 세팅여부 ( 0 : 비활성화, 1 : 활성화 )  
+  //   likeability_lv: number,                 // 현재 호감도 레벨
+  //   chatting_room: string,                  // 채팅방 ID ( ChatChannel.RoomName ex chat_00000_000|000 )
+  //   persona: string,                        // 페르소나
+  //   character: string,                      // 캐릭터 이름
+  //   lv_rules: string,                       // 호감도 레벨 규칙 ( LikeabilityLevelStructure ) {{char}}:캐릭터 이름, {{user}}:유저 페르소나 치환
+
+  // ): Promise<ApiResponse<any>> => {
+    return api.post('/api/charbot/chat/likeability', requestLikeAbilityData)
+  },
+
+
+  /**
+   * 호감도 판독 후 저장
+   * 호감도 판독 후 경험치와 레벨을 변경 후 저장
+   */
+  ChatLikeabilitySave: async (
+    chrbot_chat_key: number,
+    likeability_exp: number,      // 호감도 판독기에서 받은 경험치 총량
+    likeability_lv: number,       // 현재 호감도 레벨
+    multiImageInfoJson: string,   // 멀티 이미지 정보 ( ChatbotMultiImageStructure )
+  ): Promise<ApiResponse<ChatLikeabilitySaveResponse>> => {
+    return api.post('/api/charbot/chat/save', {
+      chrbot_chat_key,
+      likeability_exp,
+      likeability_lv,
+      multiImageInfoJson,
+    })
+  },
+
+  /**
+   * 레벨 변경
+   */
+  ChatLikeabilityLevelChange: async (
+    chrbot_chat_key: number,      // 채팅방 키
+    likeability_lv: number,       // 현재 호감도 레벨
+    likeability_fixed_lv?: number | 0, // 고정시키고 싶은 레벨, 0이면 고정없음
+  ): Promise<ApiResponse<ChatSaveResponse>> => {
+    return api.post('/api/charbot/chat/save', {
+      chrbot_chat_key,
+      likeability_lv,
+      likeability_fixed_lv,
+    })
+  },
+
+
+  /**
+   * 간편 회원가입
+   * @param persona 페르소나
+   * @param persona_gender 페르소나 성별
+   */
+  SimpleLogin: async (persona: string, persona_gender: number): Promise<ApiResponse<GuestLoginResponse>> => {
+    return api.post('/api/register5', {
+      persona,
+      persona_gender,
+    })
+  }
 }
 
 // 채팅 API
@@ -930,6 +1039,7 @@ export const chatApi = {
       nsfw,
     })
   },
+
 }
 
 // 정산 API
@@ -1199,9 +1309,7 @@ export const createApi = {
     const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
     api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/writerinfo')
-  }
-
-
+  },
 }
 
 

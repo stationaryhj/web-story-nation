@@ -7,13 +7,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Home, MessageCircle, UserRoundPlus, Store, HandCoins } from 'lucide-react'
 import { useModalStore } from '@/store/useStoreModal'
 import { useAccountStore } from '@/store/useStoreData'
+import { SocialLoginProvider } from '@/services/auth/types'
 
 export default function MobileGNB() {
   const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
   const [activeLink, setActiveLink] = useState('/')
   const { openModal } = useModalStore()
-  const { isLogin } = useAccountStore()
+  const { isLogin, loginType } = useAccountStore()
 
   // 컴포넌트가 마운트되었는지 확인
   useEffect(() => {
@@ -41,18 +42,27 @@ export default function MobileGNB() {
 
   // 네비게이션 링크 (아이콘 추가)
   const navLinks = [
-    { href: '/', label: '홈', requireLogin: false, icon: Home },
-    { href: '/chat-list', label: '대화', requireLogin: true, icon: MessageCircle },
-    { href: '/my-characters', label: '만들기', requireLogin: true, icon: UserRoundPlus },
-    { href: '/my-account', label: '수익 관리', requireLogin: true, icon: HandCoins },
-    { href: '/shop-recharge', label: '상점', requireLogin: true, icon: Store },
+    { href: '/', label: '홈', requireLogin: false, icon: Home, loginTypeCheck: false },
+    { href: '/chat-list', label: '대화', requireLogin: true, icon: MessageCircle, loginTypeCheck: false },
+    { href: '/my-characters', label: '만들기', requireLogin: true, icon: UserRoundPlus, loginTypeCheck: true },
+    { href: '/my-account', label: '수익 관리', requireLogin: true, icon: HandCoins, loginTypeCheck: true },
+    { href: '/shop-recharge', label: '상점', requireLogin: true, icon: Store, loginTypeCheck: false },
   ]
+
+  const isDisabled = '/guest'.includes(pathname || '')
 
   // 로그인 필요한 링크 체크 핸들러
   const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, link: (typeof navLinks)[0]) => {
     if (link.requireLogin && !isLogin) {
       e.preventDefault()
       openModal('login')
+    }
+
+    if(link.loginTypeCheck) {
+      if(!loginType || loginType === 'Guest' as SocialLoginProvider) {
+        e.preventDefault()
+        openModal('login')
+      }
     }
   }
 

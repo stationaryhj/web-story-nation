@@ -12,6 +12,15 @@ import {
 } from '@/types/api'
 import { ChatMode } from '@/components/modal/ChatModeModal'
 import { useAccountStore } from '@/store/useAccountStore'
+import { requestConnectedChatRoomData } from '@/services/interface'
+
+const PI_ADDRESS = process.env.NEXT_PUBLIC_PI_ADDRESS
+const CHAT_FRONTEND_ADDRESS = process.env.NEXT_PUBLIC_CHAT_FRONTEND_ADDRESS
+const CHAT_SERVER_ADDRESS = process.env.NEXT_PUBLIC_CHAT_SERVER_ADDRESS
+const CHAT_SERVER_PORT = process.env.NEXT_PUBLIC_CHAT_SERVER_PORT
+
+import CryptoJS from 'crypto-js'
+const encryptionKey = '12345678901234567890123456789012' // 32바이트 키 (256비트)
 
 // 백엔드 서버가 가지고있는 데이터
 export interface ConversationExampleJSON {
@@ -91,7 +100,7 @@ export function getImageUri(url: string | undefined | null): string {
  * @returns 소셜 타입 번호
  */
 export function getSnsTypeNumber(provider: string): number {
-  switch (provider) {
+  switch (provider.toUpperCase()) {
     case 'GUEST':
       return 0
     case 'KAKAO':
@@ -626,4 +635,83 @@ export async function uploadImages(file: File, presignedUrl: string): Promise<vo
     // ✅ FileReader 에러 시 reject
     reader.onerror = () => reject(new Error('파일 읽기 실패'))
   })
+}
+
+
+
+export async function rijndaelEncrypt(data: string): Promise<string> {
+  const keyParsed = CryptoJS.enc.Utf8.parse(encryptionKey)
+  const encrypted = CryptoJS.AES.encrypt(data, keyParsed, {
+    mode: CryptoJS.mode.ECB,        // ECB 모드
+    padding: CryptoJS.pad.Pkcs7,    // PKCS7 패딩
+    keySize: 8                      // 256비트 = 8 * 32비트 워드
+  })
+  
+  // Base64로 인코딩하여 반환
+  return encrypted.toString()  // CryptoJS는 자동으로 Base64로 인코딩
+}
+
+export async function getChatRoomEncryptData(chrbotKey: string,
+  coin: string,
+  country_code: string,
+  freeCoin: string,
+  info: any,
+  nsfw: string,
+  persona: string,
+  token: string,
+  userKey: string,
+
+  api_server?: string,
+  chat_address?: string,
+  chat_server?: string,
+  chat_server_port?: string,
+): Promise<string> {
+  const reqData: requestConnectedChatRoomData = {
+    api_server: api_server || PI_ADDRESS || 'https://qausapi.universestationery.com',
+    chat_address: chat_address || CHAT_FRONTEND_ADDRESS || 'https://qa.storynation.co.kr/character/chat',
+    chat_server: chat_server || CHAT_SERVER_ADDRESS || 'qauschat.storynation.io',
+    chat_server_port: chat_server_port || CHAT_SERVER_PORT?.toString() || '443',
+
+    chrbotKey: chrbotKey || '',
+    coin: coin || '',
+    country_code: country_code || '',
+    freeCoin: freeCoin || '',
+    info: info,
+    nsfw: nsfw || '',
+    persona: persona || '',
+    token: token || '',
+    userKey: userKey || '',
+  }
+
+  console.log('@@ reqData :: ', reqData)
+
+  // reqData 를 AES-256-ECB 암호화
+  const encryptedData = await rijndaelEncrypt(JSON.stringify(reqData))
+  console.log('encryptedData :: ', encryptedData)
+
+  // encryptedData 를 base64 인코딩
+  const base64EncodedData = btoa(encryptedData)
+  return base64EncodedData
+}
+
+
+export const getPlatform = (sns_type: number) => {
+  switch (sns_type) {
+    case 0:
+      return 'Guest'
+    case 1:
+      return 'Kakao'
+    case 2:
+      return 'Naver'
+    case 3:
+      return 'Google'
+    case 4:
+      return 'Apple'
+    case 7:
+      return 'GooglePlayGames'
+    case 8:
+      return 'Facebook'
+    default:
+      return ''
+  }
 }

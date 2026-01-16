@@ -2,10 +2,10 @@ version: "3.8"
 
 services:
   web:
-    image: brickstreammainweb:latest
-    container_name: brickstream_main_web
+    image: storynation-frontend-live-v0.3.8
+    container_name: storynation-frontend
     ports:
-      - "3000:3000"
+      - "3201:3000"
     environment:
       - NODE_ENV=production
     restart: always

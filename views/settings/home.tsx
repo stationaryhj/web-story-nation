@@ -12,30 +12,12 @@ import { BaseButton } from '@/components/elements/button/BaseButton'
 import { useSettingsStore } from '@/store/useStoreSettings'
 import { contentApi } from '@/services/api/storyNationApi'
 import { useBankStore } from '@/store/useGlobalStore'
+import { useModalStore } from '@/store/useStoreModal'
 import DeleteAccountModal from '@/components/modal/DeleteAccountModal'
 import DuplicateCheckModal from '@/components/modal/DuplicateCheckModal'
-import { getImageUri } from '@/lib/utils/storyNationUtil'
+import { getImageUri, getPlatform } from '@/lib/utils/storyNationUtil'
+import { SocialLoginProvider } from '@/services/auth/types'
 
-const getPlatform = (sns_type: number) => {
-  switch (sns_type) {
-    case 0:
-      return 'Guest'
-    case 1:
-      return 'Kakao'
-    case 2:
-      return 'Naver'
-    case 3:
-      return 'Google'
-    case 4:
-      return 'Apple'
-    case 7:
-      return 'GooglePlayGames'
-    case 8:
-      return 'Facebook'
-    default:
-      return ''
-  }
-}
 
 export default function SettingsForm() {
   const router = useRouter()
@@ -46,8 +28,11 @@ export default function SettingsForm() {
   const [showDuplicateCheckModal, setShowDuplicateCheckModal] = useState(false)
 
   const { settings } = useSettingsStore()
-  const { data: userInfo, writerInfo, fetchWriterInfo, logout, getCoinSum, uploadProfileImage } = useAccountStore()
+  const { data: userInfo, writerInfo, loginType, isLogin, fetchWriterInfo, logout, getCoinSum, uploadProfileImage } = useAccountStore()
   const { getBankList } = useBankStore()
+  const { openModal } = useModalStore()
+  
+  // const isGuestLogin = loginType === 'Guest' as SocialLoginProvider && isLogin
 
   const login_sns_state = localStorage.getItem('social_login_state') || ''
   const miner = userInfo?.minor || 0
@@ -55,7 +40,7 @@ export default function SettingsForm() {
   // 사용자 정보 상태
   const [profile, setProfile] = useState({
     nickname: userInfo?.nick_nm || '',
-    platform: getPlatform(JSON.parse(login_sns_state || '{}')?.snstype || 0) || '',
+    platform: loginType,//getPlatform(JSON.parse(login_sns_state || '{}')?.snstype || 0) || '',
     minor: userInfo?.minor || 0,
     intro: userInfo?.intro || '',
 
@@ -86,11 +71,40 @@ export default function SettingsForm() {
 
   // 닉네임이 원래 닉네임과 같은지 확인
   useEffect(() => {
+    console.log('@@ writerInfo :: ', writerInfo)
+    console.log('@@ userInfo :: ', userInfo)
+    console.log('@@ loginType :: ', loginType)
+
+    if(writerInfo) {
+      setProfile(prev => ({ ...prev,
+        email: writerInfo?.email || '',
+        bank: writerInfo?.bank_nm || '',
+        accountNumber: writerInfo?.account_no || '',
+        accountHolder: writerInfo?.user_nm || '',
+      }))
+    }
+
+    if(userInfo) {
+      setProfile(prev => ({ ...prev,
+        minor: userInfo?.minor || 0,
+        intro: userInfo?.intro || '',
+      }))
+
+      setPersona(prev => ({ ...prev,
+        name: userInfo?.persona || '',
+        gender: userInfo?.persona_gender || 1,
+      }))
+    }
+
+    if(loginType) {
+      setProfile(prev => ({ ...prev, platform: loginType || 'Guest' as SocialLoginProvider }))
+    }
+
     if (userInfo?.nick_nm) {
       setOriginalNickname(userInfo.nick_nm)
       setProfile(prev => ({ ...prev, nickname: userInfo.nick_nm }))
     }
-  }, [userInfo])
+  }, [userInfo, loginType, writerInfo])
 
   // 작가 정보 불러오기
   useEffect(() => {
@@ -410,6 +424,10 @@ export default function SettingsForm() {
   // 본인 인증 핸들러
   const handleAdultVerification = async () => {
     try {
+      if(!loginType || loginType === 'Guest' as SocialLoginProvider) {
+        openModal('login')
+        return;
+      }
       // useAccountStore의 verifyIdentity 함수 사용
       const { verifyIdentity } = useAccountStore.getState()
       const result = await verifyIdentity()

@@ -8,6 +8,7 @@ export interface LoginResult {
   error?: string;
   signupRequired?: boolean;
   needSignup?: boolean;
+  isDuplicateLogin?: boolean;
 }
 
 // 소셜 로그인 응답 데이터 타입

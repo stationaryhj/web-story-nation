@@ -4,6 +4,8 @@ import { faBell } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useState } from 'react'
 import { useModalStore } from '@/store/useStoreModal'
+import { SocialLoginProvider } from '@/services/auth/types'
+import { useAccountStore } from '@/store/useAccountStore'
 
 interface NotificationButtonProps {
   count?: number
@@ -11,10 +13,16 @@ interface NotificationButtonProps {
 }
 
 export default function NotificationButton({ count = 0, className = '' }: NotificationButtonProps) {
+  const { loginType } = useAccountStore()
   const [isHovered, setIsHovered] = useState(false)
   const { openModal } = useModalStore()
 
   const handleClick = () => {
+    if(!loginType || loginType === 'Guest' as SocialLoginProvider) {
+      openModal('login')
+      return;
+    }
+
     openModal('notification') // 알림 사이드바 모달 열기
   }
 

@@ -31,6 +31,7 @@ import { useSettingsStore } from '../../store/useStoreSettings'
 import Image from 'next/image'
 import HeaderSidebar from '@/components/elements/sidebar/HeaderSidebar'
 import { useRouter } from 'next/navigation'
+import { SocialLoginProvider } from '@/services/auth/types'
 
 // 토글 스위치 컴포넌트 수정
 const SimpleToggle = ({
@@ -79,17 +80,17 @@ export default function Header() {
   const pathname = usePathname()
   const [activeLink, setActiveLink] = useState('/')
   const { openModal } = useModalStore()
-  const { isLogin, logout, isAdult } = useAccountStore()
+  const { isLogin, logout, isAdult, loginType } = useAccountStore()
   const router = useRouter()
 
   // 네비게이션 링크 (아이콘 추가)
   const navLinks = [
-    { href: '/', label: '홈', requireLogin: false, icon: faHome },
-    { href: '/chat-list', label: '대화', requireLogin: true, icon: faComment },
-    { href: '/my-characters', label: '캐릭터 만들기', requireLogin: true, icon: faUser },
+    { href: '/', label: '홈', requireLogin: false, icon: faHome, loginTypeCheck: false },
+    { href: '/chat-list', label: '대화', requireLogin: true, icon: faComment, loginTypeCheck: false },
+    { href: '/my-characters', label: '캐릭터 만들기', requireLogin: true, icon: faUser, loginTypeCheck: true },
     // { href: '/live', label: 'Live', requireLogin: true, icon: faVideo },
-    { href: '/my-account', label: '수익 관리', requireLogin: true, icon: faChartLine },
-    { href: '/shop-recharge', label: '상점', requireLogin: true, icon: faStore },
+    { href: '/my-account', label: '수익 관리', requireLogin: true, icon: faChartLine, loginTypeCheck: true },
+    { href: '/shop-recharge', label: '상점', requireLogin: true, icon: faStore, loginTypeCheck: false },
   ]
 
   // 로그인 필요한 링크 체크 핸들러
@@ -97,6 +98,13 @@ export default function Header() {
     if (link.requireLogin && !isLogin) {
       e.preventDefault()
       openModal('login')
+    }
+
+    if(link.loginTypeCheck) {
+      if(!loginType || loginType === 'Guest' as SocialLoginProvider) {
+        e.preventDefault()
+        openModal('login')
+      }
     }
   }
 
@@ -132,6 +140,11 @@ export default function Header() {
 
   const handleAdultModeToggle = async () => {
     if(isLogin) {
+      if(!loginType || loginType === 'Guest' as SocialLoginProvider) {
+        openModal('login')
+        return;
+      }
+
       if(isAdult()) {
         await changeAdultMode()
       } else {
@@ -240,7 +253,9 @@ export default function Header() {
             </Link>
 
             <motion.button
-              onClick={() => setIsSidebarOpen(true)}
+              onClick={(e) => {
+                setIsSidebarOpen(true)
+              }}
               className="md:hidden text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 transition-colors"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}

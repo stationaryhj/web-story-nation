@@ -32,6 +32,7 @@ export default function GuestLoginForm({ onSubmit, disabled = false }: GuestLogi
     onSubmit(nickname.trim())
   }
 
+
   return (
     <form onSubmit={handleSubmit} className="w-full">
       <div className="flex flex-col space-y-2">

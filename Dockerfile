@@ -20,7 +20,7 @@ COPY --from=builder /app/tsconfig.node.json ./
 COPY --from=builder /app/postcss.config.js ./
 COPY --from=builder /app/tailwind.config.ts ./
 COPY --from=builder /app/global.d.ts ./
-COPY --from=builder /app/.env.local ./
+COPY --from=builder /app/.env ./
 
 RUN yarn install --production
 EXPOSE 3100

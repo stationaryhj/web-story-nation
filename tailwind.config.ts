@@ -111,6 +111,7 @@ const config: Config = {
       },
       backgroundImage: {
         'gradient-dark': 'linear-gradient(to bottom, #13111C, #1E1E2E)',
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
       },
     },
   },

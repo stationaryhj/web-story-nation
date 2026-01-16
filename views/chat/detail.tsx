@@ -1,6 +1,10 @@
 'use client'
 
-import { Character, useAccountStore } from '@/store/useStoreData'
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import type { FormEvent } from 'react'
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
+
 import {
   faPaperPlane,
   faArrowLeft,
@@ -17,15 +21,11 @@ import {
   faDownload,
   faEllipsisV,
   faImage,
+  faHeart,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { motion } from 'framer-motion'
-import Image from 'next/image'
 import { Gift } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import type { FormEvent } from 'react'
-import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
-import { useModalStore } from '@/store/useStoreModal'
 import type { ChatMode } from '@/components/modal/ChatModeModal'
 import { BaseButton } from '@/components/elements/button/BaseButton'
 import type { ChrbotData } from '@/types/api'
@@ -36,7 +36,13 @@ import {
   getValidImageUrl,
 } from '@/lib/utils/storyNationUtil'
 import { useNakama } from '@/app/providers/NakamaProviders'
+
+import { Character, useAccountStore } from '@/store/useStoreData'
+import { useModalStore } from '@/store/useStoreModal'
 import { useChatModeStore } from '@/store/useStoreData'
+import { useMultiImageStore } from '@/store/useMultiImageStore';
+import { useChatStore } from '@/store/useChatStore';
+
 import BaseSidebar from '@/components/elements/sidebar/BaseSidebar'
 import { chatApi, createApi } from '@/services/api/storyNationApi'
 import Tutorial from '@/components/tutorial/Tutorial'
@@ -44,103 +50,48 @@ import ResetChatModal from '@/components/modal/ResetChatModal'
 import { toast } from 'react-toastify'
 
 import BigImageModal from '@/components/modal/BigImageModal'
+import { getImageUri } from '@/lib/utils/storyNationUtil'
 
-interface ChatDetailClientProps {
-  characterId: string
-  charbotData: ChrbotData | null
-}
+import {
+  defaultNames, customChatModes,
+  MESSAGES_PER_VIEW, LOAD_MORE_THRESHOLD, LOAD_MORE_COUNT, PRELOAD_BUFFER
+} from '@/services/define'
 
-const defaultNames: Record<number, string> = {
-  1: '가성비 모드',
-  2: '스토리 모드',
-  3: '짜릿모드 1.0',
-  4: '짜릿모드 2.0',
-}
+import UnlockActionModal from '@/components/modal/UnlockActionModal'
 
 // 채팅 모드 이름 가져오기 함수
 const getChatModeName = (modeId: number) => {
   return defaultNames[modeId] || defaultNames[0]
 }
 
-const customChatModes: ChatMode[] = [
-  {
-    id: 1,
-    name: '가성비모드',
-    description: '일반적인 대화에 최적화된 모드입니다.',
-    penCost: 1,
-    ai: 'Gemini 1.5 Flash',
-    icon: faPiggyBank,
-    discount: 0,
-    original_coin: 0,
-    isShow: true,
-    isAdult: false,
-  },
-  {
-    id: 2,
-    name: '스토리모드',
-    description: '이야기 생성과 연속성이 필요한 대화에 적합합니다.',
-    penCost: 3,
-    ai: 'Sonnet 3.5 v2',
-    icon: faBookOpen,
-    discount: 0,
-    original_coin: 0,
-    isShow: true,
-    isAdult: false,
-  },
-  {
-    id: 3,
-    name: '짜릿모드 1.0',
-    description: '보다 자유롭고 창의적인 대화를 원할 때 사용하세요.',
-    penCost: 4,
-    ai: 'Gemini 1.5 Pro',
-    icon: faFire,
-    discount: 0,
-    original_coin: 0,
-    isShow: true,
-    isAdult: true,
-  },
-  {
-    id: 4,
-    name: '짜릿모드 2.0',
-    description: '가장 높은 품질과 창의성을 제공하는 최고급 모드입니다.',
-    penCost: 7,
-    ai: 'Sonnet 3.5 v2',
-    icon: faRocket,
-    discount: 0,
-    original_coin: 0,
-    isShow: true,
-    isAdult: true,
-  },
-]
 
-export default function ChatDetailClient({ characterId, charbotData }: ChatDetailClientProps) {
+
+export default function ChatDetailClient({ characterId }: { characterId: string }) {
   const router = useRouter()
-
+  const { openModal, closeModal, setSelectedCharacter } = useModalStore()
+  const { chatBotData, selectedLikeability_exp, selectedLikeability_lv, chatLikeability } = useChatStore()
+  const { chatMode } = useChatModeStore()
+  const { multiImages, bgImageUrl, openImageCount, selectedMultiImageData, chageBackgroundImage } = useMultiImageStore()
+  const { getCoinSum } = useAccountStore()
+  
   const { data: accountData, userIsAdult } = useAccountStore(state => ({
     isLogin: state.isLogin,
     data: state.data,
     userIsAdult: state.isAdult() ? 1 : 0,
   }))
 
+
   // 주석 해제
-  const first_talk = charbotData?.first_talk ? getChangeNameTag(charbotData?.first_talk, charbotData?.title) : ''
+  const first_talk = chatBotData?.first_talk ? getChangeNameTag(chatBotData?.first_talk, chatBotData?.title) : ''
 
   // 모바일 환경 감지
   const [isMobile, setIsMobile] = useState(false)
-
   const [isBigImageModalOpen, setIsBigImageModalOpen] = useState(false)
   const [bigImageUrl, setBigImageUrl] = useState('')
 
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-
-    checkIsMobile()
-    window.addEventListener('resize', checkIsMobile)
-
-    return () => window.removeEventListener('resize', checkIsMobile)
-  }, [])
+  // 이미지 해금
+  const [imgUnlockAction, setImgUnlockAction] = useState<boolean>(false)
+  const [rewardImgUrl, setRewardImgUrl] = useState<string>('')
 
   // 튜토리얼 관련 상태를 최상위로 이동
   const [showTutorial, setShowTutorial] = useState(true)
@@ -182,6 +133,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   // Nakama 컨텍스트 사용
   const nakamaContext = useNakama()
   const {
+    roomName,
     isConnected,
     isConnecting,
     chatRoomInit,
@@ -200,20 +152,26 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     updateChatMode,
     updatePromptKey,
     deleteChatMessage,
+
+    addChannelMessageListener,
+    removeChannelMessageListener
   } = nakamaContext
 
-  const [message, setMessage] = useState('')
+  // 마지막으로 수동 스크롤한 위치 기록
+  const lastManualScrollRef = useRef<number>(0)
+  const isAutoScrollingRef = useRef<boolean>(true)
+
   const hasInitialized = useRef(false)
+  const isMountedRef = useRef(true)     // 마운트 상태 추적용 ref
+  const chatContainerRef = useRef<HTMLDivElement>(null) // 채팅 컨테이너 ref
+  const toastShownRef = useRef(false)
+
+
+  const [message, setMessage] = useState('')
   const [currentModeId, setCurrentModeId] = useState(1)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [isWaitingForAI, setIsWaitingForAI] = useState<boolean>(false) // AI 응답 대기 상태
-  const { chatMode } = useChatModeStore()
-
-  const { openModal, closeModal, setSelectedCharacter } = useModalStore()
-
-  // 캐릭터 데이터 변환
-  const character = bridgeCharbotDataToCharacter(charbotData as ChrbotData)
 
   // 연결 상태 표시 관련 상태
   const [showConnectedStatus, setShowConnectedStatus] = useState(false)
@@ -225,7 +183,8 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   const [isMoreSidebarOpen, setIsMoreSidebarOpen] = useState(false)
 
   // 캐릭터 이미지
-  const [showImage, setShowImage] = useState(getValidImageUrl(character.imageUrl))
+  // const [showImage, setShowImage] = useState(getValidImageUrl(character.imageUrl))
+  const [showImage, setShowImage] = useState(getValidImageUrl(getImageUri(bgImageUrl)))
 
   // 배경 이미지 상태 추가
   const [isBackgroundEnabled, setIsBackgroundEnabled] = useState(true)
@@ -233,15 +192,140 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
   // 나가기 플래그
   const [isExit, setIsExit] = useState(false)
 
-  // 마운트 상태 추적용 ref
-  const isMountedRef = useRef(true)
-
-  // 채팅 초기화 모달 상태
+    // 채팅 초기화 모달 상태
   const [showResetChatModal, setShowResetChatModal] = useState(false)
 
-  // 채팅 컨테이너 ref
-  const chatContainerRef = useRef<HTMLDivElement>(null)
-  const toastShownRef = useRef(false)
+  // 캐릭터 데이터 변환
+  const character = bridgeCharbotDataToCharacter(chatBotData as ChrbotData)
+
+
+  // 날짜 포맷팅 함수
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  }
+
+  // 메시지 내용에서 상황 설명(*로 감싸진 텍스트)를 찾아 스타일을 적용하는 함수
+  const formatMessageWithSituations = (message: string) => {
+    // 정규식으로 *로 감싸진 텍스트 찾기
+    const parts = message.split(/(\*[^*]+\*)/g)
+
+    return parts.map((part, index) => {
+      if (part.startsWith('*') && part.endsWith('*')) {
+        // 상황 설명 부분 (기울임체, 회색, 얇은 폰트)
+        const content = part.slice(1, -1) // 별표 제거
+        return (
+          <span key={index} className="italic text-gray-400 font-medium">
+            {content}
+          </span>
+        )
+      }
+      // 일반 대화 부분
+      return <span key={index}>{part}</span>
+    })
+  }
+
+  // 모드 아이콘 가져오기 함수 수정
+  const getModeIcon = (modeId: number) => {
+    switch (modeId) {
+      case 1:
+        return faPiggyBank
+      case 2:
+        return faBookOpen
+      case 3:
+        return faFire
+      case 4:
+        return faRocket
+      default:
+        return faRocket
+    }
+  }
+
+  const checkCoin = () => {
+    const selectModeData = chatMode.find(mode => mode.chat_mode === currentModeId)
+    const currentCoin = getCoinSum()
+
+    if (currentCoin < Number(selectModeData?.coin)) {
+      // 재화 부족 시 모달 표시
+      openModal('confirmAction', {
+        title: '펜 부족',
+        description: `보유한 펜이 부족해요..ㅠㅠ\n펜을 충전하러 갈까요?`,
+        onConfirm: () => {
+          // 충전 페이지로 이동하는 로직 추가 가능
+          router.push('/shop-recharge')
+          closeModal()
+        },
+        confirmText: '충전하러 가기',
+        cancelText: '취소',
+        confirmButtonClass: 'bg-primary-500 hover:bg-primary-600 text-white',
+      })
+      return false
+    }
+
+    return true
+  }
+
+  // 스크롤을 최하단으로 이동하는 함수
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
+    }
+  }
+  
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkIsMobile()
+    window.addEventListener('resize', checkIsMobile)
+
+    return () => {
+      console.log('언마운트 >>> 시작')
+      cleanupChatRoom().catch(err => console.error('채팅방 정리 중 오류:', err))
+      window.removeEventListener('resize', checkIsMobile)
+    }
+  }, [])
+
+
+  useEffect(() => {
+    if(channelId) {
+      addChannelMessageListener(channelId as string, (message) => {
+        if(message) {
+          if( message.content && message.content.type === 'ai' ) {
+            // console.log('@@@@ addChannelMessageListener 채팅방 메세지 ::: ' , message)
+            // 여기서 호감도를 체크한다.
+
+            (async () => {
+              const result = await chatLikeability(roomName || '')
+              if(result !== null && result.err === 0) {
+                if(result.msg) {
+                  setImgUnlockAction(true)
+                  setRewardImgUrl(result.msg)
+                }
+              }
+              else {
+                toast.error(result?.msg || '호감도 판독에 실패했습니다.')
+              }
+            })()
+          }
+        }
+      })
+    }
+    
+    return () => {
+      removeChannelMessageListener(channelId as string, (message) => {
+        console.log('@@@@ removeChannelMessageListener 채팅방 메세지 ::: ' , message)
+      })
+    }
+  }, [channelId])
+
+  
+
+  useEffect(() => {
+    setShowImage(getValidImageUrl(getImageUri(bgImageUrl)))
+  }, [bgImageUrl])
+
 
   // 메시지 디버깅을 위한 로깅 추가 - 무한 루프 문제 수정
   useEffect(() => {
@@ -255,8 +339,13 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       if (!lastMsg.id.startsWith('temp_')) {
         setIsWaitingForAI(lastMsg.sender === 'user')
       }
+
+      if (lastMsg.sender === 'character') {
+        console.log('💬 캐릭터 메세지 ::', lastMsg)
+      }
     }
   }, [chatMessages]) // 의존성 배열에 chatMessages만 포함
+
 
   // 연결 상태 변화 로깅 - 타이머 클리어 추가
   useEffect(() => {
@@ -290,6 +379,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     }
   }, [isConnected, isConnecting, channelId, isInitRoom])
 
+
   // 채팅방 정리 및 연결 종료를 위한 공통 함수 최적화
   const cleanupChatRoom = useCallback(async () => {
     try {
@@ -299,6 +389,8 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       if (channelId) {
         try {
           await leaveChat(channelId)
+          console.log('1 :::: 채팅방 나가기 성공')
+
         } catch (error) {
           console.error('채팅방 나가기 중 오류:', error)
           // 오류가 발생해도 계속 진행
@@ -308,6 +400,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       // 2. 소켓 연결 종료
       try {
         await disconnectSocket()
+        console.log('2 :::: 소켓 종료 성공')
       } catch (error) {
         console.error('소켓 연결 종료 중 오류:', error)
         // 오류가 발생해도 계속 진행
@@ -315,7 +408,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
       // 3. 상태 정리 (clearChatHistory 호출 제거)
       hasInitialized.current = false
-
+      console.log('3 :::: 상태정리 끝')
       return true
     } catch (error) {
       console.error('채팅방 정리 중 오류 발생:', error)
@@ -327,6 +420,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 채팅방 초기화 메서드 - useCallback으로 변경
   const initializeChatRoom = useCallback(async () => {
+    console.log('initializeChatRoom >>> 시작')
+
+
     // 이미 초기화 중이거나 초기화가 완료된 경우 또는 필요한 데이터가 없는 경우
     if (!character?.id || !accountData?.user_key) {
       console.log('⚠️ 초기화에 필요한 데이터가 없습니다.')
@@ -406,33 +502,12 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     }
   }, [character?.id, accountData?.user_key, characterId, chatRoomInit, chatMode, isConnected, channelId, isInitRoom])
 
-  // 실제 언마운트 시에만 정리하기 위한 로직
-  useEffect(() => {
-    if (isExit) return
-
-    isMountedRef.current = true
-    console.log('🌱 컴포넌트 마운트됨')
-
-    return () => {
-      isMountedRef.current = false
-      console.log('💀 컴포넌트 실제 언마운트됨 - 채팅방 정리 예정')
-
-      // 이미 언마운트된 상태에서 비동기 작업이 완료되면 의미 없음
-      // 약간의 지연을 두어 불필요한 정리를 방지
-      setTimeout(() => {
-        // 실제 언마운트 상태인 경우에만 정리 수행
-        if (!isMountedRef.current) {
-          console.log('🧹 채팅방 정리 실행')
-          cleanupChatRoom().catch(err => console.error('채팅방 정리 중 오류:', err))
-        } else {
-          console.log('⚠️ 채팅방 정리가 취소됨 - 컴포넌트가 다시 마운트됨')
-        }
-      }, 100)
-    }
-  }, [cleanupChatRoom]) // cleanupChatRoom 의존성 추가
 
   // 채팅방 초기화 로직 - 채팅방 초기화만 담당
   useEffect(() => {
+    console.log('@@@@ isInitRoom :: ' , isInitRoom)
+    console.log('@@@@ channelId :: ' , channelId)
+
     // 이미 초기화된 상태라면 중단하고 초기화 상태만 업데이트
     if (isInitRoom && channelId) {
       console.log('✅ 채팅방이 이미 초기화된 상태입니다:', {
@@ -445,7 +520,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     }
 
     // 이미 초기화되었거나 필요한 데이터가 없으면 중단
-    if (hasInitialized.current || !character?.id || !accountData?.user_key) {
+    if (hasInitialized.current) {
       console.log('⏭️ 채팅방 초기화 로직 건너뜀', {
         hasInitialized: hasInitialized.current,
         hasCharacterId: !!character?.id,
@@ -459,7 +534,142 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     initializeChatRoom().then(() => {
       console.log('✅ initializeChatRoom 함수 완료')
     })
-  }, [character?.id, accountData?.user_key, isInitRoom, channelId, initializeChatRoom])
+  // }, [character?.id, accountData?.user_key, isInitRoom, channelId, initializeChatRoom])
+  }, [isInitRoom, channelId])
+
+  // 메시지가 추가될 때마다 스크롤을 최하단으로 이동
+  useEffect(() => {
+    scrollToBottom()
+  }, [chatMessages, scrollToBottom])
+
+  useEffect(() => {
+    if (isInitRoom) {
+      scrollToBottom()
+    }
+  }, [isInitRoom, scrollToBottom])
+
+  // 메시지가 없고 채팅방이 초기화되었을 때 first_talk 표시
+  useEffect(() => {
+    if (isInitRoom && channelId && chatMessages.length === 0 && first_talk) {
+      addChatMessage({
+        id: 'first-message',
+        sender: 'character',
+        message: first_talk,
+        timestamp: new Date(),
+      })
+    }
+  }, [isInitRoom, channelId, chatMessages.length, first_talk, addChatMessage])
+
+  // 채팅방 초기화 및 로딩 완료 시 스크롤 최하단으로 이동
+  useEffect(() => {
+    if (!isLoading && isInitRoom && channelId && chatMessages.length > 0) {
+      // 약간의 지연 후 스크롤 이동 (컴포넌트가 완전히 렌더링된 후)
+      setTimeout(scrollToBottom, 100)
+    }
+  }, [isLoading, isInitRoom, channelId, chatMessages.length, scrollToBottom])
+
+  // useEffect(() => {
+  //   console.log('characterId :: ', characterId)
+  //   const checkCharacter = async () => {
+  //     if (toastShownRef.current) return
+
+  //     const response = await createApi.GetChatBot(Number(characterId))
+  //     if (response.data.result.err == 0) {
+  //       if (response.data.chrbot.block_type !== 0 && !toastShownRef.current) {
+  //         toastShownRef.current = true
+  //         toast.error('정책 위반 사항이 포함되어 비공개된 캐릭터입니다.', {
+  //           toastId: 'block-error',
+  //         })
+  //         router.back()
+  //         return
+  //       }
+  //       if (response.data.chrbot.delete_yn !== 0 && !toastShownRef.current) {
+  //         toastShownRef.current = true
+  //         toast.error('삭제된 캐릭터입니다.', {
+  //           toastId: 'delete-error',
+  //         })
+  //         router.back()
+  //         return
+  //       }
+  //     }
+  //   }
+  //   checkCharacter()
+
+  //   return () => {
+  //     toastShownRef.current = false
+  //   }
+  // }, [characterId])
+
+
+  // 새 메시지가 추가되면 마지막 메시지가 보이도록 인덱스 조정
+  useEffect(() => {
+    // 자동 스크롤이 활성화된 경우에만 마지막 메시지로 스크롤
+    if (isAutoScrollingRef.current) {
+      if (chatMessages.length > 0) {
+        setVisibleStartIndex(Math.max(0, chatMessages.length - MESSAGES_PER_VIEW))
+        // 약간의 지연 후 스크롤 조정
+        setTimeout(scrollToBottom, 10)
+      }
+    }
+  }, [chatMessages.length])
+
+  // 현재 보여지는 메시지의 시작 인덱스
+  const [visibleStartIndex, setVisibleStartIndex] = useState(0)
+
+
+  // 보여질 메시지만 필터링 - 앞뒤로 더 많은 메시지 미리 로드
+  const visibleMessages = chatMessages.slice(
+    Math.max(0, visibleStartIndex - PRELOAD_BUFFER),
+    Math.min(chatMessages.length, visibleStartIndex + MESSAGES_PER_VIEW + PRELOAD_BUFFER)
+  )
+
+
+
+  // 스크롤 이벤트 핸들러
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const container = e.currentTarget
+    const scrollTop = container.scrollTop
+    const scrollHeight = container.scrollHeight
+    const clientHeight = container.clientHeight
+    const scrollBottom = scrollHeight - scrollTop - clientHeight
+
+    // 맨 아래로부터의 거리가 100px 이하면 자동 스크롤 활성화
+    if (scrollBottom <= 100) {
+      isAutoScrollingRef.current = true
+    } else {
+      // 사용자가 스크롤을 올린 경우 자동 스크롤 비활성화
+      if (lastManualScrollRef.current > scrollTop + 50) {
+        isAutoScrollingRef.current = false
+      }
+      lastManualScrollRef.current = scrollTop
+    }
+
+    // 스크롤이 상단에 가까워지면 이전 메시지 보여주기
+    if (scrollTop < LOAD_MORE_THRESHOLD && visibleStartIndex > 0) {
+      setVisibleStartIndex(prev => Math.max(0, prev - LOAD_MORE_COUNT))
+    }
+
+    // 스크롤이 하단에 가까워지면 다음 메시지 보여주기
+    if (scrollBottom < LOAD_MORE_THRESHOLD && visibleStartIndex + MESSAGES_PER_VIEW < chatMessages.length) {
+      setVisibleStartIndex(prev => Math.min(chatMessages.length - MESSAGES_PER_VIEW, prev + LOAD_MORE_COUNT))
+    }
+  }
+
+  // 메시지가 길어질 경우를 대비한 길이 제한 함수
+  const getLimitedVisibleMessages = () => {
+    // 너무 긴 메시지의 경우 렌더링 최적화를 위해 일정 길이 이상인 경우만 특별 처리
+    return visibleMessages.map(msg => {
+      if (msg.message.length > 1000) {
+        return {
+          ...msg,
+          // 메시지 ID에 고유값 추가하여 리렌더링 방지
+          id: `${msg.id}-visible-${visibleStartIndex}`,
+        }
+      }
+      return msg
+    })
+  }
+
 
   // 채팅방 삭제 함수
   const handleDeleteChat = async () => {
@@ -534,11 +744,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     }
   }
 
-  // 날짜 포맷팅 함수
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  }
-
   // 모드 선택 핸들러 업데이트
   const handleModeSelect = (mode: ChatMode) => {
     if(currentModeId === mode.id) {
@@ -571,7 +776,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
       if(!userIsAdult) return
 
       // 캐릭터 성인 유무 확인
-      if(charbotData?.nsfw !== 1) {
+      if(chatBotData?.nsfw !== 1) {
         toast.error('성인 캐릭터는 성인 모드로만 이용할 수 있습니다.', {
           toastId: 'adult-error',
         })
@@ -618,74 +823,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     })
   }
 
-  // 메시지 내용에서 상황 설명(*로 감싸진 텍스트)를 찾아 스타일을 적용하는 함수
-  const formatMessageWithSituations = (message: string) => {
-    // 정규식으로 *로 감싸진 텍스트 찾기
-    const parts = message.split(/(\*[^*]+\*)/g)
-
-    return parts.map((part, index) => {
-      if (part.startsWith('*') && part.endsWith('*')) {
-        // 상황 설명 부분 (기울임체, 회색, 얇은 폰트)
-        const content = part.slice(1, -1) // 별표 제거
-        return (
-          <span key={index} className="italic text-gray-400 font-medium">
-            {content}
-          </span>
-        )
-      }
-      // 일반 대화 부분
-      return <span key={index}>{part}</span>
-    })
-  }
-
-  // 모드 아이콘 가져오기 함수 수정
-  const getModeIcon = (modeId: number) => {
-    switch (modeId) {
-      case 1:
-        return faPiggyBank
-      case 2:
-        return faBookOpen
-      case 3:
-        return faFire
-      case 4:
-        return faRocket
-      default:
-        return faRocket
-    }
-  }
-
-  const checkCoin = () => {
-    const selectModeData = chatMode.find(mode => mode.chat_mode === currentModeId)
-    const currentCoin = useAccountStore.getState().getCoinSum()
-
-    if (currentCoin < Number(selectModeData?.coin)) {
-      // 재화 부족 시 모달 표시
-      openModal('confirmAction', {
-        title: '펜 부족',
-        description: `보유한 펜이 부족해요..ㅠㅠ\n펜을 충전하러 갈까요?`,
-        onConfirm: () => {
-          // 충전 페이지로 이동하는 로직 추가 가능
-          router.push('/shop-recharge')
-          closeModal()
-        },
-        confirmText: '충전하러 가기',
-        cancelText: '취소',
-        confirmButtonClass: 'bg-primary-500 hover:bg-primary-600 text-white',
-      })
-      return false
-    }
-
-    return true
-  }
-
-  // 모드 코인 차감 액
-  const getModePrice = (modeId: number) => {
-    switch (modeId) {
-      case 1:
-        return 100
-    }
-  }
-
   // 이미지 저장 함수
   const handleSaveImage = () => {
     // 이미지 URL 가져오기
@@ -726,7 +863,6 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
   // 채팅 초기화 확인
   const handleConfirmResetChat = async () => {
-    console.log('asdasd')
     const responseData = await chatApi.InitChat(Number(chrBotChatKey), currentModeId, userIsAdult)
     console.log('💬 채팅 초기화 응답:', responseData.data)
 
@@ -755,148 +891,18 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     }
   }
 
-  // 스크롤을 최하단으로 이동하는 함수
-  const scrollToBottom = () => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
-    }
+  const handleOnClickCharacter = () => {
+    setSelectedCharacter(character as Character)
+    openModal('character')
   }
 
-  // 메시지가 추가될 때마다 스크롤을 최하단으로 이동
-  useEffect(() => {
-    scrollToBottom()
-  }, [chatMessages, scrollToBottom])
-
-  useEffect(() => {
-    if (isInitRoom) {
-      scrollToBottom()
-    }
-  }, [isInitRoom, scrollToBottom])
-
-  // 메시지가 없고 채팅방이 초기화되었을 때 first_talk 표시
-  useEffect(() => {
-    if (isInitRoom && channelId && chatMessages.length === 0 && first_talk) {
-      addChatMessage({
-        id: 'first-message',
-        sender: 'character',
-        message: first_talk,
-        timestamp: new Date(),
-      })
-    }
-  }, [isInitRoom, channelId, chatMessages.length, first_talk, addChatMessage])
-
-  // 채팅방 초기화 및 로딩 완료 시 스크롤 최하단으로 이동
-  useEffect(() => {
-    if (!isLoading && isInitRoom && channelId && chatMessages.length > 0) {
-      // 약간의 지연 후 스크롤 이동 (컴포넌트가 완전히 렌더링된 후)
-      setTimeout(scrollToBottom, 100)
-    }
-  }, [isLoading, isInitRoom, channelId, chatMessages.length, scrollToBottom])
-
-  useEffect(() => {
-    console.log('characterId :: ', characterId)
-    const checkCharacter = async () => {
-      if (toastShownRef.current) return
-
-      const response = await createApi.GetChatBot(Number(characterId))
-      if (response.data.result.err == 0) {
-        if (response.data.chrbot.block_type !== 0 && !toastShownRef.current) {
-          toastShownRef.current = true
-          toast.error('정책 위반 사항이 포함되어 비공개된 캐릭터입니다.', {
-            toastId: 'block-error',
-          })
-          router.back()
-          return
-        }
-        if (response.data.chrbot.delete_yn !== 0 && !toastShownRef.current) {
-          toastShownRef.current = true
-          toast.error('삭제된 캐릭터입니다.', {
-            toastId: 'delete-error',
-          })
-          router.back()
-          return
-        }
-      }
-    }
-    checkCharacter()
-
-    return () => {
-      toastShownRef.current = false
-    }
-  }, [characterId])
-
-  // 현재 보여지는 메시지의 시작 인덱스
-  const [visibleStartIndex, setVisibleStartIndex] = useState(0)
-  const MESSAGES_PER_VIEW = 20
-  const LOAD_MORE_THRESHOLD = 500 // 스크롤 임계값 증가
-  const LOAD_MORE_COUNT = 15 // 한 번에 로드할 메시지 수 증가
-  const PRELOAD_BUFFER = 10 // 미리 로드할 메시지 버퍼
-
-  // 보여질 메시지만 필터링 - 앞뒤로 더 많은 메시지 미리 로드
-  const visibleMessages = chatMessages.slice(
-    Math.max(0, visibleStartIndex - PRELOAD_BUFFER),
-    Math.min(chatMessages.length, visibleStartIndex + MESSAGES_PER_VIEW + PRELOAD_BUFFER)
-  )
-
-  // 마지막으로 수동 스크롤한 위치 기록
-  const lastManualScrollRef = useRef<number>(0)
-  const isAutoScrollingRef = useRef<boolean>(true)
-
-  // 스크롤 이벤트 핸들러
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const container = e.currentTarget
-    const scrollTop = container.scrollTop
-    const scrollHeight = container.scrollHeight
-    const clientHeight = container.clientHeight
-    const scrollBottom = scrollHeight - scrollTop - clientHeight
-
-    // 맨 아래로부터의 거리가 100px 이하면 자동 스크롤 활성화
-    if (scrollBottom <= 100) {
-      isAutoScrollingRef.current = true
-    } else {
-      // 사용자가 스크롤을 올린 경우 자동 스크롤 비활성화
-      if (lastManualScrollRef.current > scrollTop + 50) {
-        isAutoScrollingRef.current = false
-      }
-      lastManualScrollRef.current = scrollTop
-    }
-
-    // 스크롤이 상단에 가까워지면 이전 메시지 보여주기
-    if (scrollTop < LOAD_MORE_THRESHOLD && visibleStartIndex > 0) {
-      setVisibleStartIndex(prev => Math.max(0, prev - LOAD_MORE_COUNT))
-    }
-
-    // 스크롤이 하단에 가까워지면 다음 메시지 보여주기
-    if (scrollBottom < LOAD_MORE_THRESHOLD && visibleStartIndex + MESSAGES_PER_VIEW < chatMessages.length) {
-      setVisibleStartIndex(prev => Math.min(chatMessages.length - MESSAGES_PER_VIEW, prev + LOAD_MORE_COUNT))
-    }
+  const handleOnClickShop = () => {
+    router.push('/shop-recharge')
   }
 
-  // 새 메시지가 추가되면 마지막 메시지가 보이도록 인덱스 조정
-  useEffect(() => {
-    // 자동 스크롤이 활성화된 경우에만 마지막 메시지로 스크롤
-    if (isAutoScrollingRef.current) {
-      if (chatMessages.length > 0) {
-        setVisibleStartIndex(Math.max(0, chatMessages.length - MESSAGES_PER_VIEW))
-        // 약간의 지연 후 스크롤 조정
-        setTimeout(scrollToBottom, 10)
-      }
-    }
-  }, [chatMessages.length])
-
-  // 메시지가 길어질 경우를 대비한 길이 제한 함수
-  const getLimitedVisibleMessages = () => {
-    // 너무 긴 메시지의 경우 렌더링 최적화를 위해 일정 길이 이상인 경우만 특별 처리
-    return visibleMessages.map(msg => {
-      if (msg.message.length > 1000) {
-        return {
-          ...msg,
-          // 메시지 ID에 고유값 추가하여 리렌더링 방지
-          id: `${msg.id}-visible-${visibleStartIndex}`,
-        }
-      }
-      return msg
-    })
+  const handleOpenGallery = () => {
+    setSelectedCharacter(character as Character)
+    openModal('charactorgallery')
   }
 
   // 로딩 상태 표시
@@ -937,21 +943,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
     )
   }
 
-  const handleOnClickCharacter = () => {
-    setSelectedCharacter(character as Character)
-    openModal('character')
-  }
 
-  const handleOnClickShop = () => {
-    router.push('/shop-recharge')
-  }
-
-
-  const handleOpenGallery = () => {
-    console.log('handleOpenGallery')
-    // setSelectedCharacter(character as Character)
-    // openModal('charactorgallery')
-  }
 
   // 나머지 UI 부분은 이전과 동일하게 유지
   return (
@@ -964,8 +956,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           <button
             onClick={async () => {
               try {
-                await cleanupChatRoom()
-
+                // await cleanupChatRoom()
                 // 채팅 목록 페이지로 이동
                 router.push('/chat-list')
               } catch (error) {
@@ -1040,7 +1031,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             onClick={() =>
               openModal('chatMode', {
                 currentModeId: currentModeId,
-                nsfw: charbotData?.nsfw,
+                nsfw: chatBotData?.nsfw,
                 onSelectMode: handleModeSelect,
               })
             }
@@ -1130,7 +1121,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
             <h3 className="text-lg font-semibold mb-4">채팅 모드 선택</h3>
             <div className="space-y-3">
               {chatMode.map((mode, index) => {
-                if(charbotData?.nsfw !== 1) {
+                if(chatBotData?.nsfw !== 1) {
                   if(mode.chat_mode === 3 || mode.chat_mode === 4) return null
                 }
                 const chatMode = bridgeChatModeDataToChatMode(mode, customChatModes[index])
@@ -1260,7 +1251,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
 
           {/* 이미지 컨테이너 */}
           <div className="relative h-full w-full group">
-            <Image
+            {/* <Image
               src={showImage || '/images/character1.jpg'}
               alt={character.name}
               fill
@@ -1271,13 +1262,24 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
               }}
               priority
               onClick={handleSaveImage}
-            />
+            /> */}
 
-            {/* 레벨 버튼 */}
+            {/* 호감도 레벨 버튼 */}
+            <div className='absolute top-2 left-2 flex items-center justify-center z-30'>
+              <div className='flex flex-col items-center justify-center bg-black/50 rounded-lg px-3 py-1'>
+                <FontAwesomeIcon icon={faHeart} className='text-white text-sm rounded-full bg-pink-500 p-1' />
+                <span className='text-white text-sm font-bold'>
+                  Lv.{selectedLikeability_lv || 0}
+                </span>
+              </div>
+
+              <div className='flex flex-col items-center justify-center bg-black/50 py-2.5'>
+              </div>  
+            </div>
             
 
             {/* 갤러리 버튼 */}
-            <div className='absolute top-2 right-2 flex items-center justify-center gap-4 z-30'>
+            <div className='absolute top-2 right-2 flex items-center justify-center gap-4 z-30 bg-black/50 rounded-lg'>
               <button
                 onClick={e => {
                   e.preventDefault()
@@ -1285,9 +1287,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                   handleOpenGallery()
                 }}
                 className='text-white text-xs px-2 py-1 rounded-full'>
-                <div className='grid grid-cols-1 gap-2'>
+                <div className='flex flex-col items-center justify-center gap-2'>
                   <FontAwesomeIcon icon={faImage} className='text-[14px] md:text-[20px]' />
-                  <span className="text-[14px] md:text-[20px]">{character.multi_image_count || 0}</span>
+                  <span className="text-[14px] md:text-[14px] tracking-tight">{openImageCount}/{multiImages?.length || 0}</span>
                 </div>
               </button>
             </div>
@@ -1330,7 +1332,7 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           <div className='relative'>
             {/* 모바일 전용 갤러리 버튼 */}
             {isMobile &&
-              <div className='absolute top-2 right-2 flex items-center justify-center gap-4 z-30 border rounded'>
+              <div className='absolute top-2 right-2 flex items-center justify-center gap-4 z-30 border bg-black/50 rounded-lg'>
                 <button
                   onClick={e => {
                     e.preventDefault()
@@ -1338,9 +1340,9 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
                     handleOpenGallery()
                   }}
                   className='text-white text-xs px-2 py-1 rounded-full'>
-                  <div className='grid grid-cols-1 gap-2'>
-                    <FontAwesomeIcon icon={faImage} className='text-[14px] md:text-[20px]' />
-                    <span className="text-[14px] md:text-[20px]">{character.multi_image_count || 0}</span>
+                  <div className='flex flex-col items-center justify-center gap-2'>
+                    <FontAwesomeIcon icon={faImage} className='text-[20px]' />
+                    <span className="text-[12px] tracking-tight">{openImageCount}/{multiImages?.length || 0}</span>
                   </div>
                 </button>
               </div>
@@ -1622,7 +1624,17 @@ export default function ChatDetailClient({ characterId, charbotData }: ChatDetai
           isOpen={isBigImageModalOpen} imgUrl={bigImageUrl} onClose={() => setIsBigImageModalOpen(false) }
         />
       }
-      
+
+      <UnlockActionModal
+        isOpen={imgUnlockAction}
+        imgUrl={rewardImgUrl}
+        onClose={() => setImgUnlockAction(false)}
+
+        onAnimationEnd={() => {
+          // background image 변경
+          chageBackgroundImage(selectedMultiImageData.img_selected_key || 0)
+        }}
+      />
     </div>
   )
 }

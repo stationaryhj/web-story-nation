@@ -20,7 +20,7 @@ export default function BigImageModal({isOpen, imgUrl, onClose}: {isOpen: boolea
           left: 0,
           right: 0,
           position: 'fixed',
-          zIndex: 100,
+          zIndex: 200,
         }}
       >
         <Image src={imgUrl} alt="big image" fill className="object-contain" />

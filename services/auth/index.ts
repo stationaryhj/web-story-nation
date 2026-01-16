@@ -237,6 +237,7 @@ export class AuthManager {
         // 회원가입 성공 후 데이터 변경
         const { access_token, nick_nm, snsaccesstoken, token_type } = response.data
         const loginResponse = await contentApi.userinfo2(access_token);
+        const socialType = localStorage.getItem('social_login_type');
         
         // 모든 임시 데이터 삭제
         localStorage.removeItem('signup_data');
@@ -251,6 +252,7 @@ export class AuthManager {
             ...loginResponse.data,
             access_token,
             token_type,
+            social_type: socialType,
             sns_access_token: snsaccesstoken
           }
         };
@@ -326,7 +328,7 @@ export class AuthManager {
         localStorage.removeItem('social_login_type');
         localStorage.removeItem('social_login_in_progress');
         this.clearSocialAuthInfo();
-      } else if (result.signupRequired || result.needSignup) {
+      } else if (result.signupRequired || result.needSignup || result.isDuplicateLogin) {
         // 회원가입이 필요한 경우 로그인 정보는 유지
         // 인증 정보만 초기화 (메모리 누수 방지)
         localStorage.removeItem('social_login_in_progress');
@@ -340,6 +342,7 @@ export class AuthManager {
       localStorage.removeItem('social_login_state');
       localStorage.removeItem('social_login_type');
       localStorage.removeItem('social_login_in_progress');
+      localStorage.removeItem('duplicate_login_data');
       this.clearSocialAuthInfo();
       
       return {

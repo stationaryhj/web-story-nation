@@ -11,15 +11,25 @@ import { toast } from 'react-toastify'
 import { authService } from '@/services/auth'
 import { SpeechBubble } from '@/components/animation/SpeechBubble'
 import Image from 'next/image'
+import { getChatRoomEncryptData } from '@/lib/utils/storyNationUtil'
+
+import DuplicateLoginModal from './duplicateLoginModal'
+import { getPlatform } from '@/lib/utils/storyNationUtil'
+
+const CHAT_FRONTEND_ADDRESS = process.env.NEXT_PUBLIC_CHAT_FRONTEND_ADDRESS
+
+
 interface LoginModalProps {
   isOpen: boolean
   onClose: () => void
+  chrbot_key?: string | null
 }
 
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalProps) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login')
   const [showSignup, setShowSignup] = useState(false)
+  const [isDuplicateLogin, setIsDuplicateLogin] = useState(false)
   const [loading, setLoading] = useState(false)
   const [isNewUserMode, setIsNewUserMode] = useState(false)
   const [isReward, setIsReward] = useState(false)
@@ -57,6 +67,9 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     if (!isOpen) return
 
     const handleCallbackMessage = async (event: MessageEvent) => {
+      console.log('@@ handleCallbackMessage :: ', event)
+
+
       // 출처 확인 (보안)
       if (event.origin !== window.location.origin) {
         console.warn('알 수 없는 출처의 메시지 무시됨:', event.origin)
@@ -64,6 +77,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       }
 
       // 메시지 데이터 확인
+      let loginType = null
       const data = event.data
       if (!data || typeof data !== 'object') return
 
@@ -85,6 +99,10 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           setLoading(false)
           processingCallback.current = false
           return
+        }
+
+        if(data.login_type) {
+          loginType = data.login_type
         }
 
         // 콜백 처리
@@ -112,11 +130,12 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
           // authService.handleCallback 호출
           const result = await authService.handleCallback(callbackParams)
+          console.log('@@@@@@@ result :: ', result)
 
           if (result.success) {
             // 로그인 성공 시 상태 업데이트 (useAccountStore)
             if (result.data) {
-              useAccountStore.getState().setLoginState(true, result.data)
+              useAccountStore.getState().setLoginState(true, result.data, loginType)
               await useAccountStore.getState().updateUserInfoFromUserInfo2()
               await useAccountStore.getState().fetchWriterInfo()
 
@@ -130,10 +149,31 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
               // 성공 시에만 모달 닫기
               onClose()
+              
+              if(chrbot_key) {
+                handleConnectedChatRoom(chrbot_key)
+              }
             }
           } else if (result.signupRequired || result.needSignup) {
-            // 회원가입 필요 - 모달 닫지 않고 회원가입 모달로 전환
             setShowSignup(true)
+
+            // const { isLogin, data, loginType, registerWithSocialData } = useAccountStore.getState()
+            // if(isLogin && data && loginType === 'Guest' as SocialLoginProvider) {
+            //   const nickname = data.nick_nm
+            //   const response = await contentApi.NicknmCheckToGuest(nickname, data.access_token)
+            //   if(response.data.result.err === 0) {
+            //     await registerWithSocialData(nickname, '19700101', true, () => {
+            //       localStorage.removeItem('social_login_type')
+            //       onClose()
+            //     })
+            //   }
+            // }
+            // else {
+            //   // 회원가입 필요 - 모달 닫지 않고 회원가입 모달로 전환
+            //   setShowSignup(true)
+            // }
+          } else if (result.isDuplicateLogin) {
+            setIsDuplicateLogin(true)
           } else {
             // 기타 오류
             // toast.error(result.error || '로그인에 실패했습니다.')
@@ -166,6 +206,16 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const handleSignupClose = () => {
     setShowSignup(false)
     onClose()
+
+    const { isLogin } = useAccountStore.getState()
+
+    console.log('@@ signup close :: ', isLogin)
+
+    if(isLogin) {
+      if(chrbot_key) {
+        handleConnectedChatRoom(chrbot_key)
+      }
+    }
   }
 
   const { guestLogin } = useAccountStore()
@@ -182,6 +232,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       if (!result.success && result.error) {
         // toast.error(result.error)
       }
+
     } catch (error) {
       console.error('소셜 로그인 오류:', error)
     } finally {
@@ -195,6 +246,12 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       let isSuccess = await guestLogin(nickname)
       if (isSuccess) {
         onClose()
+
+        if(chrbot_key) {
+          handleConnectedChatRoom(chrbot_key)
+          return;
+        }
+
         router.push('/')
       }
     } catch (err) {
@@ -210,12 +267,89 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     // localStorage.removeItem('social_login_state')
     localStorage.removeItem('social_login_type')
     setIsReward(true)
+
+    // loginType 최종 변경 //
+    const { data } = useAccountStore.getState()
+    const login_sns_state = localStorage.getItem('social_login_state') || ''
+    const loginType = getPlatform(JSON.parse(login_sns_state)?.snstype || 0) || ''
+    useAccountStore.getState().setLoginState(true, null, loginType)
+
+
     // setShowSignup(false)
     // onClose()
   }
 
   const handleNewUserClick = () => {
     setIsNewUserMode(true)
+  }
+
+  const handleConnectedChatRoom = async (_chrbotKey: string) => {
+    const { data: userInfo } = useAccountStore.getState()
+
+    if(!userInfo || !_chrbotKey) {
+      return
+    }
+
+    const chrbotKey = _chrbotKey
+    const nsfw = '0'
+    const freePen = Number(userInfo?.coin_free || 0) + Number(userInfo?.coin_register || 0)
+
+    const encryptedData = await getChatRoomEncryptData(
+      chrbotKey,
+      userInfo?.coin_user?.toString() || '0',
+      'KR',
+      freePen?.toString() || '0',
+      null,
+      nsfw,
+      userInfo?.persona || '',
+      userInfo?.access_token || '',
+      userInfo?.user_key?.toString() || '0',
+    )
+
+    const chatRoomPath = `${CHAT_FRONTEND_ADDRESS}?info=${encryptedData}`
+    router.push(chatRoomPath)
+    // router.push(`https://qa.storynation.co.kr/character/chat?info=${encryptedData}`)
+  }
+
+  // 소셜 로그인 이어서하기 //
+  const handleDuplicateLoginConfirm = async () => {
+    setIsDuplicateLogin(false)
+
+    // 로그인 이어서 진행 //
+    const duplicateLoginData = localStorage.getItem('duplicate_login_data');
+    console.log('@@ duplicateLoginData :: ', duplicateLoginData)
+
+    if(duplicateLoginData) {
+      const duplicateLoginDataJson = JSON.parse(duplicateLoginData)
+      const { snstype, snsauth, snsid, kr_gb, access_token } = duplicateLoginDataJson
+      const isSuccess = await useAccountStore.getState().guestToSocialLogin(snstype, snsauth, snsid, kr_gb, access_token)
+
+      localStorage.removeItem('duplicate_login_data');
+      localStorage.removeItem('social_login_type');
+
+      if(isSuccess) {
+        await useAccountStore.getState().updateUserInfoFromUserInfo2()
+        await useAccountStore.getState().fetchWriterInfo()
+
+        const { data, logout } = useAccountStore.getState()
+        if(data && data.user_block_type === 1) {
+          toast.error('정지된 계정입니다.')
+          logout()
+        }
+
+        onClose()
+        return
+      }
+    }
+
+    // login2 -> updateUserInfoFromUserInfo2() -> fetchWriterInfo
+
+    onClose()
+  }
+
+  const handleDuplicateLoginCancel = () => {
+    localStorage.removeItem('duplicate_login_data');
+    setIsDuplicateLogin(false)
   }
 
   return (
@@ -313,6 +447,15 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           onClose={handleSignupClose}
           onSuccess={handleSignupSuccess}
           state={isReward ? 'reward' : 'signup'}
+        />
+      )}
+
+      {isDuplicateLogin && (
+        <DuplicateLoginModal
+          isOpen={true}
+          onClose={() => setIsDuplicateLogin(false)}
+          onConfirm={handleDuplicateLoginConfirm}
+          onCancel={handleDuplicateLoginCancel}
         />
       )}
     </>

@@ -10,6 +10,9 @@ import {
   ErrorHandler 
 } from './types';
 
+import { useAccountStore } from '@/store/useAccountStore'
+import { SocialLoginProvider } from './types'
+
 // 리다이렉트 URI 가져오기
 const getRedirectUri = () => {
   const callback = process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URI || '';
@@ -164,6 +167,8 @@ export abstract class BaseAuthService implements AuthService {
   // 공통 로그인 처리 로직
   protected async processLogin(tokenResponse: OAuthResponse, params: LoginParams): Promise<LoginResult> {
     try {
+      const { loginType, isLogin } = useAccountStore.getState()
+
       const accessToken = params.snstype === 4 ? tokenResponse.id_token : tokenResponse.access_token;
       const idToken = params.snstype === 4 ? tokenResponse.access_token : '';
 
@@ -176,16 +181,36 @@ export abstract class BaseAuthService implements AuthService {
       );
 
       if (response.data.result.err === 0) {
+
         // 기존 회원
         const { snsid, user_all } = response.data;
         const kr_gb = user_all[0].kr_gb;
+
+        const isGuestLogin = loginType === 'Guest' as SocialLoginProvider && isLogin
+        
+        // Guest 로그인이 되어있고, 소셜 계정이 있으면 팝업 //
+        if(isGuestLogin) {
+
+          localStorage.setItem('duplicate_login_data', JSON.stringify({
+            snstype: params.snstype,
+            snsauth: params.snsauth,
+            snsid: snsid,
+            kr_gb: String(kr_gb),
+          }));
+
+          return {
+            success: false,
+            isDuplicateLogin: true,
+            error: '선택'
+          }
+        }
 
         // 로그인 처리
         const loginResponse = await contentApi.login2(
           params.snsauth, 
           params.snstype, 
           snsid, 
-          String(kr_gb)
+          String(kr_gb),
         );
 
         // 로그인 상태 저장

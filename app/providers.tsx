@@ -1,17 +1,18 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, usePathname } from 'next/navigation'
 import { SkeletonThemeProvider } from '@/components/elements/skeleton'
 import ModalManager from '@/components/modal/ModalManager'
 import { useThemeStore } from '@/store/useStoreData'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AnimatePresence } from 'framer-motion'
 import type { ReactNode } from 'react'
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, use } from 'react'
 import { InitDataLoader } from '@/app/providers/InitDataLoader'
 import app from '@/app/firebase'
 import { getAnalytics, logEvent } from 'firebase/analytics'
 import { useMainConfigStore } from '@/store/useMainConfigStore'
+import { useAccountStore } from '@/store/useAccountStore'
 
 import NoticeModal from '@/components/modal/NoticeModal'
 import { PromotionItem } from '@/types/provider'
@@ -19,6 +20,13 @@ import InspectionPage from '@/components/inspection'
 import { useModalStore } from '@/store/useStoreModal'
 
 import CharactorOpenModal from '@/components/modal/CharactorOpenModal'
+
+/**팝업을 노출시키지 않을 페이지 경로 */
+const POPUP_BLOCK_PAGE_PATHS: string[] = [
+  '/guest',
+  '/chat-list',
+  '/shop-recharge'
+]
 
 // SearchParamsHandler 컴포넌트로 분리하여 useSearchParams 로직 처리
 function SearchParamsHandler() {
@@ -39,6 +47,10 @@ function SearchParamsHandler() {
 }
 
 export default function Providers({ children }: { children: ReactNode }) {
+
+  const pathname = usePathname()
+  const isPopupBlockPage = POPUP_BLOCK_PAGE_PATHS.includes(pathname || '');
+
   const { chrbotKey } = useModalStore() // 스토어에서 값 가져오기
   const [queryClient] = useState(
     () =>
@@ -51,6 +63,7 @@ export default function Providers({ children }: { children: ReactNode }) {
         },
       })
   )
+  const { isLogin, updateUserInfoFromUserInfo } = useAccountStore()
   const { isDarkMode } = useThemeStore()
   const [mounted, setMounted] = useState(false)
   const { webConfig, activeNotices, fetchAllConfig, closeNotice } = useMainConfigStore()
@@ -95,6 +108,16 @@ export default function Providers({ children }: { children: ReactNode }) {
 
     fetchAllConfig()
   }, [])
+
+  useEffect(() => {
+    if(isLogin) {
+      updateUserInfoFromUserInfo().then(isSuccess => {
+        if(isSuccess) {
+          console.log('updateUserInfoFromUserInfo success')
+        }
+      })
+    }
+  }, [isLogin])
 
   useEffect(() => {
     if (!chrbotKey && activeNotices?.length > 0) {
@@ -204,7 +227,7 @@ export default function Providers({ children }: { children: ReactNode }) {
         </SkeletonThemeProvider>
       </div>
       )}      
-      {!chrbotKey && notice && (
+      {!chrbotKey && notice && !isPopupBlockPage && (
         <NoticeModal 
           isOpen={isNoticeModalOpen} 
           notice={notice} 
@@ -215,7 +238,7 @@ export default function Providers({ children }: { children: ReactNode }) {
         />
       )}
 
-      {chrbotKey && (
+      {chrbotKey && !isPopupBlockPage && (
         <CharactorOpenModal
           isOpen={isCharactorOpenModalOpen}
           chatBotKey={chrbotKey}

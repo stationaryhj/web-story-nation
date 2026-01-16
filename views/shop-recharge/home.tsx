@@ -9,6 +9,9 @@ import { useRouter } from 'next/navigation'
 import PageTransition from '@/components/motion/PageTransition'
 import Image from 'next/image'
 
+import { useModalStore } from '@/store/useStoreModal'
+
+
 // 더미 상품 데이터
 const penPackages = [
   {
@@ -75,10 +78,12 @@ import { ReqGetCoinChargeUseHistory } from '@/services/hooks/DataListManager'
 
 export default function ShopRecharge() {
   const router = useRouter()
+  const { openModal } = useModalStore()
+
   const [activeTab, setActiveTab] = useState<'recharge' | 'history'>('recharge')
   const { coinList, initCoinList } = useCoinStore(state => ({ coinList: state.coinList, initCoinList: state.initCoinList }))
   const [isMobile, setIsMobile] = useState(false)
-
+  
   // 모바일 화면 감지
   useEffect(() => {
     const handleResize = () => {
@@ -153,9 +158,11 @@ export default function ShopRecharge() {
 
   // OrderId 가져오기 (재사용 가능한 함수로 분리)
   const fetchOrderId = useCallback(async (coinKey: number) => {
-    console.log('@@@@@@ ::: coinKey ::: ', coinKey)
     try {
       const response = await settlementApi.GetOrderId(coinKey.toString())
+
+      console.log('@@ response :: ', response)
+
       return response.data as OrderIdResponse
     } catch (error) {
       console.error('OrderId 가져오기 실패:', error)
@@ -176,11 +183,13 @@ export default function ShopRecharge() {
       isProcessing.current = true
 
       try {
-        console.log('@@ coinKey :: ', coinKey)
-
         // API 호출로 주문 ID 가져오기
         const orderIdData = await fetchOrderId(coinKey)
-        console.log('@@ orderIdData :: ', orderIdData)
+        if(orderIdData.result.err === 5) {
+          // 접근 권한필요 //
+          openModal('login')
+          return;
+        }
 
         // 상태 업데이트 (한 번에 모아서)
         setPaymentAmount(amount)

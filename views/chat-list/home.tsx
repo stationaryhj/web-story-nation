@@ -3,7 +3,7 @@
 import Footer from '@/components/common/footer'
 import Header from '@/components/common/header'
 import PageTransition from '@/components/motion/PageTransition'
-import { bridgeCharbotChatDataToChatList } from '@/lib/utils/storyNationUtil'
+import { bridgeCharbotChatDataToChatList, rijndaelEncrypt, getChatRoomEncryptData } from '@/lib/utils/storyNationUtil'
 import { createApi, contentApi, chatApi } from '@/services/api/storyNationApi'
 import { ReqGetChatList } from '@/services/hooks/DataListManager'
 import { faSearch, faSort, faThumbtack, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons'
@@ -17,6 +17,13 @@ import type { FormEvent } from 'react'
 import { useState, useEffect, useCallback } from 'react'
 import DeleteConfirmModal from '@/components/modal/DeleteConfirmModal'
 import { BaseSelectBox } from '@/components/elements/selectbox/BaseSelectBox'
+
+import { useChatListStore } from '@/store/useChatListStore'
+import { useAccountStore } from '@/store/useAccountStore'
+
+import { requestConnectedChatRoomData } from '@/services/interface'
+
+const CHAT_FRONTEND_ADDRESS = process.env.NEXT_PUBLIC_CHAT_FRONTEND_ADDRESS
 
 const chatListOptions = [
   { value: 'latest', label: '최근 대화순' },
@@ -76,6 +83,9 @@ export default function ChatListPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [selectedOption, setSelectedOption] = useState({ value: 'latest', label: '최근 대화순' })
 
+  const { chatList, isLoading, error, total, last_page, fetchChatList } = useChatListStore()
+  const { data: userInfo, writerInfo } = useAccountStore()
+
   // Toast 알림 상태
   const [customToast, setCustomToast] = useState({
     message: '',
@@ -99,20 +109,20 @@ export default function ChatListPage() {
   }
 
   // 채팅 목록 데이터 가져오기
-  const { data: chatDataList, isLoading, error, refetch } = ReqGetChatList(itemsPerPage, currentPage)
+  // const { data: chatDataList, isLoading, error, refetch } = ReqGetChatList(itemsPerPage, currentPage)
 
   // 전체 채팅 목록
-  const [chatList, setChatList] = useState<
-    Array<{
-      id: string
-      characterId: string
-      name: string
-      lastMessage: string
-      time: string
-      imageUrl: string
-      fixed: number
-    }>
-  >([])
+  // const [chatList, setChatList] = useState<
+  //   Array<{
+  //     id: string
+  //     characterId: string
+  //     name: string
+  //     lastMessage: string
+  //     time: string
+  //     imageUrl: string
+  //     fixed: number
+  //   }>
+  // >([])
 
   // 필터링된 채팅 목록
   const [filteredChatList, setFilteredChatList] = useState<
@@ -137,31 +147,66 @@ export default function ChatListPage() {
     }[]
   >([])
 
-  // 데이터가 변경될 때마다 채팅 목록 업데이트
+  
   useEffect(() => {
-    if (chatDataList?.chrbot_chat) {
-      const chats = bridgeCharbotChatDataToChatList(chatDataList.chrbot_chat.data || [])
-      setChatList(chats)
-      setTotalPages(chatDataList.chrbot_chat.last_page || 1)
+    const fetchData = async () => {
+      await fetchChatList(itemsPerPage, currentPage)
     }
-  }, [chatDataList])
+    fetchData()
+  }, [itemsPerPage, currentPage])
+
+
+  useEffect(() => {
+    if (chatList) {
+      let filteredChats = []
+      const chats = bridgeCharbotChatDataToChatList(chatList || [])
+
+      if(activeTab === 'favorites') {
+        filteredChats = chats.filter(chat => Number(chat.fixed) > 0)
+      }
+      else {
+        filteredChats = chats
+      }
+
+      // 검색어에 따른 필터링
+      if (searchQuery.trim()) {
+        filteredChats = filteredChats.filter(chat => chat.name.toLowerCase().includes(searchQuery.toLowerCase()))
+      }
+
+      setFilteredChatList(filteredChats)
+
+      setTotalPages(last_page || 1)
+    }
+  }, [chatList, activeTab, searchQuery])
+
+  
+
+  // 데이터가 변경될 때마다 채팅 목록 업데이트
+  // useEffect(() => {
+  //   if (chatDataList?.chrbot_chat) {
+  //     const chats = bridgeCharbotChatDataToChatList(chatDataList.chrbot_chat.data || [])
+  //     setChatList(chats)
+  //     setTotalPages(chatDataList.chrbot_chat.last_page || 1)
+  //   }
+  // }, [chatDataList])
 
   // 검색어 및 탭 변경 시 필터링 적용
-  useEffect(() => {
-    let filtered = [...chatList]
+  // useEffect(() => {
+  //   let filtered = [...chatList]
 
-    // 탭에 따른 필터링
-    if (activeTab === 'favorites') {
-      filtered = filtered.filter(chat => Number(chat.fixed) > 0)
-    }
+  //   // 탭에 따른 필터링
+  //   if (activeTab === 'favorites') {
+  //     filtered = filtered.filter(chat => Number(chat.fixed) > 0)
+  //   }
 
-    // 검색어에 따른 필터링
-    if (searchQuery.trim()) {
-      filtered = filtered.filter(chat => chat.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    }
+  //   // 검색어에 따른 필터링
+  //   if (searchQuery.trim()) {
+  //     filtered = filtered.filter(chat => chat.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  //   }
 
-    setFilteredChatList(filtered)
-  }, [chatList, activeTab, searchQuery])
+  //   setFilteredChatList(filtered)
+  // }, [chatList, activeTab, searchQuery])
+
 
   // 검색 핸들러
   const handleSearch = (e: FormEvent) => {
@@ -182,10 +227,11 @@ export default function ChatListPage() {
     setCurrentPage(1) // 탭 변경 시 페이지 초기화
   }, [])
 
+
   // 페이지 변경 또는 검색 쿼리 변경 시 데이터 새로 가져오기
-  useEffect(() => {
-    refetch()
-  }, [currentPage, refetch])
+  // useEffect(() => {
+  //   refetch()
+  // }, [currentPage, refetch])
 
   const handleDeleteClick = (e: React.MouseEvent, chat: { id: number; name: string }) => {
     e.stopPropagation() // 버블링 방지
@@ -197,9 +243,9 @@ export default function ChatListPage() {
     if (!chatToDelete) return
 
     try {
-      await chatApi.CloseChat(chatToDelete.id)
+      const response = await chatApi.CloseChat(chatToDelete.id)
       // API 호출이 성공하면 목록 다시 불러오기
-      await refetch()
+      await fetchChatList(itemsPerPage, currentPage)
       setIsDeleteModalOpen(false)
       setChatToDelete(null)
     } catch (error) {
@@ -219,7 +265,7 @@ export default function ChatListPage() {
     if (_fixed === 0) {
       try {
         // 최신 데이터 가져오기 위해 즐겨찾기 상태 먼저 확인
-        await refetch()
+        // await fetchChatList(itemsPerPage, currentPage)
 
         // 현재 즐겨찾기 개수 정확히 계산
         const pinnedChatsCount = chatList.filter(chat => Number(chat.fixed) === 1).length
@@ -235,7 +281,7 @@ export default function ChatListPage() {
         // 즐겨찾기 설정 API 호출
         await contentApi.GetChatTopFixed(bot_key, 1)
         // 목록 다시 불러오기
-        await refetch()
+        fetchChatList(itemsPerPage, currentPage)
       } catch (error) {
         console.error('Failed to update chat fixed status:', error)
         showCustomToast('즐겨찾기 설정 중 오류가 발생했습니다.')
@@ -244,7 +290,7 @@ export default function ChatListPage() {
       // 즐겨찾기 해제
       try {
         await contentApi.GetChatTopFixed(bot_key, 0)
-        await refetch()
+        fetchChatList(itemsPerPage, currentPage)
       } catch (error) {
         console.error('Failed to update chat fixed status:', error)
         showCustomToast('즐겨찾기 해제 중 오류가 발생했습니다.')
@@ -317,8 +363,6 @@ export default function ChatListPage() {
   }
 
   const handleOnClickChatData = async (chat: { characterId: string }) => {
-    console.log('chat :: ', chat)
-
     const response = await createApi.GetChatBot(Number(chat.characterId))
     console.log('response :: ', response.data.chrbot.block_type)
     if (response.data.result.err === 0) {
@@ -332,7 +376,27 @@ export default function ChatListPage() {
         return
       }
 
-      router.push(`/chat/${chat.characterId}`)
+      const chrbotKey = response.data.chrbot.world_list_detail_chrbot_key.toString()
+      const nsfw = response.data.chrbot.nsfw.toString() || '0'
+      const freePen = Number(userInfo?.coin_free || 0) + Number(userInfo?.coin_register || 0)
+
+      const encryptedData = await getChatRoomEncryptData(
+        chrbotKey,
+        userInfo?.coin_user?.toString() || '0',
+        'KR',
+        freePen?.toString() || '0',
+        null,
+        nsfw,
+        userInfo?.persona || '',
+        userInfo?.access_token || '',
+        userInfo?.user_key?.toString() || '0',
+      )
+
+      const chatRoomPath = `${CHAT_FRONTEND_ADDRESS}?info=${encryptedData}`
+      router.push(chatRoomPath)
+
+      // router.push(`https://qa.storynation.co.kr/character/chat?info=${encryptedData}`)
+      // router.push(`/chat/${chat.characterId}`)
     }
   }
 

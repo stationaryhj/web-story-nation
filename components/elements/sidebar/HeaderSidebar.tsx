@@ -4,7 +4,9 @@ import React from 'react'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSun, faMoon, faCog, faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons'
+import { useAccountStore } from '@/store/useAccountStore'
 import BaseSidebar from './BaseSidebar'
+import { SocialLoginProvider } from '@/services/auth/types'
 
 interface NavLink {
   href: string
@@ -56,6 +58,14 @@ export default function HeaderSidebar({
   setActiveLink,
   logout,
 }: HeaderSidebarProps) {
+  const { loginType, guestLogin2 } = useAccountStore()
+
+  const isGuestLogin = loginType === 'Guest' as SocialLoginProvider && isLogin
+
+  const handleTestGuestLogin = async () => {
+    const result = await guestLogin2('test_brix', 1)
+  }
+  
   const sidebarContent = (
     <>
       <nav className="p-5">
@@ -76,16 +86,30 @@ export default function HeaderSidebar({
                 <SimpleToggle isOn={isAdultModeEnabled} onToggle={handleAdultModeToggle} isSidebar={true} />
               </div>
             </li> */}
-            <li>
-              <Link
-                href="/settings"
-                className="flex items-center py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors"
-                onClick={() => onClose()}
-              >
-                <FontAwesomeIcon icon={faUser} className="text-lg mr-3" />
-                내정보
-              </Link>
-            </li>
+
+            {isLogin && (
+              <li>
+                <Link
+                  href="/settings"
+                  className="flex items-center py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors"
+                  onClick={e => {
+                    // if(!isLogin) {
+                    //   e.preventDefault()
+                    //   openModal('login')
+                    //   return
+                    // }
+                    onClose()
+                  }}
+                >
+                  <FontAwesomeIcon icon={faUser} className="text-lg mr-3" />
+                  <span>내정보</span>
+                  {isGuestLogin && (
+                    <span className="text-xs text-red-500 bg-gray-100 rounded-full px-1 py-0.5 ml-2">Guest</span>
+                  )}
+                </Link>
+              </li>
+            )}
+            
             <li>
               {isLogin ? (
                 <button
@@ -111,6 +135,12 @@ export default function HeaderSidebar({
                 </button>
               )}
             </li>
+
+            {/* <li>
+              <button onClick={handleTestGuestLogin}>
+                TEST Guest 로그인
+              </button>
+            </li> */}
           </ul>
         </div>
       </nav>

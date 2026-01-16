@@ -23,6 +23,8 @@ import {
   parseConversationExamples,
   exampleDatas,
   getImageUri,
+  rijndaelEncrypt,
+  getChatRoomEncryptData,
 } from '@/lib/utils/storyNationUtil'
 import BaseModal from './BaseModal'
 import { ReqGetChatBot } from '@/services/hooks/DataListManager'
@@ -32,6 +34,13 @@ import { CharbotLikeResponse } from '@/types/api'
 import { useAccountStore } from '@/store/useStoreData'
 import ReportModal from './ReportModal'
 import { toast } from 'react-toastify'
+
+
+const PI_ADDRESS = process.env.NEXT_PUBLIC_PI_ADDRESS
+const CHAT_FRONTEND_ADDRESS = process.env.NEXT_PUBLIC_CHAT_FRONTEND_ADDRESS
+const CHAT_SERVER_ADDRESS = process.env.NEXT_PUBLIC_CHAT_SERVER_ADDRESS
+const CHAT_SERVER_PORT = process.env.NEXT_PUBLIC_CHAT_SERVER_PORT
+
 
 interface ExampleData {
   title: string
@@ -55,7 +64,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
   const router = useRouter()
   const { selectedCharacter, setSelectedCharacter, openModal, modalProps } = useModalStore()
   const [isImageLoaded, setIsImageLoaded] = useState(false)
-  const { isLogin, isAdult } = useAccountStore()
+  const { isLogin, isAdult, data: userInfo, writerInfo } = useAccountStore()
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
   const [reportSubmitted, setReportSubmitted] = useState(false)
 
@@ -127,9 +136,30 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
           toast.error('삭제된 캐릭터입니다.')
           return
         }
-        if (chatId) {
-          router.push(`/chat/${chatId}`)
-        }
+
+        const chrbotKey = response.data.chrbot.world_list_detail_chrbot_key.toString()
+        const nsfw = response.data.chrbot.nsfw.toString() || '0'
+        const freePen = Number(userInfo?.coin_free || 0) + Number(userInfo?.coin_register || 0)
+
+        const encryptedData = await getChatRoomEncryptData(
+          chrbotKey,
+          userInfo?.coin_user?.toString() || '0',
+          'KR',
+          freePen.toString() || '0',
+          null,
+          nsfw,
+          userInfo?.persona || '',
+          userInfo?.access_token || '',
+          userInfo?.user_key?.toString() || '0',
+        )
+
+        
+        const chatRoomPath = `${CHAT_FRONTEND_ADDRESS}?info=${encryptedData}`
+        router.push(chatRoomPath)
+        
+        // if (chatId) {
+        //   router.push(`/chat/${chatId}`)
+        // }
       }
     }
   }

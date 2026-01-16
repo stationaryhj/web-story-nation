@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckSquare, faSquare } from '@fortawesome/free-solid-svg-icons'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { SocialLoginProvider } from '@/services/auth/types'
 import { useAccountStore } from '@/store/useAccountStore'
 import { contentApi } from '@/services/api/storyNationApi'
 import { createPortal } from 'react-dom'
@@ -31,7 +32,7 @@ export default function SignupModal({ isOpen, onClose, onSuccess, state = 'signu
   const [birthError, setBirthError] = useState<string | null>(null)
 
   // 계정 스토어에서 회원가입 함수와 로딩 상태 가져오기
-  const { registerWithSocialData, loading, error } = useAccountStore()
+  const { isLogin, data, loginType, loading, error, registerWithSocialData } = useAccountStore()
 
   // 약관 동의 상태
   const [allAgreed, setAllAgreed] = useState(false)
@@ -42,6 +43,18 @@ export default function SignupModal({ isOpen, onClose, onSuccess, state = 'signu
 
   // 모든 필수 동의 여부 확인
   const allRequiredAgreed = serviceAgreed && privacyAgreed && paidServiceAgreed
+  const isGuestLogin = isLogin && data && loginType === 'Guest' as SocialLoginProvider
+
+  // 개별 약관 동의 시 전체 동의 업데이트
+  useEffect(() => {
+    if (serviceAgreed && privacyAgreed && paidServiceAgreed && marketingAgreed) {
+      setAllAgreed(true)
+    } else {
+      setAllAgreed(false)
+    }
+  }, [serviceAgreed, privacyAgreed, paidServiceAgreed, marketingAgreed])
+
+  
 
   // 닉네임 중복 확인
   const checkNickname = async () => {
@@ -50,10 +63,10 @@ export default function SignupModal({ isOpen, onClose, onSuccess, state = 'signu
       return
     }
 
-    if (nickname.length > 20) {
-      toast.error('닉네임은 20자 이내로 입력해주세요.')
-      return
-    }
+    // if (nickname.length > 20) {
+    //   toast.error('닉네임은 20자 이내로 입력해주세요.')
+    //   return
+    // }
 
     const response = await contentApi.NicknmCheck(nickname)
     if (response.data.result.err === 0) {
@@ -175,15 +188,6 @@ export default function SignupModal({ isOpen, onClose, onSuccess, state = 'signu
     setMarketingAgreed(!allAgreed)
   }
 
-  // 개별 약관 동의 시 전체 동의 업데이트
-  useEffect(() => {
-    if (serviceAgreed && privacyAgreed && paidServiceAgreed && marketingAgreed) {
-      setAllAgreed(true)
-    } else {
-      setAllAgreed(false)
-    }
-  }, [serviceAgreed, privacyAgreed, paidServiceAgreed, marketingAgreed])
-
   // 완료 화면에서 확인 버튼 클릭 시 로그인 페이지로 이동
   const handleCompleteConfirm = () => {
     onClose()
@@ -250,6 +254,13 @@ export default function SignupModal({ isOpen, onClose, onSuccess, state = 'signu
   useEffect(() => {
     console.log('console', isNicknameChecked, isNicknameValid)
   }, [isNicknameChecked, isNicknameValid])
+
+  useEffect(() => {
+    if(isGuestLogin) {
+      const nickname = data?.nick_nm
+      setNickname(nickname || '')
+    }
+  }, [isGuestLogin, data])
 
   // 모달이 닫힐 때 상태 초기화
   useEffect(() => {

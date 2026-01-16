@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { LoginResponse, WriterInfoData } from '@/types/api'
+import { GuestLoginResponse, LoginResponse, WriterInfoData } from '@/types/api'
 import { OAuthProvider, OAuthResponse, OAuthUserInfo } from '@/types/login'
 import { OAUTH_PROVIDERS } from '@/types/login'
 import { contentApi, createApi, settlementApi } from '@/services/api'
@@ -8,6 +8,8 @@ import axios from 'axios'
 import { authService } from '@/services/auth'
 import { useSettingsStore } from '@/store/useStoreSettings'
 import { useChatModeStore } from '@/store/useStoreData'
+import { requestConnectedChatRoomData } from '@/services/interface'
+import { SocialLoginProvider } from '@/services/auth/types'
 
 // 환경 변수에서 리다이렉트 URI 가져오기
 const REDIRECT_URI = process.env.NEXT_PUBLIC_OAUTH_REDIRECT_URI
@@ -18,15 +20,21 @@ if (!REDIRECT_URI) {
 
 interface AccountState {
   isLogin: boolean
+  loginType: SocialLoginProvider | null
   data: LoginResponse | null
   writerInfo: WriterInfoData | null
   loading: boolean
   error: string | null
   isInitialized: boolean
   // Actions
-  setLoginState: (isLogin: boolean, data: LoginResponse | null) => void
+  setLoginState: (isLogin: boolean, data: LoginResponse | null, social_type?: string) => void
+  guestToSocialLogin: (snstype: number, snsauth: string, snsid: string, kr_gb: string, access_token: string) => Promise<boolean>
   guestLogin: (nickname: string) => Promise<boolean>
   socialLogin: (type: OAuthProvider, onSignupRequired?: () => void, onLoginSuccess?: () => void) => Promise<boolean>
+  guestLogin2: (nickname: string, gender: number) => Promise<{
+    success: boolean
+    data: GuestLoginResponse | null
+  }>
   handleCallback: (code: string, state?: string, onSignupRequired?: () => void, onLoginSuccess?: () => void) => Promise<boolean>
   registerWithSocialData: (nickname: string, birthdate: string, marketingAgree: boolean, onSuccess?: () => void) => Promise<boolean>
   logout: () => void
@@ -233,11 +241,29 @@ export const useAccountStore = create<AccountState>()(
   persist(
     (set, get) => ({
       isLogin: false,
+      loginType: null,
       data: null,
       writerInfo: null,
       loading: false,
       error: null,
       isInitialized: false,
+
+      guestToSocialLogin: async (snstype: number, snsauth: string, snsid: string, kr_gb: string, access_token: string) => {
+        const response = await contentApi.login2(snsauth, snstype, snsid, kr_gb, access_token)
+        
+        if (response.data && response.data.result.err === 0) {
+          const socialType = localStorage.getItem('social_login_type');
+
+          set({
+            isLogin: true, 
+            loginType: socialType as SocialLoginProvider,
+            data: response.data, 
+            loading: false
+          });
+          return true
+        }
+        return false
+      },
 
       updateSafetyMode: async (safety: number) => {
         const response = await contentApi.SetSafetyMode(safety)
@@ -331,8 +357,19 @@ export const useAccountStore = create<AccountState>()(
         })
       },
 
-      setLoginState: (isLogin, data) => {
-        set({ isLogin, data })
+      setLoginState: (isLogin, data, social_type) => {
+        console.log('@@ setLoginState :: ', isLogin, data, social_type)
+        if(social_type) {
+          set({ loginType: social_type as SocialLoginProvider })  
+        }
+
+        if(data) {
+          set({ data })
+        }
+
+        if(isLogin) {
+          set({ isLogin })
+        }
       },
 
       setLoading: (loading) => {
@@ -397,6 +434,7 @@ export const useAccountStore = create<AccountState>()(
           
           if (userInfoResponse && userInfoResponse.data) {
             const currentData = get().data
+
             if (currentData) {
               // UserInfoResponse 타입에 맞게 필드 업데이트
               // intro, profile_url, image_url 속성은 옵셔널하게 처리
@@ -423,7 +461,6 @@ export const useAccountStore = create<AccountState>()(
                 }
               })
             }
-
 
             // 성인 모드 확인
             useSettingsStore.getState().setAdlultMode(userInfoResponse.data.safety)
@@ -477,6 +514,7 @@ export const useAccountStore = create<AccountState>()(
           if(result.success && result.data) {
             set({
               isLogin: true,
+              loginType: 'Guest' as SocialLoginProvider,
               data: result.data,
               loading: false,
             })
@@ -498,6 +536,59 @@ export const useAccountStore = create<AccountState>()(
           set({ error: errorMessage, loading: false })
           return false
         }
+      },
+
+      guestLogin2: async (nickname: string, gender: number): Promise<{
+        success: boolean
+        data: GuestLoginResponse | null
+      }> =>
+      {
+        const { isInitialized } = get()
+        if (!isInitialized) {
+          await get().initialize()
+        }
+
+        set({ loading: true, error: null })
+
+        let resultData = {
+          success: false,
+          data: null as GuestLoginResponse | null
+        }
+
+        try {
+          const result = await contentApi.SimpleLogin(nickname, gender as number)
+          if(result.data) {
+            resultData = {
+              success: true,
+              data: result.data
+            }
+
+
+            const loginData = {
+              ...result.data,
+
+              // 이름만 다른 중복데이터는 하나로 다시 재결합 //
+              coin_user: result.data.coin,
+              coin_free: result.data.freeCoin,
+              access_token: result.data.token,
+              user_key: result.data.userKey,
+            } as LoginResponse
+            set({
+              isLogin: true,
+              loginType: 'Guest' as SocialLoginProvider,
+              data: loginData,
+              loading: false,
+            })
+
+
+            await get().updateUserInfoFromUserInfo();
+            await get().fetchWriterInfo();
+          }
+        }
+        catch (error) {
+
+        }
+        return resultData
       },
 
       socialLogin: async (type: OAuthProvider, onSignupRequired?: () => void, onLoginSuccess?: () => void): Promise<boolean> => {
@@ -526,6 +617,7 @@ export const useAccountStore = create<AccountState>()(
             // 로그인 성공
             set({ 
               isLogin: true, 
+              loginType: type as SocialLoginProvider,
               data: result.data, 
               loading: false 
             });
@@ -601,7 +693,7 @@ export const useAccountStore = create<AccountState>()(
             const loginResponse = await contentApi.login2(snsauth, Number(snstype), snsid, String(kr_gb));
             
             // 로그인 상태 저장
-            set({ isLogin: true, data: loginResponse.data, loading: false });
+            set({ isLogin: true, loginType: provider as SocialLoginProvider, data: loginResponse.data, loading: false });
             
             // userinfo2 데이터 업데이트
             await get().updateUserInfoFromUserInfo2();
@@ -673,7 +765,6 @@ export const useAccountStore = create<AccountState>()(
         try {
           // 인증 서비스를 사용하여 회원가입
           const result = await authService.registerWithSocialData(nickname, birthdate, marketingAgree);
-          
           if (result.success && result.data) {
             // 회원가입 및 로그인 성공
             set({ 
@@ -710,7 +801,7 @@ export const useAccountStore = create<AccountState>()(
         // 인증 서비스를 사용하여 로그아웃
         authService.logout();
         useSettingsStore.getState().setAdlultMode(1)
-        set({ isLogin: false, data: null, writerInfo: null, isInitialized: false });
+        set({ isLogin: false, loginType: null, data: null, writerInfo: null, isInitialized: false });
       },
 
       updateBankAccount: async (bank: string, accountNumber: string, accountHolder: string) => {
