@@ -16,6 +16,7 @@ export default function GuestSignupPage() {
   return (
    <LoginModal
     isOpen={isOpen}
+    callbackUrl='/shop-recharge'
     onClose={handleClose}
     chrbot_key={null}
    />
