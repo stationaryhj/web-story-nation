@@ -23,9 +23,10 @@ interface LoginModalProps {
   isOpen: boolean
   onClose: () => void
   chrbot_key?: string | null
+  callbackUrl?: string | null
 }
 
-export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, chrbot_key, callbackUrl }: LoginModalProps) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login')
   const [showSignup, setShowSignup] = useState(false)
@@ -149,9 +150,11 @@ export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalPr
 
               // 성공 시에만 모달 닫기
               onClose()
-              
+
               if(chrbot_key) {
                 handleConnectedChatRoom(chrbot_key)
+              } else if(callbackUrl) {
+                router.push(callbackUrl)
               }
             }
           } else if (result.signupRequired || result.needSignup) {
@@ -199,27 +202,6 @@ export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalPr
     }
   }, [isOpen, onClose])
 
-  const handleSignupClick = () => {
-    setShowSignup(true)
-  }
-
-  const handleSignupClose = () => {
-    setShowSignup(false)
-    onClose()
-
-    const { isLogin } = useAccountStore.getState()
-
-    console.log('@@ signup close :: ', isLogin)
-
-    if(isLogin) {
-      if(chrbot_key) {
-        handleConnectedChatRoom(chrbot_key)
-      }
-    }
-  }
-
-  const { guestLogin } = useAccountStore()
-
   // 통합된 소셜 로그인 처리 함수
   const handleSocialLogin = async (provider: OAuthProvider) => {
     try {
@@ -240,26 +222,26 @@ export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalPr
     }
   }
 
-  const handleGuestLogin = async (nickname: string) => {
-    try {
-      setLoading(true)
-      let isSuccess = await guestLogin(nickname)
-      if (isSuccess) {
-        onClose()
+  // const handleGuestLogin = async (nickname: string) => {
+  //   try {
+  //     setLoading(true)
+  //     let isSuccess = await guestLogin(nickname)
+  //     if (isSuccess) {
+  //       onClose()
 
-        if(chrbot_key) {
-          handleConnectedChatRoom(chrbot_key)
-          return;
-        }
+  //       if(chrbot_key) {
+  //         handleConnectedChatRoom(chrbot_key)
+  //         return;
+  //       }
 
-        router.push('/')
-      }
-    } catch (err) {
-      console.error('게스트 로그인 오류:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
+  //       router.push('/')
+  //     }
+  //   } catch (err) {
+  //     console.error('게스트 로그인 오류:', err)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   // 회원가입 성공 시 모달 닫기
   const handleSignupSuccess = () => {
@@ -338,6 +320,7 @@ export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalPr
         }
 
         onClose()
+ 
         return
       }
     }
@@ -421,8 +404,8 @@ export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalPr
             </button>
           </div>
 
-          {/* 
-          <div className="relative">
+          
+         {/*  <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
             </div>
@@ -431,7 +414,7 @@ export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalPr
             </div>
           </div> */}
 
-          {/* <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} /> */}
+        {/*   <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} /> */}
           {/* 신규 가입 모드일 때만 약관 동의 문구 표시 */}
 
           <div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6 px-4">
@@ -439,17 +422,7 @@ export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalPr
           </div>
         </div>
       </BaseModal>
-
-      {/* 회원가입 모달 - isOpen 조건만 체크하여 로그인 모달과 독립적으로 표시 */}
-      {showSignup && (
-        <SignupModal
-          isOpen={isOpen}
-          onClose={handleSignupClose}
-          onSuccess={handleSignupSuccess}
-          state={isReward ? 'reward' : 'signup'}
-        />
-      )}
-
+    
       {isDuplicateLogin && (
         <DuplicateLoginModal
           isOpen={true}
