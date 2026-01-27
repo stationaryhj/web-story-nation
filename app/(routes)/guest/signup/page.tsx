@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import LoginModal from '@/components/modal/LoginModal';
 import { useAccountStore } from '@/store/useAccountStore';
@@ -10,11 +9,9 @@ export default function GuestSignupPage() {
   const { isLogin } = useAccountStore();
 
   const handleClose = () => {
-    if (!isLogin) {
-      setIsOpen(false);
+    setIsOpen(false);
 
-      window.history.back();
-    }
+    window.history.back();
   };
 
   return (

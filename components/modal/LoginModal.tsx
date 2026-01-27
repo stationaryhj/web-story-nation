@@ -131,15 +131,17 @@ export default function LoginModal({ isOpen, onClose, chrbot_key, callbackUrl }:
 
               const { data, logout } = useAccountStore.getState();
               if (data && data.user_block_type === 1) {
+                console.log('에러');
                 toast.error('정지된 계정입니다.');
-                logout();
-                onClose();
+                // logout();
+                // onClose();
                 return;
               }
 
               // 성공 시 리다이렉트 처리
               if (chrbot_key) {
-                onClose();
+                console.log('chrbot_key 있음');
+                // onClose();
                 handleConnectedChatRoom(chrbot_key);
               } else if (callbackUrl) {
                 router.push(callbackUrl);
