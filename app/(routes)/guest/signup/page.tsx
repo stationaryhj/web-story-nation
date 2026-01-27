@@ -1,23 +1,28 @@
-'use client'
+'use client';
 
-import LoginModal from '@/components/modal/LoginModal'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import LoginModal from '@/components/modal/LoginModal';
+import { useAccountStore } from '@/store/useAccountStore';
 
 export default function GuestSignupPage() {
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(true);
+  const { isLogin } = useAccountStore();
 
   const handleClose = () => {
-    setIsOpen(false)
-    window.history.back()
-  }
+    if (!isLogin) {
+      setIsOpen(false);
+
+      window.history.back();
+    }
+  };
 
   return (
-   <LoginModal
-    isOpen={isOpen}
-    callbackUrl='/shop-recharge'
-    onClose={handleClose}
-    chrbot_key={null}
-   />
-  )
+    <LoginModal
+      isOpen={isOpen}
+      callbackUrl='/shop-recharge'
+      onClose={handleClose}
+      chrbot_key={null}
+    />
+  );
 }
