@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 export default function GuestSignupPage() {
-  const router = useRouter()
   const [isOpen, setIsOpen] = useState(true)
 
   const handleClose = () => {
