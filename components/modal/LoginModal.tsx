@@ -121,7 +121,6 @@ export default function LoginModal({ isOpen, onClose, chrbot_key, callbackUrl }:
 
           // authService.handleCallback 호출
           const result = await authService.handleCallback(callbackParams);
-          console.log('@@@@@@@ result :: ', result);
 
           if (result.success) {
             // 로그인 성공 시 상태 업데이트 (useAccountStore)
@@ -143,10 +142,7 @@ export default function LoginModal({ isOpen, onClose, chrbot_key, callbackUrl }:
                 onClose();
                 handleConnectedChatRoom(chrbot_key);
               } else if (callbackUrl) {
-                // callbackUrl이 있으면 onClose 호출하지 않고 바로 이동
                 router.push(callbackUrl);
-              } else {
-                onClose();
               }
             }
           } else if (result.signupRequired || result.needSignup) {
@@ -263,7 +259,6 @@ export default function LoginModal({ isOpen, onClose, chrbot_key, callbackUrl }:
     <>
       <BaseModal isOpen={isOpen && !showSignup} onClose={onClose} size='md'>
         <div className='flex flex-col pb-6'>
-
           <div className='flex flex-col justify-center items-center gap-4 mb-4 mt-6'>
             <div>
               <Image src='/images/logo.png' alt='logo' width={250} height={100} />
