@@ -49,12 +49,7 @@ const nextConfig = {
   // SWC 컴파일러 옵션 (Next.js 12 이상)
   swcMinify: true,
   compiler: {
-    removeConsole:
-      process.env.NODE_ENV === 'production'
-        ? {
-            exclude: ['error', 'log'], // error는 유지 (선택사항)
-          }
-        : false,
+    removeConsole: false, // 모든 console 유지
   },
 };
 
