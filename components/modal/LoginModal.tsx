@@ -429,7 +429,7 @@ export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalPr
 						</div>
 					</div> */}
 
-          <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} />
+          {/*   <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} /> */}
           {/* 신규 가입 모드일 때만 약관 동의 문구 표시 */}
 
           <div className='text-center text-sm text-gray-500 dark:text-gray-400 mt-6 px-4'>

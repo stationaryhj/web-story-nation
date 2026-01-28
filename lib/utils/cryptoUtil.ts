@@ -82,12 +82,14 @@ export function decryptData<T = any>(encryptedData: string): T {
 
 /**
  * 토큰 전용 복호화 함수
+ * 채팅방에서 encryptData(token)으로 토큰 문자열을 직접 암호화해서 보냄
  * @param encryptedToken 암호화된 토큰 문자열
  * @returns 복호화된 토큰 문자열
  */
 export function decryptToken(encryptedToken: string): string {
-  const data = decryptData<{ token: string }>(encryptedToken);
-  return data.token;
+  // 토큰 문자열이 직접 암호화된 경우
+  const data = decryptData<string>(encryptedToken);
+  return data;
 }
 
 /**
@@ -96,5 +98,5 @@ export function decryptToken(encryptedToken: string): string {
  * @returns 암호화된 토큰 문자열
  */
 export function encryptToken(token: string): string {
-  return encryptData({ token });
+  return encryptData(token);
 }

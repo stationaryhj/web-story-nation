@@ -21,7 +21,7 @@ COPY --from=builder /app/postcss.config.js ./
 COPY --from=builder /app/tailwind.config.ts ./
 COPY --from=builder /app/global.d.ts ./
 # QA 환경용 .env 파일 복사
-COPY --from=builder /app/.env_local ./.env
+COPY --from=builder /app/.env.local ./.env
 
 RUN yarn install --production
 EXPOSE 3000

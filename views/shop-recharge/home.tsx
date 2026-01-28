@@ -134,19 +134,21 @@ export default function ShopRecharge() {
   // 외부(채팅방)에서 암호화된 토큰으로 접근 시 처리
   useEffect(() => {
     const token = searchParams.get('token');
-    console.log('토큰있음');
-    if (token && !isLogin) {
+
+    if (token) {
       try {
         // 암호화된 토큰 복호화
         const decryptedToken = decryptToken(token);
-        console.log('decryptedToken :: ', decryptedToken);
+
         // 토큰으로 로그인 초기화
         initFromExternalToken(decryptedToken).then((success) => {
           if (success) {
             // URL에서 token 파라미터 제거
             const url = new URL(window.location.href);
             url.searchParams.delete('token');
-            router.replace(url.pathname + url.search);
+            const search = url.searchParams.toString();
+
+            router.replace(url.pathname + (search ? `?${search}` : ''));
           }
         });
       } catch (error) {
@@ -160,7 +162,7 @@ export default function ShopRecharge() {
     isLoading: coinChargeUseHistoryLoading,
     error: coinChargeUseHistoryError,
     refetch: coinChargeUseHistoryRefetch,
-  } = ReqGetCoinChargeUseHistory(0, 1, 50);
+  } = ReqGetCoinChargeUseHistory(0, 1, 50, isLogin);
 
   console.log('@@ coinChargeUseHistoryData :: ', coinChargeUseHistoryData);
 
