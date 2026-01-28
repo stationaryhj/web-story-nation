@@ -8,7 +8,7 @@ const nextConfig = {
       's3.us-east-1.amazonaws.com',
       'universestationery-en.s3.us-east-1.amazonaws.com',
     ],
-    unoptimized: true
+    unoptimized: true,
   },
   async headers() {
     return [
@@ -27,13 +27,9 @@ const nextConfig = {
     return [
       {
         source: '/nakama/:path*',
-        destination: 'http://qauschat.storynation.io:443/:path*'
+        destination: 'http://qauschat.storynation.io:443/:path*',
       },
-      {
-        source: '/callback',
-        destination: '/oauth-callback.html'
-      }
-    ]
+    ];
   },
   // production 빌드에서 console.* 출력 제거
   webpack: (config, { isServer, dev }) => {
@@ -52,7 +48,7 @@ const nextConfig = {
               'console.debug',
               'console.warn',
               'console.error',
-              'console.table'
+              'console.table',
             ];
           }
         });
@@ -63,10 +59,13 @@ const nextConfig = {
   // SWC 컴파일러 옵션 (Next.js 12 이상)
   swcMinify: true,
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error'],  // error는 유지 (선택사항)
-    } : false,
-  }
-}
+    removeConsole:
+      process.env.NODE_ENV === 'production'
+        ? {
+            exclude: ['error'], // error는 유지 (선택사항)
+          }
+        : false,
+  },
+};
 
-module.exports = nextConfig 
+module.exports = nextConfig;
