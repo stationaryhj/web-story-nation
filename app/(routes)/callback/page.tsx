@@ -123,7 +123,11 @@ export default function CallbackPage() {
 
   useEffect(() => {
     const processCallback = async () => {
-      // alert(window.location.href)
+      // 디버깅: window.opener 상태 확인
+      console.log('=== CALLBACK DEBUG ===');
+      console.log('window.opener 존재:', !!window.opener);
+      console.log('window.location.origin:', window.location.origin);
+
       // 원본 URL 로깅
       console.log('Original URL:', window.location.href)
 
@@ -132,6 +136,24 @@ export default function CallbackPage() {
         console.log('이미 메시지가 전송되었습니다. 중복 처리 방지');
         return;
       }
+
+      // 메시지 전송 헬퍼 함수 (postMessage 또는 localStorage 사용)
+      const sendMessageToParent = (data: Record<string, unknown>) => {
+        console.log('부모 창에 메시지 전송 시도:', data);
+
+        if (window.opener) {
+          // window.opener가 있으면 postMessage 사용
+          console.log('postMessage로 전송');
+          window.opener.postMessage(data, window.location.origin);
+        } else {
+          // window.opener가 없으면 localStorage 사용 (storage 이벤트 트리거)
+          console.log('localStorage로 전송 (opener가 없음)');
+          localStorage.setItem('oauth_callback_data', JSON.stringify({
+            ...data,
+            timestamp: Date.now()
+          }));
+        }
+      };
 
       // 콜백 파라미터 가져오기
       const code = searchParams?.get('code')
@@ -160,49 +182,40 @@ export default function CallbackPage() {
         if (socialLoginType === 'naver') {
           // 네이버 로그인인 경우 커스텀 파서 사용
           const result = parseNaverCallback(window.location.href);
-          
+
           parsedState = JSON.stringify(result.state);
           stateObj = result.state;
 
           // 네이버는 여기서 리턴 (parsedState)
           sessionStorage.setItem('callback_message_sent', 'true');
-          window.opener.postMessage(
-            {
-              code,
-              state: parsedState || searchParams?.get('state'), // 파싱된 state 또는 원본 state
-              login_type: loginType
-            },
-            window.location.origin
-          )
+          sendMessageToParent({
+            code,
+            state: parsedState || searchParams?.get('state'),
+            login_type: loginType
+          });
 
           setTimeout(() => {
             console.log('콜백 창 닫기 시도');
-            // 세션 스토리지 정리
             sessionStorage.removeItem('callback_message_sent');
             window.close()
-          }, 5000)
+          }, 3000)
 
           return
         }
         else if(socialLoginType === 'apple') {
           const result = parseAppleCallback(window.location.href);
-          
-          // 네이버는 여기서 리턴 (parsedState)
+
           sessionStorage.setItem('callback_message_sent', 'true');
-          window.opener.postMessage(
-            {
-              code: result.code,
-              login_type: loginType
-            },
-            window.location.origin
-          )
+          sendMessageToParent({
+            code: result.code,
+            login_type: loginType
+          });
 
           setTimeout(() => {
             console.log('콜백 창 닫기 시도');
-            // 세션 스토리지 정리
             sessionStorage.removeItem('callback_message_sent');
             window.close()
-          }, 5000)
+          }, 3000)
 
           return
         }
@@ -237,57 +250,38 @@ export default function CallbackPage() {
         console.error('state 파싱 오류:', e)
       }
 
-      // 부모 창에 메시지 전달 
-      if (window.opener) {
-        console.log('부모 창에 메시지 전달 시작');
-        
-        // 중복 메시지 방지를 위해 플래그 설정
-        sessionStorage.setItem('callback_message_sent', 'true');
-        
-        // 에러가 있는 경우
-        if (error) {
-          console.log('에러 메시지 전송:', error);
-          window.opener.postMessage(
-            {
-              error,
-              error_description: errorDescription,
-              login_type: loginType
-            },
-            window.location.origin
-          )
-        }
-        // 성공한 경우 - 파싱된 state 파라미터 추가
-        else if (code) {
-          console.log('성공 메시지 전송:', { code: code?.substring(0, 5) + '...', login_type: loginType });
-          
-          // 기본 메시지 객체
-          const messageData = {
-            code,
-            state: parsedState || searchParams?.get('state'), // 파싱된 state 또는 원본 state
-            login_type: loginType
-          };
-          
-          // Apple 로그인인 경우 id_token 추가
-          // if (loginType === 'APPLE' || idToken) {
-          //   console.log('Apple 로그인: id_token 포함');
-          //   (messageData as any).id_token = idToken;
-          // }
-          
-          window.opener.postMessage(messageData, window.location.origin);
-        }
+      // 부모 창에 메시지 전달
+      console.log('부모 창에 메시지 전달 시작');
 
-        // 5초 후 창 닫기 (안전장치)
-        setTimeout(() => {
-          console.log('콜백 창 닫기 시도');
-          // 세션 스토리지 정리
-          sessionStorage.removeItem('callback_message_sent');
-          window.close()
-        }, 5000)
-      } else {
-        // opener가 없는 경우 (직접 접근한 경우) 홈으로 이동
-        console.log('팝업이 아닌 직접 접근, 홈으로 리다이렉트');
-        router.push('/')
+      // 중복 메시지 방지를 위해 플래그 설정
+      sessionStorage.setItem('callback_message_sent', 'true');
+
+      // 에러가 있는 경우
+      if (error) {
+        console.log('에러 메시지 전송:', error);
+        sendMessageToParent({
+          error,
+          error_description: errorDescription,
+          login_type: loginType
+        });
       }
+      // 성공한 경우 - 파싱된 state 파라미터 추가
+      else if (code) {
+        console.log('성공 메시지 전송:', { code: code?.substring(0, 5) + '...', login_type: loginType });
+
+        sendMessageToParent({
+          code,
+          state: parsedState || searchParams?.get('state'),
+          login_type: loginType
+        });
+      }
+
+      // 3초 후 창 닫기 (안전장치)
+      setTimeout(() => {
+        console.log('콜백 창 닫기 시도');
+        sessionStorage.removeItem('callback_message_sent');
+        window.close()
+      }, 3000)
     };
     
     processCallback();

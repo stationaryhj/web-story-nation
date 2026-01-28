@@ -10,24 +10,15 @@ const nextConfig = {
     ],
     unoptimized: true,
   },
-  async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: [
-          {
-            key: 'Cross-Origin-Opener-Policy',
-            value: 'same-origin-allow-popups',
-          },
-        ],
-      },
-    ];
-  },
   async rewrites() {
     return [
       {
         source: '/nakama/:path*',
         destination: 'http://qauschat.storynation.io:443/:path*',
+      },
+      {
+        source: '/callback',
+        destination: '/oauth-callback.html',
       },
     ];
   },

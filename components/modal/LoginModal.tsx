@@ -106,20 +106,8 @@ export default function LoginModal({
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleCallbackMessage = async (event: MessageEvent) => {
-      console.log('@@ handleCallbackMessage :: ', event);
-
-      // 출처 확인 (보안)
-      if (event.origin !== window.location.origin) {
-        console.warn('알 수 없는 출처의 메시지 무시됨:', event.origin);
-        return;
-      }
-
-      // 메시지 데이터 확인
-      let loginType = null;
-      const data = event.data;
-      if (!data || typeof data !== 'object') return;
-
+    // 콜백 데이터 처리 공통 함수
+    const processCallbackData = async (data: Record<string, unknown>) => {
       console.log('로그인 콜백 메시지 수신:', data);
 
       // 소셜 로그인 데이터 확인
@@ -140,6 +128,7 @@ export default function LoginModal({
           return;
         }
 
+        let loginType = null;
         if (data.login_type) {
           loginType = data.login_type;
         }
@@ -157,8 +146,8 @@ export default function LoginModal({
 
           // 콜백 파라미터 준비
           const callbackParams = {
-            code: data.code,
-            state: data.state,
+            code: data.code as string,
+            state: data.state as string,
           };
 
           // id_token이 있는 경우 (Apple 로그인) 추가
@@ -178,8 +167,8 @@ export default function LoginModal({
               await useAccountStore.getState().updateUserInfoFromUserInfo2();
               await useAccountStore.getState().fetchWriterInfo();
 
-              const { data, logout } = useAccountStore.getState();
-              if (data && data.user_block_type === 1) {
+              const { data: userData, logout } = useAccountStore.getState();
+              if (userData && userData.user_block_type === 1) {
                 toast.error('정지된 계정입니다.');
                 logout();
                 onClose();
@@ -191,7 +180,6 @@ export default function LoginModal({
                 onClose();
                 handleConnectedChatRoom(chrbot_key);
               } else if (onLoginSuccess) {
-                // callbackUrl이 있으면 onClose 호출하지 않고 바로 이동
                 onLoginSuccess();
               } else {
                 onClose();
@@ -200,10 +188,10 @@ export default function LoginModal({
           } else if (result.signupRequired || result.needSignup) {
             setShowSignup(true);
 
-            const { isLogin, data, loginType, registerWithSocialData } = useAccountStore.getState();
-            if (isLogin && data && loginType === ('Guest' as SocialLoginProvider)) {
-              const nickname = data.nick_nm;
-              const response = await contentApi.NicknmCheckToGuest(nickname, data.access_token);
+            const { isLogin, data: accountData, loginType: accLoginType, registerWithSocialData } = useAccountStore.getState();
+            if (isLogin && accountData && accLoginType === ('Guest' as SocialLoginProvider)) {
+              const nickname = accountData.nick_nm;
+              const response = await contentApi.NicknmCheckToGuest(nickname, accountData.access_token);
               if (response.data.result.err === 0) {
                 await registerWithSocialData(nickname, '19700101', true, () => {
                   localStorage.removeItem('social_login_type');
@@ -211,35 +199,67 @@ export default function LoginModal({
                 });
               }
             } else {
-              // 회원가입 필요 - 모달 닫지 않고 회원가입 모달로 전환
               setShowSignup(true);
             }
           } else if (result.isDuplicateLogin) {
             setIsDuplicateLogin(true);
-          } else {
-            // 기타 오류
-            // toast.error(result.error || '로그인에 실패했습니다.')
           }
         } catch (error) {
           console.error('콜백 처리 중 오류 발생:', error);
         } finally {
           setLoading(false);
-          // 처리 완료 후 상태 초기화
           processingCallback.current = false;
+        }
+      }
+    };
+
+    // postMessage 이벤트 핸들러
+    const handleCallbackMessage = async (event: MessageEvent) => {
+      console.log('@@ handleCallbackMessage :: ', event);
+
+      // 출처 확인 (보안)
+      if (event.origin !== window.location.origin) {
+        console.warn('알 수 없는 출처의 메시지 무시됨:', event.origin);
+        return;
+      }
+
+      const data = event.data;
+      if (!data || typeof data !== 'object') return;
+
+      await processCallbackData(data);
+    };
+
+    // localStorage storage 이벤트 핸들러 (window.opener가 없을 때 사용)
+    const handleStorageEvent = async (event: StorageEvent) => {
+      console.log('@@ handleStorageEvent :: ', event);
+
+      if (event.key === 'oauth_callback_data' && event.newValue) {
+        try {
+          const data = JSON.parse(event.newValue);
+          console.log('localStorage에서 콜백 데이터 수신:', data);
+
+          // 데이터 처리 후 localStorage 정리
+          localStorage.removeItem('oauth_callback_data');
+
+          await processCallbackData(data);
+        } catch (e) {
+          console.error('localStorage 콜백 데이터 파싱 실패:', e);
         }
       }
     };
 
     // 이벤트 리스너 등록
     window.addEventListener('message', handleCallbackMessage);
+    window.addEventListener('storage', handleStorageEvent);
 
     // cleanup 함수
     return () => {
       window.removeEventListener('message', handleCallbackMessage);
+      window.removeEventListener('storage', handleStorageEvent);
       // 모달이 닫힐 때 처리 상태 초기화
       processingCallback.current = false;
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, chrbot_key, onLoginSuccess]);
 
   // 통합된 소셜 로그인 처리 함수
   const handleSocialLogin = async (provider: OAuthProvider) => {
