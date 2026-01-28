@@ -128,9 +128,9 @@ export default function LoginModal({
           return;
         }
 
-        let loginType = null;
+        let loginType: string | undefined = undefined;
         if (data.login_type) {
-          loginType = data.login_type;
+          loginType = data.login_type as string;
         }
 
         // 콜백 처리
