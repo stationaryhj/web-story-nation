@@ -31,10 +31,9 @@ const nextConfig = {
         // 기존 TerserPlugin 설정 가져오기
         config.optimization.minimizer.forEach((minimizer) => {
           if (minimizer.constructor.name === 'TerserPlugin') {
-            // console.* 출력 제거 설정
-            minimizer.options.terserOptions.compress.drop_console = true;
+            // console.* 출력 제거 설정 (drop_console은 false로 설정하여 pure_funcs만 적용)
+            minimizer.options.terserOptions.compress.drop_console = false;
             minimizer.options.terserOptions.compress.pure_funcs = [
-              'console.log',
               'console.info',
               'console.debug',
               'console.warn',
@@ -53,7 +52,7 @@ const nextConfig = {
     removeConsole:
       process.env.NODE_ENV === 'production'
         ? {
-            exclude: ['error', 'log'], // error는 유지 (선택사항)
+            exclude: ['error'], // error는 유지 (선택사항)
           }
         : false,
   },
