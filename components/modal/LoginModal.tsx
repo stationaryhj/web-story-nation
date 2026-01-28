@@ -124,7 +124,7 @@ export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalPr
             console.log('id_token 감지됨 (Apple 로그인)');
             Object.assign(callbackParams, { id_token: data.id_token });
           }
-
+          console.log('@@ callbackParams :: ', callbackParams);
           // authService.handleCallback 호출
           const result = await authService.handleCallback(callbackParams);
           console.log('@@@@@@@ result :: ', result);
@@ -317,6 +317,11 @@ export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalPr
     if (duplicateLoginData) {
       const duplicateLoginDataJson = JSON.parse(duplicateLoginData);
       const { snstype, snsauth, snsid, kr_gb, access_token } = duplicateLoginDataJson;
+      console.log('@@ snstype :: ', snstype);
+      console.log('@@ snsauth :: ', snsauth);
+      console.log('@@ snsid :: ', snsid);
+      console.log('@@ kr_gb :: ', kr_gb);
+      console.log('@@ access_token :: ', access_token);
       const isSuccess = await useAccountStore
         .getState()
         .guestToSocialLogin(snstype, snsauth, snsid, kr_gb, access_token);
@@ -325,6 +330,7 @@ export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalPr
       localStorage.removeItem('social_login_type');
 
       if (isSuccess) {
+        console.log('@@ isSuccess :: ', isSuccess);
         await useAccountStore.getState().updateUserInfoFromUserInfo2();
         await useAccountStore.getState().fetchWriterInfo();
 

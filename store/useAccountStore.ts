@@ -295,7 +295,8 @@ export const useAccountStore = create<AccountState>()(
 
         if (response.data && response.data.result.err === 0) {
           const socialType = localStorage.getItem('social_login_type');
-
+          console.log('@@ socialType :: ', socialType);
+          console.log('@@ response.data :: ', response.data);
           set({
             isLogin: true,
             loginType: socialType as SocialLoginProvider,
