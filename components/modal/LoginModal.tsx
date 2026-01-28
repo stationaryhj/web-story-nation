@@ -7,12 +7,11 @@ import { toast } from 'react-toastify';
 import { SpeechBubble } from '@/components/animation/SpeechBubble';
 import GuestLoginForm from '@/components/form/GuestLoginForm';
 import { getChatRoomEncryptData, getPlatform } from '@/lib/utils/storyNationUtil';
-import { contentApi } from '@/services/api';
 import { authService } from '@/services/auth';
-import { SocialLoginProvider } from '@/services/auth/types';
 import { useAccountStore } from '@/store/useAccountStore';
 import { OAuthProvider } from '@/types/login';
 import BaseModal from './BaseModal';
+
 import DuplicateLoginModal from './duplicateLoginModal';
 import SignupModal from './SignupModal';
 
@@ -22,15 +21,9 @@ interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   chrbot_key?: string | null;
-  onLoginSuccess?: () => void;
 }
 
-export default function LoginModal({
-  isOpen,
-  onClose,
-  chrbot_key,
-  onLoginSuccess,
-}: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
   const [showSignup, setShowSignup] = useState(false);
@@ -49,41 +42,6 @@ export default function LoginModal({
       });
     }
   }, [isOpen]);
-
-  // 채팅방 연결
-  const navigateToChatRoom = useCallback(
-    async (chrbotKey: string) => {
-      const { data: userInfo } = useAccountStore.getState();
-      if (!userInfo || !chrbotKey) return;
-
-      const freePen = Number(userInfo?.coin_free || 0) + Number(userInfo?.coin_register || 0);
-      const encryptedData = await getChatRoomEncryptData(
-        chrbotKey,
-        userInfo?.coin_user?.toString() || '0',
-        'KR',
-        freePen?.toString() || '0',
-        null,
-        '0',
-        userInfo?.persona || '',
-        userInfo?.access_token || '',
-        userInfo?.user_key?.toString() || '0'
-      );
-
-      router.push(`${CHAT_FRONTEND_ADDRESS}?info=${encryptedData}`);
-    },
-    [router]
-  );
-
-  // 로그인 성공 처리
-  const handleSuccessRedirect = useCallback(() => {
-    if (onLoginSuccess) {
-      onLoginSuccess();
-    } else if (chrbot_key) {
-      navigateToChatRoom(chrbot_key);
-    } else {
-      onClose();
-    }
-  }, [onLoginSuccess, chrbot_key, navigateToChatRoom, onClose]);
 
   // 로그인 타임아웃 핸들러
   const handleLoginTimeout = useCallback(() => {
@@ -106,8 +64,20 @@ export default function LoginModal({
   useEffect(() => {
     if (!isOpen) return;
 
-    // 콜백 데이터 처리 공통 함수
-    const processCallbackData = async (data: Record<string, unknown>) => {
+    const handleCallbackMessage = async (event: MessageEvent) => {
+      console.log('@@ handleCallbackMessage :: ', event);
+
+      // 출처 확인 (보안)
+      if (event.origin !== window.location.origin) {
+        console.warn('알 수 없는 출처의 메시지 무시됨:', event.origin);
+        return;
+      }
+
+      // 메시지 데이터 확인
+      let loginType = null;
+      const data = event.data;
+      if (!data || typeof data !== 'object') return;
+
       console.log('로그인 콜백 메시지 수신:', data);
 
       // 소셜 로그인 데이터 확인
@@ -128,9 +98,8 @@ export default function LoginModal({
           return;
         }
 
-        let loginType: string | undefined = undefined;
         if (data.login_type) {
-          loginType = data.login_type as string;
+          loginType = data.login_type;
         }
 
         // 콜백 처리
@@ -146,8 +115,8 @@ export default function LoginModal({
 
           // 콜백 파라미터 준비
           const callbackParams = {
-            code: data.code as string,
-            state: data.state as string,
+            code: data.code,
+            state: data.state,
           };
 
           // id_token이 있는 경우 (Apple 로그인) 추가
@@ -167,99 +136,86 @@ export default function LoginModal({
               await useAccountStore.getState().updateUserInfoFromUserInfo2();
               await useAccountStore.getState().fetchWriterInfo();
 
-              const { data: userData, logout } = useAccountStore.getState();
-              if (userData && userData.user_block_type === 1) {
+              const { data, logout } = useAccountStore.getState();
+              if (data && data.user_block_type === 1) {
                 toast.error('정지된 계정입니다.');
                 logout();
                 onClose();
                 return;
               }
 
-              // 성공 시 리다이렉트 처리
+              // 성공 시에만 모달 닫기
+              onClose();
+
               if (chrbot_key) {
-                onClose();
                 handleConnectedChatRoom(chrbot_key);
-              } else if (onLoginSuccess) {
-                onLoginSuccess();
-              } else {
-                onClose();
               }
             }
           } else if (result.signupRequired || result.needSignup) {
             setShowSignup(true);
 
-            const { isLogin, data: accountData, loginType: accLoginType, registerWithSocialData } = useAccountStore.getState();
-            if (isLogin && accountData && accLoginType === ('Guest' as SocialLoginProvider)) {
-              const nickname = accountData.nick_nm;
-              const response = await contentApi.NicknmCheckToGuest(nickname, accountData.access_token);
-              if (response.data.result.err === 0) {
-                await registerWithSocialData(nickname, '19700101', true, () => {
-                  localStorage.removeItem('social_login_type');
-                  onClose();
-                });
-              }
-            } else {
-              setShowSignup(true);
-            }
+            // const { isLogin, data, loginType, registerWithSocialData } = useAccountStore.getState()
+            // if(isLogin && data && loginType === 'Guest' as SocialLoginProvider) {
+            //   const nickname = data.nick_nm
+            //   const response = await contentApi.NicknmCheckToGuest(nickname, data.access_token)
+            //   if(response.data.result.err === 0) {
+            //     await registerWithSocialData(nickname, '19700101', true, () => {
+            //       localStorage.removeItem('social_login_type')
+            //       onClose()
+            //     })
+            //   }
+            // }
+            // else {
+            //   // 회원가입 필요 - 모달 닫지 않고 회원가입 모달로 전환
+            //   setShowSignup(true)
+            // }
           } else if (result.isDuplicateLogin) {
             setIsDuplicateLogin(true);
+          } else {
+            // 기타 오류
+            // toast.error(result.error || '로그인에 실패했습니다.')
           }
         } catch (error) {
           console.error('콜백 처리 중 오류 발생:', error);
         } finally {
           setLoading(false);
+          // 처리 완료 후 상태 초기화
           processingCallback.current = false;
-        }
-      }
-    };
-
-    // postMessage 이벤트 핸들러
-    const handleCallbackMessage = async (event: MessageEvent) => {
-      console.log('@@ handleCallbackMessage :: ', event);
-
-      // 출처 확인 (보안)
-      if (event.origin !== window.location.origin) {
-        console.warn('알 수 없는 출처의 메시지 무시됨:', event.origin);
-        return;
-      }
-
-      const data = event.data;
-      if (!data || typeof data !== 'object') return;
-
-      await processCallbackData(data);
-    };
-
-    // localStorage storage 이벤트 핸들러 (window.opener가 없을 때 사용)
-    const handleStorageEvent = async (event: StorageEvent) => {
-      console.log('@@ handleStorageEvent :: ', event);
-
-      if (event.key === 'oauth_callback_data' && event.newValue) {
-        try {
-          const data = JSON.parse(event.newValue);
-          console.log('localStorage에서 콜백 데이터 수신:', data);
-
-          // 데이터 처리 후 localStorage 정리
-          localStorage.removeItem('oauth_callback_data');
-
-          await processCallbackData(data);
-        } catch (e) {
-          console.error('localStorage 콜백 데이터 파싱 실패:', e);
         }
       }
     };
 
     // 이벤트 리스너 등록
     window.addEventListener('message', handleCallbackMessage);
-    window.addEventListener('storage', handleStorageEvent);
 
     // cleanup 함수
     return () => {
       window.removeEventListener('message', handleCallbackMessage);
-      window.removeEventListener('storage', handleStorageEvent);
       // 모달이 닫힐 때 처리 상태 초기화
       processingCallback.current = false;
     };
-  }, [isOpen, onClose, chrbot_key, onLoginSuccess]);
+  }, [isOpen, onClose]);
+
+  const handleSignupClick = () => {
+    setShowSignup(true);
+  };
+
+  const handleSignupClose = () => {
+    setShowSignup(false);
+    onClose();
+
+    const { isLogin } = useAccountStore.getState();
+
+    console.log('@@ signup close :: ', isLogin);
+
+    if (isLogin) {
+      if (chrbot_key) {
+        handleConnectedChatRoom(chrbot_key);
+      }
+    }
+  };
+
+  const { guestLogin } = useAccountStore();
 
   // 통합된 소셜 로그인 처리 함수
   const handleSocialLogin = async (provider: OAuthProvider) => {
@@ -280,26 +236,26 @@ export default function LoginModal({
     }
   };
 
-  // const handleGuestLogin = async (nickname: string) => {
-  //   try {
-  //     setLoading(true)
-  //     let isSuccess = await guestLogin(nickname)
-  //     if (isSuccess) {
-  //       onClose()
+  const handleGuestLogin = async (nickname: string) => {
+    try {
+      setLoading(true);
+      let isSuccess = await guestLogin(nickname);
+      if (isSuccess) {
+        onClose();
 
-  //       if(chrbot_key) {
-  //         handleConnectedChatRoom(chrbot_key)
-  //         return;
-  //       }
+        if (chrbot_key) {
+          handleConnectedChatRoom(chrbot_key);
+          return;
+        }
 
-  //       router.push('/')
-  //     }
-  //   } catch (err) {
-  //     console.error('게스트 로그인 오류:', err)
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
+        router.push('/');
+      }
+    } catch (err) {
+      console.error('게스트 로그인 오류:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // 회원가입 성공 시 모달 닫기
   const handleSignupSuccess = () => {
@@ -379,7 +335,6 @@ export default function LoginModal({
         }
 
         onClose();
-
         return;
       }
     }
@@ -413,7 +368,6 @@ export default function LoginModal({
 
           <div className='space-y-4 my-4'>
             <button
-              type='button'
               onClick={() => handleSocialLogin('GOOGLE')}
               disabled={loading}
               className='flex w-full h-12 items-center justify-start rounded-full bg-[#F2F2F2] px-[71px] font-medium text-white transition-colors'
@@ -426,7 +380,6 @@ export default function LoginModal({
               </div>
             </button>
             <button
-              type='button'
               onClick={() => handleSocialLogin('KAKAO')}
               disabled={loading}
               className='flex w-full h-12 items-center justify-center rounded-full bg-[#FEE500] font-medium text-yellow-900 shadow transition-colors'
@@ -439,7 +392,6 @@ export default function LoginModal({
               </div>
             </button>
             <button
-              type='button'
               onClick={() => handleSocialLogin('APPLE')}
               disabled={loading}
               className='flex w-full h-12 items-center justify-start rounded-full px-[71px] bg-black font-medium text-white shadow transition-colors'
@@ -453,7 +405,6 @@ export default function LoginModal({
             </button>
 
             <button
-              type='button'
               onClick={() => handleSocialLogin('NAVER')}
               disabled={loading}
               className='flex w-full h-12 items-center justify-center rounded-full bg-[#03C75A] py-1 font-medium text-white shadow transition-colors'
@@ -467,7 +418,8 @@ export default function LoginModal({
             </button>
           </div>
 
-          {/*  <div className="relative">
+          {/* 
+          <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
             </div>
@@ -476,7 +428,7 @@ export default function LoginModal({
             </div>
           </div> */}
 
-          {/*   <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} /> */}
+          {/* <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} /> */}
           {/* 신규 가입 모드일 때만 약관 동의 문구 표시 */}
 
           <div className='text-center text-sm text-gray-500 dark:text-gray-400 mt-6 px-4'>
@@ -484,6 +436,16 @@ export default function LoginModal({
           </div>
         </div>
       </BaseModal>
+
+      {/* 회원가입 모달 - isOpen 조건만 체크하여 로그인 모달과 독립적으로 표시 */}
+      {showSignup && (
+        <SignupModal
+          isOpen={isOpen}
+          onClose={handleSignupClose}
+          onSuccess={handleSignupSuccess}
+          state={isReward ? 'reward' : 'signup'}
+        />
+      )}
 
       {isDuplicateLogin && (
         <DuplicateLoginModal
