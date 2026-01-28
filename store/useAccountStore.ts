@@ -52,6 +52,7 @@ interface AccountState {
   updateIntro: (intro: string) => Promise<{success: boolean, message: string}>
   updateUserInfoFromUserInfo2: () => Promise<boolean>
   updateUserInfoFromUserInfo: () => Promise<boolean>
+  initFromExternalToken: (accessToken: string) => Promise<boolean>
   isAdult: () => boolean
 
   editNickname: (nick_nm: string) => Promise<boolean>
@@ -473,6 +474,48 @@ export const useAccountStore = create<AccountState>()(
         }
       },
 
+      // 외부(채팅방)에서 토큰으로 로그인 상태 초기화
+      initFromExternalToken: async (accessToken: string) => {
+        try {
+          set({ loading: true, error: null })
+
+          // 토큰으로 유저 정보 조회
+          const userInfoResponse = await contentApi.userinfo(accessToken)
+
+          if (userInfoResponse && userInfoResponse.data) {
+            const userData = userInfoResponse.data as any
+            const loginData = {
+              ...userData,
+              access_token: accessToken,
+              // LoginResponse 필수 필드 기본값 설정
+              cm_user: null,
+              image_url: userData.image_url || '',
+              profile_url: userData.profile_url || '',
+              sns_type: 'guest',
+              token_type: 'Bearer',
+            } as LoginResponse
+
+            set({
+              isLogin: true,
+              loginType: 'Guest' as SocialLoginProvider,
+              data: loginData,
+              loading: false,
+            })
+
+            // 작가 정보 가져오기
+            await get().fetchWriterInfo()
+
+            return true
+          }
+
+          set({ loading: false, error: '유저 정보를 가져올 수 없습니다.' })
+          return false
+        } catch (error) {
+          console.error('외부 토큰으로 초기화 중 오류 발생:', error)
+          set({ loading: false, error: '로그인 초기화 중 오류가 발생했습니다.' })
+          return false
+        }
+      },
 
       updateUserInfoFromUserInfo2: async () => {
         try {
