@@ -53,7 +53,7 @@ const nextConfig = {
     removeConsole:
       process.env.NODE_ENV === 'production'
         ? {
-            exclude: ['error'], // error는 유지 (선택사항)
+            exclude: ['error', 'log'], // error는 유지 (선택사항)
           }
         : false,
   },
