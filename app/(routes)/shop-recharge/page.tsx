@@ -1,8 +1,8 @@
-import ShopRecharge from '@/views/shop-recharge/home'
-import React from 'react'
-import Header from '@/components/common/header'
+import React from 'react';
+import Header from '@/components/common/header';
+import ShopRecharge from '@/views/shop-recharge/home';
 
-type Props = {}
+type Props = {};
 
 export default function page({}: Props) {
   return (
@@ -10,5 +10,5 @@ export default function page({}: Props) {
       <Header />
       <ShopRecharge />
     </>
-  )
+  );
 }
