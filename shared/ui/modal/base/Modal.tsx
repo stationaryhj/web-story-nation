@@ -32,7 +32,7 @@ const Modal: FC<ModalProps> & ModalCompoundProps = ({ className, children }) => 
     <ModalContext.Provider value={contextValue}>
       <div
         className={cn(
-          'fixed inset-0 pointer-events-auto touch-pan-y flex items-center justify-center',
+          'fixed inset-0 pointer-events-auto touch-none flex items-center justify-center',
           className
         )}
         style={{ zIndex }}
