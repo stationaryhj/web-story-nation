@@ -8,6 +8,7 @@ import { useEscapeClose, useModalHistoryManager } from '@/shared/lib/hooks';
 import useModalStore from '@/shared/model/stores/useModalStore';
 import type { ModalComponent } from '@/shared/model/types/modal';
 import { ModalTypeContext } from '@/shared/ui/modal/base/modalContexts';
+import SignupModal from './SignupModal';
 import SocialLoginModal from './SocialLoginModal';
 
 // 모달 설정 타입
@@ -22,7 +23,7 @@ const MODAL_COMPONENTS: Record<string, ModalConfig> = {
   // 예시:
   // loading: { component: LoadingModal },
   socialLogin: { component: SocialLoginModal },
-  /*  signup: { component: SignupModal }, */
+  signup: { component: SignupModal },
 };
 
 export default function GlobalModalHost() {
