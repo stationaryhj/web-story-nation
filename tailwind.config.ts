@@ -66,7 +66,7 @@ const config: Config = {
         button: {
           primary: '#432df1',
           primaryHover: '#5a46fa',
-
+          gray: '#e9eaeb',
           grayHover: '#F1F2F2',
         },
         text: {
