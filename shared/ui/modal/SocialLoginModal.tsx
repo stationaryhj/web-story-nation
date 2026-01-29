@@ -389,14 +389,12 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
       <Modal.Backdrop />
       <Modal.Content className='px-6 pb-[27px] pt-20 w-[calc(100%-32px)] max-w-[400px]'>
         <Modal.Close className='absolute right-6 top-5 z-10 flex-shrink-0'>
-          <FontAwesomeIcon icon={faTimes} size='lg' className='h-6 w-6 text-dark-secondary' />
+          <FontAwesomeIcon icon={faTimes} size='lg' className='h-6 w-6 text-icons-primary' />
         </Modal.Close>
         <div className='flex flex-col gap-y-[100px]'>
           <div className='flex flex-col justify-center items-center gap-y-3'>
             <Image src='/images/logo.png' alt='logo' width={220} height={100} />
-            <div className='text-sm text-dark-secondary font-medium'>
-              함께 만드는 세계관 & 캐릭터
-            </div>
+            <div className='text-sm text-text-black font-medium'>함께 만드는 세계관 & 캐릭터</div>
           </div>
 
           <div className='relative'>
@@ -424,7 +422,7 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
                 </button>
               ))}
             </div>
-            <div className='text-center mt-5 text-xs font-regular text-gray-secondary px-[25px]'>
+            <div className='text-center mt-5 text-xs font-regular text-icons-primary px-[25px]'>
               <p className='whitespace-pre-wrap'>{`계속 진행하면 이용약관 및 개인정보 처리방침에\n동의하는 것으로 간주됩니다.`}</p>
             </div>
           </div>
