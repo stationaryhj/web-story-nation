@@ -9,7 +9,10 @@ interface ModalContentProps extends MotionProps {
 }
 
 const ModalContent: React.FC<ModalContentProps> = ({ className, children, ...props }) => {
-  const modalContentCls = `absolute z-[2] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white pointer-events-auto rounded-[20px] py-[26px] px-[clamp(15px,2vw,32px)] shadow-md`;
+  // flexbox 중앙 정렬 사용 - transform 충돌 방지
+  // relative: 내부 absolute 요소(Modal.Close 등)의 기준점
+  const modalContentCls = `relative z-[2] bg-white pointer-events-auto rounded-[20px] py-[26px] px-[clamp(15px,2vw,32px)] shadow-md`;
+
   return (
     <motion.div className={cn(modalContentCls, className)} {...props}>
       {children}

@@ -31,7 +31,10 @@ const Modal: FC<ModalProps> & ModalCompoundProps = ({ className, children }) => 
   return (
     <ModalContext.Provider value={contextValue}>
       <div
-        className={cn('fixed inset-0 pointer-events-auto touch-pan-y', className)}
+        className={cn(
+          'fixed inset-0 pointer-events-auto touch-pan-y flex items-center justify-center',
+          className
+        )}
         style={{ zIndex }}
         role='dialog'
         aria-modal='true'
