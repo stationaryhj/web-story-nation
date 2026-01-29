@@ -19,3 +19,25 @@ export const CENTER_FADE_EXPAND_ANIMATION: Variants = {
     },
   },
 };
+
+export const SLIDE_UP_ANIMATION: Variants = {
+  initial: {
+    y: '100%',
+  },
+  animate: {
+    y: '0',
+    transition: {
+      type: 'spring',
+      damping: 50,
+      stiffness: 800,
+    },
+  },
+  exit: {
+    y: '100%',
+    transition: {
+      type: 'spring',
+      damping: 50,
+      stiffness: 800,
+    },
+  },
+};
