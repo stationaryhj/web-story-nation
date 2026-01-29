@@ -8,6 +8,7 @@ import { useEscapeClose, useModalHistoryManager } from '@/shared/lib/hooks';
 import useModalStore from '@/shared/model/stores/useModalStore';
 import type { ModalComponent } from '@/shared/model/types/modal';
 import { ModalTypeContext } from '@/shared/ui/modal/base/modalContexts';
+import ConfirmModal from './ConfirmModal';
 import SignupModal from './SignupModal';
 import SocialLoginModal from './SocialLoginModal';
 
@@ -24,6 +25,7 @@ const MODAL_COMPONENTS: Record<string, ModalConfig> = {
   // loading: { component: LoadingModal },
   socialLogin: { component: SocialLoginModal },
   signup: { component: SignupModal },
+  confirm: { component: ConfirmModal },
 };
 
 export default function GlobalModalHost() {
