@@ -193,7 +193,7 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
           } else if (result.signupRequired || result.needSignup) {
             openModal({
               type: 'signup',
-              props: { onSuccess: handleSignupSuccess },
+              props: { onSuccess: handleSignupSuccess, chrbot_key },
             });
 
             // const { isLogin, data, loginType, registerWithSocialData } = useAccountStore.getState()
@@ -292,6 +292,7 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
   };
 
   // 회원가입 성공 시 - SocialLoginModal만 닫고 SignupModal은 보상 화면으로 전환됨
+  // 띠배너는 SignupModal에서 "확인" 버튼 클릭 시 열림
   const handleSignupSuccess = () => {
     console.log('[SocialLoginModal] 회원가입 성공! - handleSignupSuccess 호출됨');
 
@@ -308,13 +309,6 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
 
     // SocialLoginModal만 닫기 (SignupModal은 isCompleted=true가 되어 보상 화면 표시)
     closeModalByType('socialLogin');
-
-    // 띠배너 모달 팝업 (chrbot_key가 있을 경우)
-    console.log('[SocialLoginModal] chrbot_key 값:', chrbot_key);
-    if (chrbot_key) {
-      console.log('[SocialLoginModal] 띠배너 모달 열기 시도');
-      openModal({ type: 'redirectBanner', props: { charboyKey: chrbot_key } });
-    }
   };
 
   const handleNewUserClick = () => {
@@ -441,7 +435,7 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
                   type='button'
                   onClick={() => handleSocialLogin(button.provider)}
                   disabled={loading}
-                  className={`flex w-full px-[85px] h-11 items-center rounded-full font-medium transition-colors ${button.bgColor}`}
+                  className={`flex w-full px-[85px] max-md:px-[60px] h-11 items-center rounded-full font-medium transition-colors ${button.bgColor}`}
                 >
                   <div className='flex items-center justify-center gap-4'>
                     <Image src={button.icon} alt={button.alt} width={20} height={20} />

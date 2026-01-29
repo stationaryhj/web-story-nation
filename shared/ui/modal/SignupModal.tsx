@@ -13,9 +13,10 @@ import Modal from './base/Modal';
 
 interface SignupModalProps {
   onSuccess: () => void;
+  chrbot_key?: string | null;
 }
 
-const SignupModal = ({ onSuccess }: SignupModalProps) => {
+const SignupModal = ({ onSuccess, chrbot_key }: SignupModalProps) => {
   const router = useRouter();
   const [nickname, setNickname] = useState('');
   const [birthdate, setBirthdate] = useState('');
@@ -35,7 +36,7 @@ const SignupModal = ({ onSuccess }: SignupModalProps) => {
   const [paidServiceAgreed, setPaidServiceAgreed] = useState(false);
   const [marketingAgreed, setMarketingAgreed] = useState(false);
 
-  const { closeModalByType } = useModalStore();
+  const { closeModalByType, openModal } = useModalStore();
   // 모든 필수 동의 여부 확인
   const allRequiredAgreed = serviceAgreed && privacyAgreed && paidServiceAgreed;
   const isGuestLogin = isLogin && data && loginType === ('Guest' as SocialLoginProvider);
@@ -171,9 +172,16 @@ const SignupModal = ({ onSuccess }: SignupModalProps) => {
     setMarketingAgreed(!allAgreed);
   };
 
-  // 완료 화면에서 확인 버튼 클릭 시 SignupModal만 닫기 (띠배너는 유지)
+  // 완료 화면에서 확인 버튼 클릭 시 SignupModal 닫고 띠배너 열기
   const handleCompleteConfirm = () => {
     closeModalByType('signup');
+
+    // 띠배너 모달 팝업 (chrbot_key가 있을 경우)
+    console.log('[SignupModal] chrbot_key 값:', chrbot_key);
+    if (chrbot_key) {
+      console.log('[SignupModal] 띠배너 모달 열기 시도');
+      openModal({ type: 'redirectBanner', props: { charboyKey: chrbot_key } });
+    }
   };
 
   // 회원가입 제출
