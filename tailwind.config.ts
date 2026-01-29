@@ -63,8 +63,17 @@ const config: Config = {
           DEFAULT: '#F9FAFB',
           dark: '#F3F4F6',
         },
-        gray: {
-          secondary: '#6B7280',
+        button: {
+          primary: '#432df1',
+          primaryHover: '#5a46fa',
+
+          grayHover: '#F1F2F2',
+        },
+        text: {
+          black: '#101010',
+        },
+        icons: {
+          primary: '#6B7280',
         },
         dark: {
           primary: {
