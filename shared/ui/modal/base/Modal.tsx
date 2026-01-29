@@ -6,7 +6,7 @@ import useModalStore from '@/shared/model/stores/useModalStore';
 import ModalBackDrop from './ModalBackDrop';
 import ModalClose from './ModalClose';
 import ModalContent from './ModalContent';
-import { ModalContext } from './modalContexts';
+import { ModalContext, useModalZIndex } from './modalContexts';
 
 interface ModalProps {
   className?: string;
@@ -21,8 +21,8 @@ interface ModalCompoundProps {
 
 const Modal: FC<ModalProps> & ModalCompoundProps = ({ className, children }) => {
   const { openModal, closeModal } = useModalStore();
+  const zIndex = useModalZIndex();
 
-  const modalBaseCls = `fixed inset-0 z-[9999] pointer-events-auto touch-pan-y`;
   const contextValue = {
     openModal,
     closeModal,
@@ -30,7 +30,12 @@ const Modal: FC<ModalProps> & ModalCompoundProps = ({ className, children }) => 
 
   return (
     <ModalContext.Provider value={contextValue}>
-      <div className={cn(modalBaseCls, className)} role='dialog' aria-modal='true'>
+      <div
+        className={cn('fixed inset-0 pointer-events-auto touch-pan-y', className)}
+        style={{ zIndex }}
+        role='dialog'
+        aria-modal='true'
+      >
         {children}
       </div>
     </ModalContext.Provider>
