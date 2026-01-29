@@ -13,10 +13,9 @@ import Modal from './base/Modal';
 
 interface SignupModalProps {
   onSuccess: () => void;
-  state: 'signup' | 'reward';
 }
 
-const SignupModal = ({ onSuccess, state }: SignupModalProps) => {
+const SignupModal = ({ onSuccess }: SignupModalProps) => {
   const router = useRouter();
   const [nickname, setNickname] = useState('');
   const [birthdate, setBirthdate] = useState('');
@@ -491,7 +490,7 @@ const SignupModal = ({ onSuccess, state }: SignupModalProps) => {
           <FontAwesomeIcon icon={faTimes} size='lg' className='h-6 w-6 text-icons-primary' />
         </Modal.Close>
         <div className='relative overflow-hidden'>
-          {state === 'reward' ? <div>{completionContent}</div> : <div>{signupContent}</div>}
+          {isCompleted ? <div>{completionContent}</div> : <div>{signupContent}</div>}
         </div>
         <div className='flex justify-center w-full'>
           <BaseButton
