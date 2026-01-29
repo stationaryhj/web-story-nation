@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PageTransition from '@/components/motion/PageTransition';
 
-import { useModalStore } from '@/store/useStoreModal';
+import useModalStore from '@/shared/model/stores/useModalStore';
 
 // 더미 상품 데이터
 const penPackages = [
@@ -70,7 +70,7 @@ const penPackages = [
 ];
 
 import PaymentModal from '@/components/modal/PaymentModal';
-import { decryptToken } from '@/lib/utils/cryptoUtil';
+import { decryptData } from '@/lib/utils/cryptoUtil';
 import { settlementApi } from '@/services/api/storyNationApi';
 import { ReqGetCoinChargeUseHistory } from '@/services/hooks/DataListManager';
 import { useAccountStore } from '@/store/useAccountStore';
@@ -83,6 +83,7 @@ export default function ShopRecharge() {
   const { openModal } = useModalStore();
 
   const [activeTab, setActiveTab] = useState<'recharge' | 'history'>('recharge');
+  const [chrbotKey, setChrbotKey] = useState<string | null>(null);
   const { coinList, initCoinList } = useCoinStore((state) => ({
     coinList: state.coinList,
     initCoinList: state.initCoinList,
@@ -133,15 +134,21 @@ export default function ShopRecharge() {
 
   // 외부(채팅방)에서 암호화된 토큰으로 접근 시 처리
   useEffect(() => {
-    const token = searchParams.get('token');
+    const params = searchParams.get('auth');
 
-    if (token) {
+    if (params) {
       try {
         // 암호화된 토큰 복호화
-        const decryptedToken = decryptToken(token);
+        const decryptedParams = decryptData(params);
+        console.log('@@ decryptedParams :: ', decryptedParams);
+
+        // chrbotKey 저장 (채팅방에서 camelCase로 전송)
+        if (decryptedParams.chrbotKey) {
+          setChrbotKey(decryptedParams.chrbotKey);
+        }
 
         // 토큰으로 로그인 초기화
-        initFromExternalToken(decryptedToken).then((success) => {
+        initFromExternalToken(decryptedParams.token).then((success) => {
           if (success) {
             // URL에서 token 파라미터 제거
             const url = new URL(window.location.href);
@@ -227,7 +234,7 @@ export default function ShopRecharge() {
         const orderIdData = await fetchOrderId(coinKey);
         if (orderIdData.result.err === 5) {
           // 접근 권한필요 //
-          openModal('login');
+          openModal({ type: 'socialLogin', props: { chrbot_key: chrbotKey } });
           return;
         }
 
@@ -245,7 +252,7 @@ export default function ShopRecharge() {
         }, 300);
       }
     },
-    [fetchOrderId]
+    [fetchOrderId, openModal, chrbotKey]
   );
 
   const handlePaymentSuccess = (result: any) => {
