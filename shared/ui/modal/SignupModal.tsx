@@ -35,7 +35,7 @@ const SignupModal = ({ onSuccess }: SignupModalProps) => {
   const [paidServiceAgreed, setPaidServiceAgreed] = useState(false);
   const [marketingAgreed, setMarketingAgreed] = useState(false);
 
-  const { closeAllModals, closeModalByType } = useModalStore();
+  const { closeModalByType } = useModalStore();
   // 모든 필수 동의 여부 확인
   const allRequiredAgreed = serviceAgreed && privacyAgreed && paidServiceAgreed;
   const isGuestLogin = isLogin && data && loginType === ('Guest' as SocialLoginProvider);
@@ -171,11 +171,9 @@ const SignupModal = ({ onSuccess }: SignupModalProps) => {
     setMarketingAgreed(!allAgreed);
   };
 
-  // 완료 화면에서 확인 버튼 클릭 시 로그인 페이지로 이동
+  // 완료 화면에서 확인 버튼 클릭 시 SignupModal만 닫기 (띠배너는 유지)
   const handleCompleteConfirm = () => {
-    closeAllModals();
-
-    // router.push('/')
+    closeModalByType('signup');
   };
 
   // 회원가입 제출
