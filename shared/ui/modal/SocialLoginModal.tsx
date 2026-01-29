@@ -181,7 +181,7 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
               closeModal();
 
               // TODO: 띠배너 charbot_key 전달
-              openModal({ type: 'redirectBanner', props: { charboyKey: '647' } });
+              openModal({ type: 'redirectBanner', props: { charboyKey: chrbot_key } });
               /* 
               if (chrbot_key) {
                 handleConnectedChatRoom(chrbot_key);
@@ -305,6 +305,13 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
 
     // SocialLoginModal만 닫기 (SignupModal은 isCompleted=true가 되어 보상 화면 표시)
     closeModalByType('socialLogin');
+
+    // 띠배너 모달 팝업 (chrbot_key가 있을 경우)
+    console.log('[SocialLoginModal] chrbot_key 값:', chrbot_key);
+    if (chrbot_key) {
+      console.log('[SocialLoginModal] 띠배너 모달 열기 시도');
+      openModal({ type: 'redirectBanner', props: { charboyKey: chrbot_key } });
+    }
   };
 
   const handleNewUserClick = () => {
@@ -367,7 +374,7 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
         closeAllModals();
 
         // TODO: 띠배너 모달 팝업
-        openModal({ type: 'redirectBanner', props: { charboyKey: '647' } });
+        openModal({ type: 'redirectBanner', props: { charboyKey: chrbot_key } });
         await useAccountStore.getState().updateUserInfoFromUserInfo2();
         await useAccountStore.getState().fetchWriterInfo();
 
