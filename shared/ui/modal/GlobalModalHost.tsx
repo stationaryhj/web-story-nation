@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom';
 import { useEscapeClose, useModalHistoryManager } from '@/shared/lib/hooks';
 import useModalStore from '@/shared/model/stores/useModalStore';
 import type { ModalComponent } from '@/shared/model/types/modal';
-import { ModalTypeContext } from '@/shared/ui/modal/base/modalContexts';
+import { ModalTypeContext, ModalZIndexContext } from '@/shared/ui/modal/base/modalContexts';
 import ConfirmModal from './ConfirmModal';
 import SignupModal from './SignupModal';
 import SocialLoginModal from './SocialLoginModal';
@@ -55,15 +55,21 @@ export default function GlobalModalHost() {
   const portalModals = modals.filter((modal) => MODAL_COMPONENTS[modal.type]?.usePortal !== false);
 
   // 등록되지 않은 모달은 렌더링하지 않음
-  const renderModal = (modal: (typeof modals)[0]) => {
+  // 기본 z-index는 9999, 모달이 쌓일 때마다 10씩 증가
+  const BASE_Z_INDEX = 9999;
+
+  const renderModal = (modal: (typeof modals)[0], index: number) => {
     const config = MODAL_COMPONENTS[modal.type];
     if (!config) return null;
     const Component = config.component;
     if (!Component) return null;
+    const zIndex = BASE_Z_INDEX + index * 10;
     return (
-      <ModalTypeContext.Provider key={modal.id || modal.type} value={modal.type}>
-        <Component {...modal.props} />
-      </ModalTypeContext.Provider>
+      <ModalZIndexContext.Provider key={modal.id || modal.type} value={zIndex}>
+        <ModalTypeContext.Provider value={modal.type}>
+          <Component {...modal.props} />
+        </ModalTypeContext.Provider>
+      </ModalZIndexContext.Provider>
     );
   };
 
