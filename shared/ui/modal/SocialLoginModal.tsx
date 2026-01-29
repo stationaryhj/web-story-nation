@@ -165,6 +165,11 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
           if (result.success) {
             // 로그인 성공 시 상태 업데이트 (useAccountStore)
             if (result.data) {
+              // 게스트→유저 전환인지 확인 (띠배너 표시 여부 결정)
+              const { loginType: prevLoginType } = useAccountStore.getState();
+              const isGuestToUserConversion =
+                prevLoginType === ('Guest' as SocialLoginProvider) && chrbot_key;
+
               useAccountStore.getState().setLoginState(true, result.data, loginType);
               await useAccountStore.getState().updateUserInfoFromUserInfo2();
               await useAccountStore.getState().fetchWriterInfo();
@@ -180,12 +185,10 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
               // 성공 시에만 모달 닫기
               closeModal();
 
-              // TODO: 띠배너 charbot_key 전달
-              openModal({ type: 'redirectBanner', props: { charboyKey: chrbot_key } });
-              /* 
-              if (chrbot_key) {
-                handleConnectedChatRoom(chrbot_key);
-              } */
+              // 게스트→유저 전환 시에만 띠배너 표시
+              if (isGuestToUserConversion) {
+                openModal({ type: 'redirectBanner', props: { charboyKey: chrbot_key } });
+              }
             }
           } else if (result.signupRequired || result.needSignup) {
             openModal({
