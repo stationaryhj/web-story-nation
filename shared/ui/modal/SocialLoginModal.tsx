@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { getChatRoomEncryptData, getPlatform } from '@/lib/utils/storyNationUtil';
 import { authService } from '@/services/auth';
 import { SocialLoginProvider } from '@/services/auth/types';
+import { CENTER_FADE_EXPAND_ANIMATION } from '@/shared/config/animations';
 import useModalStore from '@/shared/model/stores/useModalStore';
 import Modal from '@/shared/ui/modal/base/Modal';
 import { useAccountStore } from '@/store/useAccountStore';
@@ -394,7 +395,10 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
   return (
     <Modal>
       <Modal.Backdrop />
-      <Modal.Content className='px-6 pb-[27px] pt-20 w-[calc(100%-32px)] max-w-[400px]'>
+      <Modal.Content
+        {...CENTER_FADE_EXPAND_ANIMATION}
+        className='px-6 pb-[27px] pt-20 w-[calc(100%-32px)] max-w-[400px]'
+      >
         <Modal.Close
           className='absolute right-6 top-5 z-10 flex-shrink-0'
           onClick={() => closeModalByType('socialLogin')}
