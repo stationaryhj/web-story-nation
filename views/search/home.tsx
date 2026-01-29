@@ -9,7 +9,7 @@ import Dropdown from '@/components/elements/dropdown/Dropdown'
 import Pagination from '@/components/elements/pagination/Pagination'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAccountStore } from '@/store/useAccountStore'
-import { useModalStore } from '@/store/useStoreModal'
+import useModalStore from '@/shared/model/stores/useModalStore'
 import { useSearchStore } from '@/store/useSearchStore'
 import { useSettingsStore } from '@/store/useStoreSettings'
 
@@ -178,7 +178,7 @@ export default function searchPage({}: Props) {
   // 캐릭터 생성 페이지로 이동하는 핸들러
   const handleCreateCharacter = () => {
     if (!isLogin) {
-      openModal('login')
+      openModal({ type: 'socialLogin' })
       return
     }
     router.push('/my-characters/create')

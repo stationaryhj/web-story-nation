@@ -12,7 +12,7 @@ import { BaseButton } from '@/components/elements/button/BaseButton'
 import { useSettingsStore } from '@/store/useStoreSettings'
 import { contentApi } from '@/services/api/storyNationApi'
 import { useBankStore } from '@/store/useGlobalStore'
-import { useModalStore } from '@/store/useStoreModal'
+import useModalStore from '@/shared/model/stores/useModalStore'
 import DeleteAccountModal from '@/components/modal/DeleteAccountModal'
 import DuplicateCheckModal from '@/components/modal/DuplicateCheckModal'
 import { getImageUri, getPlatform } from '@/lib/utils/storyNationUtil'
@@ -425,7 +425,7 @@ export default function SettingsForm() {
   const handleAdultVerification = async () => {
     try {
       if(!loginType || loginType === 'Guest' as SocialLoginProvider) {
-        openModal('login')
+        openModal({ type: 'socialLogin' })
         return;
       }
       // useAccountStore의 verifyIdentity 함수 사용
