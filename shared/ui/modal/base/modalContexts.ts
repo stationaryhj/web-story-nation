@@ -21,3 +21,8 @@ export const useModalContext = () => {
 export const ModalTypeContext = createContext<string | undefined>(undefined);
 
 export const useModalType = () => useContext(ModalTypeContext);
+
+// 모달 z-index Context (스택 순서에 따라 동적으로 증가)
+export const ModalZIndexContext = createContext<number>(9999);
+
+export const useModalZIndex = () => useContext(ModalZIndexContext);
