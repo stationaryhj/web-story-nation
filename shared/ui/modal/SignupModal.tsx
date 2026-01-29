@@ -488,7 +488,7 @@ const SignupModal = ({ onSuccess, state }: SignupModalProps) => {
       <Modal.Backdrop />
       <Modal.Content className='px-6 pb-[27px] pt-20 w-[calc(100%-32px)] max-w-[400px]'>
         <Modal.Close className='absolute right-6 top-5 z-10 flex-shrink-0'>
-          <FontAwesomeIcon icon={faTimes} size='lg' className='h-6 w-6 text-dark-secondary' />
+          <FontAwesomeIcon icon={faTimes} size='lg' className='h-6 w-6 text-icons-primary' />
         </Modal.Close>
         <div className='relative overflow-hidden'>
           {state === 'reward' ? <div>{completionContent}</div> : <div>{signupContent}</div>}
