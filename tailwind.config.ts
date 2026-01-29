@@ -1,5 +1,5 @@
 // tailwind.config.ts
-import type { Config } from 'tailwindcss'
+import type { Config } from 'tailwindcss';
 
 const config: Config = {
   content: [
@@ -7,12 +7,13 @@ const config: Config = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './views/**/*.{js,ts,jsx,tsx,mdx}',
+    './shared/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  darkMode: 'class', // 다크모드 클래스 기반으로 설정
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-poppins)', 'sans-serif'], //
+        sans: ['var(--font-poppins)', 'sans-serif'],
       },
       width: {
         '1/10': '10%',
@@ -32,11 +33,12 @@ const config: Config = {
           '200': '#C7D2FE',
           '300': '#A5B4FC',
           '400': '#818CF8',
-          '500': 'var(--primary)', // 메인 컬러
+          '500': '#432df1',
           '600': '#4F46E5',
           '700': '#4338CA',
           '800': '#3730A3',
-          '900': 'var(--primaryDark)',
+          '900': '#3730A3',
+          DEFAULT: '#432df1',
         },
         secondary: {
           '50': '#F8FAFC',
@@ -49,6 +51,7 @@ const config: Config = {
           '700': '#334155',
           '800': '#1E293B',
           '900': '#0F172A',
+          DEFAULT: '#4b477e',
         },
         accent: {
           light: '#FF6B6B',
@@ -60,7 +63,9 @@ const config: Config = {
           DEFAULT: '#F9FAFB',
           dark: '#F3F4F6',
         },
-        // 다크모드 컬러 추가
+        gray: {
+          secondary: '#6B7280',
+        },
         dark: {
           primary: {
             '50': '#1A1A2E',
@@ -68,7 +73,7 @@ const config: Config = {
             '200': '#0F3460',
             '300': '#0A2647',
             '400': '#144272',
-            '500': '#205295', // 다크모드 메인 컬러
+            '500': '#205295',
             '600': '#2C74B3',
             '700': '#5DA3FA',
             '800': '#8BBCFF',
@@ -116,6 +121,6 @@ const config: Config = {
     },
   },
   plugins: [require('tailwind-scrollbar-hide')],
-}
+};
 
-export default config
+export default config;
