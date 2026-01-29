@@ -35,7 +35,7 @@ const SignupModal = ({ onSuccess }: SignupModalProps) => {
   const [paidServiceAgreed, setPaidServiceAgreed] = useState(false);
   const [marketingAgreed, setMarketingAgreed] = useState(false);
 
-  const { closeAllModals } = useModalStore();
+  const { closeAllModals, closeModalByType } = useModalStore();
   // 모든 필수 동의 여부 확인
   const allRequiredAgreed = serviceAgreed && privacyAgreed && paidServiceAgreed;
   const isGuestLogin = isLogin && data && loginType === ('Guest' as SocialLoginProvider);
@@ -486,7 +486,10 @@ const SignupModal = ({ onSuccess }: SignupModalProps) => {
     <Modal>
       <Modal.Backdrop />
       <Modal.Content className='px-6 pb-[27px] pt-20 w-[calc(100%-32px)] max-w-[400px]'>
-        <Modal.Close className='absolute right-6 top-5 z-10 flex-shrink-0'>
+        <Modal.Close
+          className='absolute right-6 top-5 z-10 flex-shrink-0'
+          onClick={() => closeModalByType('signup')}
+        >
           <FontAwesomeIcon icon={faTimes} size='lg' className='h-6 w-6 text-icons-primary' />
         </Modal.Close>
         <div className='relative overflow-hidden'>

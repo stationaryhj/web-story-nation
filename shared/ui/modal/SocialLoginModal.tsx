@@ -66,6 +66,7 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
   const [isDuplicateLogin, setIsDuplicateLogin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isNewUserMode, setIsNewUserMode] = useState(false);
+
   // 이벤트 처리 중인지 추적하는 ref (중복 메시지 처리 방지)
   const processingCallback = useRef(false);
 
@@ -394,7 +395,10 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
     <Modal>
       <Modal.Backdrop />
       <Modal.Content className='px-6 pb-[27px] pt-20 w-[calc(100%-32px)] max-w-[400px]'>
-        <Modal.Close className='absolute right-6 top-5 z-10 flex-shrink-0'>
+        <Modal.Close
+          className='absolute right-6 top-5 z-10 flex-shrink-0'
+          onClick={() => closeModalByType('socialLogin')}
+        >
           <FontAwesomeIcon icon={faTimes} size='lg' className='h-6 w-6 text-icons-primary' />
         </Modal.Close>
         <div className='flex flex-col gap-y-[100px]'>
