@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Home, MessageCircle, UserRoundPlus, Store, HandCoins } from 'lucide-react'
-import { useModalStore } from '@/store/useStoreModal'
+import useModalStore from '@/shared/model/stores/useModalStore'
 import { useAccountStore } from '@/store/useStoreData'
 import { SocialLoginProvider } from '@/services/auth/types'
 
@@ -55,13 +55,13 @@ export default function MobileGNB() {
   const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, link: (typeof navLinks)[0]) => {
     if (link.requireLogin && !isLogin) {
       e.preventDefault()
-      openModal('login')
+      openModal({ type: 'socialLogin' })
     }
 
     if(link.loginTypeCheck) {
       if(!loginType || loginType === 'Guest' as SocialLoginProvider) {
         e.preventDefault()
-        openModal('login')
+        openModal({ type: 'socialLogin' })
       }
     }
   }

@@ -7,6 +7,7 @@ import { faSun, faMoon, faCog, faSignOutAlt, faUser } from '@fortawesome/free-so
 import { useAccountStore } from '@/store/useAccountStore'
 import BaseSidebar from './BaseSidebar'
 import { SocialLoginProvider } from '@/services/auth/types'
+import useNewModalStore from '@/shared/model/stores/useModalStore'
 
 interface NavLink {
   href: string
@@ -59,6 +60,7 @@ export default function HeaderSidebar({
   logout,
 }: HeaderSidebarProps) {
   const { loginType, guestLogin2 } = useAccountStore()
+  const { openModal: openNewModal } = useNewModalStore()
 
   const isGuestLogin = loginType === 'Guest' as SocialLoginProvider && isLogin
 
@@ -125,7 +127,7 @@ export default function HeaderSidebar({
               ) : (
                 <button
                   onClick={() => {
-                    openModal('login')
+                    openNewModal({ type: 'socialLogin' })
                     onClose()
                   }}
                   className="flex items-center w-full py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors"

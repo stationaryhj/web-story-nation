@@ -9,7 +9,7 @@ import { useCharacterGridStoreData } from '@/store/useCharacterGridStoreData'
 import { useRouter } from 'next/navigation'
 import { useAccountStore } from '@/store/useStoreData'
 import { useSettingsStore } from '@/store/useStoreSettings'
-import { useModalStore } from '@/store/useStoreModal'
+import useModalStore from '@/shared/model/stores/useModalStore'
 
 interface CharacterGridSectionProps {
   categoryId: CategoryId
@@ -41,7 +41,7 @@ export default function CharacterGridSection({
     if (isLogin) {
       router.push('/my-characters/create')
     } else {
-      openModal('login')
+      openModal({ type: 'socialLogin' })
     }
   }
 

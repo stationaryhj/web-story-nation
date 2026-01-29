@@ -4,6 +4,7 @@ import { faBell } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useState } from 'react'
 import { useModalStore } from '@/store/useStoreModal'
+import useNewModalStore from '@/shared/model/stores/useModalStore'
 import { SocialLoginProvider } from '@/services/auth/types'
 import { useAccountStore } from '@/store/useAccountStore'
 
@@ -16,10 +17,11 @@ export default function NotificationButton({ count = 0, className = '' }: Notifi
   const { loginType } = useAccountStore()
   const [isHovered, setIsHovered] = useState(false)
   const { openModal } = useModalStore()
+  const { openModal: openNewModal } = useNewModalStore()
 
   const handleClick = () => {
     if(!loginType || loginType === 'Guest' as SocialLoginProvider) {
-      openModal('login')
+      openNewModal({ type: 'socialLogin' })
       return;
     }
 

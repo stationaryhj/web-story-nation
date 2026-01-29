@@ -26,6 +26,7 @@ import { contentApi, createApi } from '@/services/api/storyNationApi';
 import { ReqGetChatBot } from '@/services/hooks/DataListManager';
 import { Character, useAccountStore } from '@/store/useStoreData';
 import { useModalStore } from '@/store/useStoreModal';
+import useNewModalStore from '@/shared/model/stores/useModalStore';
 import { CharbotLikeResponse } from '@/types/api';
 import BaseModal from './BaseModal';
 import ReportModal from './ReportModal';
@@ -55,6 +56,7 @@ export default function CharactorOpenModal({
 }: CharactorOpenModalProps) {
   const router = useRouter();
   const { openModal, modalProps } = useModalStore();
+  const { openModal: openNewModal } = useNewModalStore();
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const { isLogin, isAdult, data: userInfo, writerInfo } = useAccountStore();
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
@@ -104,7 +106,7 @@ export default function CharactorOpenModal({
   const handleStartChat = async () => {
     if (chatBotData && chatBotData?.chrbot.world_list_detail_chrbot_key) {
       if (!isLogin) {
-        openModal('login');
+        openNewModal({ type: 'socialLogin' });
         return;
       }
 
@@ -166,7 +168,7 @@ export default function CharactorOpenModal({
 
   const handleReport = () => {
     if (!isLogin) {
-      openModal('login');
+      openNewModal({ type: 'socialLogin' });
       return;
     }
     setIsReportModalOpen(true);

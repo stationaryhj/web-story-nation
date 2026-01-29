@@ -7,7 +7,7 @@ import IdeaShareModal from '../../modal/IdeaShareModal'
 import RewardModal from '../../modal/RewardModal'
 import { contentApi } from '@/services/api/storyNationApi'
 import { useAccountStore } from '@/store/useAccountStore'
-import { useModalStore } from '@/store/useStoreModal'
+import useModalStore from '@/shared/model/stores/useModalStore'
 
 // 타입 정의는 types/window.ts 파일로 이동했습니다
 // window.resizeTimer 속성을 사용하기 위해 타입 참조
@@ -204,7 +204,7 @@ export default function DraggableButton({
         if (isLogin) {
           setIdeaModalOpen(true)
         } else {
-          openModal('login')
+          openModal({ type: 'socialLogin' })
         }
       },
       position: { x: 0, y: -BUTTON_DISTANCE },
@@ -218,7 +218,7 @@ export default function DraggableButton({
         if (isLogin) {
           setRewardModalOpen(true)
         } else {
-          openModal('login')
+          openModal({ type: 'socialLogin' })
         }
       },
       position: { x: 0, y: -BUTTON_DISTANCE * 2 },

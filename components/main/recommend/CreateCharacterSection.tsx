@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { useRouter } from 'next/navigation'
 import { useAccountStore } from '@/store/useStoreData'
-import { useModalStore } from '@/store/useStoreModal'
+import useModalStore from '@/shared/model/stores/useModalStore'
 
 // 캐릭터 생성 유도 섹션 컴포넌트
 const CreateCharacterSection = memo(() => {
@@ -18,7 +18,7 @@ const CreateCharacterSection = memo(() => {
     if (isLogin) {
       router.push('/my-characters/create')
     } else {
-      openModal('login')
+      openModal({ type: 'socialLogin' })
     }
   }
 

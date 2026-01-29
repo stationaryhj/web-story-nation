@@ -4,6 +4,7 @@
 import { FadeIn } from '@/components/motion/PageTransition'
 import { useThemeStore, useAccountStore } from '@/store/useStoreData'
 import { useModalStore } from '@/store/useStoreModal'
+import useNewModalStore from '@/shared/model/stores/useModalStore'
 import {
   faBell,
   faShoppingBag,
@@ -80,6 +81,7 @@ export default function Header() {
   const pathname = usePathname()
   const [activeLink, setActiveLink] = useState('/')
   const { openModal } = useModalStore()
+  const { openModal: openNewModal } = useNewModalStore()
   const { isLogin, logout, isAdult, loginType } = useAccountStore()
   const router = useRouter()
 
@@ -97,13 +99,13 @@ export default function Header() {
   const handleNavLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, link: (typeof navLinks)[0]) => {
     if (link.requireLogin && !isLogin) {
       e.preventDefault()
-      openModal('login')
+      openNewModal({ type: 'socialLogin' })
     }
 
     if(link.loginTypeCheck) {
       if(!loginType || loginType === 'Guest' as SocialLoginProvider) {
         e.preventDefault()
-        openModal('login')
+        openNewModal({ type: 'socialLogin' })
       }
     }
   }
@@ -134,14 +136,14 @@ export default function Header() {
     if (isLogin) {
       router.push('/settings')
     } else {
-      openModal('login')
+      openNewModal({ type: 'socialLogin' })
     }
   }
 
   const handleAdultModeToggle = async () => {
     if(isLogin) {
       if(!loginType || loginType === 'Guest' as SocialLoginProvider) {
-        openModal('login')
+        openNewModal({ type: 'socialLogin' })
         return;
       }
 
@@ -152,7 +154,7 @@ export default function Header() {
       }
     }
     else {
-      openModal('login')
+      openNewModal({ type: 'socialLogin' })
     }
   }
 
