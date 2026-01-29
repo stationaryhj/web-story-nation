@@ -26,7 +26,7 @@ const ConfirmModal = ({
       text: cancelText,
       onClick: onCancel,
       className:
-        'text-text-black active:bg-button-grayHover bg-background-light hover:bg-button-grayHover',
+        'text-text-black active:bg-button-grayHover bg-button-gray hover:bg-button-grayHover',
     },
     {
       text: confirmText,
