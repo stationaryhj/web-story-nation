@@ -26,21 +26,22 @@ const ConfirmModal = ({
       text: cancelText,
       onClick: onCancel,
       className:
-        'text-chat-ai-text-desktop active:bg-color-color-web-muted-color bg-web-bg-surface hover:bg-[#f1f2f2]',
+        'text-text-black active:bg-button-grayHover bg-background-light hover:bg-button-grayHover',
     },
     {
       text: confirmText,
       onClick: onConfirm,
-      className: 'text-white bg-primary active:bg-active-btn-color hover:bg-active-btn-color',
+      className:
+        'text-white bg-button-primary active:bg-button-primaryHover hover:bg-button-primaryHover',
     },
   ];
 
   return (
-    <Modal className='z-[51]'>
+    <Modal>
       <Modal.Backdrop className='pointer-events-none' />
       <Modal.Content
         className={cn(
-          'left-1/2 w-[calc(100vw-40px)] max-w-[400px] bg-white p-5 -translate-x-1/2 overflow-hidden rounded-xl'
+          'left-1/2 w-[calc(100vw-32px)] max-w-[343px] bg-white p-5 -translate-x-1/2 overflow-hidden rounded-xl'
         )}
       >
         <div
@@ -62,7 +63,7 @@ const ConfirmModal = ({
           )}
           {content && <div className='mt-4 w-full'>{content}</div>}
         </div>
-        <div className={cn('flex justify-center')}>
+        <div className={cn('flex justify-center gap-x-[9px]')}>
           {buttons.map(
             (button, index) =>
               button.text && (
