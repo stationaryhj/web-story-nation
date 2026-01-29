@@ -7,8 +7,8 @@ import { toast } from 'react-toastify';
 import { BaseButton } from '@/components/elements/button/BaseButton';
 import { contentApi } from '@/services/api';
 import { SocialLoginProvider } from '@/services/auth/types';
+import useModalStore from '@/shared/model/stores/useModalStore';
 import { useAccountStore } from '@/store/useAccountStore';
-import { useModalStore } from '@/store/useStoreModal';
 import Modal from './base/Modal';
 
 interface SignupModalProps {
@@ -36,7 +36,7 @@ const SignupModal = ({ onSuccess, state }: SignupModalProps) => {
   const [paidServiceAgreed, setPaidServiceAgreed] = useState(false);
   const [marketingAgreed, setMarketingAgreed] = useState(false);
 
-  const { closeModal } = useModalStore();
+  const { closeAllModals } = useModalStore();
   // 모든 필수 동의 여부 확인
   const allRequiredAgreed = serviceAgreed && privacyAgreed && paidServiceAgreed;
   const isGuestLogin = isLogin && data && loginType === ('Guest' as SocialLoginProvider);
@@ -174,7 +174,7 @@ const SignupModal = ({ onSuccess, state }: SignupModalProps) => {
 
   // 완료 화면에서 확인 버튼 클릭 시 로그인 페이지로 이동
   const handleCompleteConfirm = () => {
-    closeModal();
+    closeAllModals();
 
     // router.push('/')
   };
