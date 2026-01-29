@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { SpeechBubble } from '@/components/animation/SpeechBubble';
 import { getChatRoomEncryptData, getPlatform } from '@/lib/utils/storyNationUtil';
 import { authService } from '@/services/auth';
 import { SocialLoginProvider } from '@/services/auth/types';
@@ -61,7 +60,7 @@ const CHAT_FRONTEND_ADDRESS = process.env.NEXT_PUBLIC_CHAT_FRONTEND_ADDRESS;
 
 const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
   const router = useRouter();
-  const { closeModal, openModal } = useModalStore();
+  const { closeModal, openModal, closeModalByType } = useModalStore();
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
   const [showSignup, setShowSignup] = useState(false);
   const [isDuplicateLogin, setIsDuplicateLogin] = useState(false);
@@ -180,14 +179,16 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
               // 성공 시에만 모달 닫기
               closeModal();
 
+              // TODO: 띠배너 charbot_key 전달
+              /* 
               if (chrbot_key) {
                 handleConnectedChatRoom(chrbot_key);
-              }
+              } */
             }
           } else if (result.signupRequired || result.needSignup) {
             openModal({
               type: 'signup',
-              props: { onSucess: handleSignupSuccess, state: isReward ? 'reward' : 'signup' },
+              props: { onSuccess: handleSignupSuccess, state: isReward ? 'reward' : 'signup' },
             });
 
             // const { isLogin, data, loginType, registerWithSocialData } = useAccountStore.getState()
@@ -207,8 +208,13 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
             // }
           } else if (result.isDuplicateLogin) {
             openModal({
-              type: 'duplicateLogin',
+              type: 'confirm',
               props: {
+                title: '기존에 가입된 계정이 있습니다. 그대로 로그인하시겠습니까?',
+                description:
+                  '기존 계정으로 로그인할 경우 지금까지 대화한 내용은 저장되지 않습니다.',
+                confirmText: '로그인',
+                cancelText: '취소',
                 onConfirm: handleDuplicateLoginConfirm,
                 onCancel: handleDuplicateLoginCancel,
               },
@@ -375,7 +381,7 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
 
   const handleDuplicateLoginCancel = () => {
     localStorage.removeItem('duplicate_login_data');
-    setIsDuplicateLogin(false);
+    closeModalByType('confirm');
   };
 
   return (
