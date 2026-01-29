@@ -66,7 +66,6 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
   const [isDuplicateLogin, setIsDuplicateLogin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isNewUserMode, setIsNewUserMode] = useState(false);
-  const [isReward, setIsReward] = useState(false);
   // 이벤트 처리 중인지 추적하는 ref (중복 메시지 처리 방지)
   const processingCallback = useRef(false);
 
@@ -188,7 +187,7 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
           } else if (result.signupRequired || result.needSignup) {
             openModal({
               type: 'signup',
-              props: { onSuccess: handleSignupSuccess, state: isReward ? 'reward' : 'signup' },
+              props: { onSuccess: handleSignupSuccess },
             });
 
             // const { isLogin, data, loginType, registerWithSocialData } = useAccountStore.getState()
@@ -286,16 +285,14 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
     }
   };
 
-  // 회원가입 성공 시 모달 닫기
+  // 회원가입 성공 시 - SocialLoginModal만 닫고 SignupModal은 보상 화면으로 전환됨
   const handleSignupSuccess = () => {
     console.log('[SocialLoginModal] 회원가입 성공! - handleSignupSuccess 호출됨');
 
     // 임시 저장 데이터 정리
-    // localStorage.removeItem('social_login_state')
     localStorage.removeItem('social_login_type');
-    setIsReward(true);
 
-    // loginType 최종 변경 //
+    // loginType 최종 변경
     const { data } = useAccountStore.getState();
     const login_sns_state = localStorage.getItem('social_login_state') || '';
     const loginType = getPlatform(JSON.parse(login_sns_state)?.snstype || 0) || '';
@@ -303,12 +300,8 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
 
     console.log('[SocialLoginModal] 회원가입 완료 - loginType:', loginType, 'userData:', data);
 
+    // SocialLoginModal만 닫기 (SignupModal은 isCompleted=true가 되어 보상 화면 표시)
     closeModalByType('socialLogin');
-    // TODO: 회원가입 펜 적용 모달 오픈
-
-    // TODO: 띠배너 모달 팝업
-    // setShowSignup(false)
-    // onClose()
   };
 
   const handleNewUserClick = () => {
