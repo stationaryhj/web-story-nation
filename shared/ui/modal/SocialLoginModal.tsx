@@ -181,6 +181,7 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
               closeModal();
 
               // TODO: 띠배너 charbot_key 전달
+              openModal({ type: 'redirectBanner', props: { charboyKey: '647' } });
               /* 
               if (chrbot_key) {
                 handleConnectedChatRoom(chrbot_key);
@@ -366,6 +367,7 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
         closeAllModals();
 
         // TODO: 띠배너 모달 팝업
+        openModal({ type: 'redirectBanner', props: { charboyKey: '647' } });
         await useAccountStore.getState().updateUserInfoFromUserInfo2();
         await useAccountStore.getState().fetchWriterInfo();
 
