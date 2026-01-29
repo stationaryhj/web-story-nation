@@ -1,9 +1,9 @@
 'use client';
 
-import { type MotionProps, motion } from 'framer-motion';
+import { type HTMLMotionProps, motion } from 'framer-motion';
 import { cn } from '@/shared/lib/utils/cn';
 
-interface ModalContentProps extends MotionProps {
+interface ModalContentProps extends HTMLMotionProps<'div'> {
   className?: string;
   children: React.ReactNode;
 }

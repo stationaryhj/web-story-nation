@@ -6,7 +6,7 @@ import { cn } from '@/shared/lib/utils/cn';
 interface ModalButtonProps extends MotionProps {
   className?: string;
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const ModalClose: React.FC<ModalButtonProps> = ({ className, children, onClick, ...rest }) => {
