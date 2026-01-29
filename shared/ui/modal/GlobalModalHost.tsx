@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback } from 'react';
 import ReactDOM from 'react-dom';
 
@@ -9,6 +9,7 @@ import useModalStore from '@/shared/model/stores/useModalStore';
 import type { ModalComponent } from '@/shared/model/types/modal';
 import { ModalTypeContext, ModalZIndexContext } from '@/shared/ui/modal/base/modalContexts';
 import ConfirmModal from './ConfirmModal';
+import RedirectBannerModal from './RedirectBannerModal';
 import SignupModal from './SignupModal';
 import SocialLoginModal from './SocialLoginModal';
 
@@ -26,6 +27,7 @@ const MODAL_COMPONENTS: Record<string, ModalConfig> = {
   socialLogin: { component: SocialLoginModal },
   signup: { component: SignupModal },
   confirm: { component: ConfirmModal },
+  redirectBanner: { component: RedirectBannerModal },
 };
 
 export default function GlobalModalHost() {
@@ -65,11 +67,19 @@ export default function GlobalModalHost() {
     if (!Component) return null;
     const zIndex = BASE_Z_INDEX + index * 10;
     return (
-      <ModalZIndexContext.Provider key={modal.id || modal.type} value={zIndex}>
-        <ModalTypeContext.Provider value={modal.type}>
-          <Component {...modal.props} />
-        </ModalTypeContext.Provider>
-      </ModalZIndexContext.Provider>
+      <motion.div
+        key={modal.id || modal.type}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.15 }}
+      >
+        <ModalZIndexContext.Provider value={zIndex}>
+          <ModalTypeContext.Provider value={modal.type}>
+            <Component {...modal.props} />
+          </ModalTypeContext.Provider>
+        </ModalZIndexContext.Provider>
+      </motion.div>
     );
   };
 
