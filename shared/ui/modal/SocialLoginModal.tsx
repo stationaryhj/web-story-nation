@@ -376,8 +376,11 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
         console.log('[SocialLoginModal] 기존 유저 연동 성공! - guestToSocialLogin 완료');
         closeAllModals();
 
-        // TODO: 띠배너 모달 팝업
-        openModal({ type: 'redirectBanner', props: { charboyKey: chrbot_key } });
+        // 띠배너 모달 팝업 (chrbot_key가 있을 경우)
+        if (chrbot_key) {
+          openModal({ type: 'redirectBanner', props: { charboyKey: chrbot_key } });
+        }
+
         await useAccountStore.getState().updateUserInfoFromUserInfo2();
         await useAccountStore.getState().fetchWriterInfo();
 
@@ -387,16 +390,15 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
         if (data && data.user_block_type === 1) {
           toast.error('정지된 계정입니다.');
           logout();
+          closeModalByType('redirectBanner');
         }
 
-        closeModal();
         return;
       }
     }
 
-    // login2 -> updateUserInfoFromUserInfo2() -> fetchWriterInfo
-
-    closeModal();
+    // 실패 시 confirm 모달만 닫기
+    closeModalByType('confirm');
   };
 
   const handleDuplicateLoginCancel = () => {
