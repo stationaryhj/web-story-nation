@@ -60,7 +60,7 @@ const CHAT_FRONTEND_ADDRESS = process.env.NEXT_PUBLIC_CHAT_FRONTEND_ADDRESS;
 
 const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
   const router = useRouter();
-  const { closeModal, openModal, closeModalByType } = useModalStore();
+  const { closeModal, openModal, closeModalByType, closeAllModals } = useModalStore();
   const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
   const [showSignup, setShowSignup] = useState(false);
   const [isDuplicateLogin, setIsDuplicateLogin] = useState(false);
@@ -288,6 +288,8 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
 
   // 회원가입 성공 시 모달 닫기
   const handleSignupSuccess = () => {
+    console.log('[SocialLoginModal] 회원가입 성공! - handleSignupSuccess 호출됨');
+
     // 임시 저장 데이터 정리
     // localStorage.removeItem('social_login_state')
     localStorage.removeItem('social_login_type');
@@ -299,6 +301,12 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
     const loginType = getPlatform(JSON.parse(login_sns_state)?.snstype || 0) || '';
     useAccountStore.getState().setLoginState(true, null, loginType);
 
+    console.log('[SocialLoginModal] 회원가입 완료 - loginType:', loginType, 'userData:', data);
+
+    closeModalByType('socialLogin');
+    // TODO: 회원가입 펜 적용 모달 오픈
+
+    // TODO: 띠배너 모달 팝업
     // setShowSignup(false)
     // onClose()
   };
@@ -359,11 +367,16 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
       localStorage.removeItem('social_login_type');
 
       if (isSuccess) {
-        console.log('@@ isSuccess :: ', isSuccess);
+        console.log('[SocialLoginModal] 기존 유저 연동 성공! - guestToSocialLogin 완료');
+        closeAllModals();
+
+        // TODO: 띠배너 모달 팝업
         await useAccountStore.getState().updateUserInfoFromUserInfo2();
         await useAccountStore.getState().fetchWriterInfo();
 
         const { data, logout } = useAccountStore.getState();
+        console.log('[SocialLoginModal] 기존 유저 연동 완료 - userData:', data);
+
         if (data && data.user_block_type === 1) {
           toast.error('정지된 계정입니다.');
           logout();
