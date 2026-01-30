@@ -570,12 +570,14 @@ export const contentApi = {
 
   /**
    * 캐봇 챗 모드 가져오기
+   * @param overrideToken 선택적 토큰 (외부 토큰 초기화 시 사용)
    */
-  GetChatMode: async (): Promise<ApiResponse<CharbotChatModeResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
-    api.defaults.headers.common['Authorization'] = account_token
+  GetChatMode: async (overrideToken?: string): Promise<ApiResponse<CharbotChatModeResponse>> => {
+    const token = overrideToken || useAccountStore.getState().data?.access_token || '';
+    const account_token = `Bearer ${token}`;
+    api.defaults.headers.common['Authorization'] = account_token;
     // return api.post('/api/charbot/chatmode')
-    return api.post('/api/charbot/chatmode/auth')
+    return api.post('/api/charbot/chatmode/auth');
   },
 
   /**
