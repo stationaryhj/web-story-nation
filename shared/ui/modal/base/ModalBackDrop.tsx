@@ -25,19 +25,13 @@ const ModalBackDrop: React.FC<ModalBackdropProps> = ({
     }
   };
 
-  // iOS 터치 스크롤 방지
-  const handleTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault();
-  };
-
-  const modalBackdropCls = `fixed inset-0 z-[1] bg-black/50 pointer-events-auto`;
+  const modalBackdropCls = `fixed inset-0 z-[1] bg-black/50 pointer-events-auto touch-none`;
   return (
     <motion.div
       role='presentation'
       aria-hidden='true'
       className={cn(modalBackdropCls, className)}
       onClick={handleClose}
-      onTouchMove={handleTouchMove}
       {...props}
     />
   );
