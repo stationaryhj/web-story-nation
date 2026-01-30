@@ -3,6 +3,7 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 RUN yarn install
 COPY . .
+RUN cp .env_release .env
 RUN yarn build
 
 # 런타임 스테이지
@@ -20,9 +21,9 @@ COPY --from=builder /app/tsconfig.node.json ./
 COPY --from=builder /app/postcss.config.js ./
 COPY --from=builder /app/tailwind.config.ts ./
 COPY --from=builder /app/global.d.ts ./
-# QA 환경용 .env 파일 복사
-COPY --from=builder /app/..env_release ./.env
+# 프로덕션 환경용 .env 파일 복사
+COPY --from=builder /app/.env_release ./.env
 
 RUN yarn install --production
-EXPOSE 3100
+EXPOSE 3000
 CMD ["yarn", "start"]
