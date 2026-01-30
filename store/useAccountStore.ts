@@ -527,7 +527,14 @@ export const useAccountStore = create<AccountState>()(
       // 외부(채팅방)에서 토큰으로 로그인 상태 초기화
       initFromExternalToken: async (accessToken: string) => {
         try {
-          set({ loading: true, error: null });
+          // 기존 유저 데이터 먼저 초기화 (게스트 데이터로 덮어쓰기 전에)
+          set({
+            loading: true,
+            error: null,
+            isLogin: false,
+            data: null,
+            writerInfo: null,
+          });
 
           // 토큰 검증
           if (!accessToken || accessToken === 'undefined') {
