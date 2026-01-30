@@ -152,7 +152,7 @@ export default function ShopRecharge() {
           if (success) {
             // URL에서 token 파라미터 제거
             const url = new URL(window.location.href);
-            url.searchParams.delete('token');
+            url.searchParams.delete('auth');
             const search = url.searchParams.toString();
 
             router.replace(url.pathname + (search ? `?${search}` : ''));
