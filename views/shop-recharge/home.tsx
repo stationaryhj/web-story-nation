@@ -119,6 +119,9 @@ export default function ShopRecharge() {
   const isProcessing = useRef(false);
   const selectedCoinRef = useRef<CoinData | null>(null);
 
+  // 외부 토큰 초기화 완료 여부 (API 호출 지연용)
+  const [isExternalAuthReady, setIsExternalAuthReady] = useState(false);
+
   // user Data
   const {
     data: accountData,
@@ -131,6 +134,9 @@ export default function ShopRecharge() {
   }));
   const freePen = Number(accountData?.coin_free || 0) + Number(accountData?.coin_register || 0);
   const paidPen = Number(accountData?.coin_user || 0);
+
+  // 외부 토큰 파라미터 존재 여부 확인
+  const hasExternalAuth = searchParams.get('auth') !== null;
 
   // 외부(채팅방)에서 암호화된 토큰으로 접근 시 처리
   useEffect(() => {
@@ -150,6 +156,8 @@ export default function ShopRecharge() {
         // 토큰으로 로그인 초기화
         initFromExternalToken(decryptedParams.token).then((success) => {
           if (success) {
+            // 외부 토큰 초기화 완료 - API 호출 허용
+            setIsExternalAuthReady(true);
             // URL에서 token 파라미터 제거
             const url = new URL(window.location.href);
             url.searchParams.delete('auth');
@@ -161,15 +169,21 @@ export default function ShopRecharge() {
       } catch (error) {
         console.error('토큰 복호화 실패:', error);
       }
+    } else {
+      // 외부 토큰 없이 접근한 경우 바로 ready
+      setIsExternalAuthReady(true);
     }
   }, [searchParams, isLogin, initFromExternalToken, router]);
+
+  // API 호출 활성화 조건: 로그인 상태이고, 외부 토큰 초기화가 완료되었거나 외부 토큰이 없는 경우
+  const canFetchData = isLogin && (isExternalAuthReady || !hasExternalAuth);
 
   const {
     data: coinChargeUseHistoryData,
     isLoading: coinChargeUseHistoryLoading,
     error: coinChargeUseHistoryError,
     refetch: coinChargeUseHistoryRefetch,
-  } = ReqGetCoinChargeUseHistory(0, 1, 50, isLogin);
+  } = ReqGetCoinChargeUseHistory(0, 1, 50, canFetchData);
 
   console.log('@@ coinChargeUseHistoryData :: ', coinChargeUseHistoryData);
 
