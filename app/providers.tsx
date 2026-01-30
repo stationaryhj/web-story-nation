@@ -104,14 +104,21 @@ export default function Providers({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (isLogin) {
+    // 외부 토큰으로 접근하는 경우(채팅방 → 상점) 자동 업데이트 스킵
+    // initFromExternalToken에서 별도로 처리함
+    const hasExternalAuth =
+      pathname === '/shop-recharge' &&
+      typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).has('auth');
+
+    if (isLogin && !hasExternalAuth) {
       updateUserInfoFromUserInfo().then((isSuccess) => {
         if (isSuccess) {
           console.log('updateUserInfoFromUserInfo success');
         }
       });
     }
-  }, [isLogin]);
+  }, [isLogin, pathname]);
 
   useEffect(() => {
     if (!chrbotKey && activeNotices?.length > 0) {
