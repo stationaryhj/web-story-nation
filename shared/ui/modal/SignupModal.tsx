@@ -291,7 +291,9 @@ const SignupModal = ({ onSuccess, chrbot_key }: SignupModalProps) => {
             placeholder='닉네임을 입력하세요. (20자 이내)'
             value={nickname}
             onChange={(e) => {
-              setNickname(e.target.value);
+              const value = e.target.value;
+              const maxLength = 20;
+              setNickname(value.length <= maxLength ? value : value.slice(0, maxLength));
               setIsNicknameChecked(false);
               setIsNicknameValid(false);
             }}
