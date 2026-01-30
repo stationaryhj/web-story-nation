@@ -72,7 +72,7 @@ interface AccountState {
   updateNicknameAndCoin: (nick_nm: string, coin_user: number) => void;
   setPersona: (persona: string, persona_gender: number) => void;
   setWriterInfo: (writerInfo: WriterInfoData | null) => void;
-  fetchWriterInfo: () => Promise<void>;
+  fetchWriterInfo: (overrideToken?: string) => Promise<void>;
   updateBankAccount: (
     bank: string,
     accountNumber: string,
@@ -366,7 +366,7 @@ export const useAccountStore = create<AccountState>()(
         set({ writerInfo });
       },
 
-      fetchWriterInfo: async () => {
+      fetchWriterInfo: async (overrideToken?: string) => {
         const { data } = get();
         if (!data || !data.writerchk || data.writerchk !== 1) {
           set({ writerInfo: null });
@@ -381,7 +381,7 @@ export const useAccountStore = create<AccountState>()(
             console.error('작가 정보 가져오기 실패:', response.data?.result?.msg);
           }
 
-          const responseChatMode = await contentApi.GetChatMode();
+          const responseChatMode = await contentApi.GetChatMode(overrideToken);
 
           if (responseChatMode.data.result.err === 0) {
             useChatModeStore.getState().setChatMode(responseChatMode.data.chat_mode);
@@ -568,8 +568,8 @@ export const useAccountStore = create<AccountState>()(
               loading: false,
             });
 
-            // 작가 정보 가져오기
-            await get().fetchWriterInfo();
+            // 작가 정보 가져오기 (새 토큰을 직접 전달하여 상태 동기화 문제 방지)
+            await get().fetchWriterInfo(accessToken);
 
             return true;
           }
