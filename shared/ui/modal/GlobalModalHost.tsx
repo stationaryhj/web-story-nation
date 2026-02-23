@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { useCallback } from 'react';
 import ReactDOM from 'react-dom';
 
@@ -8,6 +8,7 @@ import { useEscapeClose, useModalHistoryManager } from '@/shared/lib/hooks';
 import useModalStore from '@/shared/model/stores/useModalStore';
 import type { ModalComponent } from '@/shared/model/types/modal';
 import { ModalTypeContext, ModalZIndexContext } from '@/shared/ui/modal/base/modalContexts';
+import ChatModeSelectModal from './ChatModeSelectModal';
 import ConfirmModal from './ConfirmModal';
 import RedirectBannerModal from './RedirectBannerModal';
 import SignupModal from './SignupModal';
@@ -28,6 +29,7 @@ const MODAL_COMPONENTS: Record<string, ModalConfig> = {
   signup: { component: SignupModal },
   confirm: { component: ConfirmModal },
   redirectBanner: { component: RedirectBannerModal },
+  chatModeSelect: { component: ChatModeSelectModal },
 };
 
 export default function GlobalModalHost() {
@@ -57,8 +59,8 @@ export default function GlobalModalHost() {
   const portalModals = modals.filter((modal) => MODAL_COMPONENTS[modal.type]?.usePortal !== false);
 
   // 등록되지 않은 모달은 렌더링하지 않음
-  // 기본 z-index는 9999, 모달이 쌓일 때마다 10씩 증가
-  const BASE_Z_INDEX = 9999;
+  // 기본 z-index를 충분히 높여 페이지 콘텐츠와 충돌을 방지
+  const BASE_Z_INDEX = 20000;
 
   const renderModal = (modal: (typeof modals)[0], index: number) => {
     const config = MODAL_COMPONENTS[modal.type];
@@ -67,19 +69,13 @@ export default function GlobalModalHost() {
     if (!Component) return null;
     const zIndex = BASE_Z_INDEX + index * 10;
     return (
-      <motion.div
-        key={modal.id || modal.type}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.15 }}
-      >
+      <div key={modal.id || modal.type}>
         <ModalZIndexContext.Provider value={zIndex}>
           <ModalTypeContext.Provider value={modal.type}>
             <Component {...modal.props} />
           </ModalTypeContext.Provider>
         </ModalZIndexContext.Provider>
-      </motion.div>
+      </div>
     );
   };
 
