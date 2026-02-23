@@ -1269,7 +1269,7 @@ export const createApi = {
    */
   GetCreateChatBotInProgress: async (
     world_list_detail_chrbot_key: number | null,
-    chat_room_mode: number
+    chat_room_mode?: number
   ): Promise<ApiResponse<CharbotInprogressResponse>> => {
     const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
     api.defaults.headers.common['Authorization'] = account_token;
