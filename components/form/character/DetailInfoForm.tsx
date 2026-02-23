@@ -5,6 +5,7 @@ import { faPlus, faUser, faRobot, faTrashCan } from '@fortawesome/free-solid-svg
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import type { ChangeEvent } from 'react'
 import { ConversationExample, useCreateCharacterData } from '@/store/useCreateCharacterData'
+import { FormTextarea } from '@/shared/ui/form'
 import Tutorial from '@/components/tutorial/Tutorial'
 import BaseModal from '@/components/modal/BaseModal'
 import { toast } from 'react-toastify'
@@ -432,44 +433,27 @@ export default function DetailInfoForm({
 
           {/* 공개설명 */}
           <div className='flex flex-col gap-4'>
-            <div>
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h3 className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">공개 설명</h3>
-                </div>
-                <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-                  {formatTextLength(formData.content_public.length, MAX_CONTENT_LENGTH)}
-                </span>
-              </div>
-              <textarea
-                id="content-public"
-                value={formData.content_public}
-                onChange={handleContentPublicChange}
-                placeholder='독자에게 공개되고 AI에게 전송되는 프롬프트에요 :) 캐릭터를 자세히 설명해 주세요!'
-                rows={4}
-                className="w-full px-4 py-3 rounded-lg text-sm sm:text-base border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
-              />
-            </div>
+            <FormTextarea
+              label='공개 설명'
+              name='content_public'
+              id='content-public'
+              value={formData.content_public}
+              onChange={handleContentPublicChange}
+              placeholder='독자에게 공개되고 AI에게 전송되는 프롬프트에요 :) 캐릭터를 자세히 설명해 주세요!'
+              rows={4}
+              maxLength={MAX_CONTENT_LENGTH}
+            />
 
             {/* 비공개설명 */}
-            <div>
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h3 className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">비공개 설명</h3>
-                </div>
-                <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-                  {formatTextLength(formData.content.length, MAX_CONTENT_LENGTH)}
-                </span>
-              </div>
-              <textarea
-                id="content"
-                value={formData.content}
-                onChange={handleContentChange}
-                placeholder='AI에게만 전송되는 비밀 프롬프트에요 :) 작가님만의 비법 프롬프트를 입력해 보세요!'
-                rows={4}
-                className="w-full px-4 py-3 rounded-lg text-sm sm:text-base border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none"
-              />
-            </div>
+            <FormTextarea
+              label='비공개 설명'
+              name='content'
+              value={formData.content}
+              onChange={handleContentChange}
+              placeholder='AI에게만 전송되는 비밀 프롬프트에요 :) 작가님만의 비법 프롬프트를 입력해 보세요!'
+              rows={4}
+              maxLength={MAX_CONTENT_LENGTH}
+            />
           </div>
 
           <div className="mt-4 flex justify-end items-center">
