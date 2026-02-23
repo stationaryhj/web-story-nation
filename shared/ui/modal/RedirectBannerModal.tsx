@@ -37,25 +37,13 @@ const RedirectBannerModal = ({ charboyKey }: { charboyKey: string }) => {
       nsfw,
       userInfo?.persona || '',
       userInfo?.access_token || '',
-      userInfo?.user_key?.toString() || '0',
-      'https://qausapi.universestationery.com',
-      'https://qa.storynation.co.kr/character/chat',
-      'qauschat.storynation.io',
-      '443'
+      userInfo?.user_key?.toString() || '0'
     );
     // api_server?: string,
     // chat_address?: string,
     // chat_server?: string,
     // chat_server_port?: string
-    console.log('chrbotKey :: ', chrbotKey);
-    console.log('userInfo?.coin_user :: ', userInfo?.coin_user);
-    console.log('freePen :: ', freePen);
-    console.log('nsfw :: ', nsfw);
-    console.log('userInfo?.persona :: ', userInfo?.persona);
-    console.log('userInfo?.access_token :: ', userInfo?.access_token);
-    console.log('userInfo?.user_key :: ', userInfo?.user_key);
-    console.log('encryptedData :: ', encryptedData);
-    router.push(`https://qa.storynation.co.kr/character/chat?info=${encryptedData}`);
+    router.push(`${process.env.NEXT_PUBLIC_CHAT_FRONTEND_ADDRESS}?info=${encryptedData}`);
   };
 
   return (
