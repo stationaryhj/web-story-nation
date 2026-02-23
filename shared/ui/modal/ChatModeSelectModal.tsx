@@ -45,6 +45,7 @@ export default function ChatModeSelectModal({ onLimitError }: ChatModeSelectModa
 
     if (data?.chrbot && data?.result.err === 0) {
       router.push(`/my-characters/edit/${data.chrbot.world_list_detail_chrbot_key}`);
+      closeModal();
     }
   };
   return (
