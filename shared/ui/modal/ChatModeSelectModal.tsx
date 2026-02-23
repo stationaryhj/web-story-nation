@@ -32,14 +32,14 @@ export default function ChatModeSelectModal({ onLimitError }: ChatModeSelectModa
     },
   ];
 
-  const handleModeSelect = async () => {
-    const response = await createApi.GetCreateChatBotInProgress(null);
+  const handleModeSelect = async (chatRoomMode: number) => {
+    const response = await createApi.GetCreateChatBotInProgress(null, chatRoomMode);
     const data = response.data as CharbotInprogressResponse;
     console.log('data :: ', data);
     if (data?.result.err === 4) {
       console.log('에러터짐');
       closeModal();
-      onLimitError(); // 부모에서 LimitModal 열기
+      onLimitError();
       return;
     }
 
@@ -67,7 +67,7 @@ export default function ChatModeSelectModal({ onLimitError }: ChatModeSelectModa
             <div
               key={mode.mode}
               className='group flex flex-col rounded-xl border overflow-hidden border-[#D9D9D9] cursor-pointer'
-              onClick={handleModeSelect}
+              onClick={() => handleModeSelect(mode.mode)}
             >
               <div className='overflow-hidden'>
                 <Image
