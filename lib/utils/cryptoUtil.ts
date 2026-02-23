@@ -28,11 +28,12 @@ export function encryptData(data: any): string {
   const encrypted = CryptoJS.AES.encrypt(jsonString, CryptoJS.enc.Utf8.parse(ENCRYPTION_KEY), {
     mode: CryptoJS.mode.ECB,
     padding: CryptoJS.pad.Pkcs7,
+    keySize: 8,
   });
 
   // 3. Base64 문자열로 변환
   const base64String = encrypted.toString();
-  return btoa(base64String);
+  return base64String;
 }
 
 /**
@@ -52,6 +53,7 @@ export function decryptData<T = any>(encryptedData: string): T {
       {
         mode: CryptoJS.mode.ECB,
         padding: CryptoJS.pad.Pkcs7,
+        keySize: 8,
       }
     );
 
