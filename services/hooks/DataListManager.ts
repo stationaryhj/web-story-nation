@@ -288,11 +288,17 @@ export const UseChat = (chrbot_chat_key: number, chat_mode: number) => {
   return { data, isLoading, error, refetch };
 };
 
-export const ReqGetCreateChatBotInProgress = (world_list_detail_chrbot_key: number | null) => {
+export const ReqGetCreateChatBotInProgress = (
+  world_list_detail_chrbot_key: number | null,
+  chat_room_mode: number
+) => {
   const { data, isLoading, error, refetch } = useQuery<CharbotInprogressResponse>({
-    queryKey: ['createChatBotInProgress', world_list_detail_chrbot_key],
+    queryKey: ['createChatBotInProgress', world_list_detail_chrbot_key, chat_room_mode],
     queryFn: async () => {
-      const response = await createApi.GetCreateChatBotInProgress(world_list_detail_chrbot_key);
+      const response = await createApi.GetCreateChatBotInProgress(
+        world_list_detail_chrbot_key,
+        chat_room_mode
+      );
       return response.data as CharbotInprogressResponse;
     },
   });
