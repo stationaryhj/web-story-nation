@@ -413,13 +413,13 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
         >
           <FontAwesomeIcon icon={faTimes} size='lg' className='h-6 w-6 text-icons-primary' />
         </Modal.Close>
-        <div className='flex flex-col gap-y-[100px]'>
-          <div className='flex flex-col justify-center items-center gap-y-3'>
+        <div className='flex flex-col gap-y-[100px] max-w-[320px] mx-auto w-full items-start'>
+          <div className='flex flex-col gap-y-3 w-full items-center justify-center'>
             <Image src='/images/logo.png' alt='logo' width={220} height={100} />
             <div className='text-sm text-text-black font-medium'>함께 만드는 세계관 & 캐릭터</div>
           </div>
 
-          <div className='relative'>
+          <div className='relative w-full'>
             <div className='w-[183px] py-3 rounded-[10px] shadow-[0_2px_7px_1px_rgba(0,0,0,0.15)] absolute bottom-[calc(100%+16px)] left-1/2 -translate-x-1/2'>
               <p className='text-[13px] text-primary font-regular text-center'>
                 3초만에 가입하면 30펜 지급!
@@ -428,24 +428,22 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
                 className={`absolute -bottom-1.5 w-0 h-0 left-1/2 -translate-x-1/2 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-white dark:border-t-gray-800`}
               />
             </div>
-            <div className='space-y-1.5'>
+            <div className='space-y-1.5 w-full'>
               {SOCIAL_LOGIN_BUTTONS.map((button) => (
                 <button
                   key={button.provider}
                   type='button'
                   onClick={() => handleSocialLogin(button.provider)}
                   disabled={loading}
-                  className={`flex w-full px-[85px] max-md:px-[60px] h-11 items-center rounded-full font-medium transition-colors ${button.bgColor}`}
+                  className={`flex w-full justify-center items-center gap-4 h-11 px-6 rounded-full font-medium transition-colors ${button.bgColor}`}
                 >
-                  <div className='flex items-center justify-center gap-4'>
-                    <Image src={button.icon} alt={button.alt} width={20} height={20} />
-                    <span className={`text-[15px] ${button.textColor}`}>{button.label}</span>
-                  </div>
+                  <Image src={button.icon} alt={button.alt} width={20} height={20} />
+                  <span className={`text-[15px] ${button.textColor}`}>{button.label}</span>
                 </button>
               ))}
             </div>
-            <div className='text-center mt-5 text-xs font-regular text-icons-primary px-[25px]'>
-              <p className='whitespace-pre-wrap'>{`계속 진행하면 이용약관 및 개인정보 처리방침에\n동의하는 것으로 간주됩니다.`}</p>
+            <div className='text-left mt-5 text-xs font-regular text-icons-primary'>
+              <p className='whitespace-pre-wrap text-center'>{`계속 진행하면 이용약관 및 개인정보 처리방침에\n동의하는 것으로 간주됩니다.`}</p>
             </div>
           </div>
 
