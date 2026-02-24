@@ -4,7 +4,7 @@ import { apiRoute } from '@/shared/config/apiRoute'
 import type { CharbotInprogressResponse } from '@/types/api'
 
 export const useCharacterInProgress = (characterId: number) => {
-  return useQuery({
+  return useQuery<CharbotInprogressResponse>({
     queryKey: ['characterInProgress', characterId],
     queryFn: async () => {
       const response = await instance.post(apiRoute.charbot.inprogress.get, {
