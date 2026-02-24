@@ -22,13 +22,13 @@ export default function ChatModeSelectModal({ onLimitError }: ChatModeSelectModa
       title: '캐릭터',
       description: '1:1 채팅, DM에 특화된 캐릭터를 손쉽게 만들어요.',
       img: '/images/bg_character_room.png',
-      mode: 0,
+      mode: 1,
     },
     {
       title: '스토리',
       description: '더 많은 설정과 탄탄한 서사의 스토리를 만들어요.',
       img: '/images/bg_story_room.png',
-      mode: 1,
+      mode: 0,
     },
   ];
 
