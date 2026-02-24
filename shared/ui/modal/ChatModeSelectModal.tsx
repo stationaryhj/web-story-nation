@@ -70,13 +70,12 @@ export default function ChatModeSelectModal({ onLimitError }: ChatModeSelectModa
               className='group flex flex-col rounded-xl border overflow-hidden border-[#D9D9D9] cursor-pointer'
               onClick={() => handleModeSelect(mode.mode)}
             >
-              <div className='overflow-hidden'>
+              <div className='relative overflow-hidden aspect-[267/166]'>
                 <Image
-                  className='group-hover:scale-105 transition-all duration-300 w-full h-full object-cover'
+                  className='group-hover:scale-105 transition-all duration-300 object-cover'
                   src={mode.img}
                   alt={mode.title}
-                  width={100}
-                  height={100}
+                  fill
                 />
               </div>
               <div className='py-3 px-4 border-t border-[#D9D9D9] space-y-1'>
