@@ -5,16 +5,14 @@ import {
   ChatbotPropertyStructure,
   ChatImageSaveRequest,
   ChatLikeabilityData,
-  MultiImageData
-} from '@/services/interface'
-
+  MultiImageData,
+} from '@/services/interface';
 
 export interface ApiResponse<T = any> {
   success: boolean;
   data: T;
   code?: string;
 }
-
 
 export interface GetUuidResponse {
   clientId: string;
@@ -34,7 +32,6 @@ export interface UnlockMultiImageResponse {
   coin_register: number;
   ranking: boolean;
 }
-
 
 // Login
 export interface LoginResponse {
@@ -67,26 +64,24 @@ export interface LoginResponse {
   result: ApiResult;
 }
 
-
 export interface GuestLoginResponse extends LoginResponse {
-  api_server?: string
-  chat_address?: string
-  chat_server?: string
-  chat_server_port?: string
-  coin?: number
-  country_code?: string //국가 코드
-  freeCoin?: number //무료 코인 보유량
-  info?: any
-  nsfw?: number
-  token?: string
-  userKey?: number
-  chrbotKey?: string
+  api_server?: string;
+  chat_address?: string;
+  chat_server?: string;
+  chat_server_port?: string;
+  coin?: number;
+  country_code?: string; //국가 코드
+  freeCoin?: number; //무료 코인 보유량
+  info?: any;
+  nsfw?: number;
+  token?: string;
+  userKey?: number;
+  chrbotKey?: string;
 }
-
 
 // export function convertToLoginData(guestLoginResponse: GuestLoginResponse): LoginResponse {
 //   let ref: LoginResponse = {
-    
+
 //   }
 //   return ref;
 // }
@@ -117,7 +112,6 @@ export interface UserInfoResponse {
   safety: number;
 }
 
-
 // Charbot Top 10 List
 export type CharbotTop10Response = {
   order: Array<number>;
@@ -132,8 +126,8 @@ export type CharbotTop10Response = {
     module_8: Array<ModuleCharacter>;
     module_9: Array<ModuleCharacter>;
     module_10: Array<ModuleCreater>;
-  }
-  
+  };
+
   result: ApiResult;
 };
 
@@ -144,29 +138,27 @@ export type CharbotTop10NewResponse = {
     module_3: Array<ModuleCharacter>;
     module_9: Array<ModuleCharacter>;
     module_10: Array<ModuleCreater>;
-  }
-  
+  };
+
   order: Array<number>;
   result: ApiResult;
 };
-
 
 // Charbot Top 10 Ranking ( Creater )
 export type CharbotTop10RankingResponse = {
   result: ApiResult;
   charbot_top10: Array<ModuleCreater>;
-}
-
+};
 
 export type GetTop10RankingResponse = {
   result: ApiResult;
   module_8: Array<ModuleCharacterCharacter>;
-}
+};
 
 export type GetTop10RankingCreaterResponse = {
   result: ApiResult;
   module_10: Array<ModuleCreater>;
-}
+};
 
 export interface ModuleCharacterCharacter {
   world_list_detail_chrbot_key: number;
@@ -190,7 +182,6 @@ export interface ModuleCharacterCharacter {
   likeability_yn: number;
   multi_image_count: number;
 }
-
 
 // Module Character
 export interface ModuleCharacter {
@@ -235,7 +226,6 @@ export interface TagListResponse {
     [key: string]: TagRanking[];
   };
 }
-
 
 // Tag Top Ranking List
 export interface TagRankingListResponse {
@@ -340,9 +330,8 @@ export interface ChrbotData {
   writer_note: string;
 }
 
-
 export interface CharbotChatListResponse {
-  chrbot_chat: CharbotChatListData,
+  chrbot_chat: CharbotChatListData;
   result: ApiResult;
 }
 
@@ -405,13 +394,11 @@ export interface CharbotGetListResponse {
   result: ApiResult;
 }
 
-
 // CharbotGetListMine Response
 export interface CharbotGetListMineResponse {
   chrbotList: CharbotGetListMineData;
   result: ApiResult;
 }
-
 
 export interface CharbotGetListMineData {
   current_page: number;
@@ -452,7 +439,6 @@ export interface CharbotMineData {
   writer_note?: string;
 }
 
-
 export interface CharbotInprogressResponse {
   chrbot: CharbotInprogressData;
   charbot_tag: Array<CharbotTagData>;
@@ -480,17 +466,17 @@ export interface CharbotInprogressData {
   img_web_url: string;
   intro: string;
   like_cnt: number;
-  likeabilities: any[];             // 호감도 속성 ( 새로 추가 )
-  likeability_max_lv: number;       // 호감도 최대 레벨
-  likeability_yn: number;           // 호감도 활성화 여부 ( 0 : 비활성화, 1 : 활성화 )
+  likeabilities: any[]; // 호감도 속성 ( 새로 추가 )
+  likeability_max_lv: number; // 호감도 최대 레벨
+  likeability_yn: number; // 호감도 활성화 여부 ( 0 : 비활성화, 1 : 활성화 )
   msg_cnt: number;
-  multi_image_count: number;        // 이미지 개수 ( 새로 추가 )
-  multi_images: any[];              // 이미지 목록 ( 새로 추가 )
+  multi_image_count: number; // 이미지 개수 ( 새로 추가 )
+  multi_images: any[]; // 이미지 목록 ( 새로 추가 )
   nsfw: number;
-  property: string;                 // 캐봇의 속성이 있다면 저장 : 기타설정들 ( 새로 추가 )
+  property: string; // 캐봇의 속성이 있다면 저장 : 기타설정들 ( 새로 추가 )
   show_yn: number;
   sort: number;
-  subject?: string;                  // 제목
+  subject?: string; // 제목
   tags: string;
   title: string;
   update_dt: string;
@@ -499,6 +485,7 @@ export interface CharbotInprogressData {
   world_list_detail_chrbot_key: number;
   world_list_detail_key: number;
   writer_note: string;
+  chat_room_mode: number;
 }
 
 export interface CharbotTagData {
@@ -514,9 +501,6 @@ export interface SaleMonthlyIncomeResponse {
   monthlyIncome: number;
   result: ApiResult;
 }
-
-
-
 
 // SaleMonthlyIncomeList Response
 export interface SaleMonthlyIncomeListResponse {
@@ -547,7 +531,6 @@ export interface IncomeData {
   pen: string;
   title: string;
 }
-
 
 // CharbotLike Response
 export interface CharbotLikeResponse {
@@ -608,7 +591,6 @@ export interface CoinData {
   sort: number;
 }
 
-
 // CoinChargeUseHistory Response
 export interface CoinChargeUseHistoryResponse {
   historyList: CoinChargeUseHistoryData;
@@ -642,11 +624,11 @@ export interface UseHistoryData {
 
 // Use Coin Response
 export interface ChatUseResponse {
-  coin: number,
-  coin_free: number,
-  coin_free_dt: string,
-  coin_register: number,
-  charge_use_key: number,
+  coin: number;
+  coin_free: number;
+  coin_free_dt: string;
+  coin_register: number;
+  charge_use_key: number;
   result: ApiResult;
 }
 
@@ -658,66 +640,59 @@ export interface ConfirmTossPaymentResponse {
   result: ApiResult;
 }
 
-
 // ChatMessageResponse
 export interface ChatMessageResponse {
   msg_len: number;
   prompt_key: string;
   response: string;
-  summary_position: number
+  summary_position: number;
   result: ApiResult;
 }
 
-
 export interface OpenChatResponse extends ChatLikeabilityData {
-  arrangePrompt: number
-  prompt_key: string
+  arrangePrompt: number;
+  prompt_key: string;
   world_list_detail_chrbot: WorldListDetailChrbot;
-  summary_position: number
+  summary_position: number;
 
   // 추가
-  chrbot_likeability?: LikeabilityRuleStructure[] | null
-  nsfw_chat: number | 0
+  chrbot_likeability?: LikeabilityRuleStructure[] | null;
+  nsfw_chat: number | 0;
 
-  result: ApiResult
+  result: ApiResult;
 }
-
-
-
 
 export interface LikeabilityRuleStructure {
-  lv: number,
-  lv_name: string,
-  features: string,
-  rules: string
+  lv: number;
+  lv_name: string;
+  features: string;
+  rules: string;
 }
-
 
 export interface WorldListDetailChrbot {
-  block_type: number
-  chat_cnt: number
-  comment_cnt: number
-  delete_yn: number
-  first_talk: string
-  gender: string
-  img_url: string
-  img_url_nsfw: string
-  img_web_url: string
-  like_cnt: number
-  likeability_max_lv: number
-  likeability_yn: number
-  lv: number
-  msg_cnt: number
-  multi_image_count: number
-  nick_nm: string
-  nsfw: number
-  property: string
-  tags: string
-  title: string
-  user_key: number
-  world_list_detail_chrbot_key: number
+  block_type: number;
+  chat_cnt: number;
+  comment_cnt: number;
+  delete_yn: number;
+  first_talk: string;
+  gender: string;
+  img_url: string;
+  img_url_nsfw: string;
+  img_web_url: string;
+  like_cnt: number;
+  likeability_max_lv: number;
+  likeability_yn: number;
+  lv: number;
+  msg_cnt: number;
+  multi_image_count: number;
+  nick_nm: string;
+  nsfw: number;
+  property: string;
+  tags: string;
+  title: string;
+  user_key: number;
+  world_list_detail_chrbot_key: number;
 }
-
 
 // InquiryList Response
 export interface InquiryListResponse {
@@ -736,16 +711,16 @@ export interface InquiryListResponse {
     to: number | null;
     total: number;
     result: ApiResult;
-  }
+  };
 }
 
 // Inquiry Data
 export interface InquiryData {
-  notice_key: number
-  title: string
-  content: string
-  sort: number
-  create_dt: string
+  notice_key: number;
+  title: string;
+  content: string;
+  sort: number;
+  create_dt: string;
 }
 
 // BankList Response
@@ -755,17 +730,16 @@ export interface BankListResponse {
 }
 
 export interface BankData {
-  bank_key: number
-  bank_nm: string
-  img_url: string
-  sort: number
+  bank_key: number;
+  bank_nm: string;
+  img_url: string;
+  sort: number;
 }
 
 // WriteRemailEdit Response
 export interface WriteRemailEditResponse {
   result: ApiResult;
 }
-
 
 // BankAccountEdit Response
 export interface BankAccountEditResponse {
@@ -782,7 +756,6 @@ export interface ViewTermsResponse {
   result: ApiResult;
   URL: string;
 }
-
 
 // SendFeedback Response
 export interface SendFeedbackResponse {
@@ -831,40 +804,39 @@ export interface GetPresignedUrlMultiResponse {
   files: any[];
 }
 
-
 // WithdrawRequestListResponse
 export interface WithdrawRequestListResponse {
   result: {
-    err: number
-    msg: string
-  }
+    err: number;
+    msg: string;
+  };
   withdrawrequest: {
-    current_page: number
-    data: WithdrawRequestItem[]
-    first_page_url: string
-    from: number
-    last_page: number
-    last_page_url: string
+    current_page: number;
+    data: WithdrawRequestItem[];
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
     links: Array<{
-      url: string | null
-      label: string
-      active: boolean
-    }>
-    next_page_url: string | null
-    path: string
-    per_page: string
-    prev_page_url: string | null
-    to: number
-    total: number
-  }
-  sum_price: string
+      url: string | null;
+      label: string;
+      active: boolean;
+    }>;
+    next_page_url: string | null;
+    path: string;
+    per_page: string;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
+  };
+  sum_price: string;
 }
 
 export interface WithdrawRequestItem {
-  withdraw_request_key: number
-  price: number
-  pen: number
-  create_dt: string
+  withdraw_request_key: number;
+  price: number;
+  pen: number;
+  create_dt: string;
 }
 
 // register4 Response
@@ -882,7 +854,6 @@ export interface GetSearchResponse {
   result: ApiResult;
 }
 
-
 export interface NicknmChangeResponse {
   result: ApiResult;
   nick_nm: string;
@@ -897,7 +868,6 @@ export interface ChatFreePenResponse {
   coin_free_dt: string;
 }
 
-
 // InitChat Response
 export interface InitChatResponse {
   arrangePrompt: string;
@@ -909,17 +879,15 @@ export interface SetSafetyModeResponse {
   result: ApiResult;
 }
 
-
 export interface ChatSaveResponse {
-  result: ApiResult
-  chrbot_chat: ChatImageSaveRequest
+  result: ApiResult;
+  chrbot_chat: ChatImageSaveRequest;
 }
 
-
 export interface ChatLikeabilityResponse {
-  multi_image_data: MultiImageData[]
-  response: string
-  result: ApiResult
+  multi_image_data: MultiImageData[];
+  response: string;
+  result: ApiResult;
 }
 
 export interface ChatLikeabilitySaveResponse extends ChatSaveResponse {}
@@ -950,32 +918,25 @@ export const SocialLoginTypes = {
   },
 } as const;
 
-export type SocialLoginType = typeof SocialLoginTypes[keyof typeof SocialLoginTypes];
-
-
+export type SocialLoginType = (typeof SocialLoginTypes)[keyof typeof SocialLoginTypes];
 
 export interface MultiImageStructure {
-  idx: number
-  chrbot_multi_image_key: number
-  world_list_detail_chrbot_key: number
-  lv: number
-  img_url: string
-  rules: string
-  show_yn: number
-  default_yn: number
-} 
-
-
-
-
-
+  idx: number;
+  chrbot_multi_image_key: number;
+  world_list_detail_chrbot_key: number;
+  lv: number;
+  img_url: string;
+  rules: string;
+  show_yn: number;
+  default_yn: number;
+}
 
 export interface ChatLikeData {
-  world_list_detail_chrbot_key: number
-  likeability_yn: number
-  likeability_lv: number
-  chatting_room: string
-  persona: string
-  character: string
-  lv_rules: any
+  world_list_detail_chrbot_key: number;
+  likeability_yn: number;
+  likeability_lv: number;
+  chatting_room: string;
+  persona: string;
+  character: string;
+  lv_rules: any;
 }
