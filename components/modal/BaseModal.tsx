@@ -133,14 +133,14 @@ export default function BaseModal({
           initial: { y: position === 'top' ? -100 : position === 'bottom' ? 100 : 0, opacity: 0 },
           animate: { y: 0, opacity: 1 },
           exit: { y: position === 'top' ? -100 : position === 'bottom' ? 100 : 0, opacity: 0 },
-          transition: { type: 'spring', damping: 25, stiffness: 300 },
+          transition: { type: 'spring' as const, damping: 25, stiffness: 300 },
         }
       case 'scale':
         return {
           initial: { opacity: 0, scale: 0.9 },
           animate: { opacity: 1, scale: 1 },
           exit: { opacity: 0, scale: 0.9 },
-          transition: { type: 'spring', damping: 20, stiffness: 300 },
+          transition: { type: 'spring' as const, damping: 20, stiffness: 300 },
         }
       case 'none':
       default:
