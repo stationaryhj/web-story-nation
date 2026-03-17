@@ -15,7 +15,7 @@ export const numUtil = {
     numUtil
       .convertToBigNumbers(...values)
       .reduce((min, current) =>
-        min.comparedTo(current) < 0 ? min : current,
+        (min.comparedTo(current) ?? NaN) < 0 ? min : current,
       ),
 
   /** 모든 인자를 BigNumber로 변환 후 최댓값을 찾음 */
@@ -23,7 +23,7 @@ export const numUtil = {
     numUtil
       .convertToBigNumbers(...values)
       .reduce((max, current) =>
-        max.comparedTo(current) > 0 ? max : current,
+        (max.comparedTo(current) ?? NaN) > 0 ? max : current,
       ),
 
   /** BigNumber 와 일반 숫자 상관없이 전부 string 로 변환 */
@@ -44,10 +44,10 @@ export const numUtil = {
 
   /** total 기준 확률이 true 인지 (60% 확률로 true 를 내고 싶으면 numUtil.randSuccess(60, 100)) */
   randSuccess: (prob: BigNumber | number | string, total: BigNumber | number | string) =>
-    numUtil
+    (numUtil
       .convertToBigNumber(prob)
       .dividedBy(total)
-      .comparedTo(Math.random()) >= 0,
+      .comparedTo(Math.random()) ?? NaN) >= 0,
 
   /** 객체 안에 가중치가 있는 변수의 가중치를 반영한 랜덤 필드값을 반환 */
   randDiceObj: (obj: { [key: string]: BigNumber | number | string }) => {

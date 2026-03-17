@@ -54,7 +54,7 @@ export const numFormatter = {
   comparedTo: (a: BigNumber | number | string, b: BigNumber | number | string) => {
     const bnA = numFormatter.convertToBigNumber(a);
     const bnB = numFormatter.convertToBigNumber(b);
-    return bnA.comparedTo(bnB);
+    return bnA.comparedTo(bnB) ?? NaN;
   },
 
   /** BigNumber로 변환, 이미 BigNumber인 경우 변환하지 않음 */

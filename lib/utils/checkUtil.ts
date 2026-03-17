@@ -71,7 +71,7 @@ export const checkUtil = {
     if (allowEmpty && checkUtil.isEmptyString(value)) {
       return true;
     }
-    return numUtil.convertToBigNumber(value.toString()).comparedTo(0) === 0;
+    return (numUtil.convertToBigNumber(value.toString()).comparedTo(0) ?? NaN) === 0;
   },
 
   /** 0 포함한 양의 소수면 true (빈값, 0 허용 여부 결정가능)
@@ -115,23 +115,23 @@ export const checkUtil = {
 
   /** a가 b와 같으면 true */
   isEqual: (a: string | number, b: string | number): boolean =>
-    numUtil.convertToBigNumber(a).comparedTo(b) === 0,
+    (numUtil.convertToBigNumber(a).comparedTo(b) ?? NaN) === 0,
 
   /** a가 b보다 낮으면 true */
   isLower: (a: string | number, b: string | number): boolean =>
-    numUtil.convertToBigNumber(a).comparedTo(b) < 0,
+    (numUtil.convertToBigNumber(a).comparedTo(b) ?? NaN) < 0,
 
   /** a가 b보다 낮거나 같으면 true */
   isLowerOrEqual: (a: string | number, b: string | number): boolean =>
-    numUtil.convertToBigNumber(a).comparedTo(b) <= 0,
+    (numUtil.convertToBigNumber(a).comparedTo(b) ?? NaN) <= 0,
 
   /** a가 b보다 높으면 true */
   isHigher: (a: string | number, b: string | number): boolean =>
-    numUtil.convertToBigNumber(a).comparedTo(b) > 0,
+    (numUtil.convertToBigNumber(a).comparedTo(b) ?? NaN) > 0,
 
   /** a가 b보다 높거나 같으면 true */
   isHigherOrEqual: (a: string | number, b: string | number): boolean =>
-    numUtil.convertToBigNumber(a).comparedTo(b) >= 0,
+    (numUtil.convertToBigNumber(a).comparedTo(b) ?? NaN) >= 0,
 
   /** 현재가 만료 시간인지 확인 */
   isExpiredIsoString: (expiredTime: string): boolean =>
