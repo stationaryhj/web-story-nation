@@ -188,7 +188,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
           userInfo?.user_key?.toString() || '0'
         )
 
-        const chatRoomPath = `${CHAT_FRONTEND_ADDRESS}/character/chat?info=${encryptedData}`
+        const chatRoomPath = `${CHAT_FRONTEND_ADDRESS}?info=${encryptedData}`
         router.push(chatRoomPath)
 
         // if (chatId) {
