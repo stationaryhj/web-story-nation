@@ -1,5 +1,10 @@
-import type { CharacterGender, CharacterVisibility, CharacterRating } from '@/src/features/edit-character/model/characterFormStore'
-import { parseConversationExamples } from '@/lib/utils/storyNationUtil'
+import { parseConversationExamples, parseExampleJsonToIntroBubbles } from '@/lib/utils/storyNationUtil'
+import type {
+  CharacterGender,
+  CharacterRating,
+  CharacterVisibility,
+  DmFormValues,
+} from '@/src/features/edit-character/model/dmFormTypes'
 
 function getGenderFromNumber(gender: number): CharacterGender {
   if (gender === 1) return 'male'
@@ -7,12 +12,13 @@ function getGenderFromNumber(gender: number): CharacterGender {
   return 'unspecified'
 }
 
-export type BridgedCharacterData = ReturnType<typeof bridgeCharacterInProgressToCharacter>
+export type BridgedCharacterData = DmFormValues
 
 /**
  * 서버에서 받은 inprogress 데이터를 CharacterFormData 형태로 변환
  */
-export function bridgeCharacterInProgressToCharacter(data: any) {
+export function bridgeCharacterInProgressToCharacter(data: any): DmFormValues {
+  const multiImages = (data.multi_images || []).map((image: any) => ({ ...image }))
   let __content = ''
   let __content_public = ''
 
@@ -39,6 +45,7 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
     content_show_yn: data.content_show_yn || 0,
 
     conversationExamples: parseConversationExamples(data.example || ''),
+    introBubbles: parseExampleJsonToIntroBubbles(data.first_talk || ''),
 
     hashtags: data.tags
       ? data.tags
@@ -61,9 +68,10 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
     likeability_max_lv: data.likeability_max_lv || 0,
     likeability_yn: data.likeability_yn || 0,
     multi_image_count: data.multi_image_count || 0,
-    multi_images: data.multi_images || [],
-    multi_images_original: data.multi_images || [],
+    multi_images: multiImages,
+    multi_images_original: multiImages.map((image: any) => ({ ...image })),
     property: data.property || '',
+    introActiveSpeaker: 'character',
 
     chat_room_mode: data.chat_room_mode ?? 0,
     isVisibilityLock: data.finish_yn === 1 && data.show_yn === 1,

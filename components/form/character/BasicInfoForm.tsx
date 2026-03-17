@@ -455,7 +455,7 @@ export default function BasicInfoForm({
             placeholder='예시)까칠한 뱀파이어'
             rows={12}
             maxLength={80}
-            hasError={isVaild && !formData.bio}
+            errorMessage={isVaild && !formData.bio ? '한 줄 소개를 입력해주세요.' : undefined}
           />
 
           {/* 첫 메시지 */}
@@ -469,7 +469,7 @@ export default function BasicInfoForm({
             placeholder='캐릭터가 보내는 첫 메세지를 입력하세요'
             rows={12}
             maxLength={MAX_FIRST_MESSAGE_LENGTH}
-            hasError={isVaild && !formData.firstMessage}
+            errorMessage={isVaild && !formData.firstMessage ? '첫 메시지를 입력해주세요.' : undefined}
           />
 
           {/* 캐릭터 태그 */}

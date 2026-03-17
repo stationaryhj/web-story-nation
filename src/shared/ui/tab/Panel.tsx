@@ -10,11 +10,10 @@ interface PanelProps {
 
 const Panel: React.FC<PanelProps> = ({ children, className, value }) => {
   const { selectedTab } = useTabContext();
-
-  if (selectedTab !== value) return null;
+  const isActive = selectedTab === value;
 
   return (
-    <div className={className}>
+    <div className={`h-full ${className ?? ''}`} hidden={!isActive}>
       {children}
     </div>
   );

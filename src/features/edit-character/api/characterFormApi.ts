@@ -1,18 +1,22 @@
 import { useMutation } from '@tanstack/react-query'
+import type { CharacterFormData, Tag } from '@/features/edit-character/model/characterFormStore'
+import type { DmMultiImage, DmSavePayload, SaveMultiImagesPayload } from '@/features/edit-character/model/dmFormTypes'
+import { introBubblesToExampleJson, type IntroBubbleGroup } from '@/lib/utils/storyNationUtil'
 import { instance } from '@/shared/api/instance/instance'
 import { apiRoute } from '@/shared/config/apiRoute'
-import { exampleDatasToConversationJson } from '@/lib/utils/storyNationUtil'
-import type { CharacterFormData, Tag } from '@/features/edit-character/model/characterFormStore'
-import type { MultiImageData } from '@/services/define'
-
 
 /**
  * 캐릭터 기본 정보 임시저장
  */
 export const useSaveInProgress = () => {
   return useMutation({
-    mutationFn: async ({ formData, finishYn = 0 }: { formData: CharacterFormData; finishYn?: number }) => {
+    mutationFn: async ({ formData, finishYn = 0 }: { formData: DmSavePayload; finishYn?: number }) => {
       const isLock = formData.finish_yn === 1 && formData.visibility === 'public'
+
+      const firstTalk =
+        formData.introBubbles.length > 0
+          ? JSON.stringify(introBubblesToExampleJson(formData.introBubbles as IntroBubbleGroup[]))
+          : formData.firstMessage || ''
 
       const payload = {
         world_list_detail_chrbot_key: formData.world_list_detail_chrbot_key || '',
@@ -22,20 +26,14 @@ export const useSaveInProgress = () => {
         subject: formData.subject || '',
         gender: formData.gender === 'male' ? 1 : formData.gender === 'female' ? 2 : 0,
         intro: formData.bio || '',
-        first_talk: formData.firstMessage || '',
+        first_talk: firstTalk,
         content: formData.content || '',
         content_public: formData.content_public || '',
-        example:
-          formData.conversationExamples && formData.conversationExamples.length > 0
-            ? JSON.stringify(exampleDatasToConversationJson(formData.conversationExamples))
-            : '',
+        example: '',
         nsfw: formData.rating === 'adult' ? 1 : 2,
         show_yn: formData.visibility === 'public' ? 1 : 0,
-        content_show_yn: 2,
-        example_show_yn:
-          formData.conversationExamples && formData.conversationExamples.length > 0
-            ? formData.examplesVisibility === 'public' ? 1 : 0
-            : 0,
+        content_show_yn: formData.content_show_yn || 2,
+        example_show_yn: 0,
         finish_yn: formData.finish_yn ? formData.finish_yn : finishYn,
         likeability_yn: formData.likeability_yn || 0,
         likeabilities: formData.likeabilities || [],
@@ -70,9 +68,14 @@ export const useSaveInProgress = () => {
       apiFormData.append('writer_note', payload.writer_note)
       apiFormData.append('countryCode', 'KR')
 
+      console.log('@@ [saveInProgress] payload ::', payload)
+      console.log('@@ [saveInProgress] finishYn ::', finishYn)
+
       const response = await instance.post(apiRoute.charbot.inprogress.save, apiFormData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
+
+      console.log('@@ [saveInProgress] response ::', response.data)
 
       if (!response.data || (response.data.result && response.data.result.err !== 0)) {
         throw new Error(response.data?.result?.msg || '저장에 실패했습니다.')
@@ -85,27 +88,33 @@ export const useSaveInProgress = () => {
   })
 }
 
-
 /**
  * 멀티이미지 저장 (변경분만 전송)
  */
 export const useSaveMultiImages = () => {
   return useMutation({
-    mutationFn: async (formData: CharacterFormData): Promise<MultiImageData[] | null> => {
-      const changedImages = formData.multi_images.filter(item => {
-        const original = formData.multi_images_original.find(orig =>
-          orig.idx === item.idx &&
-          orig.chrbot_multi_image_key === item.chrbot_multi_image_key &&
-          orig.default_yn === item.default_yn &&
-          orig.img_url === item.img_url &&
-          orig.lv === item.lv &&
-          orig.rules === item.rules &&
-          orig.show_yn === item.show_yn
+    mutationFn: async (formData: SaveMultiImagesPayload): Promise<DmMultiImage[] | null> => {
+      const hasAddedOrModified = formData.multi_images.some(item => {
+        const original = formData.multi_images_original.find(
+          orig =>
+            orig.idx === item.idx &&
+            orig.chrbot_multi_image_key === item.chrbot_multi_image_key &&
+            orig.default_yn === item.default_yn &&
+            orig.img_url === item.img_url &&
+            orig.lv === item.lv &&
+            orig.rules === item.rules &&
+            orig.show_yn === item.show_yn
         )
         return original === undefined
       })
 
-      const saveDatas = changedImages.map(item => ({
+      const hasDeleted = formData.multi_images_original.some(
+        orig => !formData.multi_images.some(item => item.chrbot_multi_image_key === orig.chrbot_multi_image_key)
+      )
+
+      if (!hasAddedOrModified && !hasDeleted) return null
+
+      const saveDatas = formData.multi_images.map(item => ({
         idx: item.idx || 0,
         chrbot_multi_image_key: item.chrbot_multi_image_key || 0,
         default_yn: item.default_yn,
@@ -139,6 +148,24 @@ export const useSaveMultiImages = () => {
   })
 }
 
+/**
+ * 멀티이미지 단건 삭제
+ */
+export const useDeleteMultiImage = () => {
+  return useMutation({
+    mutationFn: async (chrbot_multi_image_key: number) => {
+      if (!chrbot_multi_image_key) return
+
+      const response = await instance.post(apiRoute.charbot.inprogress.deleteMultiImage, {
+        chrbot_multi_image_key,
+      })
+
+      if (!response.data || (response.data.result && response.data.result.err !== 0)) {
+        throw new Error(response.data?.result?.msg || '삭제에 실패했습니다.')
+      }
+    },
+  })
+}
 
 /**
  * 태그 저장
@@ -171,7 +198,6 @@ export const useSaveHashtags = () => {
   })
 }
 
-
 /**
  * property 저장
  */
@@ -192,10 +218,9 @@ export const useSaveProperty = () => {
 
       if (formData.multi_images.length > 0) {
         img_public_keys = formData.multi_images
-          .filter(item =>
-            item.show_yn === 1 ||
-            (item.default_yn === 1 && item.lv === 0) ||
-            (item.default_yn === 1 && item.lv === 1)
+          .filter(
+            item =>
+              item.show_yn === 1 || (item.default_yn === 1 && item.lv === 0) || (item.default_yn === 1 && item.lv === 1)
           )
           .map(item => item.chrbot_multi_image_key)
       }
@@ -216,26 +241,6 @@ export const useSaveProperty = () => {
 
       if (!response.data || (response.data.result && response.data.result.err !== 0)) {
         throw new Error(response.data?.result?.msg || '저장에 실패했습니다.')
-      }
-    },
-  })
-}
-
-
-/**
- * 멀티이미지 단건 삭제
- */
-export const useDeleteMultiImage = () => {
-  return useMutation({
-    mutationFn: async (chrbot_multi_image_key: number) => {
-      if (!chrbot_multi_image_key) return
-
-      const response = await instance.post(apiRoute.charbot.inprogress.deleteMultiImage, {
-        chrbot_multi_image_key,
-      })
-
-      if (!response.data || (response.data.result && response.data.result.err !== 0)) {
-        throw new Error(response.data?.result?.msg || '삭제에 실패했습니다.')
       }
     },
   })

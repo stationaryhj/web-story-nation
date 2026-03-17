@@ -7,9 +7,12 @@ import { useModalStore } from '@/store/useStoreModal'
 import { faPencilAlt, faTrash, faLock, faFire, faImages, faImage } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Image from 'next/image'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 import { getChangeNameTag } from '@/lib/utils/storyNationUtil'
+import { contentApi, createApi } from '@/services/api/storyNationApi'
+import type { CharbotResponse } from '@/types/api'
 
 interface CardProps {
   character: Character
@@ -41,9 +44,29 @@ export default function Card({
   const [isMobile, setIsMobile] = useState(false)
   const [imageError, setImageError] = React.useState(false)
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const isTemp = character.finish_yn == 0
   const isLocked = character.show_yn == 0
+
+  // hover 시 모달 데이터 prefetch
+  const handlePrefetch = useCallback(() => {
+    const id = Number(character.id)
+    if (!id) return
+    queryClient.prefetchQuery({
+      queryKey: ['createChatBot', id],
+      queryFn: async () => {
+        const response = await createApi.GetChatBot(id)
+        return response.data as CharbotResponse
+      },
+      staleTime: 60_000,
+    })
+    queryClient.prefetchQuery({
+      queryKey: ['multiImage', id],
+      queryFn: () => contentApi.GetMultiImageData(id, 0),
+      staleTime: 60_000,
+    })
+  }, [character.id, queryClient])
 
   // 카드 클릭 기본 핸들러 - 캐릭터 모달 열기
   const defaultCardClick = () => {
@@ -108,6 +131,7 @@ export default function Card({
         <div
           className="group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-dark-background-light dark:border dark:border-dark-secondary-200/10 cursor-pointer flex mb-2"
           onClick={handleCardClick}
+          onMouseEnter={handlePrefetch}
         >
           {/* 이미지 영역 */}
           <div className="relative w-32 h-32 overflow-hidden">
@@ -218,6 +242,7 @@ export default function Card({
         <div
           className="group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-dark-background-light dark:border dark:border-dark-secondary-200/10 cursor-pointer"
           onClick={handleCardClick}
+          onMouseEnter={handlePrefetch}
         >
           <div className="block">
             <div className="relative aspect-[3/4] overflow-hidden rounded-t-xl">

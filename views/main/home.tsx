@@ -1,20 +1,21 @@
-'use client'
+'use client';
 
-import Footer from '@/components/common/footer'
-import Header from '@/components/common/header'
-import PageTransition from '@/components/motion/PageTransition'
-import { useStoreData } from '@/store/useStoreData'
-import { useSettingsStore } from '@/store/useStoreSettings'
-import { useState, useEffect } from 'react'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import SearchBar from '@/components/elements/searchBar/SearchBar'
-import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs'
-import ModalManager from '@/components/modal/ModalManager'
-import CharacterRankingSidebar from '@/components/elements/sidebar/CharacterRankingSidebar'
-import AuthorRankingSidebar from '@/components/elements/sidebar/AuthorRankingSidebar'
-import NewCharacterSidebar from '@/components/elements/sidebar/NewCharacterSidebar'
-import CharacterGridSection from '@/components/main/CharacterGridSection'
-import RecommendSection from '@/components/main/RecommendSection'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import Footer from '@/components/common/footer';
+import Header from '@/components/common/header';
+import SearchBar from '@/components/elements/searchBar/SearchBar';
+import AuthorRankingSidebar from '@/components/elements/sidebar/AuthorRankingSidebar';
+import CharacterRankingSidebar from '@/components/elements/sidebar/CharacterRankingSidebar';
+import NewCharacterSidebar from '@/components/elements/sidebar/NewCharacterSidebar';
+import ButtonTabs, { TabItem } from '@/components/elements/tabs/ButtonTabs';
+import CharacterGridSection from '@/components/main/CharacterGridSection';
+import RecommendSection from '@/components/main/RecommendSection';
+import ModalManager from '@/components/modal/ModalManager';
+import PageTransition from '@/components/motion/PageTransition';
+import useModalStore from '@/shared/model/stores/useModalStore';
+import { useStoreData } from '@/store/useStoreData';
+import { useSettingsStore } from '@/store/useStoreSettings';
 
 // 네비게이션 탭 정의
 const navigationTabs: TabItem[] = [
@@ -22,64 +23,67 @@ const navigationTabs: TabItem[] = [
   { id: 'male', label: '남자', shouldUpdateUrl: true },
   { id: 'female', label: '여자', shouldUpdateUrl: true },
   { id: 'unknown', label: '성별모름', shouldUpdateUrl: true },
-]
+];
 
 export default function Home() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const { fetchCharacters, characters } = useStoreData()
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const { fetchCharacters, characters } = useStoreData();
 
   // URL 파라미터에서 현재 탭 가져오기
-  const tabParam = searchParams?.get('tab') || 'all'
+  const tabParam = searchParams?.get('tab') || 'all';
 
   // 상태 관리
-  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
 
   // 사이드바 상태
-  const [isCharacterRankingSidebarOpen, setIsCharacterRankingSidebarOpen] = useState(false)
-  const [isAuthorRankingSidebarOpen, setIsAuthorRankingSidebarOpen] = useState(false)
-  const [isNewCharacterSidebarOpen, setIsNewCharacterSidebarOpen] = useState(false)
-
+  const [isCharacterRankingSidebarOpen, setIsCharacterRankingSidebarOpen] = useState(false);
+  const [isAuthorRankingSidebarOpen, setIsAuthorRankingSidebarOpen] = useState(false);
+  const [isNewCharacterSidebarOpen, setIsNewCharacterSidebarOpen] = useState(false);
 
   useEffect(() => {
     // 페이지 로드 시 모든 캐릭터 데이터 미리 로드
-    fetchCharacters()
-  }, [fetchCharacters])
+    fetchCharacters();
+  }, [fetchCharacters]);
 
   // 네비게이션 핸들러
   const handleCategoryChange = (categoryId: string) => {
     // 페이지 이동
-    const params = new URLSearchParams(searchParams?.toString() || '')
+    const params = new URLSearchParams(searchParams?.toString() || '');
 
     if (categoryId !== 'all') {
-      params.set('tab', categoryId)
+      params.set('tab', categoryId);
     } else {
-      params.delete('tab')
+      params.delete('tab');
     }
 
-    router.push(`${pathname}?${params.toString()}`)
-  }
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   // 검색 핸들러
   const handleSearch = (query: string, option: string = 'character') => {
     // 검색 기능 구현
-    console.log('검색어:', query, '검색 옵션:', option)
-  }
+    console.log('검색어:', query, '검색 옵션:', option);
+  };
 
   return (
     <PageTransition>
-      <main className="min-h-screen pb-24 md:pb-20 bg-white dark:bg-dark-background-light">
+      <main className='min-h-screen pb-24 md:pb-20 bg-white dark:bg-dark-background-light'>
         <Header />
 
         {/* 검색바 */}
-        <div className="container mx-auto px-4 pt-6 relative">
-          <SearchBar onSearch={handleSearch} placeholder="캐릭터나 작가를 검색해보세요" />
+        <div className='container mx-auto px-4 pt-6 relative'>
+          <SearchBar onSearch={handleSearch} placeholder='캐릭터나 작가를 검색해보세요' />
         </div>
 
         {/* 네비게이션 탭 */}
-        <div className="container px-4 mt-8 mx-auto flex justify-center w-full">
-          <ButtonTabs tabs={navigationTabs} defaultTabId={tabParam} onTabChange={handleCategoryChange} />
+        <div className='container px-4 mt-8 mx-auto flex justify-center w-full'>
+          <ButtonTabs
+            tabs={navigationTabs}
+            defaultTabId={tabParam}
+            onTabChange={handleCategoryChange}
+          />
         </div>
 
         {/* 카테고리별 콘텐츠 */}
@@ -109,8 +113,11 @@ export default function Home() {
           onClose={() => setIsAuthorRankingSidebarOpen(false)}
         />
 
-        <NewCharacterSidebar isOpen={isNewCharacterSidebarOpen} onClose={() => setIsNewCharacterSidebarOpen(false)} />
+        <NewCharacterSidebar
+          isOpen={isNewCharacterSidebarOpen}
+          onClose={() => setIsNewCharacterSidebarOpen(false)}
+        />
       </main>
     </PageTransition>
-  )
+  );
 }

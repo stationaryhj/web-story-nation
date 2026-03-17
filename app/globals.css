@@ -4,26 +4,28 @@
 
 /* 모든 스크롤바 완전히 제거 */
 * {
-  scrollbar-width: none !important; /* Firefox */
-  -ms-overflow-style: none !important; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
 }
 
-*::-webkit-scrollbar,
-html::-webkit-scrollbar,
-body::-webkit-scrollbar,
-div::-webkit-scrollbar,
-main::-webkit-scrollbar,
-section::-webkit-scrollbar,
-article::-webkit-scrollbar,
-aside::-webkit-scrollbar,
-header::-webkit-scrollbar,
-footer::-webkit-scrollbar,
-nav::-webkit-scrollbar,
-#__next::-webkit-scrollbar {
-  display: none !important; /* Chrome, Safari, Opera */
-  width: 0 !important;
-  height: 0 !important;
-  background: transparent !important;
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* 스크롤바 표시 */
+.show-scrollbar {
+  scrollbar-width: thin !important;
+}
+
+.show-scrollbar::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+
+.show-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.25) !important;
+  border-radius: 3px !important;
 }
 
 /* 중요 컨테이너 스크롤바 제거 */
@@ -341,14 +343,22 @@ body {
 
 /* 자물쇠 흔들기 애니메이션 */
 @keyframes shake {
-  0%, 100% { 
-    transform: translateX(0) rotate(0deg); 
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
   }
-  10%, 30%, 50%, 70%, 90% { 
-    transform: translateX(-3px) rotate(-2deg); 
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-3px) rotate(-2deg);
   }
-  20%, 40%, 60%, 80% { 
-    transform: translateX(3px) rotate(2deg); 
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(3px) rotate(2deg);
   }
 }
 
@@ -358,19 +368,27 @@ body {
 
 /* UnlockActionModal 애니메이션들 */
 @keyframes unlock-shake {
-  0%, 100% { 
-    transform: translateX(0) rotate(0deg) scale(1); 
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg) scale(1);
   }
-  10%, 30%, 50%, 70%, 90% { 
-    transform: translateX(-8px) rotate(-5deg) scale(1.05); 
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-8px) rotate(-5deg) scale(1.05);
   }
-  20%, 40%, 60%, 80% { 
-    transform: translateX(8px) rotate(5deg) scale(1.05); 
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(8px) rotate(5deg) scale(1.05);
   }
 }
 
 @keyframes unlock-break {
-  0% { 
+  0% {
     transform: scale(1) rotate(0deg);
     opacity: 1;
   }
@@ -382,14 +400,14 @@ body {
     transform: scale(1.2) rotate(15deg);
     opacity: 0.8;
   }
-  100% { 
+  100% {
     transform: scale(0.3) rotate(180deg);
     opacity: 0;
   }
 }
 
 @keyframes unlock-zoom-in {
-  0% { 
+  0% {
     transform: scale(0.3) rotate(-10deg);
     opacity: 0;
   }
@@ -397,112 +415,114 @@ body {
     transform: scale(1.1) rotate(2deg);
     opacity: 0.8;
   }
-  100% { 
+  100% {
     transform: scale(1) rotate(0deg);
     opacity: 1;
   }
 }
 
 @keyframes unlock-final-show {
-  0%, 100% { 
+  0%,
+  100% {
     transform: scale(1);
   }
-  50% { 
+  50% {
     transform: scale(1.02);
   }
 }
 
 @keyframes glow-pulse {
-  0%, 100% { 
+  0%,
+  100% {
     opacity: 0.3;
     transform: scale(1);
   }
-  50% { 
+  50% {
     opacity: 0.6;
     transform: scale(1.1);
   }
 }
 
 @keyframes shine {
-  0% { 
+  0% {
     transform: translateX(-100%) rotate(45deg);
     opacity: 0;
   }
-  50% { 
+  50% {
     opacity: 1;
   }
-  100% { 
+  100% {
     transform: translateX(100%) rotate(45deg);
     opacity: 0;
   }
 }
 
 @keyframes fade-in-up {
-  0% { 
+  0% {
     transform: translateY(20px);
     opacity: 0;
   }
-  100% { 
+  100% {
     transform: translateY(0);
     opacity: 1;
   }
 }
 
 @keyframes particle-0 {
-  0% { 
+  0% {
     transform: translate(0, 0) scale(0);
     opacity: 1;
   }
-  50% { 
+  50% {
     transform: translate(60px, -80px) scale(1);
     opacity: 1;
   }
-  100% { 
+  100% {
     transform: translate(120px, -160px) scale(0);
     opacity: 0;
   }
 }
 
 @keyframes particle-1 {
-  0% { 
+  0% {
     transform: translate(0, 0) scale(0);
     opacity: 1;
   }
-  50% { 
+  50% {
     transform: translate(-60px, -80px) scale(1);
     opacity: 1;
   }
-  100% { 
+  100% {
     transform: translate(-120px, -160px) scale(0);
     opacity: 0;
   }
 }
 
 @keyframes particle-2 {
-  0% { 
+  0% {
     transform: translate(0, 0) scale(0);
     opacity: 1;
   }
-  50% { 
+  50% {
     transform: translate(80px, 60px) scale(1);
     opacity: 1;
   }
-  100% { 
+  100% {
     transform: translate(160px, 120px) scale(0);
     opacity: 0;
   }
 }
 
 @keyframes particle-3 {
-  0% { 
+  0% {
     transform: translate(0, 0) scale(0);
     opacity: 1;
   }
-  50% { 
+  50% {
     transform: translate(-80px, 60px) scale(1);
     opacity: 1;
   }
-  100% { 
+  100% {
     transform: translate(-160px, 120px) scale(0);
     opacity: 0;
   }

@@ -315,6 +315,7 @@ export default function SignupModal({
             disabled={loading || isSubmitting}
           />
           <button
+            type='button'
             className='absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-primary-500 px-2 py-1 text-xs text-white hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-700'
             onClick={checkNickname}
             disabled={loading || isSubmitting}
@@ -360,6 +361,7 @@ export default function SignupModal({
       <div className='space-y-3 border-t border-gray-200 pt-4 dark:border-gray-700'>
         <div className='flex items-center'>
           <button
+            type='button'
             className='mr-2 text-gray-600 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400'
             onClick={toggleAllAgreements}
             disabled={loading || isSubmitting}
@@ -376,6 +378,7 @@ export default function SignupModal({
         <div className='flex items-center justify-between'>
           <div className='flex items-center'>
             <button
+              type='button'
               className='mr-2 text-gray-600 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400'
               onClick={() => setServiceAgreed(!serviceAgreed)}
               disabled={loading || isSubmitting}
@@ -390,6 +393,7 @@ export default function SignupModal({
           <a
             href='/terms?tab=service'
             target='_blank'
+            rel='noopener noreferrer'
             className='text-sm text-primary-500 hover:underline dark:text-primary-400'
           >
             보기
@@ -400,6 +404,7 @@ export default function SignupModal({
         <div className='flex items-center justify-between'>
           <div className='flex items-center'>
             <button
+              type='button'
               className='mr-2 text-gray-600 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400'
               onClick={() => setPrivacyAgreed(!privacyAgreed)}
               disabled={loading || isSubmitting}
@@ -414,6 +419,7 @@ export default function SignupModal({
           <a
             href='/terms?tab=privacy'
             target='_blank'
+            rel='noopener noreferrer'
             className='text-sm text-primary-500 hover:underline dark:text-primary-400'
           >
             보기
@@ -424,6 +430,7 @@ export default function SignupModal({
         <div className='flex items-center justify-between'>
           <div className='flex items-center'>
             <button
+              type='button'
               className='mr-2 text-gray-600 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400'
               onClick={() => setPaidServiceAgreed(!paidServiceAgreed)}
               disabled={loading || isSubmitting}
@@ -438,6 +445,7 @@ export default function SignupModal({
           <a
             href='/terms?tab=paid'
             target='_blank'
+            rel='noopener noreferrer'
             className='text-sm text-primary-500 hover:underline dark:text-primary-400'
           >
             보기
@@ -448,6 +456,7 @@ export default function SignupModal({
         <div className='flex items-center justify-between'>
           <div className='flex items-center'>
             <button
+              type='button'
               className='mr-2 text-gray-600 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400'
               onClick={() => setMarketingAgreed(!marketingAgreed)}
               disabled={loading || isSubmitting}
@@ -462,6 +471,7 @@ export default function SignupModal({
           <a
             href='/terms?tab=marketing'
             target='_blank'
+            rel='noopener noreferrer'
             className='text-sm text-primary-500 hover:underline dark:text-primary-400'
           >
             보기

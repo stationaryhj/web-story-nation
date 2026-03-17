@@ -40,45 +40,45 @@ export interface Tag {
 // 캐릭터 데이터 타입 정의
 export interface CharacterFormData {
   // 기본 설정
-  name: string
-  subject: string
-  gender: CharacterGender
-  visibility: CharacterVisibility
-  rating: CharacterRating
-  bio: string
-  firstMessage: string
-  hashtags: Array<string>
-  examplesVisibility: CharacterVisibility
-  detailVisibility: CharacterVisibility
+  name: string // 캐릭터 이름 (서버: title)
+  subject: string // 캐릭터 제목 (서버: subject) - 목록에서 이름 대신 표시
+  gender: CharacterGender // 성별 (서버: gender) - male/female/unspecified ↔ 1/2/0
+  visibility: CharacterVisibility // 게시 범위 (서버: show_yn) - public/private ↔ 1/0
+  rating: CharacterRating // 이용 등급 (서버: nsfw) - adult/all ↔ 1/2
+  bio: string // 한줄 소개 (서버: intro)
+  firstMessage: string // 첫 메시지 (서버: first_talk)
+  hashtags: Array<string> // 캐릭터 태그 (서버: tags) - 쉼표 구분 문자열 ↔ 배열
+  examplesVisibility: CharacterVisibility // 대화 예시 공개 여부 (서버: example_show_yn)
+  detailVisibility: CharacterVisibility // 상세 설명 공개 여부 (서버: content_show_yn)
 
   // 상세 설정
-  content: string
-  content_public: string
+  content: string // 비공개 설명 (서버: content) - AI에게만 전송
+  content_public: string // 공개 설명 (서버: content_public) - 독자에게 공개 + AI 전송
 
-  conversationExamples: exampleDatas[]
+  conversationExamples: exampleDatas[] // 대화 예시 목록 (서버: example) - JSON 문자열 ↔ 배열
 
   // 이미지 설정 - 경로만 저장
-  imgUrl: string // 기본 이미지 경로
-  imgUrlNsfw: string // 성인 이미지 경로
+  imgUrl: string // 기본 이미지 경로 (서버: img_url)
+  imgUrlNsfw: string // 성인 이미지 경로 (서버: img_url_nsfw)
 
   // API 호환성 속성
-  world_list_detail_chrbot_key?: string
-  isVisibilityLock?: boolean
+  world_list_detail_chrbot_key?: string // 캐릭터 고유 ID (서버 발급)
+  isVisibilityLock?: boolean // 공개 후 비공개 전환 잠금 (finish_yn=1 && show_yn=1)
 
-  likeability_yn?: number
-  likeabilities?: LikeAbilityData[]
-  likeability_max_lv?: number
+  likeability_yn?: number // 호감도 시스템 활성화 여부 (서버: likeability_yn) - 0/1
+  likeabilities?: LikeAbilityData[] // 호감도 레벨별 데이터 (서버: likeabilities)
+  likeability_max_lv?: number // 호감도 최대 레벨 (서버: likeability_max_lv)
 
 
   // 멀티이미지
-  multi_images_original: MultiImageData[]
+  multi_images_original: MultiImageData[] // 멀티이미지 원본 (변경 감지용 스냅샷)
 
-  multi_image_count: number
-  multi_images: MultiImageData[]
-  
-  property: string
+  multi_image_count: number // 멀티이미지 개수 (서버: multi_image_count)
+  multi_images: MultiImageData[] // 멀티이미지 목록 (서버: multi_images)
 
-  writer_note: string
+  property: string // 마무리 설정 데이터 (서버: property) - 선택 이미지 키/URL 등
+
+  writer_note: string // 작가 노트 (서버: writer_note)
 
   // 추가 속성을 위한 인덱스 시그니처
   [key: string]: any

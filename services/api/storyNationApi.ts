@@ -1,13 +1,9 @@
-import axios from 'axios';
-import type { PriSignedUrlInfo } from '@/services/define';
-import {
-  ChatLikeabilityData,
-  requestConnectedChatRoomData,
-  requestLikeAbilityData,
-} from '@/services/interface';
-import { useAccountStore } from '@/store/useStoreData';
-import { useModalStore } from '@/store/useStoreModal';
-import { useSettingsStore } from '@/store/useStoreSettings';
+import axios from 'axios'
+import type { PriSignedUrlInfo } from '@/services/define'
+import { ChatLikeabilityData, requestConnectedChatRoomData, requestLikeAbilityData } from '@/services/interface'
+import { useAccountStore } from '@/store/useStoreData'
+import { useModalStore } from '@/store/useStoreModal'
+import { useSettingsStore } from '@/store/useStoreSettings'
 import type {
   ApiResponse,
   BankAccountEditResponse,
@@ -56,7 +52,7 @@ import type {
   WriteRemailEditResponse,
   WriterInfoResponse,
   WriterWithdrawResponse,
-} from '../../types/api';
+} from '../../types/api'
 
 // API 기본 설정
 const createApiInstance = (baseURL: string) => {
@@ -68,14 +64,14 @@ const createApiInstance = (baseURL: string) => {
       'X-Web-Access': true,
     },
     withCredentials: false,
-  });
+  })
 
   // 응답 인터셉터 설정
   instance.interceptors.response.use(
-    (response) => {
-      return response;
+    response => {
+      return response
     },
-    (error) => {
+    error => {
       /* if (error.response) {
         // 401 에러 처리 - 인증 만료 시 메인 페이지로 리다이렉트
         if (error.response.status === 401) {
@@ -116,40 +112,40 @@ const createApiInstance = (baseURL: string) => {
         return Promise.reject({ message: '요청 중 오류가 발생했습니다.' })
       } */
     }
-  );
+  )
 
-  return instance;
-};
+  return instance
+}
 
-const API_URL = process.env.NEXT_PUBLIC_STORYNATION_API_URL;
-const CHAT_URL = process.env.NEXT_PUBLIC_STORYNATION_CHAT_URL;
+const API_URL = process.env.NEXT_PUBLIC_STORYNATION_API_URL
+const CHAT_URL = process.env.NEXT_PUBLIC_STORYNATION_CHAT_URL
 
 // API 인스턴스 생성
-const api = createApiInstance(API_URL || '');
-const chatApiInstance = createApiInstance(API_URL || '');
+const api = createApiInstance(API_URL || '')
+const chatApiInstance = createApiInstance(API_URL || '')
 
 // 인증 토큰 설정 함수
 const setAuthToken = (token: string | null) => {
   if (token) {
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    chatApiInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    chatApiInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`
   } else {
-    delete api.defaults.headers.common['Authorization'];
-    delete chatApiInstance.defaults.headers.common['Authorization'];
+    delete api.defaults.headers.common['Authorization']
+    delete chatApiInstance.defaults.headers.common['Authorization']
   }
-};
+}
 
 // 로컬 스토리지에서 토큰 가져와서 설정
 if (typeof window !== 'undefined') {
-  const token = localStorage.getItem('authorization')?.replaceAll('"', '');
+  const token = localStorage.getItem('authorization')?.replaceAll('"', '')
   if (token) {
-    setAuthToken(token);
+    setAuthToken(token)
   }
 }
 
 export const GetApiUrl = () => {
-  return API_URL;
-};
+  return API_URL
+}
 
 // 콘텐츠 API
 export const contentApi = {
@@ -158,11 +154,11 @@ export const contentApi = {
    * @param profile_url 프로필 이미지 주소
    */
   myprofileupdate: async (profile_url: string): Promise<ApiResponse> => {
-    const _access_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = _access_token;
+    const _access_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = _access_token
     return api.post('/api/myprofileupdate', {
       profile_url,
-    });
+    })
   },
 
   /**
@@ -170,11 +166,11 @@ export const contentApi = {
    * @param intro 자기소개
    */
   myintroupdate: async (intro: string): Promise<ApiResponse> => {
-    const _access_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = _access_token;
+    const _access_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = _access_token
     return api.post('/api/myintroupdate', {
       intro,
-    });
+    })
   },
 
   /**
@@ -192,7 +188,7 @@ export const contentApi = {
     access_token: string = ''
   ): Promise<ApiResponse<LoginResponse>> => {
     if (access_token) {
-      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`
     }
 
     return api.post('/api/login2', {
@@ -200,7 +196,7 @@ export const contentApi = {
       snstype,
       snsid,
       kr_gb,
-    });
+    })
   },
 
   /**
@@ -210,7 +206,7 @@ export const contentApi = {
   LoginGuest: async (nick_nm: string): Promise<ApiResponse<LoginResponse>> => {
     return api.post('/api/guestlogin', {
       nick_nm,
-    });
+    })
   },
 
   /**
@@ -219,15 +215,15 @@ export const contentApi = {
    * login 후 정보를 저장하기때문에 현재는 사용안함
    */
   userinfo: async (access_token: string): Promise<ApiResponse<UserInfoResponse>> => {
-    const _access_token = `Bearer ${access_token}`;
-    api.defaults.headers.common['Authorization'] = _access_token;
-    return api.get('/api/userinfo');
+    const _access_token = `Bearer ${access_token}`
+    api.defaults.headers.common['Authorization'] = _access_token
+    return api.get('/api/userinfo')
   },
 
   userinfo2: async (access_token: string): Promise<ApiResponse> => {
-    const _access_token = `Bearer ${access_token}`;
-    api.defaults.headers.common['Authorization'] = _access_token;
-    return api.post('/api/myuserinfo');
+    const _access_token = `Bearer ${access_token}`
+    api.defaults.headers.common['Authorization'] = _access_token
+    return api.post('/api/myuserinfo')
   },
 
   /**
@@ -257,7 +253,7 @@ export const contentApi = {
       birth,
       accessToken,
       marketing_agree,
-    });
+    })
   },
 
   /**
@@ -277,16 +273,16 @@ export const contentApi = {
       snstype,
       token,
       appleAccessToken,
-    });
+    })
   },
 
   /**
    * 로그아웃
    */
   Signout: async (): Promise<ApiResponse> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
-    return api.post('/api/signout');
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/signout')
   },
 
   /**
@@ -298,7 +294,7 @@ export const contentApi = {
     return api.post('/api/snsgettoken', {
       snsauth,
       token_key,
-    });
+    })
   },
 
   /**
@@ -308,7 +304,7 @@ export const contentApi = {
   getUuid: async (snstype: number): Promise<ApiResponse<GetUuidResponse>> => {
     return api.post('/api/get/uuid', {
       snstype,
-    });
+    })
   },
 
   /**
@@ -316,20 +312,20 @@ export const contentApi = {
    * 현재 new 로 사용중
    */
   GetTop10: async (): Promise<ApiResponse<CharbotTop10Response>> => {
-    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1;
+    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
     return api.post('/api/charbot/rcmnd/top10', {
       safety,
-    });
+    })
   },
 
   /**
    * Top10 New
    */
   GetTop10New: async (): Promise<ApiResponse<CharbotTop10NewResponse>> => {
-    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1;
+    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
     return api.post('/api/charbot/rcmnd/top10', {
       safety,
-    });
+    })
   },
 
   /**
@@ -346,14 +342,14 @@ export const contentApi = {
     gender: number,
     module_type: number
   ): Promise<ApiResponse> => {
-    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1;
+    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
     return api.post('/api/charbot/rcmnd/ranking/top10', {
       countryCode,
       module_type,
       ranking_type,
       gender,
       safety,
-    });
+    })
   },
 
   /**
@@ -368,13 +364,13 @@ export const contentApi = {
     countryCode: string,
     ranking_type: number
   ): Promise<ApiResponse<GetTop10RankingCreaterResponse>> => {
-    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1;
+    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
     return api.post('/api/charbot/rcmnd/ranking/top10', {
       countryCode,
       module_type: 3,
       ranking_type,
       safety,
-    });
+    })
   },
 
   /**
@@ -394,7 +390,7 @@ export const contentApi = {
     paginate: number,
     gender: number
   ): Promise<ApiResponse<GetTop10RankingResponse>> => {
-    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1;
+    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
     return api.post('/api/charbot/rcmnd/getlist', {
       module_id,
       ranking_type,
@@ -402,7 +398,7 @@ export const contentApi = {
       paginate,
       gender,
       safety,
-    });
+    })
   },
 
   /**
@@ -423,7 +419,7 @@ export const contentApi = {
     paginate: number,
     countryCode: string = 'KR'
   ): Promise<ApiResponse<CharbotSearchResponse>> => {
-    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1;
+    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
     return api.post('/api/charbot/getlist', {
       type,
       chrbot_tag_keys,
@@ -433,7 +429,7 @@ export const contentApi = {
       paginate,
       countryCode,
       safety,
-    });
+    })
   },
 
   /**
@@ -443,14 +439,14 @@ export const contentApi = {
   GetTagRankingList: async (type: number): Promise<ApiResponse<TagRankingListResponse>> => {
     return api.post('/api/charbot/tagranking/get', {
       type,
-    });
+    })
   },
 
   /**
    * 태그 리스트
    */
   GetTagList: async (): Promise<ApiResponse<TagListResponse>> => {
-    return api.post('/api/charbot/tag/get');
+    return api.post('/api/charbot/tag/get')
   },
 
   /**
@@ -458,11 +454,11 @@ export const contentApi = {
    * @param content 피드백 내용
    */
   SendFeedback: async (content: string): Promise<ApiResponse<SendFeedbackResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/charbot/feedback', {
       content,
-    });
+    })
   },
 
   /**
@@ -470,17 +466,14 @@ export const contentApi = {
    * @param paginate 페이지 당 아이템 수
    * @param page 페이지
    */
-  GetChatList: async (
-    paginate: number,
-    page: number
-  ): Promise<ApiResponse<CharbotChatListResponse>> => {
+  GetChatList: async (paginate: number, page: number): Promise<ApiResponse<CharbotChatListResponse>> => {
     // 토큰 직접 구성
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/charbot/chat/list', {
       paginate,
       page,
-    });
+    })
   },
 
   /**
@@ -492,7 +485,7 @@ export const contentApi = {
     return api.post('/api/charbot/chat/topfixed', {
       chrbot_chat_key,
       fixed,
-    });
+    })
   },
 
   /**
@@ -508,14 +501,14 @@ export const contentApi = {
     paginate: number,
     page: number
   ): Promise<ApiResponse<GetSearchResponse>> => {
-    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1;
+    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
     return api.post('/api/charbot/search', {
       search,
       order,
       paginate,
       page,
       safety,
-    });
+    })
   },
 
   /**
@@ -529,27 +522,25 @@ export const contentApi = {
     page: number,
     paginate: number
   ): Promise<ApiResponse<GetSearchResponse>> => {
-    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1;
+    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
     return api.post('/api/charbot/getlist/user', {
       target_nick_nm,
       page,
       paginate,
       safety,
-    });
+    })
   },
 
   /**
    * 캐봇 좋아요
    * @param world_list_detail_chrbot_key 월드 캐봇 키
    */
-  CharBotLike: async (
-    world_list_detail_chrbot_key: number
-  ): Promise<ApiResponse<CharbotLikeResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+  CharBotLike: async (world_list_detail_chrbot_key: number): Promise<ApiResponse<CharbotLikeResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/charbot/like', {
       world_list_detail_chrbot_key,
-    });
+    })
   },
 
   /**
@@ -573,7 +564,7 @@ export const contentApi = {
       c_report_key,
       content,
       countryCode,
-    });
+    })
   },
 
   /**
@@ -585,12 +576,12 @@ export const contentApi = {
     persona: string,
     persona_gender: number
   ): Promise<ApiResponse<ChangePersonaNameResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/personachange', {
       persona,
       persona_gender,
-    });
+    })
   },
 
   /**
@@ -598,11 +589,11 @@ export const contentApi = {
    * @param overrideToken 선택적 토큰 (외부 토큰 초기화 시 사용)
    */
   GetChatMode: async (overrideToken?: string): Promise<ApiResponse<CharbotChatModeResponse>> => {
-    const token = overrideToken || useAccountStore.getState().data?.access_token || '';
-    const account_token = `Bearer ${token}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const token = overrideToken || useAccountStore.getState().data?.access_token || ''
+    const account_token = `Bearer ${token}`
+    api.defaults.headers.common['Authorization'] = account_token
     // return api.post('/api/charbot/chatmode')
-    return api.post('/api/charbot/chatmode/auth');
+    return api.post('/api/charbot/chatmode/auth')
   },
 
   /**
@@ -610,21 +601,18 @@ export const contentApi = {
    * @param page 페이지
    * @param paginate 페이지 당 아이템 수
    */
-  GetInquiryList: async (
-    page: number,
-    paginate: number
-  ): Promise<ApiResponse<InquiryListResponse>> => {
+  GetInquiryList: async (page: number, paginate: number): Promise<ApiResponse<InquiryListResponse>> => {
     return api.post('/api/cs/inquiryList', {
       page,
       paginate,
-    });
+    })
   },
 
   /**
    * 은행 리스트
    */
   GetBankList: async (): Promise<ApiResponse<BankListResponse>> => {
-    return api.post('/api/banklist');
+    return api.post('/api/banklist')
   },
 
   /**
@@ -632,11 +620,11 @@ export const contentApi = {
    * @param email 이메일
    */
   WriteRemailEdit: async (email: string): Promise<ApiResponse<WriteRemailEditResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/writeremailedit', {
       email,
-    });
+    })
   },
 
   /**
@@ -650,13 +638,13 @@ export const contentApi = {
     account_no: string,
     user_nm: string
   ): Promise<ApiResponse<BankAccountEditResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/writerebankaccountedit', {
       bank_key,
       account_no,
       user_nm,
-    });
+    })
   },
 
   /**
@@ -678,7 +666,7 @@ export const contentApi = {
       countrycode,
       os_type,
       terms_type,
-    });
+    })
   },
 
   /* 2025-03-30 추가 */
@@ -686,49 +674,45 @@ export const contentApi = {
   NicknmCheck: async (nick_nm: string): Promise<ApiResponse> => {
     return api.post('/api/nicknmcheck', {
       nick_nm,
-    });
+    })
   },
 
   NicknmCheckToGuest: async (nick_nm: string, access_token: string = ''): Promise<ApiResponse> => {
-    const account_token = `Bearer ${access_token}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${access_token}`
+    api.defaults.headers.common['Authorization'] = account_token
 
     return api.post('/api/nicknmcheck', {
       nick_nm,
-    });
+    })
   },
 
   // 패스인증
-  GetPassInfo: async (
-    success_url: string,
-    failed_url: string,
-    mode = 1
-  ): Promise<ApiResponse<GetPassInfoResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+  GetPassInfo: async (success_url: string, failed_url: string, mode = 1): Promise<ApiResponse<GetPassInfoResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/getpassinfo', {
       success_url,
       failed_url,
       mode,
-    });
+    })
   },
 
   // 패스인증 성공
   PassSuccess: async (enc_data: string): Promise<ApiResponse> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/pass/success', {
       enc_data,
-    });
+    })
   },
 
   // 패스인증 실패
   PassFailed: async (enc_data: string): Promise<ApiResponse> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/pass/failed', {
       enc_data,
-    });
+    })
   },
 
   // 파일 업로드 전 사전 서명 요청
@@ -737,48 +721,45 @@ export const contentApi = {
     file_type: string,
     type: 5
   ): Promise<ApiResponse<GetPresignedUrlResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/s3/presignedurl', {
       file_name,
       file_type,
       type,
-    });
+    })
   },
 
-  GetPresignedUrlMulti: async (
-    type: 6,
-    files: any
-  ): Promise<ApiResponse<GetPresignedUrlMultiResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+  GetPresignedUrlMulti: async (type: 6, files: any): Promise<ApiResponse<GetPresignedUrlMultiResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('api/s3/presignedurl/multiple', {
       files: JSON.stringify(files),
       type,
-    });
+    })
   },
 
   // 닉네임 변경
   NicknmChange: async (nick_nm: string): Promise<ApiResponse<NicknmChangeResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/nicknmchange', {
       nick_nm,
-    });
+    })
   },
 
   // 새로운 알림 추가 ( 갱신 )
   NewNotice: async (): Promise<ApiResponse> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
-    return api.post('/api/newnoti');
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/newnoti')
   },
 
   // 알림 가져오기
   GetNotice: async (): Promise<ApiResponse> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
-    return api.post('/api/getnoti');
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/getnoti')
   },
 
   // naver/get/token
@@ -786,20 +767,16 @@ export const contentApi = {
     return api.post('api/naver/get/token', {
       code,
       state,
-    });
+    })
   },
 
   // google/get/token
-  GetGoogleToken: async (
-    code: string,
-    state: string,
-    redirect_uri: string
-  ): Promise<ApiResponse> => {
+  GetGoogleToken: async (code: string, state: string, redirect_uri: string): Promise<ApiResponse> => {
     return api.post('api/google/get/token', {
       code,
       state,
       redirect_uri,
-    });
+    })
   },
 
   // api/apple/get/token
@@ -807,16 +784,16 @@ export const contentApi = {
     return api.post('api/apple/get/token', {
       code,
       redirect_uri,
-    });
+    })
   },
 
   // safety Filter
   SetSafetyMode: async (safety: number): Promise<ApiResponse> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/safety', {
       safety,
-    });
+    })
   },
 
   /**
@@ -826,12 +803,12 @@ export const contentApi = {
     world_list_detail_chrbot_key: number,
     likeability_yn: number
   ): Promise<ApiResponse<any>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/charbot/inprogress/get/multiimagedata', {
       world_list_detail_chrbot_key,
       likeability_yn,
-    });
+    })
   },
 
   /**
@@ -848,7 +825,7 @@ export const contentApi = {
       chrbot_chat_key,
       chrbot_multi_image_key,
       multiImageInfoJson,
-    });
+    })
   },
 
   /**
@@ -863,7 +840,7 @@ export const contentApi = {
       chrbot_chat_key,
       multiImageInfoJson,
       img_fixed,
-    });
+    })
   },
 
   /**
@@ -882,7 +859,7 @@ export const contentApi = {
     //   lv_rules: string,                       // 호감도 레벨 규칙 ( LikeabilityLevelStructure ) {{char}}:캐릭터 이름, {{user}}:유저 페르소나 치환
 
     // ): Promise<ApiResponse<any>> => {
-    return api.post('/api/charbot/chat/likeability', requestLikeAbilityData);
+    return api.post('/api/charbot/chat/likeability', requestLikeAbilityData)
   },
 
   /**
@@ -900,7 +877,7 @@ export const contentApi = {
       likeability_exp,
       likeability_lv,
       multiImageInfoJson,
-    });
+    })
   },
 
   /**
@@ -915,7 +892,7 @@ export const contentApi = {
       chrbot_chat_key,
       likeability_lv,
       likeability_fixed_lv,
-    });
+    })
   },
 
   /**
@@ -923,16 +900,13 @@ export const contentApi = {
    * @param persona 페르소나
    * @param persona_gender 페르소나 성별
    */
-  SimpleLogin: async (
-    persona: string,
-    persona_gender: number
-  ): Promise<ApiResponse<GuestLoginResponse>> => {
+  SimpleLogin: async (persona: string, persona_gender: number): Promise<ApiResponse<GuestLoginResponse>> => {
     return api.post('/api/register5', {
       persona,
       persona_gender,
-    });
+    })
   },
-};
+}
 
 // 채팅 API
 export const chatApi = {
@@ -941,16 +915,13 @@ export const chatApi = {
    * @param chrbot_chat_key 채팅 키
    * @param chat_mode 채팅 모드 ( 1: 가성비모드, 2: 스토리모드, 3: 짜릿1.0, 4: 짜릿2.0 )
    */
-  UseChat: async (
-    chrbot_chat_key: number,
-    chat_mode: number
-  ): Promise<ApiResponse<ChatUseResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+  UseChat: async (chrbot_chat_key: number, chat_mode: number): Promise<ApiResponse<ChatUseResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return chatApiInstance.post('/api/charbot/chat/use', {
       chrbot_chat_key,
       chat_mode,
-    });
+    })
   },
 
   /**
@@ -964,13 +935,13 @@ export const chatApi = {
     chat_mode: number,
     nsfw: number
   ): Promise<ApiResponse<OpenChatResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    chatApiInstance.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    chatApiInstance.defaults.headers.common['Authorization'] = account_token
     return chatApiInstance.post('/api/charbot/chat/open', {
       chrbot_chat_key,
       chat_mode,
       nsfw,
-    });
+    })
   },
 
   /**
@@ -978,11 +949,11 @@ export const chatApi = {
    * @param chrbot_chat_key 채팅 키 ( nakama 에서 채팅 키 추출 )
    */
   CloseChat: async (chrbot_chat_key: number): Promise<ApiResponse> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    chatApiInstance.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    chatApiInstance.defaults.headers.common['Authorization'] = account_token
     return chatApiInstance.post('/api/charbot/chat/close', {
       chrbot_chat_key,
-    });
+    })
   },
 
   /**
@@ -1007,7 +978,7 @@ export const chatApi = {
       chrbot_chat_key,
       stream: stream ? 1 : 0,
       countryCode: 'KR',
-    });
+    })
   },
 
   /**
@@ -1032,7 +1003,7 @@ export const chatApi = {
       chrbot_chat_key,
       stream: stream ? 1 : 0,
       countryCode: 'KR',
-    });
+    })
   },
 
   /**
@@ -1041,16 +1012,12 @@ export const chatApi = {
    * @param chat_mode 채팅 모드 ( 1: 가성비모드, 2: 스토리모드, 3: 짜릿1.0, 4: 짜릿2.0 )
    * @param nsfw 유저가 성인이면 1, 아니면 0
    */
-  ArrangeChat: async (
-    chrbot_chat_key: number,
-    chat_mode: number,
-    nsfw: number
-  ): Promise<ApiResponse> => {
+  ArrangeChat: async (chrbot_chat_key: number, chat_mode: number, nsfw: number): Promise<ApiResponse> => {
     return chatApiInstance.post('/api/charbot/chat/arrange', {
       chrbot_chat_key,
       chat_mode,
       nsfw,
-    });
+    })
   },
 
   /**
@@ -1070,7 +1037,7 @@ export const chatApi = {
       summary_id,
       countryCode,
       chat_mode,
-    });
+    })
   },
 
   /**
@@ -1094,7 +1061,7 @@ export const chatApi = {
       nsfw,
       delete_id,
       // delete_idx,
-    });
+    })
   },
 
   /**
@@ -1103,28 +1070,24 @@ export const chatApi = {
    * @param chat_mode 채팅 모드 ( 1: 가성비모드, 2: 스토리모드, 3: 짜릿1.0, 4: 짜릿2.0 )
    * @param nsfw 유저가 성인이면 1, 아니면 0
    */
-  InitChat: async (
-    chrbot_chat_key: number,
-    chat_mode: number,
-    nsfw: number
-  ): Promise<ApiResponse> => {
+  InitChat: async (chrbot_chat_key: number, chat_mode: number, nsfw: number): Promise<ApiResponse> => {
     return chatApiInstance.post('/api/charbot/chat/init', {
       chrbot_chat_key,
       chat_mode,
       nsfw,
-    });
+    })
   },
-};
+}
 
 // 정산 API
 export const settlementApi = {
   // 월별 수익 내역
   GetMonthlyIncome: async (type: number): Promise<ApiResponse<SaleMonthlyIncomeResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/sales/monthlyIncome_V1', {
       type,
-    });
+    })
   },
 
   /**
@@ -1142,20 +1105,17 @@ export const settlementApi = {
       type,
       page,
       paginate,
-    });
+    })
   },
 
   // 출금 신청 내역
-  GetWithdrawRequestList: async (
-    page: number,
-    paginate: number
-  ): Promise<ApiResponse<WithdrawRequestListResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+  GetWithdrawRequestList: async (page: number, paginate: number): Promise<ApiResponse<WithdrawRequestListResponse>> => {
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/sales/withdrawrequestList', {
       page,
       paginate,
-    });
+    })
   },
 
   /**
@@ -1165,14 +1125,14 @@ export const settlementApi = {
   GetOrderId: async (coinKey: string): Promise<ApiResponse<OrderIdResponse>> => {
     return api.post('/api/getorderid', {
       coin_key: coinKey,
-    });
+    })
   },
 
   /**
    * 코인 리스트
    */
   GetCoinList: async (): Promise<ApiResponse<CoinListResponse>> => {
-    return api.post('/api/coinlist');
+    return api.post('/api/coinlist')
   },
 
   /**
@@ -1186,13 +1146,13 @@ export const settlementApi = {
     paginate: number,
     charge_type: number
   ): Promise<ApiResponse<CoinChargeUseHistoryResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/getcoinchargeusehistory_v2', {
       page,
       paginate,
       charge_type,
-    });
+    })
   },
 
   /**
@@ -1206,22 +1166,22 @@ export const settlementApi = {
     orderId: string,
     amount: number
   ): Promise<ApiResponse<ConfirmTossPaymentResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/web/toss/confirm', {
       paymentKey,
       orderId,
       amount,
-    });
+    })
   },
 
   /**
    * 작가 출금 현황
    */
   GetWriterWithdrawStatus: async (): Promise<ApiResponse<WriterWithdrawResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
-    return api.post('/api/sales/writerwithdraw');
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/sales/writerwithdraw')
   },
 
   /**
@@ -1239,8 +1199,8 @@ export const settlementApi = {
     resno1: string,
     resno2: string
   ): Promise<ApiResponse> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/sales/withdrawrequest', {
       price,
       locale,
@@ -1248,18 +1208,18 @@ export const settlementApi = {
       resno1,
       resno2,
       encryption: 1,
-    });
+    })
   },
 
   /**
    * 출석 보상
    */
   UseFreePen: async (): Promise<ApiResponse<ChatFreePenResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
-    return api.post('/api/charbot/chat/freepen');
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/charbot/chat/freepen')
   },
-};
+}
 
 // 크리에이트 API ( 캐봇 작성 )
 export const createApi = {
@@ -1271,18 +1231,18 @@ export const createApi = {
     world_list_detail_chrbot_key: number | null,
     chat_room_mode?: number
   ): Promise<ApiResponse<CharbotInprogressResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/charbot/inprogress/get', {
       world_list_detail_chrbot_key,
       chat_room_mode,
-    });
+    })
   },
 
   // 현재 작업중인 캐봇 저장 (FormData 방식)
   SaveInProgressFormData: async (formData: FormData): Promise<ApiResponse> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    console.log('formData', formData)
     // ✅ FormData 전송을 위한 axios 설정 (Content-Type 제거)
     return api.post('/api/charbot/inprogress/save', formData, {
       headers: {
@@ -1290,22 +1250,22 @@ export const createApi = {
         'X-Web-Access': true,
         'Content-Type': 'multipart/form-data', // ✅ 기본 JSON Content-Type 제거
       },
-    });
+    })
   },
 
   /**
    * 멀티 이미지 업로드
    */
   SaveMultiImageData: async (formData: FormData): Promise<ApiResponse> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/charbot/inprogress/save/multiimagedata', formData, {
       headers: {
         Authorization: account_token,
         'X-Web-Access': true,
         'Content-Type': 'multipart/form-data',
       },
-    });
+    })
   },
 
   /**
@@ -1313,11 +1273,11 @@ export const createApi = {
    */
 
   DeleteMultiImageData: async (chrbot_multi_image_key: number): Promise<ApiResponse> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/charbot/inprogress/delete/multiimagedata', {
       chrbot_multi_image_key,
-    });
+    })
   },
 
   /**
@@ -1335,7 +1295,7 @@ export const createApi = {
       world_list_detail_chrbot_key,
       tags,
       c_chrbot_tag_key,
-    });
+    })
   },
 
   /**
@@ -1345,7 +1305,7 @@ export const createApi = {
   DeleteChatBot: async (world_list_detail_chrbot_key: number): Promise<ApiResponse> => {
     return api.post('/api/charbot/delete', {
       world_list_detail_chrbot_key,
-    });
+    })
   },
 
   /**
@@ -1359,54 +1319,50 @@ export const createApi = {
     page: number,
     paginate: number
   ): Promise<ApiResponse<CharbotGetListMineResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
     return api.post('/api/charbot/getlist/mine', {
       target_nick_nm,
       page,
       paginate,
-    });
+    })
   },
 
   /**
    * 캐봇 상세 정보
    * @param world_list_detail_chrbot_key 캐봇 키
    */
-  GetChatBot: async (
-    world_list_detail_chrbot_key: number
-  ): Promise<ApiResponse<CharbotResponse>> => {
+  GetChatBot: async (world_list_detail_chrbot_key: number): Promise<ApiResponse<CharbotResponse>> => {
     return api.post('/api/charbot/get', {
       world_list_detail_chrbot_key,
-    });
+    })
   },
 
   /**
    * ?????? 캐봇 인증 ?????? 이런걸 만든기억이 없는데??????
    */
   GetChatBotAuth: async (): Promise<ApiResponse> => {
-    return api.post('/api/charbot/get/auth');
+    return api.post('/api/charbot/get/auth')
   },
 
   /**
    * 작가 정보
    */
   GetWriterInfo: async (): Promise<ApiResponse<WriterInfoResponse>> => {
-    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`;
-    api.defaults.headers.common['Authorization'] = account_token;
-    return api.post('/api/writerinfo');
+    const account_token = `Bearer ${useAccountStore.getState().data?.access_token || ''}`
+    api.defaults.headers.common['Authorization'] = account_token
+    return api.post('/api/writerinfo')
   },
-};
+}
 
-export { setAuthToken, API_URL, CHAT_URL };
+export { setAuthToken, API_URL, CHAT_URL }
 
 export const getWebConfig = async (): Promise<ApiResponse> => {
-  const path =
-    'https://sps-download.s3.ap-northeast-2.amazonaws.com/space_play_en/config/web/config_web.json';
-  return axios.get(path);
-};
+  const path = 'https://sps-download.s3.ap-northeast-2.amazonaws.com/space_play_en/config/web/config_web.json'
+  return axios.get(path)
+}
 
 export const getWebNotice = async (): Promise<ApiResponse> => {
-  const path =
-    'https://sps-download.s3.ap-northeast-2.amazonaws.com/space_play_en/contents_config/contents_config.json';
-  return axios.get(path);
-};
+  const path = 'https://sps-download.s3.ap-northeast-2.amazonaws.com/space_play_en/contents_config/contents_config.json'
+  return axios.get(path)
+}

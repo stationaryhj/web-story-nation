@@ -1,6 +1,6 @@
-import { ChatMode } from '@/components/modal/ChatModeModal';
-import { requestConnectedChatRoomData } from '@/services/interface';
-import { useAccountStore } from '@/store/useAccountStore';
+import { ChatMode } from '@/components/modal/ChatModeModal'
+import { requestConnectedChatRoomData } from '@/services/interface'
+import { useAccountStore } from '@/store/useAccountStore'
 import {
   CharbotChatData,
   CharbotChatListData,
@@ -12,32 +12,32 @@ import {
   LoginResponse,
   ModuleCharacter,
   ModuleCreater,
-} from '@/types/api';
+} from '@/types/api'
 
-const PI_ADDRESS = process.env.NEXT_PUBLIC_PI_ADDRESS;
-const CHAT_FRONTEND_ADDRESS = process.env.NEXT_PUBLIC_CHAT_FRONTEND_ADDRESS;
-const CHAT_SERVER_ADDRESS = process.env.NEXT_PUBLIC_CHAT_SERVER_ADDRESS;
-const CHAT_SERVER_PORT = process.env.NEXT_PUBLIC_CHAT_SERVER_PORT;
+const PI_ADDRESS = process.env.NEXT_PUBLIC_PI_ADDRESS
+const CHAT_FRONTEND_ADDRESS = process.env.NEXT_PUBLIC_CHAT_FRONTEND_ADDRESS
+const CHAT_SERVER_ADDRESS = process.env.NEXT_PUBLIC_CHAT_SERVER_ADDRESS
+const CHAT_SERVER_PORT = process.env.NEXT_PUBLIC_CHAT_SERVER_PORT
 
-import CryptoJS from 'crypto-js';
+import CryptoJS from 'crypto-js'
 
-const encryptionKey = '12345678901234567890123456789012'; // 32바이트 키 (256비트)
+const encryptionKey = '12345678901234567890123456789012' // 32바이트 키 (256비트)
 
 // 백엔드 서버가 가지고있는 데이터
 export interface ConversationExampleJSON {
-  text_counts: number[];
-  titles: string[];
+  text_counts: number[]
+  titles: string[]
   examples: {
-    example: ExampleData[];
-  }[];
+    example: ExampleData[]
+  }[]
 }
 
 export interface exampleDatas {
-  index: number;
-  title: string;
-  userMsg: string;
-  characterMsg: string;
-  textLength: number;
+  index: number
+  title: string
+  userMsg: string
+  characterMsg: string
+  textLength: number
 }
 
 export const exampleDatasToConversationJson = (data: exampleDatas[]) => {
@@ -45,11 +45,11 @@ export const exampleDatasToConversationJson = (data: exampleDatas[]) => {
     text_counts: [],
     titles: [],
     examples: [],
-  };
+  }
 
-  data.forEach((exampleData) => {
-    rValue.text_counts.push(exampleData.textLength || 0);
-    rValue.titles.push(exampleData.title || `대화 예시 ${exampleData.index + 1}`);
+  data.forEach(exampleData => {
+    rValue.text_counts.push(exampleData.textLength || 0)
+    rValue.titles.push(exampleData.title || `대화 예시 ${exampleData.index + 1}`)
     rValue.examples.push({
       example: [
         {
@@ -61,14 +61,80 @@ export const exampleDatasToConversationJson = (data: exampleDatas[]) => {
           message: exampleData.userMsg || '',
         },
       ],
-    });
-  });
-  return rValue;
-};
+    })
+  })
+  return rValue
+}
 
 interface ExampleData {
-  speaker: string;
-  message: string;
+  speaker: string
+  message: string
+}
+
+// ─── DM 인트로 버블 변환 ───
+
+export interface IntroBubbleMessage {
+  id: string
+  text: string
+}
+
+export interface IntroBubbleGroup {
+  id: string
+  speaker: 'character' | 'user'
+  messages: IntroBubbleMessage[]
+}
+
+/** introBubbles → example JSON (서버 저장용) */
+export const introBubblesToExampleJson = (bubbles: IntroBubbleGroup[]): ConversationExampleJSON => {
+  const allMessages: ExampleData[] = []
+  let totalLength = 0
+
+  bubbles.forEach(group => {
+    const speaker = group.speaker === 'character' ? '{{char}}' : '{{user}}'
+    const combined = group.messages.map(msg => msg.text).join('\n')
+    allMessages.push({ speaker, message: combined })
+    totalLength += combined.length
+  })
+
+  return {
+    text_counts: [totalLength],
+    titles: ['intro'],
+    examples: [{ example: allMessages }],
+  }
+}
+
+/** example JSON 문자열 → introBubbles (로드 복원용) */
+export const parseExampleJsonToIntroBubbles = (exampleText: string): IntroBubbleGroup[] => {
+  if (!exampleText) return []
+
+  try {
+    const parsed = JSON.parse(exampleText) as ConversationExampleJSON
+    if (!parsed.examples?.[0]?.example) return []
+
+    const messages = parsed.examples[0].example
+    const bubbles: IntroBubbleGroup[] = []
+
+    messages.forEach(msg => {
+      const speaker: 'character' | 'user' = msg.speaker === '{{char}}' ? 'character' : 'user'
+      const lines = msg.message.split('\n')
+      const groupMessages = lines.map(line => ({ id: crypto.randomUUID(), text: line }))
+
+      const last = bubbles[bubbles.length - 1]
+      if (last && last.speaker === speaker) {
+        last.messages.push(...groupMessages)
+      } else {
+        bubbles.push({
+          id: crypto.randomUUID(),
+          speaker,
+          messages: groupMessages,
+        })
+      }
+    })
+
+    return bubbles
+  } catch {
+    return []
+  }
 }
 
 /**
@@ -76,22 +142,22 @@ interface ExampleData {
  */
 export function getImageUri(url: string | undefined | null): string {
   // 기본 이미지 경로 (이미지가 없거나 로드에 실패한 경우 사용)
-  const defaultImageUrl = '/images/placeholders/default-character.jpg';
+  const defaultImageUrl = '/images/placeholders/default-avatar.svg'
 
-  if (!url) return defaultImageUrl; // url이 없을 경우 기본 이미지 반환
+  if (!url) return defaultImageUrl // url이 없을 경우 기본 이미지 반환
 
   try {
     if (url.indexOf('kr/') > -1) {
-      return url.replace('kr/', 'https://d287ta38o0t5x8.cloudfront.net/');
+      return url.replace('kr/', 'https://d287ta38o0t5x8.cloudfront.net/')
     } else if (url.indexOf('image/') > -1) {
-      return 'https://d2gimcyf1gz7jq.cloudfront.net/' + url;
+      return 'https://d2gimcyf1gz7jq.cloudfront.net/' + url
     } else if (url.indexOf('promotion/') > -1) {
-      return 'https://d287ta38o0t5x8.cloudfront.net/' + url;
+      return 'https://d287ta38o0t5x8.cloudfront.net/' + url
     }
-    return url;
+    return url
   } catch (error) {
-    console.error('Error processing image URL:', error);
-    return defaultImageUrl; // 에러 발생 시 기본 이미지 반환
+    console.error('Error processing image URL:', error)
+    return defaultImageUrl // 에러 발생 시 기본 이미지 반환
   }
 }
 
@@ -103,22 +169,22 @@ export function getImageUri(url: string | undefined | null): string {
 export function getSnsTypeNumber(provider: string): number {
   switch (provider.toUpperCase()) {
     case 'GUEST':
-      return 0;
+      return 0
     case 'KAKAO':
-      return 1;
+      return 1
     case 'NAVER':
-      return 2;
+      return 2
     case 'GOOGLE':
-      return 3;
+      return 3
     case 'APPLE':
-      return 4;
+      return 4
 
     case 'GOOGLEPLAYGAMES':
-      return 7;
+      return 7
     case 'FACEBOOK':
-      return 8;
+      return 8
     default:
-      return 0;
+      return 0
   }
 }
 
@@ -128,13 +194,13 @@ export function getSnsTypeNumber(provider: string): number {
  * @returns 탑 10 데이터 리스트
  */
 export function bridgeTop10DataToModuleCharacter(dataList: Array<ModuleCharacter>) {
-  const characters = dataList?.map((item) => {
+  const characters = dataList?.map(item => {
     // 태그 분리 및 정제
-    const rawTags = item.tags ? item.tags.split(',') : [];
+    const rawTags = item.tags ? item.tags.split(',') : []
     // 태그 정제 - 중복 제거 및 빈 문자열 제거
     const uniqueTags = Array.from(new Set(rawTags))
-      .filter((tag) => tag.trim() !== '')
-      .map((tag) => tag.trim()); // 공백 제거
+      .filter(tag => tag.trim() !== '')
+      .map(tag => tag.trim()) // 공백 제거
 
     return {
       id: item.world_list_detail_chrbot_key.toString(),
@@ -159,14 +225,14 @@ export function bridgeTop10DataToModuleCharacter(dataList: Array<ModuleCharacter
       likeability_max_lv: item.likeability_max_lv,
       likeability_yn: item.likeability_yn,
       multi_image_count: item.multi_image_count,
-    };
-  });
+    }
+  })
 
-  return characters;
+  return characters
 }
 
 export function bridgeModuleCreatorToCharacter(dataList: Array<ModuleCreater>) {
-  const creaters = dataList?.map((item) => {
+  const creaters = dataList?.map(item => {
     return {
       id: item.user_key.toString(),
       name: item.nick_nm || '',
@@ -176,15 +242,15 @@ export function bridgeModuleCreatorToCharacter(dataList: Array<ModuleCreater>) {
       characterCount: 0,
       moduleType: item.module_type,
       isVerified: true,
-    };
-  });
+    }
+  })
 
-  return creaters;
+  return creaters
 }
 
 export function bridgeCharbotGetListMineDataToCharacter(dataList: Array<CharbotMineData>) {
-  console.log('bridgeCharbotGetListMineDataToCharacter :: ', dataList);
-  const characters = dataList?.map((item) => ({
+  console.log('bridgeCharbotGetListMineDataToCharacter :: ', dataList)
+  const characters = dataList?.map(item => ({
     id: item.world_list_detail_chrbot_key.toString(),
     name: item.title,
     subject: item.subject,
@@ -208,9 +274,9 @@ export function bridgeCharbotGetListMineDataToCharacter(dataList: Array<CharbotM
     likeability_yn: item.likeability_yn,
     multi_image_count: item.multi_image_count,
     writer_note: item.writer_note,
-  }));
+  }))
 
-  return characters;
+  return characters
 }
 
 /**
@@ -219,12 +285,12 @@ export function bridgeCharbotGetListMineDataToCharacter(dataList: Array<CharbotM
  * @returns Character 타입으로 변환된 데이터 리스트
  */
 export function bridgeCharacterDataToCharacter(dataList: Array<ModuleCharacter>) {
-  const characters = dataList?.map((item) => {
+  const characters = dataList?.map(item => {
     // 태그 처리 로직 추가
-    const rawTags = item.tags ? item.tags.split(',') : [];
+    const rawTags = item.tags ? item.tags.split(',') : []
     const uniqueTags = Array.from(new Set(rawTags))
-      .filter((tag) => tag.trim() !== '')
-      .map((tag) => tag.trim());
+      .filter(tag => tag.trim() !== '')
+      .map(tag => tag.trim())
 
     return {
       id: item.world_list_detail_chrbot_key.toString(),
@@ -250,10 +316,10 @@ export function bridgeCharacterDataToCharacter(dataList: Array<ModuleCharacter>)
       likeability_max_lv: item.likeability_max_lv,
       likeability_yn: item.likeability_yn,
       multi_image_count: item.multi_image_count,
-    };
-  });
+    }
+  })
 
-  return characters;
+  return characters
 }
 
 export function bridgeCharbotDataToCharacter(data: ChrbotData) {
@@ -282,11 +348,11 @@ export function bridgeCharbotDataToCharacter(data: ChrbotData) {
     likeability_yn: data.likeability_yn,
     multi_image_count: data.multi_image_count,
     writer_note: data.writer_note,
-  };
+  }
 }
 
 export function bridgeCharbotChatDataToChatList(data: Array<CharbotChatData>) {
-  return data.map((item) => ({
+  return data.map(item => ({
     id: item.chrbot_chat_key.toString(),
     characterId: item.world_list_detail_chrbot_key.toString(),
     name: item.title,
@@ -294,12 +360,12 @@ export function bridgeCharbotChatDataToChatList(data: Array<CharbotChatData>) {
     time: '',
     imageUrl: getImageUri(item.img_url),
     fixed: item.fixed,
-  }));
+  }))
 }
 
 export function bridgeLoginDataToUserInfo(data: LoginResponse | null) {
   if (!data) {
-    return null;
+    return null
   }
 
   return {
@@ -315,27 +381,25 @@ export function bridgeLoginDataToUserInfo(data: LoginResponse | null) {
     persona: data.persona,
     persona_gender: data.persona_gender,
     getBalance: (): number => {
-      return Number(data.coin_free) + Number(data.coin_free_dt) + Number(data.coin_register);
+      return Number(data.coin_free) + Number(data.coin_free_dt) + Number(data.coin_register)
     },
-  };
+  }
 }
 
 export const parseConversationExamples = (exampleText: string) => {
   // 대화 예시가 없으면 빈 배열 반환
-  if (!exampleText) return [];
+  if (!exampleText) return []
 
   try {
-    let dataList: exampleDatas[] = [];
-    const parseData = JSON.parse(exampleText) as ConversationExampleJSON;
+    let dataList: exampleDatas[] = []
+    const parseData = JSON.parse(exampleText) as ConversationExampleJSON
 
     for (let i = 0; i < parseData.text_counts.length; i++) {
-      const index = i;
-      const title = parseData.titles[i];
-      const userMsg =
-        parseData.examples[i].example.find((item) => item.speaker === '{{user}}')?.message || '';
-      const characterMsg =
-        parseData.examples[i].example.find((item) => item.speaker === '{{char}}')?.message || '';
-      const length = parseData.text_counts[i];
+      const index = i
+      const title = parseData.titles[i]
+      const userMsg = parseData.examples[i].example.find(item => item.speaker === '{{user}}')?.message || ''
+      const characterMsg = parseData.examples[i].example.find(item => item.speaker === '{{char}}')?.message || ''
+      const length = parseData.text_counts[i]
 
       if (userMsg.length > 0 || characterMsg.length > 0) {
         const data: exampleDatas = {
@@ -344,14 +408,14 @@ export const parseConversationExamples = (exampleText: string) => {
           userMsg: userMsg,
           characterMsg: characterMsg,
           textLength: length,
-        };
+        }
 
-        dataList.push(data);
+        dataList.push(data)
       }
     }
-    return dataList;
+    return dataList
   } catch (e) {
-    return [];
+    return []
   }
 
   // // 대화 예시들을 분리 (빈 줄 두 개로 구분)
@@ -378,7 +442,7 @@ export const parseConversationExamples = (exampleText: string) => {
   //     isEditing: false,
   //   }
   // })
-};
+}
 
 /**
  * 진행 중인 캐릭터 생성 데이터를 Character 타입으로 변환하는 함수
@@ -387,23 +451,23 @@ export const parseConversationExamples = (exampleText: string) => {
  */
 export function bridgeCharacterInProgressToCharacter(data: any) {
   // 대화 예시를 파싱하는 함수
-  console.log('bridgeCharacterInProgressToCharacter >> ', data);
+  console.log('bridgeCharacterInProgressToCharacter >> ', data)
 
-  let __content = '';
-  let __content_public = '';
+  let __content = ''
+  let __content_public = ''
   if (data.content_show_yn === 2) {
     if (data.content_public) {
-      __content_public = data.content_public;
+      __content_public = data.content_public
     }
 
     if (data.content) {
-      __content = data.content;
+      __content = data.content
     }
   } else {
     if (data.content_show_yn === 1) {
-      __content_public = data.content;
+      __content_public = data.content
     } else {
-      __content = data.content;
+      __content = data.content
     }
   }
 
@@ -450,7 +514,7 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
 
     // 공개 + 공개 일시에 비공개로 변경 불가능
     isVisibilityLock: data.finish_yn === 1 && data.show_yn === 1 ? true : false,
-  };
+  }
 }
 
 export function bridgeChatModeDataToChatMode(data: ChatModeData, customData: ChatMode) {
@@ -460,7 +524,7 @@ export function bridgeChatModeDataToChatMode(data: ChatModeData, customData: Cha
     penCost: data.coin,
     discount: data.discount,
     original_coin: data.original_coin,
-  };
+  }
 }
 
 export function bridgeInquiryDataToNotification(data: InquiryData) {
@@ -472,7 +536,7 @@ export function bridgeInquiryDataToNotification(data: InquiryData) {
     isRead: true,
     date: new Date(data.create_dt),
     sort: data.sort,
-  };
+  }
 }
 
 /**
@@ -483,8 +547,8 @@ export function bridgeInquiryDataToNotification(data: InquiryData) {
 export function bridgeIncomeDataToEarningItems(data: Array<IncomeData>, lastIndex: number | 1) {
   // 데이터가 없거나 배열이 아닌 경우 빈 배열 반환
   if (!data || !Array.isArray(data)) {
-    console.warn('Invalid income data:', data);
-    return [];
+    console.warn('Invalid income data:', data)
+    return []
   }
 
   return data.map((item, index) => ({
@@ -494,7 +558,7 @@ export function bridgeIncomeDataToEarningItems(data: Array<IncomeData>, lastInde
     amount: parseFloat(item.pen), // pen 값을 숫자로 변환하고 10000을 곱해 펜 단위로 표시
     cnt: item.cnt, // 횟수 정보 추가
     title: item.title, // 제목 정보 추가
-  }));
+  }))
 }
 
 // 출금 내역 데이터를 UI에 맞게 변환하는 함수
@@ -513,95 +577,93 @@ export const bridgeWithdrawDataToWithdrawItems = (data: any[], page: number = 1)
       .replace('.', ''),
     amount: item.pen,
     status: '완료', // API에서 상태 정보가 없어서 기본값으로 '완료' 설정
-  }));
-};
+  }))
+}
 
 export function getChangeNameTag(script: string, charName: string) {
-  let changeScript = '';
+  let changeScript = ''
   const userName = useAccountStore.getState().isLogin
-    ? useAccountStore.getState().data?.persona ||
-      useAccountStore.getState().data?.nick_nm ||
-      '정보없음'
-    : '아무개';
+    ? useAccountStore.getState().data?.persona || useAccountStore.getState().data?.nick_nm || '정보없음'
+    : '아무개'
 
   changeScript = script
     .replaceAll('{{character}}', charName)
     .replaceAll('{{user}}', userName)
-    .replaceAll('{{char}}', charName);
-  return changeScript;
+    .replaceAll('{{char}}', charName)
+  return changeScript
 }
 
 // 이미지 URL 유효성 체크 함수 추가
 export const getValidImageUrl = (url: string | null | undefined): string => {
-  if (!url) return '/images/placeholders/author_default_img.jpg';
+  if (!url) return '/images/placeholders/author_default_img.jpg'
 
   try {
     // URL 유효성 체크 (상대 경로는 그대로 통과, 절대 경로는 유효한 URL인지 확인)
-    if (url.startsWith('/')) return url; // 상대 경로는 그대로 사용
-    new URL(url); // 절대 URL인 경우 유효성 체크
-    return url;
+    if (url.startsWith('/')) return url // 상대 경로는 그대로 사용
+    new URL(url) // 절대 URL인 경우 유효성 체크
+    return url
   } catch (e) {
-    console.warn('Invalid image URL:', url);
-    return '/images/placeholders/author_default_img.jpg';
+    console.warn('Invalid image URL:', url)
+    return '/images/placeholders/author_default_img.jpg'
   }
-};
+}
 
 function getCategory(gender: number) {
   if (gender === 1) {
-    return 'male';
+    return 'male'
   } else if (gender === 2) {
-    return 'female';
+    return 'female'
   } else {
-    return 'unspecified';
+    return 'unspecified'
   }
 }
 
 export async function uploadImages(file: File, presignedUrl: string): Promise<void> {
   // ✅ Promise로 감싸서 FileReader와 Image 로딩을 기다릴 수 있게 함
   return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
 
-    reader.onload = async (event) => {
-      const img = new window.Image();
-      img.src = event.target?.result as string;
+    reader.onload = async event => {
+      const img = new window.Image()
+      img.src = event.target?.result as string
 
       img.onload = async () => {
         try {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
+          const canvas = document.createElement('canvas')
+          const ctx = canvas.getContext('2d')
 
           // 이미지 최대 크기 설정 (가로/세로 최대 1024px)
-          const MAX_SIZE = 1024;
-          let width = img.width;
-          let height = img.height;
+          const MAX_SIZE = 1024
+          let width = img.width
+          let height = img.height
 
           if (width > height && width > MAX_SIZE) {
-            height = Math.round((height * MAX_SIZE) / width);
-            width = MAX_SIZE;
+            height = Math.round((height * MAX_SIZE) / width)
+            width = MAX_SIZE
           } else if (height > MAX_SIZE) {
-            width = Math.round((width * MAX_SIZE) / height);
-            height = MAX_SIZE;
+            width = Math.round((width * MAX_SIZE) / height)
+            height = MAX_SIZE
           }
 
-          canvas.width = width;
-          canvas.height = height;
-          ctx?.drawImage(img, 0, 0, width, height);
+          canvas.width = width
+          canvas.height = height
+          ctx?.drawImage(img, 0, 0, width, height)
 
           // 압축된 이미지를 Blob으로 변환
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.8)
 
           // Base64 데이터 URL에서 바이너리 데이터 추출
-          const base64Data = dataUrl.split(',')[1];
-          const binaryData = atob(base64Data);
-          const arrayBuffer = new ArrayBuffer(binaryData.length);
-          const uint8Array = new Uint8Array(arrayBuffer);
+          const base64Data = dataUrl.split(',')[1]
+          const binaryData = atob(base64Data)
+          const arrayBuffer = new ArrayBuffer(binaryData.length)
+          const uint8Array = new Uint8Array(arrayBuffer)
 
           for (let i = 0; i < binaryData.length; i++) {
-            uint8Array[i] = binaryData.charCodeAt(i);
+            uint8Array[i] = binaryData.charCodeAt(i)
           }
 
-          const blob = new Blob([uint8Array], { type: 'image/jpeg' });
+          const blob = new Blob([uint8Array], { type: 'image/jpeg' })
 
           // S3에 이미지 업로드
           const result = await fetch(presignedUrl, {
@@ -610,37 +672,37 @@ export async function uploadImages(file: File, presignedUrl: string): Promise<vo
             headers: {
               'Content-Type': 'image/jpeg',
             },
-          });
+          })
 
-          console.log('result :: ', result);
+          console.log('result :: ', result)
 
           // ✅ 업로드 완료 후 resolve 호출
-          resolve();
+          resolve()
         } catch (error) {
-          console.error('이미지 업로드 중 오류:', error);
-          reject(error);
+          console.error('이미지 업로드 중 오류:', error)
+          reject(error)
         }
-      };
+      }
 
       // ✅ 이미지 로딩 실패 시 reject
-      img.onerror = () => reject(new Error('이미지 로딩 실패'));
-    };
+      img.onerror = () => reject(new Error('이미지 로딩 실패'))
+    }
 
     // ✅ FileReader 에러 시 reject
-    reader.onerror = () => reject(new Error('파일 읽기 실패'));
-  });
+    reader.onerror = () => reject(new Error('파일 읽기 실패'))
+  })
 }
 
 export async function rijndaelEncrypt(data: string): Promise<string> {
-  const keyParsed = CryptoJS.enc.Utf8.parse(encryptionKey);
+  const keyParsed = CryptoJS.enc.Utf8.parse(encryptionKey)
   const encrypted = CryptoJS.AES.encrypt(data, keyParsed, {
     mode: CryptoJS.mode.ECB, // ECB 모드
     padding: CryptoJS.pad.Pkcs7, // PKCS7 패딩
     keySize: 8, // 256비트 = 8 * 32비트 워드
-  });
+  })
 
   // Base64로 인코딩하여 반환
-  return encrypted.toString(); // CryptoJS는 자동으로 Base64로 인코딩
+  return encrypted.toString() // CryptoJS는 자동으로 Base64로 인코딩
 }
 
 export async function getChatRoomEncryptData(
@@ -661,8 +723,7 @@ export async function getChatRoomEncryptData(
 ): Promise<string> {
   const reqData: requestConnectedChatRoomData = {
     api_server: api_server || PI_ADDRESS || 'https://qausapi.universestationery.com',
-    chat_address:
-      chat_address || CHAT_FRONTEND_ADDRESS || 'https://qa.storynation.co.kr/character/chat',
+    chat_address: chat_address || CHAT_FRONTEND_ADDRESS || 'https://qa.storynation.co.kr/character/chat',
     chat_server: chat_server || CHAT_SERVER_ADDRESS || 'qauschat.storynation.io',
     chat_server_port: chat_server_port || CHAT_SERVER_PORT?.toString() || '443',
 
@@ -675,36 +736,36 @@ export async function getChatRoomEncryptData(
     persona: persona || '',
     token: token || '',
     userKey: userKey || '',
-  };
+  }
 
-  console.log('@@ reqData :: ', reqData);
+  console.log('@@ reqData :: ', reqData)
 
   // reqData 를 AES-256-ECB 암호화
-  const encryptedData = await rijndaelEncrypt(JSON.stringify(reqData));
-  console.log('encryptedData :: ', encryptedData);
+  const encryptedData = await rijndaelEncrypt(JSON.stringify(reqData))
+  console.log('encryptedData :: ', encryptedData)
 
   // encryptedData 를 base64 인코딩
-  const base64EncodedData = btoa(encryptedData);
-  return base64EncodedData;
+  const base64EncodedData = btoa(encryptedData)
+  return base64EncodedData
 }
 
 export const getPlatform = (sns_type: number) => {
   switch (sns_type) {
     case 0:
-      return 'Guest';
+      return 'Guest'
     case 1:
-      return 'Kakao';
+      return 'Kakao'
     case 2:
-      return 'Naver';
+      return 'Naver'
     case 3:
-      return 'Google';
+      return 'Google'
     case 4:
-      return 'Apple';
+      return 'Apple'
     case 7:
-      return 'GooglePlayGames';
+      return 'GooglePlayGames'
     case 8:
-      return 'Facebook';
+      return 'Facebook'
     default:
-      return '';
+      return ''
   }
-};
+}

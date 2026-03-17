@@ -13,5 +13,6 @@ export const apiRoute = {
   },
   s3: {
     presignedUrl: '/api/s3/presignedurl',
+    presignedUrlMulti: '/api/s3/presignedurl/multiple',
   },
 } as const

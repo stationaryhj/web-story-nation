@@ -1,7 +1,10 @@
 // tailwind.config.ts
-import type { Config } from 'tailwindcss';
+import type { Config } from 'tailwindcss'
 
 const config: Config = {
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -123,6 +126,28 @@ const config: Config = {
             dark: '#FF4242',
           },
         },
+        v2: {
+          black: {
+            Default: '#000000',
+            '50': '#292929',
+          },
+          gray: {
+            '50': '#F8F8F8',
+            '100': '#F4F5F5',
+            '200': '#F1F2F2',
+            '300': '#E9EAEB',
+            '400': '#E5E7EB',
+            '500': '#A6A6A6',
+            '600': '#909090',
+            '700': '#6B7280',
+          },
+          red: {
+            DEFAULT: '#FF4242',
+          },
+          purple: {
+            DEFAULT: '#7665FF',
+          },
+        },
       },
       container: {
         center: true,
@@ -142,6 +167,6 @@ const config: Config = {
     },
   },
   plugins: [require('tailwind-scrollbar-hide')],
-};
+}
 
-export default config;
+export default config
