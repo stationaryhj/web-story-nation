@@ -188,7 +188,7 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
           userInfo?.user_key?.toString() || '0'
         )
 
-        const chatRoomPath = `http://localhost:5173/character/chat?info=${encryptedData}`
+        const chatRoomPath = `${CHAT_FRONTEND_ADDRESS}/character/chat?info=${encryptedData}`
         router.push(chatRoomPath)
 
         // if (chatId) {
@@ -523,90 +523,92 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   <div className="flex flex-col rounded-lg bg-white/80 p-4 dark:bg-dark-secondary-900/50">
                     {isDmMode ? (
                       <div className="space-y-3">
-                        {introBubbles.filter(group => group.messages.length > 0).map(group => (
-                          <div
-                            key={group.id}
-                            className={`flex ${group.speaker === 'user' ? 'justify-end' : 'items-start'}`}
-                          >
-                            {group.speaker === 'character' && (
-                              <div className="relative mr-3 flex-shrink-0">
-                                <div className="h-10 w-10 overflow-hidden rounded-full border-2 border-primary-200 shadow-sm dark:border-primary-800">
-                                  {selectedCharacter.imageUrl ? (
-                                    <Image
-                                      src={selectedCharacter.imageUrl}
-                                      alt={selectedCharacter.name || '캐릭터'}
-                                      width={40}
-                                      height={40}
-                                      className="h-full w-full object-cover"
-                                    />
-                                  ) : (
-                                    <div className="flex h-full w-full items-center justify-center bg-primary-100 dark:bg-primary-900">
-                                      <FontAwesomeIcon
-                                        icon={faUser}
-                                        className="text-primary-500 dark:text-primary-400"
-                                      />
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            )}
-                            <div className={`max-w-[85%] ${group.speaker === 'user' ? '' : ''}`}>
+                        {introBubbles
+                          .filter(group => group.messages.length > 0)
+                          .map(group => (
+                            <div
+                              key={group.id}
+                              className={`flex ${group.speaker === 'user' ? 'justify-end' : 'items-start'}`}
+                            >
                               {group.speaker === 'character' && (
-                                <div className="mb-1 text-xs font-medium text-primary-600 dark:text-primary-400">
-                                  {selectedCharacter.name || '캐릭터'}
-                                </div>
-                              )}
-                              <div className="space-y-2">
-                                {group.messages.map(m => {
-                                  const isImageToken = /^\[\d+\]$/.test(m.text)
-                                  const imageUrl = getMultiImageUrl(m.text)
-                                  const isVoice = m.text.startsWith(VOICE_PREFIX)
-                                  if (isImageToken) {
-                                    return imageUrl ? (
-                                      <div key={m.id} className="h-[160px] w-[160px] overflow-hidden rounded-lg">
-                                        <Image
-                                          src={imageUrl}
-                                          alt="인트로 이미지"
-                                          width={160}
-                                          height={160}
-                                          className="h-full w-full rounded-lg object-cover"
+                                <div className="relative mr-3 flex-shrink-0">
+                                  <div className="h-10 w-10 overflow-hidden rounded-full border-2 border-primary-200 shadow-sm dark:border-primary-800">
+                                    {selectedCharacter.imageUrl ? (
+                                      <Image
+                                        src={selectedCharacter.imageUrl}
+                                        alt={selectedCharacter.name || '캐릭터'}
+                                        width={40}
+                                        height={40}
+                                        className="h-full w-full object-cover"
+                                      />
+                                    ) : (
+                                      <div className="flex h-full w-full items-center justify-center bg-primary-100 dark:bg-primary-900">
+                                        <FontAwesomeIcon
+                                          icon={faUser}
+                                          className="text-primary-500 dark:text-primary-400"
                                         />
                                       </div>
-                                    ) : (
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                              <div className={`max-w-[85%] ${group.speaker === 'user' ? '' : ''}`}>
+                                {group.speaker === 'character' && (
+                                  <div className="mb-1 text-xs font-medium text-primary-600 dark:text-primary-400">
+                                    {selectedCharacter.name || '캐릭터'}
+                                  </div>
+                                )}
+                                <div className="space-y-2">
+                                  {group.messages.map(m => {
+                                    const isImageToken = /^\[\d+\]$/.test(m.text)
+                                    const imageUrl = getMultiImageUrl(m.text)
+                                    const isVoice = m.text.startsWith(VOICE_PREFIX)
+                                    if (isImageToken) {
+                                      return imageUrl ? (
+                                        <div key={m.id} className="h-[160px] w-[160px] overflow-hidden rounded-lg">
+                                          <Image
+                                            src={imageUrl}
+                                            alt="인트로 이미지"
+                                            width={160}
+                                            height={160}
+                                            className="h-full w-full rounded-lg object-cover"
+                                          />
+                                        </div>
+                                      ) : (
+                                        <div
+                                          key={m.id}
+                                          className="h-[160px] w-[160px] animate-pulse rounded-lg bg-secondary-100 dark:bg-dark-secondary-800"
+                                        />
+                                      )
+                                    }
+                                    if (isVoice) {
+                                      return (
+                                        <VoiceBubble
+                                          key={m.id}
+                                          text={m.text.slice(VOICE_PREFIX.length)}
+                                          className="rounded-lg rounded-tl-none border border-primary-100 bg-primary-50 text-secondary-800 dark:border-primary-800/50 dark:bg-primary-900/30 dark:text-secondary-200"
+                                        />
+                                      )
+                                    }
+                                    return (
                                       <div
                                         key={m.id}
-                                        className="h-[160px] w-[160px] animate-pulse rounded-lg bg-secondary-100 dark:bg-dark-secondary-800"
-                                      />
+                                        className={`rounded-lg p-3 text-sm shadow-sm ${
+                                          group.speaker === 'character'
+                                            ? 'rounded-tl-none border border-primary-100 bg-primary-50 text-secondary-800 dark:border-primary-800/50 dark:bg-primary-900/30 dark:text-secondary-200'
+                                            : 'rounded-tr-none border border-secondary-200 bg-white text-secondary-800 dark:border-dark-secondary-700 dark:bg-dark-secondary-800 dark:text-secondary-200'
+                                        }`}
+                                      >
+                                        <p className="whitespace-pre-wrap break-words leading-relaxed">
+                                          {getChangeNameTag(m.text, selectedCharacter.name)}
+                                        </p>
+                                      </div>
                                     )
-                                  }
-                                  if (isVoice) {
-                                    return (
-                                      <VoiceBubble
-                                        key={m.id}
-                                        text={m.text.slice(VOICE_PREFIX.length)}
-                                        className="rounded-lg rounded-tl-none border border-primary-100 bg-primary-50 text-secondary-800 dark:border-primary-800/50 dark:bg-primary-900/30 dark:text-secondary-200"
-                                      />
-                                    )
-                                  }
-                                  return (
-                                    <div
-                                      key={m.id}
-                                      className={`rounded-lg p-3 text-sm shadow-sm ${
-                                        group.speaker === 'character'
-                                          ? 'rounded-tl-none border border-primary-100 bg-primary-50 text-secondary-800 dark:border-primary-800/50 dark:bg-primary-900/30 dark:text-secondary-200'
-                                          : 'rounded-tr-none border border-secondary-200 bg-white text-secondary-800 dark:border-dark-secondary-700 dark:bg-dark-secondary-800 dark:text-secondary-200'
-                                      }`}
-                                    >
-                                      <p className="whitespace-pre-wrap break-words leading-relaxed">
-                                        {getChangeNameTag(m.text, selectedCharacter.name)}
-                                      </p>
-                                    </div>
-                                  )
-                                })}
+                                  })}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
                       </div>
                     ) : (
                       <div className="flex items-start">
@@ -890,87 +892,92 @@ export default function CharactorModal({ isOpen, onClose }: CharactorModalProps)
                   </h3>
                   {isDmMode ? (
                     <div className="space-y-3">
-                      {introBubbles.filter(group => group.messages.length > 0).map(group => (
-                        <div
-                          key={group.id}
-                          className={`flex ${group.speaker === 'user' ? 'justify-end' : 'items-start'}`}
-                        >
-                          {group.speaker === 'character' && (
-                            <div className="relative mr-3 flex-shrink-0">
-                              <div className="h-10 w-10 overflow-hidden rounded-full border-2 border-primary-200 shadow-sm dark:border-primary-800">
-                                {selectedCharacter.imageUrl ? (
-                                  <Image
-                                    src={selectedCharacter.imageUrl}
-                                    alt={selectedCharacter.name || '캐릭터'}
-                                    width={40}
-                                    height={40}
-                                    className="h-full w-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="flex h-full w-full items-center justify-center bg-primary-100 dark:bg-primary-900">
-                                    <FontAwesomeIcon icon={faUser} className="text-primary-500 dark:text-primary-400" />
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                          <div className="max-w-[85%]">
+                      {introBubbles
+                        .filter(group => group.messages.length > 0)
+                        .map(group => (
+                          <div
+                            key={group.id}
+                            className={`flex ${group.speaker === 'user' ? 'justify-end' : 'items-start'}`}
+                          >
                             {group.speaker === 'character' && (
-                              <div className="mb-1 text-xs font-medium text-primary-600 dark:text-primary-400">
-                                {selectedCharacter.name || '캐릭터'}
-                              </div>
-                            )}
-                            <div className="space-y-2">
-                              {group.messages.map(m => {
-                                const isImageToken = /^\[\d+\]$/.test(m.text)
-                                const imageUrl = getMultiImageUrl(m.text)
-                                const isVoice = m.text.startsWith(VOICE_PREFIX)
-                                if (isImageToken) {
-                                  return imageUrl ? (
-                                    <div key={m.id} className="overflow-hidden rounded-lg">
-                                      <Image
-                                        src={imageUrl}
-                                        alt="인트로 이미지"
-                                        width={300}
-                                        height={300}
-                                        className="h-auto w-full rounded-lg object-cover"
+                              <div className="relative mr-3 flex-shrink-0">
+                                <div className="h-10 w-10 overflow-hidden rounded-full border-2 border-primary-200 shadow-sm dark:border-primary-800">
+                                  {selectedCharacter.imageUrl ? (
+                                    <Image
+                                      src={selectedCharacter.imageUrl}
+                                      alt={selectedCharacter.name || '캐릭터'}
+                                      width={40}
+                                      height={40}
+                                      className="h-full w-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="flex h-full w-full items-center justify-center bg-primary-100 dark:bg-primary-900">
+                                      <FontAwesomeIcon
+                                        icon={faUser}
+                                        className="text-primary-500 dark:text-primary-400"
                                       />
                                     </div>
-                                  ) : (
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                            <div className="max-w-[85%]">
+                              {group.speaker === 'character' && (
+                                <div className="mb-1 text-xs font-medium text-primary-600 dark:text-primary-400">
+                                  {selectedCharacter.name || '캐릭터'}
+                                </div>
+                              )}
+                              <div className="space-y-2">
+                                {group.messages.map(m => {
+                                  const isImageToken = /^\[\d+\]$/.test(m.text)
+                                  const imageUrl = getMultiImageUrl(m.text)
+                                  const isVoice = m.text.startsWith(VOICE_PREFIX)
+                                  if (isImageToken) {
+                                    return imageUrl ? (
+                                      <div key={m.id} className="overflow-hidden rounded-lg">
+                                        <Image
+                                          src={imageUrl}
+                                          alt="인트로 이미지"
+                                          width={300}
+                                          height={300}
+                                          className="h-auto w-full rounded-lg object-cover"
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div
+                                        key={m.id}
+                                        className="h-[160px] w-[160px] animate-pulse rounded-lg bg-secondary-100 dark:bg-dark-secondary-800"
+                                      />
+                                    )
+                                  }
+                                  if (isVoice) {
+                                    return (
+                                      <VoiceBubble
+                                        key={m.id}
+                                        text={m.text.slice(VOICE_PREFIX.length)}
+                                        className="rounded-lg rounded-tl-none border border-primary-100 bg-primary-50 text-secondary-800 dark:border-primary-800/50 dark:bg-primary-900/30 dark:text-secondary-200"
+                                      />
+                                    )
+                                  }
+                                  return (
                                     <div
                                       key={m.id}
-                                      className="h-[160px] w-[160px] animate-pulse rounded-lg bg-secondary-100 dark:bg-dark-secondary-800"
-                                    />
+                                      className={`rounded-lg p-3 text-sm shadow-sm ${
+                                        group.speaker === 'character'
+                                          ? 'rounded-tl-none border border-primary-100 bg-primary-50 text-secondary-800 dark:border-primary-800/50 dark:bg-primary-900/30 dark:text-secondary-200'
+                                          : 'rounded-tr-none border border-secondary-200 bg-white text-secondary-800 dark:border-dark-secondary-700 dark:bg-dark-secondary-800 dark:text-secondary-200'
+                                      }`}
+                                    >
+                                      <p className="whitespace-pre-wrap break-words leading-relaxed">
+                                        {getChangeNameTag(m.text, selectedCharacter.name)}
+                                      </p>
+                                    </div>
                                   )
-                                }
-                                if (isVoice) {
-                                  return (
-                                    <VoiceBubble
-                                      key={m.id}
-                                      text={m.text.slice(VOICE_PREFIX.length)}
-                                      className="rounded-lg rounded-tl-none border border-primary-100 bg-primary-50 text-secondary-800 dark:border-primary-800/50 dark:bg-primary-900/30 dark:text-secondary-200"
-                                    />
-                                  )
-                                }
-                                return (
-                                  <div
-                                    key={m.id}
-                                    className={`rounded-lg p-3 text-sm shadow-sm ${
-                                      group.speaker === 'character'
-                                        ? 'rounded-tl-none border border-primary-100 bg-primary-50 text-secondary-800 dark:border-primary-800/50 dark:bg-primary-900/30 dark:text-secondary-200'
-                                        : 'rounded-tr-none border border-secondary-200 bg-white text-secondary-800 dark:border-dark-secondary-700 dark:bg-dark-secondary-800 dark:text-secondary-200'
-                                    }`}
-                                  >
-                                    <p className="whitespace-pre-wrap break-words leading-relaxed">
-                                      {getChangeNameTag(m.text, selectedCharacter.name)}
-                                    </p>
-                                  </div>
-                                )
-                              })}
+                                })}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   ) : (
                     <div className="mb-4 flex items-start">
