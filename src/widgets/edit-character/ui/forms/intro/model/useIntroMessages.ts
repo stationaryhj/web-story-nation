@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { type FieldError, useFormContext } from 'react-hook-form'
 import { getImageUri } from '@/lib/utils/storyNationUtil'
 import type { DmFormValues } from '@/src/features/edit-character/model/dmFormTypes'
-import { useAccountStore } from '@/store/useAccountStore'
 import useModalStore from '@/src/shared/model/stores/useModalStore'
 import { useTabContext } from '@/src/shared/ui/tab/Tab'
 import {
@@ -44,10 +43,7 @@ export function useIntroMessages() {
   const bubbleGroups: BubbleGroup[] = watch('introBubbles') ?? []
   const multiImages = watch('multi_images') ?? []
   const activeSpeaker: Speaker = watch('introActiveSpeaker') ?? 'character'
-  const { data } = useAccountStore()
-
   const introBubblesError = errors.introBubbles as FieldError | undefined
-  const userName = data?.persona || data?.nick_nm
 
   const messages = useMemo(() => groupsToFlat(bubbleGroups), [bubbleGroups])
   const grouped = useMemo(() => groupForRender(messages), [messages])
@@ -81,7 +77,10 @@ export function useIntroMessages() {
     [characterName]
   )
 
-  const messagesLength = useMemo(() => messages.reduce((sum, msg) => sum + msg.text.length, 0), [messages])
+  const messagesLength = useMemo(
+    () => messages.reduce((sum, msg) => (msg.type === 'image' ? sum : sum + msg.text.length), 0),
+    [messages]
+  )
   const totalLength = messagesLength + inputText.length
 
   const handleChange = useCallback(
@@ -228,7 +227,7 @@ export function useIntroMessages() {
     }
   }
 
-  const displayText = useCallback((text: string) => text.replaceAll('{{user}}', userName || ''), [userName])
+  const displayText = useCallback((text: string) => text, [])
 
   // ─── 전송 ───
 
