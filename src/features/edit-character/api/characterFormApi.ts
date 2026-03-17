@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { instance } from '@/shared/api/instance/instance'
 import { apiRoute } from '@/shared/config/apiRoute'
 import { exampleDatasToConversationJson } from '@/lib/utils/storyNationUtil'
-import type { CharacterFormData, Tag } from '@/features/character-form/model/characterFormStore'
+import type { CharacterFormData, Tag } from '@/features/edit-character/model/characterFormStore'
 import type { MultiImageData } from '@/services/define'
 
 

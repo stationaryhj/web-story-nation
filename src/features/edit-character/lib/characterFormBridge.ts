@@ -1,4 +1,4 @@
-import type { CharacterGender } from '@/store/useCreateCharacterData'
+import type { CharacterGender, CharacterVisibility, CharacterRating } from '@/src/features/edit-character/model/characterFormStore'
 import { parseConversationExamples } from '@/lib/utils/storyNationUtil'
 
 function getGenderFromNumber(gender: number): CharacterGender {
@@ -6,6 +6,8 @@ function getGenderFromNumber(gender: number): CharacterGender {
   if (gender === 2) return 'female'
   return 'unspecified'
 }
+
+export type BridgedCharacterData = ReturnType<typeof bridgeCharacterInProgressToCharacter>
 
 /**
  * 서버에서 받은 inprogress 데이터를 CharacterFormData 형태로 변환
@@ -26,7 +28,7 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
   }
 
   return {
-    id: data.world_list_detail_chrbot_key?.toString() || '',
+    world_list_detail_chrbot_key: data.world_list_detail_chrbot_key?.toString() || '',
     name: data.title || '',
     subject: data.subject || '',
     gender: getGenderFromNumber(Number(data.gender)),
@@ -45,13 +47,12 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
           .filter((tag: string) => tag !== '')
       : [],
 
-    img_url: data.img_url || '',
-    img_url_nsfw: data.img_url_nsfw || '',
-    img_web_url: data.img_web_url || '',
+    imgUrl: data.img_url || '',
+    imgUrlNsfw: data.img_url_nsfw || '',
 
-    visibility: data.show_yn === 1 ? 'public' : 'private',
-    examplesVisibility: data.example_show_yn === 1 ? 'public' : 'private',
-    rating: data.nsfw === 1 ? 'adult' : 'all',
+    visibility: (data.show_yn === 1 ? 'public' : 'private') as CharacterVisibility,
+    examplesVisibility: (data.example_show_yn === 1 ? 'public' : 'private') as CharacterVisibility,
+    rating: (data.nsfw === 1 ? 'adult' : 'all') as CharacterRating,
 
     finish_yn: data.finish_yn || 0,
     writer_note: data.writer_note || '',
@@ -64,6 +65,7 @@ export function bridgeCharacterInProgressToCharacter(data: any) {
     multi_images_original: data.multi_images || [],
     property: data.property || '',
 
+    chat_room_mode: data.chat_room_mode ?? 0,
     isVisibilityLock: data.finish_yn === 1 && data.show_yn === 1,
   }
 }

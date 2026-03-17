@@ -11,4 +11,7 @@ export const apiRoute = {
       get: '/api/charbot/tag/get',
     },
   },
+  s3: {
+    presignedUrl: '/api/s3/presignedurl',
+  },
 } as const

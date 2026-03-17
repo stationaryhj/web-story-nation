@@ -410,12 +410,12 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
 
           result.messages.forEach((message) => {
             const messageContent = message.content as any;
-            const senderId = message.message_id || 
+            const senderId = message.message_id ||
               `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-            const createTime = message.create_time ? 
+            const createTime = message.create_time ?
               new Date(message.create_time) : new Date();
-            
-            
+
+
             addChatMessage({
               id: senderId,
               sender: messageContent?.type === 'user' ? 'user' : 'character',
@@ -842,7 +842,12 @@ export const NakamaProvider: React.FC<NakamaProviderProps> = ({
     // 메시지 핸들러 설정
     socketRef.current.onchannelmessage = async (message) => {
       try {
-        console.log('소켓에서 받은 메세지 ::: ' , message)
+        console.log('@@ [onchannelmessage] 소켓 메시지 수신:', {
+          message_id: message.message_id,
+          channel_id: message.channel_id,
+          content: message.content,
+          create_time: message.create_time,
+        });
 
         // 내부 메시지 처리 함수 호출하여 UI에 메시지 표시
         handleMessage(message);

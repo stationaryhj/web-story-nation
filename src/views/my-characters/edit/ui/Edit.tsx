@@ -1,15 +1,16 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import Header from '@/components/common/header';
 import { useCharacterInProgress } from '@/shared/api/queries/useCharacterInProgress';
-import { EditStory } from '@/widgets/edit-story';
+import { EditDm, EditStory } from '@/widgets/edit-character';
 
 export default function Edit() {
   const params = useParams();
   const characterId = Number(params?.id);
 
   const { data, isLoading, error } = useCharacterInProgress(characterId);
-  const chatRoomMode = data?.chrbot?.chat_room_mode;
+  const chatRoomMode = data?.chat_room_mode;
 
   if (isLoading) {
     return (
@@ -30,9 +31,13 @@ export default function Edit() {
   }
 
   if (chatRoomMode === 1) {
-    // TODO: DM 모드 페이지 구현 후 교체
-    return <div>DM 모드 (준비 중)</div>;
+    return <EditDm data={data!} />;
   }
 
-  return <EditStory />;
+  return (
+    <>
+      <Header />
+      <EditStory />
+    </>
+  );
 }

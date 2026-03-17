@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { instance } from '@/shared/api/instance/instance'
 import { apiRoute } from '@/shared/config/apiRoute'
-import type { Tag } from '@/features/character-form/model/characterFormStore'
+import type { Tag } from '@/features/edit-character/model/characterFormStore'
 
 export const useTagList = () => {
   return useQuery<Tag[]>({

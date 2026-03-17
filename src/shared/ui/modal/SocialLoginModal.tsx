@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import GuestLoginForm from '@/components/form/GuestLoginForm';
 import { getChatRoomEncryptData, getPlatform } from '@/lib/utils/storyNationUtil';
 import { authService } from '@/services/auth';
 import { SocialLoginProvider } from '@/services/auth/types';
@@ -458,7 +459,7 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
 						</div>
 					</div> */}
 
-          {/*   <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} /> */}
+          <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} />
           {/* 신규 가입 모드일 때만 약관 동의 문구 표시 */}
         </div>
       </Modal.Content>
