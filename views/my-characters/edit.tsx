@@ -174,7 +174,6 @@ export default function EditCharacterPage() {
         return
       }
 
-      const saveResult = await saveInProgress(1)
       setActiveTab('basic')
       router.push('/my-characters')
     } catch (error) {

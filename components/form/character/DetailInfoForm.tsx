@@ -11,7 +11,6 @@ import BaseModal from '@/components/modal/BaseModal'
 import { toast } from 'react-toastify'
 import { exampleDatas } from '@/lib/utils/storyNationUtil'
 
-
 import LikeForm from './components/detail/like-form'
 
 const MAX_CONTENT_LENGTH = 3500
@@ -90,7 +89,7 @@ export default function DetailInfoForm({
 }: DetailInfoFormProps) {
   const { isVaild, formData, setFormField } = useCreateCharacterData()
 
-    // 현재 선택된 입력 필드 (user 또는 character)
+  // 현재 선택된 입력 필드 (user 또는 character)
   const [activeField, setActiveField] = useState<{ id: number; field: 'user' | 'character' } | null>(null)
   const [showTutorial, setShowTutorial] = useState(false)
   const [totalMessageLength, setTotalMessageLength] = useState(0) // 전체 메시지 길이
@@ -110,7 +109,6 @@ export default function DetailInfoForm({
 
   const exampleDatas = formData.conversationExamples
 
-  
   // 디바운스된 토스트 알림 함수
   const showDebouncedToast = (message: string) => {
     if (toastDebounceRef.current) {
@@ -127,7 +125,7 @@ export default function DetailInfoForm({
   const calculateTotalMessageLength = () => {
     let total = 0
 
-    if(exampleDatas.length === 0) {
+    if (exampleDatas.length === 0) {
       return 0
     }
 
@@ -138,15 +136,12 @@ export default function DetailInfoForm({
     return total
   }
 
-
-
   // 전체 메시지 길이 업데이트
   useEffect(() => {
     const total = calculateTotalMessageLength()
     setTotalMessageLength(total)
     setRemainingChars(MAX_REMAINING_LENGTH - total)
   }, [formData.conversationExamples])
-
 
   useEffect(() => {
     const total = formData.content.length + formData.content_public.length
@@ -222,10 +217,8 @@ export default function DetailInfoForm({
     // 대화 예시 추가
     addConversationExample()
 
-
     // 튜토리얼 조건을 더 걸어놔야 할것같음.. 현재는 다시 추가할때마다 투토리얼이 표시됨
     // 현재 조건은 튜토리얼 다시보지 않기를 했을 시에만 !! 혹은 튜토리얼을 보고 언마운트가 안되어있을 경우에만 !!
-
 
     // 약간의 지연 후 스크롤 및 튜토리얼 표시 (DOM 업데이트 대기)
     setTimeout(() => {
@@ -259,7 +252,6 @@ export default function DetailInfoForm({
     }
   }, [exampleDatas])
 
-
   // 유효성 검사
   useEffect(() => {
     if (onValidationChange) {
@@ -275,13 +267,12 @@ export default function DetailInfoForm({
     setFormField('examplesVisibility', visibility)
   }
 
-
   const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value
     let totalContentLength = formData.content.length + formData.content_public.length
     totalContentLength -= formData.content.length
 
-    if((totalContentLength + value.length) > MAX_CONTENT_LENGTH) {
+    if (totalContentLength + value.length > MAX_CONTENT_LENGTH) {
       showDebouncedToast(`전체 상세 설명 글자수는 ${MAX_CONTENT_LENGTH}자를 초과할 수 없습니다.`)
       return
     }
@@ -294,7 +285,7 @@ export default function DetailInfoForm({
     let totalContentLength = formData.content.length + formData.content_public.length
     totalContentLength -= formData.content_public.length
 
-    if((totalContentLength + value.length) > MAX_CONTENT_LENGTH) {
+    if (totalContentLength + value.length > MAX_CONTENT_LENGTH) {
       showDebouncedToast(`전체 상세 설명 글자수는 ${MAX_CONTENT_LENGTH}자를 초과할 수 없습니다.`)
       return
     }
@@ -315,23 +306,22 @@ export default function DetailInfoForm({
     })
 
     const findData = formData.conversationExamples.find((find: exampleDatas) => find.index === id)
-    if(!findData) {
+    if (!findData) {
       return
     }
 
-    if(isUser) {
+    if (isUser) {
       totalMsgLength -= findData.userMsg.length
     } else {
       totalMsgLength -= findData.characterMsg.length
     }
 
-    if((totalMsgLength + msg.length) > MAX_REMAINING_LENGTH) {
+    if (totalMsgLength + msg.length > MAX_REMAINING_LENGTH) {
       showDebouncedToast(`전체 대화 예시는 ${MAX_REMAINING_LENGTH}자를 초과할 수 없습니다.`)
       return
     }
 
-
-    if(isUser) {
+    if (isUser) {
       findData.userMsg = msg
     } else {
       findData.characterMsg = msg
@@ -339,7 +329,6 @@ export default function DetailInfoForm({
     findData.textLength = findData.userMsg.length + findData.characterMsg.length
     updateConversationExample(findData)
   }
-
 
   // 커서 관련 공통 함수
   const handleSpecialTagInsert = (field: 'user' | 'character', id: number, tag: string) => {
@@ -414,7 +403,6 @@ export default function DetailInfoForm({
     return `${current}/${max}`
   }
 
-
   return (
     <>
       <div className="space-y-8">
@@ -422,7 +410,7 @@ export default function DetailInfoForm({
 
         {/* 상세 설명 */}
         <div>
-          <div className="flex justify-between items-start mb-6">
+          <div className="mb-6 flex items-start justify-between">
             <div>
               <h3 className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">상세 설명</h3>
               <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">
@@ -432,33 +420,33 @@ export default function DetailInfoForm({
           </div>
 
           {/* 공개설명 */}
-          <div className='flex flex-col gap-4'>
+          <div className="flex flex-col gap-4">
             <FormTextarea
-              label='공개 설명'
-              name='content_public'
-              id='content-public'
+              label="공개 설명"
+              name="content_public"
+              id="content-public"
               value={formData.content_public}
               onChange={handleContentPublicChange}
-              placeholder='독자에게 공개되고 AI에게 전송되는 프롬프트에요 :) 캐릭터를 자세히 설명해 주세요!'
+              placeholder="독자에게 공개되고 AI에게 전송되는 프롬프트에요 :) 캐릭터를 자세히 설명해 주세요!"
               rows={4}
               maxLength={MAX_CONTENT_LENGTH}
             />
 
             {/* 비공개설명 */}
             <FormTextarea
-              label='비공개 설명'
-              name='content'
+              label="비공개 설명"
+              name="content"
               value={formData.content}
               onChange={handleContentChange}
-              placeholder='AI에게만 전송되는 비밀 프롬프트에요 :) 작가님만의 비법 프롬프트를 입력해 보세요!'
+              placeholder="AI에게만 전송되는 비밀 프롬프트에요 :) 작가님만의 비법 프롬프트를 입력해 보세요!"
               rows={4}
               maxLength={MAX_CONTENT_LENGTH}
             />
           </div>
 
-          <div className="mt-4 flex justify-end items-center">
+          <div className="mt-4 flex items-center justify-end">
             <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-            전체 상세 설명 글자수: {totalContentChars}/{MAX_CONTENT_LENGTH}(남은 글자 수: {contentChars}자)
+              전체 상세 설명 글자수: {totalContentChars}/{MAX_CONTENT_LENGTH}(남은 글자 수: {contentChars}자)
               {/* 전체 대화 예시 글자 수: {totalMessageLength}/1500 (남은 글자 수: {remainingChars}자) */}
             </span>
           </div>
@@ -467,83 +455,77 @@ export default function DetailInfoForm({
         {/* 구분선 */}
         <hr className="border-secondary-200 dark:border-dark-secondary-200/10" />
 
-        {/* 대화 예시 섹션 */}
-        <div id="conversation-examples">
-          <div className="mb-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-                  대화 예시(최대 3개)
-                </h3>
-                <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-                  캐릭터의 말투가 채팅에 반영될 거에요!
-                </p>
+        {exampleDatas.length === 0 ? (
+          ''
+        ) : (
+          <div id="conversation-examples">
+            <div className="mb-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
+                    대화 예시(최대 3개)
+                  </h3>
+                  <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">
+                    캐릭터의 말투가 채팅에 반영될 거에요!
+                  </p>
+                </div>
+              </div>
+
+              {/* 대화 예시 공개/비공개 선택 버튼 */}
+              <div className="mt-4 grid w-full grid-cols-2 gap-2 sm:w-1/2 sm:gap-4 md:w-1/3">
+                <button
+                  type="button"
+                  className={`w-full rounded-lg px-2 py-1.5 text-center text-sm transition-colors sm:px-3 sm:py-2 sm:text-base ${
+                    formData.examplesVisibility === 'private'
+                      ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                      : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                  }`}
+                >
+                  대화 예시 비공개
+                </button>
+                <button
+                  type="button"
+                  className={`w-full rounded-lg px-2 py-1.5 text-center text-sm transition-colors sm:px-3 sm:py-2 sm:text-base ${
+                    formData.examplesVisibility === 'public'
+                      ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
+                      : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                  }`}
+                >
+                  대화 예시 공개
+                </button>
               </div>
             </div>
 
-            {/* 대화 예시 공개/비공개 선택 버튼 */}
-            <div className="grid grid-cols-2 gap-2 sm:gap-4 w-full sm:w-1/2 md:w-1/3 mt-4">
-              <button
-                type="button"
-                onClick={() => handleExamplesVisibilitySelect('private')}
-                className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-center text-sm sm:text-base transition-colors ${
-                  formData.examplesVisibility === 'private'
-                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-                }`}
-              >
-                대화 예시 비공개
-              </button>
-              <button
-                type="button"
-                onClick={() => handleExamplesVisibilitySelect('public')}
-                className={`w-full px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-center text-sm sm:text-base transition-colors ${
-                  formData.examplesVisibility === 'public'
-                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
-                }`}
-              >
-                대화 예시 공개
-              </button>
-            </div>
-          </div>
-
-          {/* 빈 대화 예시 추가 구역 */}
-          {exampleDatas.length < 3 && (
+            {/* 빈 대화 예시 추가 구역 */}
+            {/*  {exampleDatas.length < 3 && (
             <div
               id="button-add-chat-example"
-              className="flex items-center justify-center border-2 border-dashed border-secondary-200 dark:border-dark-secondary-200/10 rounded-lg p-3 sm:p-4 mt-3 sm:mt-4 cursor-pointer hover:border-primary-300 dark:hover:border-dark-primary-500/30 transition-colors mb-4"
+              className="mb-4 mt-3 flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-secondary-200 p-3 transition-colors hover:border-primary-300 dark:border-dark-secondary-200/10 dark:hover:border-dark-primary-500/30 sm:mt-4 sm:p-4"
               onClick={handleAddConversationExample}
             >
               <div className="flex flex-col items-center text-secondary-500 dark:text-dark-secondary-500">
-                <FontAwesomeIcon icon={faPlus} className="mb-1 sm:mb-2 text-lg sm:text-xl" />
+                <FontAwesomeIcon icon={faPlus} className="mb-1 text-lg sm:mb-2 sm:text-xl" />
                 <span className="text-xs sm:text-sm">대화 예시 추가하기</span>
               </div>
             </div>
           )}
-
-          {/* 대화 예시 목록 */}
-          <div className="space-y-6">
-            {exampleDatas.length === 0 ? (
-              <div className="text-center py-8 text-secondary-500 dark:text-dark-secondary-500">
-                대화 예시가 없습니다. 아래 버튼을 클릭하여 추가해주세요.
-              </div>
-            ) : (
-              exampleDatas.map((data: exampleDatas) => (
+          */}
+            {/* 대화 예시 목록 */}
+            <div className="space-y-6">
+              {exampleDatas.map((data: exampleDatas) => (
                 <div
                   key={data.index}
-                  className="relative bg-secondary-50 dark:bg-dark-secondary-800/5 p-3 sm:p-4 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10"
+                  className="relative rounded-lg border border-secondary-200 bg-secondary-50 p-3 dark:border-dark-secondary-200/10 dark:bg-dark-secondary-800/5 sm:p-4"
                 >
-                  <div className="flex justify-between items-center mb-3 sm:mb-4">
-                    <h4 className="text-xs sm:text-sm font-medium text-secondary-700 dark:text-dark-secondary-400"></h4>
-                    <div className="flex space-x-1 sm:space-x-2">
-                      {/* 특수 태그 버튼들 */}
+                  <div className="mb-3 flex items-center justify-between sm:mb-4">
+                    <h4 className="text-xs font-medium text-secondary-700 dark:text-dark-secondary-400 sm:text-sm"></h4>
+                    {/* <div className="flex space-x-1 sm:space-x-2">
                       <div className="flex gap-2">
                         <button
                           id="context-info-button"
                           type="button"
                           onClick={handleContextInfoClick}
-                          className="px-1 sm:px-3 sm:py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-[11px] sm:text-xs flex items-center sm:mr-0 sm:mb-0 w-auto"
+                          className="flex w-auto items-center rounded bg-gray-200 px-1 text-[11px] text-gray-700 hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 sm:mb-0 sm:mr-0 sm:px-3 sm:py-1.5 sm:text-xs"
                           title="상황 설명 추가"
                         >
                           상황 설명 추가(*)
@@ -552,7 +534,7 @@ export default function DetailInfoForm({
                           id="character-name-button"
                           type="button"
                           onClick={handleCharacterNameClick}
-                          className="px-1 sm:px-3 sm:py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-[11px] sm:text-xs flex items-center sm:mr-0 sm:mb-0 w-auto"
+                          className="flex w-auto items-center rounded bg-gray-200 px-1 text-[11px] text-gray-700 hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 sm:mb-0 sm:mr-0 sm:px-3 sm:py-1.5 sm:text-xs"
                           title="캐릭터 이름 추가"
                         >
                           캐릭터 이름
@@ -561,7 +543,7 @@ export default function DetailInfoForm({
                           id="user-name-button"
                           type="button"
                           onClick={handleUserNameClick}
-                          className="px-1 sm:px-3 sm:py-1.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 text-[11px] sm:text-xs flex items-center w-auto"
+                          className="flex w-auto items-center rounded bg-gray-200 px-1 text-[11px] text-gray-700 hover:bg-gray-200 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400 sm:px-3 sm:py-1.5 sm:text-xs"
                           title="유저 이름 추가"
                         >
                           유저 이름
@@ -571,17 +553,17 @@ export default function DetailInfoForm({
                         id="delete-chat-example"
                         type="button"
                         onClick={() => handleDeleteExample(data.index)}
-                        className="p-1 sm:p-1.5 text-red-500 hover:text-red-700 focus:outline-none"
+                        className="p-1 text-red-500 hover:text-red-700 focus:outline-none sm:p-1.5"
                         title="대화 예시 삭제"
                       >
                         <FontAwesomeIcon icon={faTrashCan} />
                       </button>
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* 대화 예시 제목 입력 필드 */}
                   <div className="mb-3 sm:mb-4">
-                    <div className="flex justify-between items-center mb-1">
+                    <div className="mb-1 flex items-center justify-between">
                       <label className="block text-xs font-medium text-secondary-700 dark:text-dark-secondary-400">
                         대화 예시 제목
                       </label>
@@ -589,20 +571,23 @@ export default function DetailInfoForm({
                         {formatTextLength((data.title || '').length, 25)}
                       </span>
                     </div>
-                    <input
+                    <div className="w-full rounded-lg border border-secondary-200 bg-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-400 dark:focus:ring-dark-primary-500 sm:px-4 sm:py-3">
+                      <p>{data.title}</p>
+                    </div>
+                    {/* <input
                       type="text"
                       id={`example-title-${data.index}`}
                       value={data.title || ''}
                       onChange={e => handleExampleTitleChange(data.index, e.target.value)}
                       placeholder="대화 예시 제목을 입력하세요"
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 text-sm"
+                      className="w-full rounded-lg border border-secondary-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-400 dark:focus:ring-dark-primary-500 sm:px-4 sm:py-3"
                       maxLength={25}
-                    />
+                    /> */}
                   </div>
 
                   {/* 사용자 메시지 */}
                   <div id="user-message-container" className="mb-3 sm:mb-4">
-                    <div className="flex justify-between items-center mb-1">
+                    <div className="mb-1 flex items-center justify-between">
                       <label className="block text-xs font-medium text-secondary-700 dark:text-dark-secondary-400">
                         <FontAwesomeIcon icon={faUser} className="mr-1" /> 유저 메시지
                       </label>
@@ -610,20 +595,23 @@ export default function DetailInfoForm({
                         {data.userMsg?.length || 0}자
                       </span>
                     </div>
-                    <textarea
+                    <div className="w-full resize-none rounded-lg border border-secondary-200 bg-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-400 dark:focus:ring-dark-primary-500 sm:px-4 sm:py-3">
+                      <p>{data.userMsg || ''}</p>
+                    </div>
+                    {/*   <textarea
                       id={`user-message-${data.index}`}
                       value={data.userMsg || ''}
                       onChange={e => handleMessageChange(data.index, e.target.value, true)}
                       onFocus={() => setActiveField({ id: data.index, field: 'user' })}
                       placeholder="유저 대화 내용을 입력하세요"
                       rows={2}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none text-sm"
-                    />
+                      className="w-full resize-none rounded-lg border border-secondary-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-400 dark:focus:ring-dark-primary-500 sm:px-4 sm:py-3"
+                    /> */}
                   </div>
 
                   {/* 캐릭터 메시지 */}
                   <div id="character-message-container">
-                    <div className="flex justify-between items-center mb-1">
+                    <div className="mb-1 flex items-center justify-between">
                       <label className="block text-xs font-medium text-secondary-700 dark:text-dark-secondary-400">
                         <FontAwesomeIcon icon={faRobot} className="mr-1" /> 캐릭터 메시지
                       </label>
@@ -631,29 +619,32 @@ export default function DetailInfoForm({
                         {data.characterMsg?.length || 0}자
                       </span>
                     </div>
-                    <textarea
+                    <div className="w-full resize-none rounded-lg border border-secondary-200 bg-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-400 dark:focus:ring-dark-primary-500 sm:px-4 sm:py-3">
+                      <p>{data.characterMsg || ''}</p>
+                    </div>
+                    {/*  <textarea
                       id={`character-message-${data.index}`}
                       value={data.characterMsg || ''}
                       onChange={e => handleMessageChange(data.index, e.target.value, false)}
                       onFocus={() => setActiveField({ id: data.index, field: 'character' })}
                       placeholder="캐릭터 대화 내용을 입력하세요"
                       rows={2}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none text-sm"
-                    />
+                      className="w-full resize-none rounded-lg border border-secondary-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-400 dark:focus:ring-dark-primary-500 sm:px-4 sm:py-3"
+                    /> */}
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
 
-          {/* 전체 대화 예시 글자 수 표시 */}
-          <div className="mt-4 flex justify-end items-center">
-            <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-              전체 대화 예시 글자 수: {totalMessageLength}/{MAX_REMAINING_LENGTH} (남은 글자 수: {remainingChars}자)
-            </span>
+            {/* 전체 대화 예시 글자 수 표시 */}
+            <div className="mt-4 flex items-center justify-end">
+              <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
+                전체 대화 예시 글자 수: {totalMessageLength}/{MAX_REMAINING_LENGTH} (남은 글자 수: {remainingChars}자)
+              </span>
+            </div>
           </div>
-        </div>
-
+        )}
+        {/* 대화 예시 섹션 */}
 
         <LikeForm />
       </div>
@@ -695,24 +686,24 @@ export default function DetailInfoForm({
         size="sm"
         animation="scale"
         footerContent={
-          <div className="flex justify-end gap-2 w-full">
+          <div className="flex w-full justify-end gap-2">
             <button
               onClick={() => setIsDeleteModalOpen(false)}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 transition-colors rounded-lg text-gray-700"
+              className="rounded-lg bg-gray-100 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-200"
             >
               취소
             </button>
             <button
               onClick={confirmDeleteExample}
-              className="px-4 py-2 bg-red-500 hover:bg-red-600 transition-colors rounded-lg text-white"
+              className="rounded-lg bg-red-500 px-4 py-2 text-white transition-colors hover:bg-red-600"
             >
               삭제
             </button>
           </div>
         }
       >
-        <p className="text-center my-4">정말로 이 대화 예시를 삭제하시겠습니까?</p>
-        <p className="text-center text-gray-500 text-sm mb-4">삭제한 대화 예시는 복구할 수 없습니다.</p>
+        <p className="my-4 text-center">정말로 이 대화 예시를 삭제하시겠습니까?</p>
+        <p className="mb-4 text-center text-sm text-gray-500">삭제한 대화 예시는 복구할 수 없습니다.</p>
       </BaseModal>
     </>
   )
