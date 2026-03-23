@@ -10,6 +10,7 @@ import type { DmFormValues } from '@/src/features/edit-character/model/dmFormTyp
 import { FormFieldHeader } from '@/src/shared/ui/form'
 import { useUploadImage, useUploadImages } from '@/src/features/edit-character/api/useUploadImage'
 import { useDeleteMultiImage, useSaveMultiImages } from '@/src/features/edit-character/api/characterFormApi'
+import { useDmSave } from '@/src/features/edit-character/lib/useDmSave'
 import type { DmMultiImage } from '@/src/features/edit-character/model/dmFormTypes'
 import { cn } from '@/src/shared/lib/utils/cn'
 import DeleteIcon from '@/src/shared/ui/icons/DeleteIcon'
@@ -26,6 +27,7 @@ export default function MediaForm() {
   const { mutateAsync: uploadImages, isPending: isPendingAdd } = useUploadImages()
   const { mutateAsync: deleteMultiImage } = useDeleteMultiImage()
   const { mutateAsync: saveMultiImages } = useSaveMultiImages()
+  const { handleSave } = useDmSave(methods)
   const isPending = isPendingEdit || isPendingAdd
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
@@ -116,6 +118,11 @@ export default function MediaForm() {
         original.filter(item => item.chrbot_multi_image_key !== target.chrbot_multi_image_key),
         { shouldDirty: false }
       )
+    }
+
+    // 인트로 버블 변경사항을 서버에 반영
+    if (tokens.length > 0) {
+      handleSave().catch(e => console.error('임시저장 실패:', e))
     }
   }
 

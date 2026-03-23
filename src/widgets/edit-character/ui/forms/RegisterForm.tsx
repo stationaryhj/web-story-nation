@@ -137,23 +137,32 @@ function OptionSection<TName extends 'visibility' | 'rating'>({
 }
 
 export default function RegisterForm() {
-  const { register, watch } = useFormContext<DmFormValues>()
-  const writerNoteField = register('writer_note')
+  const { control, watch } = useFormContext<DmFormValues>()
   const isVisibilityLock = watch('isVisibilityLock')
   return (
     <div className="flex flex-col gap-8 px-4 py-[25px]">
       <OptionSection name="visibility" label="공개 설정" options={visibilityOptions} isLocked={isVisibilityLock} />
       <OptionSection name="rating" label="이용 등급" options={ageRatingOptions} />
 
-      <FormTextarea
-        {...writerNoteField}
-        label="작가의 말"
-        placeholder="독자에게 하고싶은 말을 자유롭게 입력해 보세요!"
-        onChange={e => {
-          writerNoteField.onChange(e)
-          autoResize(e.target, { maxRows: 20 })
-        }}
-        rows={10}
+      <Controller
+        name="writer_note"
+        control={control}
+        render={({ field, fieldState }) => (
+          <FormTextarea
+            ref={field.ref}
+            label="작가의 말"
+            placeholder="독자에게 하고싶은 말을 자유롭게 입력해 보세요!"
+            maxLength={1000}
+            showCount
+            value={field.value}
+            onChange={e => {
+              field.onChange(e)
+              autoResize(e.target, { maxRows: 20 })
+            }}
+            rows={10}
+            errorMessage={fieldState.error?.message}
+          />
+        )}
       />
     </div>
   )

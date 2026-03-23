@@ -8,7 +8,6 @@ import { FormButtonGroup, FormImageUpload, FormInput, FormTextarea } from '@/src
 
 export default function ProfileForm() {
   const {
-    register,
     control,
     formState: { errors },
   } = useFormContext<DmFormValues>()
@@ -49,14 +48,23 @@ export default function ProfileForm() {
           />
         )}
       />
-      <FormInput
-        label="이름"
-        required
-        maxLength={25}
-        showCount
-        placeholder="캐릭터 이름을 입력하세요."
-        errorMessage={errors.name?.message}
-        {...register('name', { required: '이름을 입력해주세요.' })}
+      <Controller
+        name="name"
+        control={control}
+        rules={{ required: '이름을 입력해주세요.' }}
+        render={({ field, fieldState }) => (
+          <FormInput
+            ref={field.ref}
+            label="이름"
+            required
+            maxLength={25}
+            showCount
+            placeholder="캐릭터 이름을 입력하세요."
+            errorMessage={fieldState.error?.message}
+            value={field.value}
+            onChange={field.onChange}
+          />
+        )}
       />
       <Controller
         name="gender"
