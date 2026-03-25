@@ -88,11 +88,11 @@ export function useIntroMessages() {
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const remaining = MAX_INPUT_LENGTH - messagesLength
+      const remaining = MAX_INPUT_LENGTH - messagesLength - editingDelta
       const value = e.target.value.slice(0, Math.max(0, remaining))
       setInputText(value)
     },
-    [messagesLength]
+    [messagesLength, editingDelta]
   )
 
   // ─── 편집 ───
