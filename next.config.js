@@ -22,38 +22,12 @@ const nextConfig = {
       },
     ];
   },
-  // production 빌드에서 console.* 출력 제거
-  webpack: (config, { isServer, dev }) => {
-    // 개발 환경이 아닌 경우 적용 (클라이언트 및 서버 모두)
-    if (!dev) {
-      // Terser 플러그인 설정 (클라이언트 빌드)
-      if (!isServer) {
-        // 기존 TerserPlugin 설정 가져오기
-        config.optimization.minimizer.forEach((minimizer) => {
-          if (minimizer.constructor.name === 'TerserPlugin') {
-            // console.* 출력 제거 설정
-            minimizer.options.terserOptions.compress.drop_console = true;
-            minimizer.options.terserOptions.compress.pure_funcs = [
-              'console.log',
-              'console.info',
-              'console.debug',
-              'console.warn',
-              'console.error',
-              'console.table',
-            ];
-          }
-        });
-      }
-    }
-    return config;
-  },
-  // SWC 컴파일러 옵션 (Next.js 12 이상)
-  swcMinify: true,
+  turbopack: {},
   compiler: {
     removeConsole:
       process.env.NODE_ENV === 'production'
         ? {
-            exclude: ['error'], // error는 유지 (선택사항)
+            exclude: ['error'],
           }
         : false,
   },
