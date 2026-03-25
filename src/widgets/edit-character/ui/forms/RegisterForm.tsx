@@ -14,7 +14,6 @@ import PrivateAccessIcon from '@/src/shared/ui/icons/PrivateAccessIcon'
 import PublicAccessIcon from '@/src/shared/ui/icons/PublicAccessIcon'
 import ShieldCheckIcon from '@/src/shared/ui/icons/ShieldCheckIcon'
 import VerifiedIcon from '@/src/shared/ui/icons/VerifiedIcon'
-import { autoResize } from '@/src/shared/lib/utils/autoResize'
 
 interface OptionItem<TValue extends string> {
   label: string
@@ -27,6 +26,7 @@ interface OptionItem<TValue extends string> {
 interface OptionSectionProps<TName extends 'visibility' | 'rating'> {
   name: TName
   label: string
+  description?: string
   options: OptionItem<DmFormValues[TName]>[]
   isLocked?: boolean
 }
@@ -68,6 +68,7 @@ const ageRatingOptions: OptionItem<CharacterRating>[] = [
 function OptionSection<TName extends 'visibility' | 'rating'>({
   name,
   label,
+  description,
   options,
   isLocked = false,
 }: OptionSectionProps<TName>) {
@@ -76,7 +77,7 @@ function OptionSection<TName extends 'visibility' | 'rating'>({
 
   return (
     <div>
-      <FormFieldHeader label={label} required />
+      <FormFieldHeader label={label} required description={description} />
       <Controller
         name={name}
         control={control}
@@ -141,7 +142,13 @@ export default function RegisterForm() {
   const isVisibilityLock = watch('isVisibilityLock')
   return (
     <div className="flex flex-col gap-8 px-4 py-[25px]">
-      <OptionSection name="visibility" label="공개 설정" options={visibilityOptions} isLocked={isVisibilityLock} />
+      <OptionSection
+        name="visibility"
+        label="공개 설정"
+        description="한 번 공개된 캐릭터는 비공개로 수정할 수 없어요."
+        options={visibilityOptions}
+        isLocked={isVisibilityLock}
+      />
       <OptionSection name="rating" label="이용 등급" options={ageRatingOptions} />
 
       <Controller
@@ -155,12 +162,10 @@ export default function RegisterForm() {
             maxLength={1000}
             showCount
             value={field.value}
-            onChange={e => {
-              field.onChange(e)
-              autoResize(e.target, { maxRows: 20 })
-            }}
+            onChange={field.onChange}
             rows={10}
             errorMessage={fieldState.error?.message}
+            autoResize={{ maxRows: 20 }}
           />
         )}
       />

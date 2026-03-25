@@ -1,7 +1,8 @@
 import type { TextareaHTMLAttributes } from 'react'
-import { forwardRef, useCallback, useRef } from 'react'
+import { forwardRef, useCallback, useEffect, useRef } from 'react'
 
 import { cn } from '@/shared/lib/utils/cn'
+import { autoResize as autoResizeUtil } from '@/shared/lib/utils/autoResize'
 
 import FormFieldHeader from './FormFieldHeader'
 
@@ -12,6 +13,7 @@ interface FormTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> 
   errorMessage?: string
   showCount?: boolean
   wrapperClassName?: string
+  autoResize?: { maxRows?: number }
 }
 
 const textareaBase =
@@ -36,11 +38,14 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
       value,
       rows = 4,
       onChange,
+      autoResize,
       ...rest
     },
     ref
   ) => {
     const internalRef = useRef<HTMLTextAreaElement | null>(null)
+    const autoResizeRef = useRef(autoResize)
+    autoResizeRef.current = autoResize
     const currentLength = typeof value === 'string' ? value.length : 0
 
     const handleRef = useCallback(
@@ -52,8 +57,20 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
       [ref]
     )
 
+    // value 변경 시 높이 맞추기
+    useEffect(() => {
+      const opts = autoResizeRef.current
+      if (!opts || !internalRef.current) return
+      autoResizeUtil(internalRef.current, opts)
+    }, [value])
+
+    // 입력 시 높이 맞추기
     const handleChange = useCallback(
       (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const opts = autoResizeRef.current
+        if (opts) {
+          autoResizeUtil(e.target, opts)
+        }
         onChange?.(e)
       },
       [onChange]
@@ -68,6 +85,7 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
             value={value}
             rows={rows}
             maxLength={maxLength}
+            spellCheck={false}
             onChange={handleChange}
             className={cn(textareaBase, errorMessage ? textareaVariants.error : textareaVariants.default, className)}
             {...rest}

@@ -45,13 +45,13 @@ export default function CharacterSettingForm() {
                     <p className="text-sm text-v2-gray-700 max-md:text-xs">{ownLength}</p>
                   </div>
                   <FormTextarea
-                    rows={8}
                     placeholder={field.placeholder}
                     value={value}
                     onChange={e => {
                       const newValue = e.target.value
                       onChange(newValue.length <= maxForThis ? newValue : newValue.slice(0, maxForThis))
                     }}
+                    autoResize={{}}
                     {...rest}
                   />
                 </div>

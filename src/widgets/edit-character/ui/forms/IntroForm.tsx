@@ -1,6 +1,7 @@
 'use client'
 
-import { AIMessageLayout, Avatar, UserMessageLayout } from '@/src/shared/ui/chat-bubble'
+import { Avatar } from '@/src/shared/ui/chat-bubble'
+import { AIMessageLayout, UserMessageLayout } from './intro/MessageLayout'
 import { useIntroMessages } from '@/src/widgets/edit-character/ui/forms/intro/model/useIntroMessages'
 import BubbleItem from './intro/BubbleItem'
 import IntroInput from './intro/IntroInput'

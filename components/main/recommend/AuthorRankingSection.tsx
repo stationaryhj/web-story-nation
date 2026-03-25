@@ -17,7 +17,7 @@ const authorRankingTabs: TabItem[] = [
 
 // 랭킹 탭에 따른 업데이트 문구
 const getRankingUpdateMessage = (tabId: string) => {
-  return '이벤트 간 매출 20% 정산! 15,000원부터 출금!'
+  return '15,000원부터 출금 가능! 지금 바로 작품을 만들어보세요!'
 }
 
 // 작가 랭킹 섹션 컴포넌트
@@ -76,7 +76,7 @@ const AuthorRankingSection = memo(() => {
         <div className="mb-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-secondary-900 dark:text-dark-secondary-700 relative inline-block">
-              🏆작가 랭킹: 1억 소진까지 1+1 현금 정산!
+              🏆작가 랭킹: 수익의 10%를 매월 현금 정산!
             </h2>
             <button
               onClick={() => setIsAuthorRankingSidebarOpen(true)}

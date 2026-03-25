@@ -9,7 +9,8 @@ import type {
 function getGenderFromNumber(gender: number): CharacterGender {
   if (gender === 1) return 'male'
   if (gender === 2) return 'female'
-  return 'unspecified'
+  if (gender === 3) return 'unspecified'
+  return ''
 }
 
 export type BridgedCharacterData = DmFormValues

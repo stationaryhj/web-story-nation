@@ -2,6 +2,8 @@ interface AutoResizeOptions {
   maxRows?: number
 }
 export const autoResize = (el: HTMLTextAreaElement, options?: AutoResizeOptions) => {
+  if (el.offsetParent === null) return
+
   const { maxRows } = options ?? {}
 
   el.style.height = 'auto'

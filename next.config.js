@@ -22,7 +22,7 @@ const nextConfig = {
       },
     ];
   },
-  /* // production 빌드에서 console.* 출력 제거
+  // production 빌드에서 console.* 출력 제거
   webpack: (config, { isServer, dev }) => {
     // 개발 환경이 아닌 경우 적용 (클라이언트 및 서버 모두)
     if (!dev) {
@@ -56,7 +56,7 @@ const nextConfig = {
             exclude: ['error'], // error는 유지 (선택사항)
           }
         : false,
-  }, */
+  },
 };
 
 module.exports = nextConfig;

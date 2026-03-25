@@ -3,7 +3,6 @@
 import { Controller, useFormContext } from 'react-hook-form'
 import { useUploadImage } from '@/src/features/edit-character/api/useUploadImage'
 import type { DmFormValues } from '@/src/features/edit-character/model/dmFormTypes'
-import { autoResize } from '@/src/shared/lib/utils/autoResize'
 import { FormButtonGroup, FormImageUpload, FormInput, FormTextarea } from '@/src/shared/ui/form'
 
 export default function ProfileForm() {
@@ -98,11 +97,9 @@ export default function ProfileForm() {
             showCount
             placeholder="예) 까칠한 뱀파이어"
             value={field.value}
-            onChange={e => {
-              autoResize(e.target, { maxRows: 4 })
-              field.onChange(e)
-            }}
+            onChange={field.onChange}
             errorMessage={fieldState.error?.message}
+            autoResize={{ maxRows: 4 }}
           />
         )}
       />

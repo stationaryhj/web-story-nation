@@ -618,8 +618,41 @@ function getCategory(gender: number) {
   }
 }
 
+/** Animated WebP 여부를 바이너리에서 ANIM 청크로 판별 */
+async function isAnimatedWebP(file: File): Promise<boolean> {
+  if (file.type !== 'image/webp') return false
+  const buffer = await file.slice(0, 40000).arrayBuffer()
+  const bytes = new Uint8Array(buffer)
+  for (let i = 0; i < bytes.length - 3; i++) {
+    if (bytes[i] === 0x41 && bytes[i + 1] === 0x4e && bytes[i + 2] === 0x49 && bytes[i + 3] === 0x4d) {
+      return true
+    }
+  }
+  return false
+}
+
+function getMimeType(file: File): string {
+  const ext = file.name.split('.').pop()?.toLowerCase()
+  switch (ext) {
+    case 'png': return 'image/png'
+    case 'webp': return 'image/webp'
+    case 'gif': return 'image/gif'
+    default: return 'image/jpeg'
+  }
+}
+
 export async function uploadImages(file: File, presignedUrl: string): Promise<void> {
-  // ✅ Promise로 감싸서 FileReader와 Image 로딩을 기다릴 수 있게 함
+  // Animated WebP는 Canvas를 거치면 애니메이션이 사라지므로 원본 업로드
+  const animated = await isAnimatedWebP(file)
+  if (animated) {
+    await fetch(presignedUrl, {
+      method: 'PUT',
+      body: file,
+      headers: { 'Content-Type': 'image/webp' },
+    })
+    return
+  }
+
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.readAsDataURL(file)
@@ -633,7 +666,6 @@ export async function uploadImages(file: File, presignedUrl: string): Promise<vo
           const canvas = document.createElement('canvas')
           const ctx = canvas.getContext('2d')
 
-          // 이미지 최대 크기 설정 (가로/세로 최대 1024px)
           const MAX_SIZE = 1024
           let width = img.width
           let height = img.height
@@ -650,10 +682,10 @@ export async function uploadImages(file: File, presignedUrl: string): Promise<vo
           canvas.height = height
           ctx?.drawImage(img, 0, 0, width, height)
 
-          // 압축된 이미지를 Blob으로 변환
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.8)
+          const mimeType = getMimeType(file)
+          const quality = mimeType === 'image/png' ? undefined : 0.8
+          const dataUrl = canvas.toDataURL(mimeType, quality)
 
-          // Base64 데이터 URL에서 바이너리 데이터 추출
           const base64Data = dataUrl.split(',')[1]
           const binaryData = atob(base64Data)
           const arrayBuffer = new ArrayBuffer(binaryData.length)
@@ -663,20 +695,14 @@ export async function uploadImages(file: File, presignedUrl: string): Promise<vo
             uint8Array[i] = binaryData.charCodeAt(i)
           }
 
-          const blob = new Blob([uint8Array], { type: 'image/jpeg' })
+          const blob = new Blob([uint8Array], { type: mimeType })
 
-          // S3에 이미지 업로드
-          const result = await fetch(presignedUrl, {
+          await fetch(presignedUrl, {
             method: 'PUT',
             body: blob,
-            headers: {
-              'Content-Type': 'image/jpeg',
-            },
+            headers: { 'Content-Type': mimeType },
           })
 
-          console.log('result :: ', result)
-
-          // ✅ 업로드 완료 후 resolve 호출
           resolve()
         } catch (error) {
           console.error('이미지 업로드 중 오류:', error)
@@ -684,11 +710,9 @@ export async function uploadImages(file: File, presignedUrl: string): Promise<vo
         }
       }
 
-      // ✅ 이미지 로딩 실패 시 reject
       img.onerror = () => reject(new Error('이미지 로딩 실패'))
     }
 
-    // ✅ FileReader 에러 시 reject
     reader.onerror = () => reject(new Error('파일 읽기 실패'))
   })
 }

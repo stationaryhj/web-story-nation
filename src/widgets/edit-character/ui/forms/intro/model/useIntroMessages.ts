@@ -81,7 +81,10 @@ export function useIntroMessages() {
     () => messages.reduce((sum, msg) => (msg.type === 'image' ? sum : sum + msg.text.length), 0),
     [messages]
   )
-  const totalLength = messagesLength + inputText.length
+  const editingDelta = editing
+    ? editing.text.length - (messages.find(m => m.id === editing.id)?.text.length ?? 0)
+    : 0
+  const totalLength = messagesLength + inputText.length + editingDelta
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -101,7 +104,7 @@ export function useIntroMessages() {
   const handleEditChange = (text: string) => {
     if (!editing) return
     const otherLength = messagesLength - (messages.find(m => m.id === editing.id)?.text.length ?? 0)
-    const remaining = MAX_INPUT_LENGTH - otherLength
+    const remaining = MAX_INPUT_LENGTH - otherLength - inputText.length
     setEditing({ ...editing, text: text.slice(0, Math.max(0, remaining)) })
   }
 

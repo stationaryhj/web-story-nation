@@ -1,7 +1,7 @@
 import type { IntroBubbleGroup, exampleDatas } from '@/lib/utils/storyNationUtil'
 import type { LikeAbilityData, MultiImageData } from '@/services/define'
 
-export type CharacterGender = 'male' | 'female' | 'unspecified'
+export type CharacterGender = 'male' | 'female' | 'unspecified' | ''
 export type CharacterVisibility = 'public' | 'private'
 export type CharacterRating = 'all' | 'adult'
 export type DmSpeaker = IntroBubbleGroup['speaker']
@@ -74,7 +74,7 @@ export const defaultDmFormValues: DmFormValues = {
   world_list_detail_chrbot_key: '',
   name: '',
   subject: '',
-  gender: 'unspecified',
+  gender: '',
   visibility: 'private',
   examplesVisibility: 'private',
   rating: 'all',

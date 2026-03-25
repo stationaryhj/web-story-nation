@@ -11,6 +11,7 @@ import type { BridgedCharacterData } from '@/src/features/edit-character/lib/cha
 import { defaultDmFormValues, type DmFormValues } from '@/src/features/edit-character/model/dmFormTypes'
 import { Tab } from '@/src/shared/ui/tab'
 import { CharacterSettingForm, IntroForm, MediaForm, ProfileForm, RegisterForm } from './forms'
+import useModalStore from '@/src/shared/model/stores/useModalStore'
 
 const buttonBase =
   'rounded-lg px-4 py-2.5 py-1.5 px-[10px] text-sm max-md:text-xs transition-colors duration-200 text-center'
@@ -66,7 +67,7 @@ interface EditDmProps {
 
 export default function EditDm({ data }: EditDmProps) {
   const router = useRouter()
-
+  const { openModal } = useModalStore()
   const methods = useForm<DmFormValues>({
     defaultValues: defaultDmFormValues,
   })
@@ -109,7 +110,10 @@ export default function EditDm({ data }: EditDmProps) {
     {
       label: '임시저장',
       variant: 'secondary' as const,
-      onClick: () => handleSave().catch(e => console.error('임시저장 실패:', e)),
+      onClick: () =>
+        handleSave()
+          .then(() => openModal({ type: 'alert', props: { message: '임시저장을 완료했어요.' } }))
+          .catch(e => console.error('임시저장 실패:', e)),
     },
     {
       label: '등록하기',
