@@ -106,7 +106,7 @@ const CharacterMediaModal = (props: CharacterMediaModalProps) => {
               })}
             </div>
           ) : (
-            <div className="flex h-[50vh] flex-col items-center justify-center gap-y-3">
+            <div className="flex h-full flex-col items-center justify-center gap-y-3">
               <ImagePlaceholderIcon className="h-12 w-12 text-v2-gray-600" />
               <p className="cursor-default text-2xl font-bold text-v2-gray-600">업로드된 이미지가 없어요.</p>
               {mode === 'upload' && (
