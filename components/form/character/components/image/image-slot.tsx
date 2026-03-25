@@ -12,59 +12,62 @@ const DEFAULT_DESCRIPTION = '캐릭터가 첫 메시지를 보냈을 때 자동�
 const DEFAULT_DESCRIPTION_ETC = '캐릭터가 레벨업을 했을 때 자동으로 해금되는 이미지입니다.'
 const PLACEHOLDER = '공개 조건을 입력하세요.\n예시: {{char}}가 {{user}}에게 인사를 건낸다.'
 
-
 interface ImageSlotProps {
-	data: any
+  data: any
 }
 
-export default function ImageSlot({ 
-	data,
-}: ImageSlotProps) {
-	
-	const { openModal, closeModal } = useModalStore()
-	const { isVaild, formData, deleteMultiImageData, changeMultiImageShow, changeMultiImageDefault, changeMultiImageRules, changeMultiImageImage } = useCreateCharacterData()
+export default function ImageSlot({ data }: ImageSlotProps) {
+  const { openModal, closeModal } = useModalStore()
+  const {
+    isVaild,
+    formData,
+    deleteMultiImageData,
+    changeMultiImageShow,
+    changeMultiImageDefault,
+    changeMultiImageRules,
+    changeMultiImageImage,
+  } = useCreateCharacterData()
 
-	const _hash = data?.hash || ''
-	const _isDeleteCondition = data?.isDeleteCondition || false
-	const _chrbot_multi_image_key = data.chrbot_multi_image_key
-	const _imageUrl = data.img_url
-	const _rules = data.rules
-	const _isDefault = data.default_yn === 1
-	const _imageKey = data.chrbot_multi_image_key.toString()
-	const _index = data.idx
-	const _show_yn = data.show_yn
-	const _lv = data.lv
+  const _hash = data?.hash || ''
+  const _isDeleteCondition = data?.isDeleteCondition || false
+  const _chrbot_multi_image_key = data.chrbot_multi_image_key
+  const _imageUrl = data.img_url
+  const _rules = data.rules
+  const _isDefault = data.default_yn === 1
+  const _imageKey = data.chrbot_multi_image_key.toString()
+  const _index = data.idx
+  const _show_yn = data.show_yn
+  const _lv = data.lv
 
-	const DefaultDescription = _lv < 2 ? DEFAULT_DESCRIPTION : DEFAULT_DESCRIPTION_ETC
-	const isFinish = formData.finish_yn || 0
+  const DefaultDescription = _lv < 2 ? DEFAULT_DESCRIPTION : DEFAULT_DESCRIPTION_ETC
+  const isFinish = formData.finish_yn || 0
 
-	const handleDelete = () => {
-		openModal('confirmAction', {
-			title: '이미지를 삭제할까요?',
-			description: '입력한 내용과 이미지가 모두 삭제되며 복구할 수 없어요',
-			confirmText: '삭제',
-			onConfirm: () => {
-				deleteMultiImageData(_hash, _index, _lv, _chrbot_multi_image_key, _imageUrl)
-				closeModal()
-			}
-		})
-	}
+  const handleDelete = () => {
+    openModal('confirmAction', {
+      title: '이미지를 삭제할까요?',
+      description: '입력한 내용과 이미지가 모두 삭제되며 복구할 수 없어요',
+      confirmText: '삭제',
+      onConfirm: () => {
+        deleteMultiImageData(_hash, _index, _lv, _chrbot_multi_image_key, _imageUrl)
+        closeModal()
+      },
+    })
+  }
 
-	const handleChangeShow = () => {
-		changeMultiImageShow(_index, _lv, _chrbot_multi_image_key, _imageUrl)
-	}
+  const handleChangeShow = () => {
+    changeMultiImageShow(_index, _lv, _chrbot_multi_image_key, _imageUrl)
+  }
 
+  const handleChangeDefault = () => {
+    changeMultiImageDefault(_index, _lv, _chrbot_multi_image_key, _imageUrl)
+  }
 
-	const handleChangeDefault = () => {
-		changeMultiImageDefault(_index, _lv, _chrbot_multi_image_key, _imageUrl)
-	}
+  const handleChangeRules = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    changeMultiImageRules(_index, _lv, _chrbot_multi_image_key, _imageUrl, e.target.value)
+  }
 
-	const handleChangeRules = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		changeMultiImageRules(_index, _lv, _chrbot_multi_image_key, _imageUrl, e.target.value)
-	}
-
-	const handleChangeImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0]
+  const handleChangeImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
     if (!file) return
 
     // 파일 크기 확인 (10MB 이하)
@@ -88,112 +91,105 @@ export default function ImageSlot({
       const presignedUrl = presignedResponse.data.presignedUrl
       const s3FilePath = presignedResponse.data.path
 
-
       await uploadImages(file, presignedUrl)
       changeMultiImageImage(_index, _lv, _chrbot_multi_image_key, _imageUrl, s3FilePath)
-    }
-    catch(error) {
+    } catch (error) {
       console.error(error)
     }
-	}
-	
-	return (
-		<div
-			className='flex gap-3 bg-white dark:bg-dark-secondary-800 dark:border-dark-secondary-600'
-		>
-			{/* 이미지 영역 */}
-			<div className='flex-shrink-0 relative'>
-			<input
-				id={`imageUpload_${_imageKey + _index + _imageUrl}`}
-				type="file"
-				accept="image/*"
-				onChange={e => {
-					handleChangeImage(e)
-					e.target.value = ''
-				}}
-				className="hidden"
-			/>
+  }
 
-			<label 
-				htmlFor={`imageUpload_${_imageKey + _index + _imageUrl}`}
-				className="cursor-pointer block"
-			>
-				<Image
-					src={getImageUri(_imageUrl || '') || '/images/sft_icon_on.png'} 
-					alt='이미지' 
-					width={120} 
-					height={120} 
-					className='rounded-lg object-cover outline outline-1 outline-secondary-200 hover:outline-2 hover:outline-primary-500 transition-all duration-200'
-				/>
-			</label>
+  return (
+    <div className="flex gap-3 bg-white dark:border-dark-secondary-600 dark:bg-dark-secondary-800">
+      {/* 이미지 영역 */}
+      <div className="relative flex-shrink-0">
+        <input
+          id={`imageUpload_${_imageKey + _index + _imageUrl}`}
+          type="file"
+          accept="image/*"
+          onChange={e => {
+            handleChangeImage(e)
+            e.target.value = ''
+          }}
+          className="hidden"
+        />
 
-				{_isDefault &&
-					<div className="absolute top-1 left-1 flex items-center justify-center">
-						<span className='bg-primary-500 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm'>
-							기본
-						</span>
-					</div>
-				}
+        <label htmlFor={`imageUpload_${_imageKey + _index + _imageUrl}`} className="block cursor-pointer">
+          <Image
+            src={getImageUri(_imageUrl || '') || '/images/sft_icon_on.png'}
+            alt="이미지"
+            width={120}
+            height={120}
+            className="rounded-lg object-cover outline outline-1 outline-secondary-200 transition-all duration-200 hover:outline-2 hover:outline-primary-500"
+          />
+        </label>
 
-				{/* show 버튼 */}
-				{(!_isDefault || _lv > 1) &&
-					<button
-						onClick={() => handleChangeShow()}
-						className="absolute top-1 right-1 flex items-center justify-center">
-						<span className={`text-white text-xs px-1 py-1 rounded-full ${_show_yn ? 'backdrop-blur-sm' : 'bg-primary-500'}`}>
-							{_show_yn === 1 ? (
-								<Image src="/images/icons/img_lock_on.png" alt="show" width={18} height={18} />
-							) : (
-								<Image src="/images/icons/img_lock_off.png" alt="hide" width={18} height={18} />
-							)}
-						</span>
-					</button>
-				}
-			</div>
+        {_isDefault && (
+          <div className="absolute left-1 top-1 flex items-center justify-center">
+            <span className="rounded-full bg-primary-500 px-2 py-1 text-xs text-white backdrop-blur-sm">기본</span>
+          </div>
+        )}
 
-			{/* 설명 영역 */}
-			<div className='flex-1 flex flex-col gap-2'>
-				<div className='flex-1 flex-shrink-0 relative'>
-					<textarea 
-						className={`w-full h-full p-2 border rounded-md resize-none text-sm ${
-							!_isDefault && isVaild && _rules.length === 0 ?
-								'border-red-500 bg-red-50' :
-								'border-secondary-300 dark:border-dark-secondary-300/20'
-						}`}
-						placeholder={_isDefault ? DefaultDescription : PLACEHOLDER}
-						onChange={e => handleChangeRules(e)}
-						value={_isDefault ? '' : _rules || ''}
-						disabled={_isDefault}
-					/>
-					
-					{!_isDefault &&
-						<div className='absolute bottom-0 right-1 flex items-end justify-end'>
-							{_rules.length}/1000
-						</div>
-					}
-				</div>
+        {/* show 버튼 */}
+        {(!_isDefault || _lv > 1) && (
+          <button
+            onClick={() => handleChangeShow()}
+            className="absolute right-1 top-1 flex items-center justify-center"
+          >
+            <span
+              className={`rounded-full px-1 py-1 text-xs text-white ${_show_yn ? 'backdrop-blur-sm' : 'bg-primary-500'}`}
+            >
+              {_show_yn === 1 ? (
+                <Image src="/images/icons/img_lock_on.png" alt="show" width={18} height={18} />
+              ) : (
+                <Image src="/images/icons/img_lock_off.png" alt="hide" width={18} height={18} />
+              )}
+            </span>
+          </button>
+        )}
+      </div>
 
-				<div className='flex items-center justify-between gap-2 w-full'>
-					{/* 삭제 */}
+      {/* 설명 영역 */}
+      <div className="flex flex-1 flex-col gap-2">
+        <div className="relative flex-1 flex-shrink-0">
+          <textarea
+            className={`h-full w-full resize-none rounded-md border p-2 text-sm ${
+              !_isDefault && isVaild && _rules.length === 0
+                ? 'border-red-500 bg-red-50'
+                : 'border-secondary-300 dark:border-dark-secondary-300/20'
+            }`}
+            placeholder={_isDefault ? DefaultDescription : PLACEHOLDER}
+            onChange={e => handleChangeRules(e)}
+            value={_isDefault ? '' : _rules || ''}
+            disabled={_isDefault}
+            maxLength={100}
+          />
 
-					<div className='flex items-center justify-start'>
-					{(_isDeleteCondition || isFinish === 0) &&
-						<button className='px-2 bg-primary-500 rounded-full' onClick={() => handleDelete()}>
-							<span className='text-xs text-white p-1'>X</span>
-						</button>
-					}
-					</div>
+          {!_isDefault && (
+            <div className="absolute bottom-0 right-1 flex items-end justify-end">{_rules.length}/100</div>
+          )}
+        </div>
 
-					{/* 디폴트 변경 */}
-					<div className='flex items-center justify-end'>
-					{!_isDefault &&
-						<button className='px-2 bg-primary-500 rounded-full' onClick={() => handleChangeDefault()}>
-							<span className='text-xs text-white p-1'>기본 이미지로 선택</span>
-						</button>
-					}
-					</div>
-				</div>
-			</div>
-		</div>
-	)
+        <div className="flex w-full items-center justify-between gap-2">
+          {/* 삭제 */}
+
+          <div className="flex items-center justify-start">
+            {(_isDeleteCondition || isFinish === 0) && (
+              <button className="rounded-full bg-primary-500 px-2" onClick={() => handleDelete()}>
+                <span className="p-1 text-xs text-white">X</span>
+              </button>
+            )}
+          </div>
+
+          {/* 디폴트 변경 */}
+          <div className="flex items-center justify-end">
+            {!_isDefault && (
+              <button className="rounded-full bg-primary-500 px-2" onClick={() => handleChangeDefault()}>
+                <span className="p-1 text-xs text-white">기본 이미지로 선택</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }

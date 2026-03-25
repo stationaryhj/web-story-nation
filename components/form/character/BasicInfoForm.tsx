@@ -11,7 +11,6 @@ import { contentApi } from '@/services/api';
 import { useAccountStore } from '@/store/useAccountStore';
 import { Tag, useCreateCharacterData } from '@/store/useCreateCharacterData';
 import { useModalStore } from '@/store/useStoreModal';
-import { FormInput, FormTextarea } from '@/shared/ui/form';
 import ConfirmActionModal from '../../modal/ConfirmActionModal';
 import { RequiredLabel } from '../CharacterForm';
 
@@ -293,27 +292,47 @@ export default function BasicInfoForm({
           </div>
 
           {/* 이름 */}
-          <FormInput
-            label='캐릭터 이름'
-            required
-            name='name'
-            value={formData.name}
-            onChange={handleInputChange}
-            placeholder='캐릭터의 이름을 입력하세요'
-            maxLength={25}
-            hasError={isVaild && !formData.name}
-          />
+          <div>
+            <RequiredLabel>
+              <label className='block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400'>
+                캐릭터 이름
+              </label>
+            </RequiredLabel>
+            <input
+              type='text'
+              name='name'
+              value={formData.name}
+              onChange={handleInputChange}
+              placeholder='캐릭터의 이름을 입력하세요'
+              className={`mt-1 block w-full rounded-lg border ${
+                isVaild && !formData.name
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                  : 'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
+              } px-4 py-3 text-secondary-900 placeholder-secondary-400 focus:outline-none focus:ring-1 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500`}
+              maxLength={25}
+            />
+          </div>
 
           {/* 제목 */}
-          <FormInput
-            label='제목(선택)'
-            description='캐릭터 목록에서 이름 대신 출력되는 제목이에요!'
-            name='subject'
-            value={formData.subject}
-            onChange={handleInputChange}
-            placeholder='제목을 입력하세요. 예) 영화관 데이트'
-            maxLength={25}
-          />
+          <div>
+            <div className='flex items-center gap-1'>
+              <div className='flex items-center gap-1'>
+                <div className='text-sm font-medium text-secondary-700 dark:text-dark-secondary-400'>
+                  <p className='font-bold'>제목(선택)</p>
+                  <p className='text-xs text-secondary-400 dark:text-dark-secondary-400'>캐릭터 목록에서 이름 대신 출력되는 제목이에요!</p>
+                </div>
+              </div>
+            </div>
+            <input
+              type='text'
+              name='subject'
+              value={formData.subject}
+              onChange={handleInputChange}
+              placeholder='제목을 입력하세요. 예) 영화관 데이트'
+              className={`mt-1 block w-full rounded-lg border border-secondary-200 focus:border-primary-500 focus:ring-primary-500 px-4 py-3 text-secondary-900 placeholder-secondary-400 focus:outline-none focus:ring-1 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500`}
+              maxLength={25}
+            />
+          </div>
 
           {/* 성별 */}
           <div>
@@ -445,32 +464,64 @@ export default function BasicInfoForm({
           </div>
 
           {/* 한줄 소개 */}
-          <FormTextarea
-            label='한줄 소개'
-            required
-            description='내 캐릭터를 간단히 소개해 보세요!'
-            name='bio'
-            value={formData.bio}
-            onChange={handleInputChange}
-            placeholder='예시)까칠한 뱀파이어'
-            rows={12}
-            maxLength={80}
-            errorMessage={isVaild && !formData.bio ? '한 줄 소개를 입력해주세요.' : undefined}
-          />
+          <div>
+            <div className='flex justify-between items-center mb-2'>
+              <RequiredLabel>
+                <label htmlFor='bio' className='block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400'>
+                  한줄 소개
+                </label>
+              </RequiredLabel>
+              <span className='text-xs text-secondary-500 dark:text-dark-secondary-500'>{formData.bio.length}/80</span>
+            </div>
+            <p className='text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2'>
+              내 캐릭터를 간단히 소개해 보세요!
+            </p>
+            <textarea
+              id='bio'
+              name='bio'
+              value={formData.bio}
+              onChange={handleInputChange}
+              placeholder='예시)까칠한 뱀파이어'
+              rows={2}
+              className={`w-full px-4 py-3 rounded-lg border ${
+                isVaild && !formData.bio
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                  : 'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
+              } dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none`}
+              maxLength={80}
+            />
+          </div>
 
           {/* 첫 메시지 */}
-          <FormTextarea
-            label='첫 메세지'
-            required
-            description='재미있는 선톡으로 유저의 답장을 이끌어내 보세요!'
-            name='firstMessage'
-            value={formData.firstMessage}
-            onChange={handleInputChange}
-            placeholder='캐릭터가 보내는 첫 메세지를 입력하세요'
-            rows={12}
-            maxLength={MAX_FIRST_MESSAGE_LENGTH}
-            errorMessage={isVaild && !formData.firstMessage ? '첫 메시지를 입력해주세요.' : undefined}
-          />
+          <div>
+            <div className='flex justify-between items-center mb-2'>
+              <RequiredLabel>
+                <label htmlFor='firstMessage' className='block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400'>
+                  첫 메세지
+                </label>
+              </RequiredLabel>
+              <span className='text-xs text-secondary-500 dark:text-dark-secondary-500'>
+                {formData.firstMessage.length}/{MAX_FIRST_MESSAGE_LENGTH}
+              </span>
+            </div>
+            <p className='text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2'>
+              재미있는 선톡으로 유저의 답장을 이끌어내 보세요!
+            </p>
+            <textarea
+              id='firstMessage'
+              name='firstMessage'
+              value={formData.firstMessage}
+              onChange={handleInputChange}
+              placeholder='캐릭터가 보내는 첫 메세지를 입력하세요'
+              rows={2}
+              className={`w-full px-4 py-3 rounded-lg border ${
+                isVaild && !formData.firstMessage
+                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                  : 'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
+              } dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none`}
+              maxLength={MAX_FIRST_MESSAGE_LENGTH}
+            />
+          </div>
 
           {/* 캐릭터 태그 */}
           <div>
