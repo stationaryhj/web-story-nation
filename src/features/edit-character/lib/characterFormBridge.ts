@@ -20,19 +20,8 @@ export type BridgedCharacterData = DmFormValues
  */
 export function bridgeCharacterInProgressToCharacter(data: any): DmFormValues {
   const multiImages = (data.multi_images || []).map((image: any) => ({ ...image }))
-  let __content = ''
-  let __content_public = ''
-
-  if (data.content_show_yn === 2) {
-    if (data.content_public) __content_public = data.content_public
-    if (data.content) __content = data.content
-  } else {
-    if (data.content_show_yn === 1) {
-      __content_public = data.content
-    } else {
-      __content = data.content
-    }
-  }
+  const __content = data.content || ''
+  const __content_public = data.content_public || ''
 
   return {
     world_list_detail_chrbot_key: data.world_list_detail_chrbot_key?.toString() || '',
