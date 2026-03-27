@@ -5,8 +5,8 @@ import { cn } from '@/src/shared/lib/utils/cn'
 import SendIcon from '@/src/shared/ui/icons/SendIcon'
 import TTSPlayIcon from '@/src/shared/ui/icons/TTSPlayIcon'
 import UploadGalleryIcon from '@/src/shared/ui/icons/UploadGalleryIcon'
-import { MAX_INPUT_LENGTH } from '@/src/widgets/edit-character/ui/forms/intro/model/introMessage'
-import type { Speaker } from '@/src/widgets/edit-character/ui/forms/intro/model/introMessage'
+import { MAX_INPUT_LENGTH } from '../../../model/intro/introMessage'
+import type { Speaker } from '../../../model/intro/introMessage'
 
 const ACTION_BUTTONS = [
   { key: 'image', label: '이미지', icon: UploadGalleryIcon },

@@ -1,10 +1,10 @@
-interface PlayIcon2Props {
+interface PlayFilledIconProps {
   className?: string;
   onClick?: () => void;
   size?: number;
 }
 
-const PlayIcon2 = ({ className, onClick, size = 24 }: PlayIcon2Props) => {
+const PlayFilledIcon = ({ className, onClick, size = 24 }: PlayFilledIconProps) => {
   return (
     <svg
       aria-hidden='true'
@@ -24,4 +24,4 @@ const PlayIcon2 = ({ className, onClick, size = 24 }: PlayIcon2Props) => {
   );
 };
 
-export default PlayIcon2;
+export default PlayFilledIcon;

@@ -34,7 +34,7 @@ import useNewModalStore from '@/shared/model/stores/useModalStore'
 import { Character, useAccountStore } from '@/store/useStoreData'
 import { useModalStore } from '@/store/useStoreModal'
 import { CharbotLikeResponse } from '@/types/api'
-import VoiceBubble from '@/src/features/edit-character/ui/VoiceBubble'
+import VoiceBubble from '@/src/shared/ui/chat-bubble/VoiceBubble'
 import BaseModal from './BaseModal'
 import ReportModal from './ReportModal'
 

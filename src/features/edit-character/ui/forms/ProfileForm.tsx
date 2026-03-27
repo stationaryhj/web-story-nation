@@ -1,8 +1,8 @@
 'use client'
 
 import { Controller, useFormContext } from 'react-hook-form'
-import { useUploadImage } from '@/src/features/edit-character/api/useUploadImage'
-import type { DmFormValues } from '@/src/features/edit-character/model/dmFormTypes'
+import { useUploadImage } from '../../api/useUploadImage'
+import type { DmFormValues } from '../../model/dmFormTypes'
 import { FormButtonGroup, FormImageUpload, FormInput, FormTextarea } from '@/src/shared/ui/form'
 
 export default function ProfileForm() {

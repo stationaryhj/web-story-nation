@@ -6,7 +6,7 @@ import type {
   CharacterRating,
   CharacterVisibility,
   DmFormValues,
-} from '@/src/features/edit-character/model/dmFormTypes'
+} from '../../model/dmFormTypes'
 import { cn } from '@/src/shared/lib/utils/cn'
 import useModalStore from '@/src/shared/model/stores/useModalStore'
 import { FormFieldHeader, FormTextarea } from '@/src/shared/ui/form'

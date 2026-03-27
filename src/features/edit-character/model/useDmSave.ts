@@ -11,7 +11,7 @@ import type {
 } from '@/features/edit-character/model/dmFormTypes'
 import { useTagList } from '@/shared/api/queries/useTagList'
 import useModalStore from '@/shared/model/stores/useModalStore'
-import { useSaveHashtags, useSaveInProgress, useSaveMultiImages, useSaveProperty } from '../api/characterFormApi'
+import { useSaveHashtags, useSaveInProgress, useSaveMultiImages, useSaveProperty } from '../api/dmCharacterApi'
 
 /** 인트로 버블에서 참조되는 이미지 토큰을 추출 (숫자 키 + hash) */
 function getIntroImageTokens(introBubbles: IntroBubbleGroup[]): { keys: Set<number>; hashes: Set<string> } {

@@ -15,7 +15,7 @@ import {
   type BubbleGroup,
   type Speaker,
   type MessageType,
-} from '@/src/widgets/edit-character/ui/forms/intro/model/introMessage'
+} from '@/src/features/edit-character/model/intro/introMessage'
 
 export function useIntroMessages() {
   const { openModal, closeModalByType } = useModalStore()

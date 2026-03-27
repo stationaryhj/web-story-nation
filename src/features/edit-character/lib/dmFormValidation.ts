@@ -1,4 +1,4 @@
-import type { CharacterFormData } from '@/store/useCreateCharacterData'
+import type { CharacterFormData } from '@/features/edit-character/model/characterFormStore'
 
 type TabType = 'basic' | 'detail' | 'image' | 'last'
 

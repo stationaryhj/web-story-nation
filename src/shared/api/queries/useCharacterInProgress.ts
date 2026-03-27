@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { instance } from '@/shared/api/instance/instance'
 import { apiRoute } from '@/shared/config/apiRoute'
-import { bridgeCharacterInProgressToCharacter } from '@/src/features/edit-character/lib/characterFormBridge'
 import type { CharbotInprogressResponse } from '@/types/api'
 
 export const useCharacterInProgress = (characterId: number) => {
@@ -15,7 +14,6 @@ export const useCharacterInProgress = (characterId: number) => {
       console.log('@@ [useCharacterInProgress] chat_room_mode ::', response.data?.chrbot?.chat_room_mode)
       return response.data as CharbotInprogressResponse
     },
-    select: (data) => bridgeCharacterInProgressToCharacter(data.chrbot),
     enabled: !!characterId,
   })
 }

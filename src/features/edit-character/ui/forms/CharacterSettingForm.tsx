@@ -1,6 +1,6 @@
 'use client'
 
-import type { DmFormValues } from '@/src/features/edit-character/model/dmFormTypes'
+import type { DmFormValues } from '../../model/dmFormTypes'
 import { FormFieldHeader, FormTextarea } from '@/src/shared/ui/form'
 import { Controller, useFormContext } from 'react-hook-form'
 

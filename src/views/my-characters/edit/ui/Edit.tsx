@@ -1,16 +1,22 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useParams } from 'next/navigation'
 import Header from '@/components/common/header'
 import { useCharacterInProgress } from '@/shared/api/queries/useCharacterInProgress'
-import { EditDm, EditStory } from '@/widgets/edit-character'
+import { bridgeCharacterInProgressToCharacter } from '@/src/features/edit-character/lib/dmFormBridge'
+import { EditDm, EditStory } from '@/src/features/edit-character'
 
 export default function Edit() {
   const params = useParams()
   const characterId = Number(params?.id)
 
-  const { data, isLoading, error } = useCharacterInProgress(characterId)
-  const chatRoomMode = data?.chat_room_mode
+  const { data: rawData, isLoading, error } = useCharacterInProgress(characterId)
+  const chatRoomMode = rawData?.chrbot?.chat_room_mode
+  const bridgedData = useMemo(
+    () => (rawData ? bridgeCharacterInProgressToCharacter(rawData.chrbot) : undefined),
+    [rawData],
+  )
 
   if (isLoading) {
     return (
@@ -31,7 +37,7 @@ export default function Edit() {
   }
 
   if (chatRoomMode === 1) {
-    return <EditDm data={data!} />
+    return <EditDm data={bridgedData!} />
   }
 
   return (

@@ -1,5 +1,5 @@
 import PaidCoinFilledIcon from '@/src/shared/ui/icons/PaidCoinFilledIcon'
-import PlayIcon2 from '@/src/shared/ui/icons/PlayIcon2'
+import PlayFilledIcon from '@/src/shared/ui/icons/PlayFilledIcon'
 import { countOneVoiceSegment } from '@/src/shared/lib/utils/ttsCost'
 import { cn } from '@/src/shared/lib/utils/cn'
 
@@ -33,7 +33,7 @@ export default function VoiceBubble({ text, className }: VoiceBubbleProps) {
 
   return (
     <div className={cn('flex w-fit items-center gap-x-1.5 rounded-xl bg-v2-gray-100 py-2 pl-2 pr-3', className)}>
-      <PlayIcon2 size={24} className="shrink-0 text-black" />
+      <PlayFilledIcon size={24} className="shrink-0 text-black" />
       <div
         className="flex"
         style={{

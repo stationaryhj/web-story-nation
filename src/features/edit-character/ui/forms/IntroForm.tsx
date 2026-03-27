@@ -2,7 +2,7 @@
 
 import { Avatar } from '@/src/shared/ui/chat-bubble'
 import { AIMessageLayout, UserMessageLayout } from './intro/MessageLayout'
-import { useIntroMessages } from '@/src/widgets/edit-character/ui/forms/intro/model/useIntroMessages'
+import { useIntroMessages } from '../../model/intro/useIntroMessages'
 import BubbleItem from './intro/BubbleItem'
 import IntroInput from './intro/IntroInput'
 
