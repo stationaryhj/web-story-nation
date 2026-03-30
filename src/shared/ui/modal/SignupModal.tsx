@@ -270,7 +270,8 @@ const SignupModal = ({ onSuccess, chrbot_key }: SignupModalProps) => {
   // 회원가입 양식 내용
   const signupContent = (
     <div className='flex flex-col space-y-6'>
-      {/* 닉네임 입력 */}
+      {/* 닉네임 입력 - 주석처리 */}
+      {/*
       <div className='space-y-2'>
         <label
           htmlFor='nickname'
@@ -310,6 +311,7 @@ const SignupModal = ({ onSuccess, chrbot_key }: SignupModalProps) => {
           </button>
         </div>
       </div>
+      */}
 
       {/* 생년월일 입력 */}
       <div className='space-y-2'>

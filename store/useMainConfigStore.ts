@@ -196,10 +196,9 @@ export const useMainConfigStore = create<MainConfigStore>()(
       name: 'config-storage', // localStorage에 저장될 키 이름
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        // 필요한 상태만 저장
+        // activeNotices는 persist하지 않음 - 매번 서버에서 최신 데이터를 fetch
         webConfig: state.webConfig,
-        webNotice: state.webNotice,
-        activeNotices: state.activeNotices
+        webNotice: state.webNotice
       })
     }
   )
