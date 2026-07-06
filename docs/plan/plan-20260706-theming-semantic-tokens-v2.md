@@ -232,3 +232,39 @@
 - 데드 파일 `styles/globals.css` 정리(별도 이슈).
 - 오렌지 실드 뱃지(#FF8A00) core 토큰 승격.
 - 색상 외 레이아웃/애니메이션/간격 리팩터.
+
+---
+
+## 사후 반영 — 실제 구현과 계획의 차이 (2026-07-06 구현 완료)
+
+> 계획대로 착수했으나 실제 구현 중 **범위 산정 오류**가 드러나 후속 배치가 추가됐다. 상세 리뷰: `docs/review/review-20260706-theming-semantic-tokens-impl.md`. 배치별 구현 산출물: `docs/write/write-20260706-theming-*.md`.
+
+### 🔴 최대 차이 — 4·5단계 스코프가 라이브 파일을 누락 (범위 산정 오류)
+- **계획**: 4단계를 `src/shared/ui`·`components/elements`·`components/modal`, 5단계를 `views/*`·결제로 **대표 디렉토리 열거** 방식으로 스코프했다.
+- **실제**: 6단계(잔재 정리)에서 전 코드베이스 `grep`을 돌린 결과, **4·5단계 디렉토리에 포함되지 않은 라이브 구 다크 팔레트 224건/30파일**이 남아 있었다. 대표 예: `components/common/{header,footer,MobileGNB}`(전 페이지 크롬), `components/form/character/*`(캐릭터 생성 폼 전체), `components/main/*`·`recommend/*`, `components/chat/*`, `components/elements/{navigation,tabs,tags,list,selectbox}`, `src/features/edit-character/ui/EditStory.tsx`, `app/(routes)/chat/[id]/page.tsx`.
+- **원인**: 계획이 "대표 디렉토리 + 원시유틸 425/HEX 55 카운트"에는 근거했으나, **디렉토리 열거를 코드베이스 전수 grep으로 교차검증하지 않아** `components/common`·`components/form/character`·`components/main`·`components/chat` 등 계층이 통째로 빠졌다.
+- **조치**: 계획에 없던 **후속 배치 A/B/C**(산출물 step7/8/9)를 추가해 30파일을 마저 치환. 최종적으로 **라이브 코드의 색상 `dark:` 유틸 0건** 달성.
+
+### 실제 실행된 단계 매핑
+| 계획 단계 | 실제 산출물(docs/write) | 비고 |
+|---|---|---|
+| 1·2·3·7 (인프라+폰트) | (직접 구현) `write-...-semantic-tokens-v2.md` | 계획대로 |
+| 4 (공용 UI) | `write-...-step4-shared-ui.md` (66파일) | 계획대로 |
+| 5 (views·결제) | `write-...-step5-views.md` (19페이지+결제4) | 계획대로 |
+| 6 (dark 잔재 정리) | `write-...-step6-dark-cleanup.md` | **여기서 범위 공백 발견** |
+| — (계획 밖 후속 A) | `write-...-step7-chrome-main.md` (9파일) | 헤더/푸터/GNB/메인추천 |
+| — (계획 밖 후속 B) | `write-...-step8-character-form.md` (11파일) | 캐릭터 생성/편집 폼 |
+| — (계획 밖 후속 C) | `write-...-step9-chat-elements.md` (11파일) | 채팅/엘리먼트/잔여모달 |
+
+### 계획 세부와 달라진 소소한 결정
+- **라이트 `surface-sunken`/`surface-elevated` 값**: 계획은 "현행 라이트 대응값"으로 뒀으나, 회귀 0을 위해 라이트에서는 흰색(`255 255 255`) 위주로 채워 넣음(다크에서만 #0F0F0F/#3A3A3A로 스왑).
+- **brand 호버 매핑**: 계획 매핑표는 `primary-600`→`brand-hover`였으나, 4단계 `CardGrid.tsx` 선례를 우선해 "더보기" 류 링크는 `text-brand hover:text-brand-hover`로 통일(확인 필요로 표시).
+- **`useThemeStore` 처리**: "제거 또는 중립화 택일" 중 **중립화**(persist 제거·`APP_THEME` 고정값) 채택 — `header.tsx`/`Portal.tsx` 등 소비처 호환 유지.
+
+### 계획이 예상 못 한 발견
+- **오펀(미사용) 컴포넌트**: `components/chat/*`, `components/elements/badge/Badge.tsx`, `components/form/ToggleSwitch.tsx`, `views/chat/home.tsx`(전체 주석)는 어디서도 import되지 않음. 색상 작업 범위 밖이라 삭제하지 않고 별도 정리 이슈로 남김.
+- **최종 잔량 76건/12파일**: 전량 죽은 코드(주석)·오펀 컴포넌트 → 방치 가능.
+
+### 미해결(후속 필요)
+- **다크 실사용 육안/접근성(WCAG AA) QA 미수행** — 다크 릴리스 전 필수 게이트.
+- 누적된 "확인 필요" 항목(결제 CTA 색 통일, 앱다운로드 배지색, like-level 다색, 삭제버튼 danger 승격 등) 제품 컨펌.
