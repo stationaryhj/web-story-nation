@@ -1,5 +1,5 @@
 // tailwind.config.ts
-import type { Config } from 'tailwindcss'
+import type { Config } from 'tailwindcss';
 
 const config: Config = {
   future: {
@@ -28,7 +28,7 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ['var(--font-poppins)', 'sans-serif'],
+        sans: ['var(--font-poppins)', 'var(--font-noto-sans-kr)', 'sans-serif'],
       },
       width: {
         '1/10': '10%',
@@ -42,6 +42,25 @@ const config: Config = {
         '9/10': '90%',
       },
       colors: {
+        // ── Semantic 토큰 (CSS 변수 기반, .dark에서 자동 스왑) ──
+        // RGB 채널(`R G B`) 변수를 참조하므로 `bg-surface/50` 같은 alpha 유틸이 동작한다.
+        surface: {
+          DEFAULT: 'rgb(var(--color-surface) / <alpha-value>)',
+          sunken: 'rgb(var(--color-surface-sunken) / <alpha-value>)',
+          elevated: 'rgb(var(--color-surface-elevated) / <alpha-value>)',
+          'elevated-hover': 'rgb(var(--color-surface-elevated-hover) / <alpha-value>)',
+        },
+        border: {
+          default: 'rgb(var(--color-border-default) / <alpha-value>)',
+        },
+        brand: {
+          DEFAULT: 'rgb(var(--color-brand) / <alpha-value>)',
+          hover: 'rgb(var(--color-brand-hover) / <alpha-value>)',
+        },
+        danger: {
+          DEFAULT: 'rgb(var(--color-danger) / <alpha-value>)',
+        },
+        overlay: 'rgb(var(--color-overlay) / <alpha-value>)',
         primary: {
           '50': '#EEF2FF',
           '100': '#E0E7FF',
@@ -86,6 +105,9 @@ const config: Config = {
         },
         text: {
           black: '#101010',
+          primary: 'rgb(var(--color-text-primary) / <alpha-value>)',
+          muted: 'rgb(var(--color-text-muted) / <alpha-value>)',
+          inverse: 'rgb(var(--color-text-inverse) / <alpha-value>)',
         },
         icons: {
           primary: '#6B7280',
@@ -167,6 +189,6 @@ const config: Config = {
     },
   },
   plugins: [require('tailwind-scrollbar-hide')],
-}
+};
 
-export default config
+export default config;

@@ -1,25 +1,34 @@
 // app/layout.tsx
-import type { Metadata } from 'next'
-import { Poppins } from 'next/font/google'
-import 'react-toastify/dist/ReactToastify.css'
+import type { Metadata } from 'next';
+import { Noto_Sans_KR, Poppins } from 'next/font/google';
+import 'react-toastify/dist/ReactToastify.css';
 
-import './globals.css'
-import Script from 'next/script'
-import type { ReactNode } from 'react'
+import './globals.css';
+import { Plus } from 'lucide-react';
+import Script from 'next/script';
+import type { ReactNode } from 'react';
+import MobileGNB from '@/components/common/MobileGNB';
+import DraggableButton from '@/components/elements/button/DraggableButton';
+import { ToastPortal } from '@/components/elements/toast/ToastPortal';
+import { IS_DARK_THEME } from '@/shared/config/theme';
+import Providers from './providers';
 
-import Providers from './providers'
-import DraggableButton from '@/components/elements/button/DraggableButton'
-import MobileGNB from '@/components/common/MobileGNB'
-import { Plus } from 'lucide-react'
-import { ToastPortal } from '@/components/elements/toast/ToastPortal'
-
-// Poppins 폰트 설정
+// Poppins 폰트 설정 (라틴 우선)
 const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
   variable: '--font-poppins',
   display: 'swap',
-})
+});
+
+// Noto Sans KR — 한글 폴백. 글리프 용량이 커 korean subset은 프리로드하지 않고
+// latin subset + display:swap + unicode-range 폴백으로 처리(초기 로드 부담 최소화).
+const notoSansKr = Noto_Sans_KR({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-noto-sans-kr',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: '스토리네이션',
@@ -47,54 +56,25 @@ export const metadata: Metadata = {
     description: '스네: 함께 만드는 세계관&캐릭터 채팅',
     images: ['https://www.storynation.co.kr/images/sn-thumb.jpg'],
   },
-}
+};
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ko" className={`${poppins.variable}`} suppressHydrationWarning>
+    <html
+      lang='ko'
+      className={`${poppins.variable} ${notoSansKr.variable}${IS_DARK_THEME ? ' dark' : ''}`}
+      suppressHydrationWarning
+    >
       <head>
         <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, height=device-height"
+          name='viewport'
+          content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, height=device-height'
         />
-        {/* 다크모드 초기화를 위한 인라인 스크립트 */}
-        <Script
-          id="theme-init"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  // 로컬 스토리지에서 테마 설정 가져오기
-                  const storedTheme = localStorage.getItem('theme-storage');
-                  const theme = storedTheme ? JSON.parse(storedTheme) : null;
-                  const isDarkMode = theme?.state?.isDarkMode;
-                  
-                  // 시스템 다크모드 감지
-                  const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                  
-                  // 다크모드 적용 여부 결정
-                  const shouldApplyDarkMode = isDarkMode === true || 
-                    (isDarkMode === undefined && prefersDarkMode);
-                  
-                  // HTML에 다크모드 클래스 추가
-                  if (shouldApplyDarkMode) {
-                    document.documentElement.classList.add('dark');
-                  } else {
-                    document.documentElement.classList.remove('dark');
-                  }
-                } catch (e) {
-                  // 에러 발생 시 기본값 사용
-                  console.error('테마 초기화 중 오류 발생:', e);
-                }
-              })();
-            `,
-          }}
-        />
+        {/* 테마는 APP_THEME 상수로 서버에서 정적 결정되므로 초기화 스크립트가 불필요하다. */}
         {/* 뷰포트 높이 계산을 위한 스크립트 */}
         <Script
-          id="viewport-height"
-          strategy="beforeInteractive"
+          id='viewport-height'
+          strategy='beforeInteractive'
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
@@ -119,21 +99,24 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
       </head>
-      <body className="font-sans bg-white dark:bg-gray-900 transition-colors duration-300" suppressHydrationWarning>
+      <body
+        className='font-sans bg-surface transition-colors duration-300'
+        suppressHydrationWarning
+      >
         <Providers>
-          <div className="flex min-h-screen flex-col md:pb-0">
-            <div className="flex-1" id="main-content">
+          <div className='flex min-h-screen flex-col md:pb-0'>
+            <div className='flex-1' id='main-content'>
               {children}
             </div>
           </div>
         </Providers>
 
         {/* 메인 플로팅 메뉴 버튼 */}
-        <DraggableButton color="bg-primary-500" />
+        <DraggableButton color='bg-primary-500' />
 
         <MobileGNB />
         <ToastPortal />
       </body>
     </html>
-  )
+  );
 }

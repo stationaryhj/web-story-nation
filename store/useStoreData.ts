@@ -1,52 +1,53 @@
-import { ChatModeData, CoinData, CoinListResponse, InquiryData } from '@/types/api'
-import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
-import { settlementApi } from '@/services/api/storyNationApi'
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import { settlementApi } from '@/services/api/storyNationApi';
+import { IS_DARK_THEME } from '@/shared/config/theme';
+import { ChatModeData, CoinData, CoinListResponse, InquiryData } from '@/types/api';
 
 // 캐릭터 타입 정의
 export interface Character {
-  id: string
-  name: string
-  subject?: string
-  description: string
-  detailDescription?: string
-  example?: string
-  first_talk?: string
-  imageUrl: string
-  commentCount: number
-  likeCount?: number
-  hashtags: Array<string>
-  isAdult: boolean
+  id: string;
+  name: string;
+  subject?: string;
+  description: string;
+  detailDescription?: string;
+  example?: string;
+  first_talk?: string;
+  imageUrl: string;
+  commentCount: number;
+  likeCount?: number;
+  hashtags: Array<string>;
+  isAdult: boolean;
   creator: {
-    id: string
-    nickname: string
-    username: string
-    profileImageUrl: string | null
-    isActive: boolean
-  }
-  category: 'male' | 'female' | 'unspecified' // 카테고리 추가
-  gender?: 'male' | 'female' | 'unknown' // 성별 추가
-  createdAt?: string // 생성 날짜 추가
-  finish_yn?: number | 0
-  show_yn?: number | any
-  block_type?: number | any
-  likeability_max_lv?: number | any
-  likeability_yn?: number | any
-  multi_image_count?: number | any
-  writer_note?: string | any
+    id: string;
+    nickname: string;
+    username: string;
+    profileImageUrl: string | null;
+    isActive: boolean;
+  };
+  category: 'male' | 'female' | 'unspecified'; // 카테고리 추가
+  gender?: 'male' | 'female' | 'unknown'; // 성별 추가
+  createdAt?: string; // 생성 날짜 추가
+  finish_yn?: number | 0;
+  show_yn?: number | any;
+  block_type?: number | any;
+  likeability_max_lv?: number | any;
+  likeability_yn?: number | any;
+  multi_image_count?: number | any;
+  writer_note?: string | any;
 }
 
 // 스토어 타입 정의
 interface DataStore {
-  characters: Array<Character>
-  maleCharacters: Array<Character>
-  femaleCharacters: Array<Character>
-  unspecifiedCharacters: Array<Character>
-  recommendedCharacters: Array<Character>
-  isLoading: boolean
-  error: string | null
-  fetchCharacters: () => Promise<void>
-  fetchCategoryCharacters: (category: string) => Promise<Array<Character>>
+  characters: Array<Character>;
+  maleCharacters: Array<Character>;
+  femaleCharacters: Array<Character>;
+  unspecifiedCharacters: Array<Character>;
+  recommendedCharacters: Array<Character>;
+  isLoading: boolean;
+  error: string | null;
+  fetchCharacters: () => Promise<void>;
+  fetchCategoryCharacters: (category: string) => Promise<Array<Character>>;
 }
 
 // 이미지 URL 배열 (랜덤 이미지 사용을 위한)
@@ -57,7 +58,7 @@ const characterImages = [
   '/images/character1.jpg',
   '/images/placeholders/default-character.jpg',
   '/images/placeholders/author_default_img.jpg',
-]
+];
 
 // 해시태그 목록 (랜덤 해시태그 생성용)
 const allHashtags = [
@@ -99,28 +100,30 @@ const allHashtags = [
   '#유토피아',
   '#사이버펑크',
   '#스팀펑크',
-]
+];
 
 // 랜덤 날짜 생성 함수
 const randomDate = (start: Date, end: Date) => {
-  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString()
-}
+  return new Date(
+    start.getTime() + Math.random() * (end.getTime() - start.getTime())
+  ).toISOString();
+};
 
 // 랜덤 해시태그 선택 함수
 const getRandomHashtags = (count: number) => {
-  const shuffled = [...allHashtags].sort(() => 0.5 - Math.random())
-  return shuffled.slice(0, count)
-}
+  const shuffled = [...allHashtags].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+};
 
 // 랜덤 숫자 생성 함수
 const getRandomNumber = (min: number, max: number) => {
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 
 // 랜덤 이미지 URL 가져오기
 const getRandomImage = () => {
-  return characterImages[Math.floor(Math.random() * characterImages.length)]
-}
+  return characterImages[Math.floor(Math.random() * characterImages.length)];
+};
 
 // 임시 데이터 (기존 데이터)
 const dummyCharacters: Array<Character> = [
@@ -149,7 +152,8 @@ const dummyCharacters: Array<Character> = [
     id: '2',
     name: '리아 김',
     subject: '낮에는 평범한 대학생, 밤에는 사이버 세계의 정의를 실현하는 비밀 요원.',
-    description: '한국계 미국인 천재 해커. 낮에는 평범한 대학생, 밤에는 사이버 세계의 정의를 실현하는 비밀 요원.',
+    description:
+      '한국계 미국인 천재 해커. 낮에는 평범한 대학생, 밤에는 사이버 세계의 정의를 실현하는 비밀 요원.',
     imageUrl: getRandomImage(),
     commentCount: 89,
     likeCount: 245,
@@ -169,8 +173,10 @@ const dummyCharacters: Array<Character> = [
   {
     id: '3',
     name: '마르코 발렌티',
-    subject: '이탈리아 출신의 미스터리한 셰프. 그의 요리에는 사람의 마음을 사로잡는 마법 같은 비밀이 있다.',
-    description: '이탈리아 출신의 미스터리한 셰프. 그의 요리에는 사람의 마음을 사로잡는 마법 같은 비밀이 있다.',
+    subject:
+      '이탈리아 출신의 미스터리한 셰프. 그의 요리에는 사람의 마음을 사로잡는 마법 같은 비밀이 있다.',
+    description:
+      '이탈리아 출신의 미스터리한 셰프. 그의 요리에는 사람의 마음을 사로잡는 마법 같은 비밀이 있다.',
     imageUrl: getRandomImage(),
     commentCount: 210,
     likeCount: 412,
@@ -190,8 +196,10 @@ const dummyCharacters: Array<Character> = [
   {
     id: '4',
     name: '아야 나카무라',
-    subject: '도쿄의 밤을 지배하는 언더그라운드 DJ. 음악으로 사람들의 영혼을 움직이는 능력을 가졌다.',
-    description: '도쿄의 밤을 지배하는 언더그라운드 DJ. 음악으로 사람들의 영혼을 움직이는 능력을 가졌다.',
+    subject:
+      '도쿄의 밤을 지배하는 언더그라운드 DJ. 음악으로 사람들의 영혼을 움직이는 능력을 가졌다.',
+    description:
+      '도쿄의 밤을 지배하는 언더그라운드 DJ. 음악으로 사람들의 영혼을 움직이는 능력을 가졌다.',
     imageUrl: getRandomImage(),
     commentCount: 175,
     likeCount: 289,
@@ -211,7 +219,8 @@ const dummyCharacters: Array<Character> = [
   {
     id: '5',
     name: '알렉산더 볼코프',
-    subject: '전직 러시아 특수부대 요원. 과거의 그림자에서 벗어나 평범한 삶을 꿈꾸지만, 과거는 그를 쉽게 놓아주지 않는다.',
+    subject:
+      '전직 러시아 특수부대 요원. 과거의 그림자에서 벗어나 평범한 삶을 꿈꾸지만, 과거는 그를 쉽게 놓아주지 않는다.',
     description:
       '전직 러시아 특수부대 요원. 과거의 그림자에서 벗어나 평범한 삶을 꿈꾸지만, 과거는 그를 쉽게 놓아주지 않는다.',
     imageUrl: getRandomImage(),
@@ -234,7 +243,8 @@ const dummyCharacters: Array<Character> = [
     id: '6',
     name: '엘리자베스 파커',
     subject: '뉴욕의 야심 찬 패션 디자이너. 화려한 패션계의 이면에 숨겨진 어두운 비밀을 파헤친다.',
-    description: '뉴욕의 야심 찬 패션 디자이너. 화려한 패션계의 이면에 숨겨진 어두운 비밀을 파헤친다.',
+    description:
+      '뉴욕의 야심 찬 패션 디자이너. 화려한 패션계의 이면에 숨겨진 어두운 비밀을 파헤친다.',
     imageUrl: getRandomImage(),
     commentCount: 98,
     likeCount: 215,
@@ -254,8 +264,10 @@ const dummyCharacters: Array<Character> = [
   {
     id: '7',
     name: '미스터리 X',
-    subject: '정체를 알 수 없는 미스터리한 인물. 과거도, 성별도 알려진 바 없지만 놀라운 능력을 가지고 있다.',
-    description: '정체를 알 수 없는 미스터리한 인물. 과거도, 성별도 알려진 바 없지만 놀라운 능력을 가지고 있다.',
+    subject:
+      '정체를 알 수 없는 미스터리한 인물. 과거도, 성별도 알려진 바 없지만 놀라운 능력을 가지고 있다.',
+    description:
+      '정체를 알 수 없는 미스터리한 인물. 과거도, 성별도 알려진 바 없지만 놀라운 능력을 가지고 있다.',
     imageUrl: getRandomImage(),
     commentCount: 245,
     likeCount: 478,
@@ -299,7 +311,8 @@ const dummyCharacters: Array<Character> = [
     id: '9',
     name: '유진 리',
     subject: '천재적인 프로그래머이자 화이트 해커. 가상 세계에서는 그 누구보다 강력한 존재이다.',
-    description: '천재적인 프로그래머이자 화이트 해커. 가상 세계에서는 그 누구보다 강력한 존재이다.',
+    description:
+      '천재적인 프로그래머이자 화이트 해커. 가상 세계에서는 그 누구보다 강력한 존재이다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
     likeCount: getRandomNumber(100, 500),
@@ -361,8 +374,10 @@ const dummyCharacters: Array<Character> = [
   {
     id: '12',
     name: '토마스 워커',
-    subject: '인류의 미래를 구하기 위해 시간을 여행하는 과학자. 과거를 바꾸면 미래도 바뀐다는 것을 알고 있다.',
-    description: '인류의 미래를 구하기 위해 시간을 여행하는 과학자. 과거를 바꾸면 미래도 바뀐다는 것을 알고 있다.',
+    subject:
+      '인류의 미래를 구하기 위해 시간을 여행하는 과학자. 과거를 바꾸면 미래도 바뀐다는 것을 알고 있다.',
+    description:
+      '인류의 미래를 구하기 위해 시간을 여행하는 과학자. 과거를 바꾸면 미래도 바뀐다는 것을 알고 있다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
     likeCount: getRandomNumber(100, 500),
@@ -384,8 +399,10 @@ const dummyCharacters: Array<Character> = [
   {
     id: '13',
     name: '소피아 로드리게스',
-    subject: '세계적인 발레리나. 완벽주의적 성격으로 극한의 연습을 거듭하며 자신의 한계를 시험한다.',
-    description: '세계적인 발레리나. 완벽주의적 성격으로 극한의 연습을 거듭하며 자신의 한계를 시험한다.',
+    subject:
+      '세계적인 발레리나. 완벽주의적 성격으로 극한의 연습을 거듭하며 자신의 한계를 시험한다.',
+    description:
+      '세계적인 발레리나. 완벽주의적 성격으로 극한의 연습을 거듭하며 자신의 한계를 시험한다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
     likeCount: getRandomNumber(100, 500),
@@ -405,8 +422,10 @@ const dummyCharacters: Array<Character> = [
   {
     id: '14',
     name: '에밀리 왕',
-    subject: '화학 재해로 특수한 능력을 갖게 된 과학자. 분자 구조를 변형시키는 능력으로 범죄와 싸운다.',
-    description: '화학 재해로 특수한 능력을 갖게 된 과학자. 분자 구조를 변형시키는 능력으로 범죄와 싸운다.',
+    subject:
+      '화학 재해로 특수한 능력을 갖게 된 과학자. 분자 구조를 변형시키는 능력으로 범죄와 싸운다.',
+    description:
+      '화학 재해로 특수한 능력을 갖게 된 과학자. 분자 구조를 변형시키는 능력으로 범죄와 싸운다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
     likeCount: getRandomNumber(100, 500),
@@ -426,8 +445,10 @@ const dummyCharacters: Array<Character> = [
   {
     id: '15',
     name: '나탈리 벤소니',
-    subject: '17세기의 해적선 선장으로 바다의 공포로 불리는 여성. 대양을 항해하며 끝없는 모험을 찾는다.',
-    description: '17세기의 해적선 선장으로 바다의 공포로 불리는 여성. 대양을 항해하며 끝없는 모험을 찾는다.',
+    subject:
+      '17세기의 해적선 선장으로 바다의 공포로 불리는 여성. 대양을 항해하며 끝없는 모험을 찾는다.',
+    description:
+      '17세기의 해적선 선장으로 바다의 공포로 불리는 여성. 대양을 항해하며 끝없는 모험을 찾는다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
     likeCount: getRandomNumber(100, 500),
@@ -447,8 +468,10 @@ const dummyCharacters: Array<Character> = [
   {
     id: '16',
     name: '클로이 파크',
-    subject: '천재적인 게임 개발자이자 프로 게이머. 가상 세계와 현실 세계의 경계를 허무는 게임을 개발 중이다.',
-    description: '천재적인 게임 개발자이자 프로 게이머. 가상 세계와 현실 세계의 경계를 허무는 게임을 개발 중이다.',
+    subject:
+      '천재적인 게임 개발자이자 프로 게이머. 가상 세계와 현실 세계의 경계를 허무는 게임을 개발 중이다.',
+    description:
+      '천재적인 게임 개발자이자 프로 게이머. 가상 세계와 현실 세계의 경계를 허무는 게임을 개발 중이다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
     likeCount: getRandomNumber(100, 500),
@@ -470,7 +493,8 @@ const dummyCharacters: Array<Character> = [
   {
     id: '17',
     name: '에이든',
-    description: '초자연적인 능력을 가진 존재. 시간과 공간을 초월하여 다양한 시대를 여행하며 인류의 역사를 관찰한다.',
+    description:
+      '초자연적인 능력을 가진 존재. 시간과 공간을 초월하여 다양한 시대를 여행하며 인류의 역사를 관찰한다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
     likeCount: getRandomNumber(100, 500),
@@ -490,7 +514,8 @@ const dummyCharacters: Array<Character> = [
   {
     id: '18',
     name: '리버',
-    description: '다차원 세계에서 온 방문자. 현실을 꿈처럼 바라보며 인간의 감정과 행동에 깊은 관심을 가지고 있다.',
+    description:
+      '다차원 세계에서 온 방문자. 현실을 꿈처럼 바라보며 인간의 감정과 행동에 깊은 관심을 가지고 있다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
     likeCount: getRandomNumber(100, 500),
@@ -510,7 +535,8 @@ const dummyCharacters: Array<Character> = [
   {
     id: '19',
     name: '모르간',
-    description: '마법의 숲에 사는 정령. 자연과 하나가 되어 식물을 조종하고 동물들과 대화하는 능력을 가졌다.',
+    description:
+      '마법의 숲에 사는 정령. 자연과 하나가 되어 식물을 조종하고 동물들과 대화하는 능력을 가졌다.',
     imageUrl: getRandomImage(),
     commentCount: getRandomNumber(50, 300),
     likeCount: getRandomNumber(100, 500),
@@ -548,10 +574,10 @@ const dummyCharacters: Array<Character> = [
     gender: 'unknown',
     createdAt: randomDate(new Date(2023, 0, 1), new Date()),
   },
-]
+];
 
 // 추천 캐릭터 ID 목록 (실제로는 알고리즘에 의해 결정될 수 있음)
-const recommendedIds = ['1', '4', '5', '7', '10', '15', '17', '19']
+const recommendedIds = ['1', '4', '5', '7', '10', '15', '17', '19'];
 
 // Zustand 스토어 생성
 export const useStoreData = create<DataStore>((set, get) => ({
@@ -564,18 +590,18 @@ export const useStoreData = create<DataStore>((set, get) => ({
   error: null,
 
   fetchCharacters: async () => {
-    set({ isLoading: true, error: null })
+    set({ isLoading: true, error: null });
 
     try {
       // 실제 API 호출 대신 임시 데이터 사용
       // 실제 구현에서는 axios 등을 사용하여 API 호출
-      await new Promise(resolve => setTimeout(resolve, 1000)) // 로딩 시뮬레이션
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // 로딩 시뮬레이션
 
       // 카테고리별로 캐릭터 분류
-      const maleChars = dummyCharacters.filter(char => char.category === 'male')
-      const femaleChars = dummyCharacters.filter(char => char.category === 'female')
-      const unspecifiedChars = dummyCharacters.filter(char => char.category === 'unspecified')
-      const recommendedChars = dummyCharacters.filter(char => recommendedIds.includes(char.id))
+      const maleChars = dummyCharacters.filter((char) => char.category === 'male');
+      const femaleChars = dummyCharacters.filter((char) => char.category === 'female');
+      const unspecifiedChars = dummyCharacters.filter((char) => char.category === 'unspecified');
+      const recommendedChars = dummyCharacters.filter((char) => recommendedIds.includes(char.id));
 
       set({
         characters: dummyCharacters,
@@ -584,9 +610,9 @@ export const useStoreData = create<DataStore>((set, get) => ({
         unspecifiedCharacters: unspecifiedChars,
         recommendedCharacters: recommendedChars,
         isLoading: false,
-      })
+      });
     } catch (error) {
-      set({ error: '캐릭터 데이터를 불러오는데 실패했습니다.', isLoading: false })
+      set({ error: '캐릭터 데이터를 불러오는데 실패했습니다.', isLoading: false });
     }
   },
 
@@ -595,93 +621,81 @@ export const useStoreData = create<DataStore>((set, get) => ({
     if (get().characters.length > 0) {
       switch (category) {
         case 'male':
-          return get().maleCharacters
+          return get().maleCharacters;
         case 'female':
-          return get().femaleCharacters
+          return get().femaleCharacters;
         case 'unspecified':
-          return get().unspecifiedCharacters
+          return get().unspecifiedCharacters;
         case 'recommended':
-          return get().recommendedCharacters
+          return get().recommendedCharacters;
         default:
-          return get().characters
+          return get().characters;
       }
     }
 
     // 데이터가 없으면 먼저 로드
-    await get().fetchCharacters()
+    await get().fetchCharacters();
 
     // 로드 후 다시 분류하여 반환
     switch (category) {
       case 'male':
-        return get().maleCharacters
+        return get().maleCharacters;
       case 'female':
-        return get().femaleCharacters
+        return get().femaleCharacters;
       case 'unspecified':
-        return get().unspecifiedCharacters
+        return get().unspecifiedCharacters;
       case 'recommended':
-        return get().recommendedCharacters
+        return get().recommendedCharacters;
       default:
-        return get().characters
+        return get().characters;
     }
   },
-}))
+}));
 
 // 다크모드 스토어 타입 정의
 interface ThemeStore {
-  isDarkMode: boolean
-  toggleDarkMode: () => void
-  enableDarkMode: () => void
-  disableDarkMode: () => void
-  initializeTheme: () => void
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+  enableDarkMode: () => void;
+  disableDarkMode: () => void;
+  initializeTheme: () => void;
 }
 
 // 안전한 localStorage 접근을 위한 커스텀 스토리지 객체
 const safeStorage = {
   getItem: (name: string): string | null => {
-    if (typeof window === 'undefined') return null
-    return localStorage.getItem(name)
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(name);
   },
   setItem: (name: string, value: string): void => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem(name, value)
+      localStorage.setItem(name, value);
     }
   },
   removeItem: (name: string): void => {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem(name)
+      localStorage.removeItem(name);
     }
   },
-}
+};
 
-// 다크모드 스토어 생성 (로컬 스토리지에 저장)
-export const useThemeStore = create<ThemeStore>()(
-  persist(
-    set => ({
-      isDarkMode: false,
-      toggleDarkMode: () => set(state => ({ isDarkMode: !state.isDarkMode })),
-      enableDarkMode: () => set({ isDarkMode: true }),
-      disableDarkMode: () => set({ isDarkMode: false }),
-      initializeTheme: () => {
-        const savedTheme = localStorage.getItem('theme-storage')
-        if (!savedTheme) {
-          set({ isDarkMode: false })
-        }
-      },
-    }),
-    {
-      name: 'theme-storage',
-      storage: createJSONStorage(() => safeStorage),
-      skipHydration: true,
-    }
-  )
-)
+// 다크모드 스토어 — 런타임 토글/persist를 제거하고 APP_THEME 상수로 고정한다.
+// (사용자 대면 토글 없음. 테마 전환은 src/shared/config/theme.ts의 APP_THEME 한 줄로만 제어)
+// 기존 소비처(header/Portal 등) 호환을 위해 export 시그니처는 유지하되 토글은 no-op.
+export const useThemeStore = create<ThemeStore>()(() => ({
+  isDarkMode: IS_DARK_THEME,
+  toggleDarkMode: () => {},
+  enableDarkMode: () => {},
+  disableDarkMode: () => {},
+  initializeTheme: () => {},
+}));
 
 interface CoinStore {
-  coinList: Array<CoinData>
-  orderId: string
-  setCoinList: (coinList: Array<CoinData>) => void
-  setOrderId: (orderId: string) => void
-  initCoinList: () => Promise<void>
+  coinList: Array<CoinData>;
+  orderId: string;
+  setCoinList: (coinList: Array<CoinData>) => void;
+  setOrderId: (orderId: string) => void;
+  initCoinList: () => Promise<void>;
 }
 
 export const useCoinStore = create<CoinStore>()(
@@ -693,10 +707,10 @@ export const useCoinStore = create<CoinStore>()(
       setOrderId: (orderId: string) => set({ orderId }),
 
       initCoinList: async () => {
-        if(get().coinList.length > 0) return
-        const response = await settlementApi.GetCoinList()
-        set({ coinList: response.data.coinList })
-      }
+        if (get().coinList.length > 0) return;
+        const response = await settlementApi.GetCoinList();
+        set({ coinList: response.data.coinList });
+      },
     }),
     {
       name: 'coin-storage',
@@ -704,16 +718,16 @@ export const useCoinStore = create<CoinStore>()(
       // skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
     }
   )
-)
+);
 
 interface ChatModeStore {
-  chatMode: Array<ChatModeData>
-  setChatMode: (chatMode: Array<ChatModeData>) => void
+  chatMode: Array<ChatModeData>;
+  setChatMode: (chatMode: Array<ChatModeData>) => void;
 }
 
 export const useChatModeStore = create<ChatModeStore>()(
   persist(
-    set => ({
+    (set) => ({
       chatMode: [],
       setChatMode: (chatMode: Array<ChatModeData>) => set({ chatMode }),
     }),
@@ -723,16 +737,16 @@ export const useChatModeStore = create<ChatModeStore>()(
       // skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
     }
   )
-)
+);
 
 interface InquiryStore {
-  inquiryList: Array<InquiryData>
-  setInquiryList: (inquiryList: Array<InquiryData>) => void
+  inquiryList: Array<InquiryData>;
+  setInquiryList: (inquiryList: Array<InquiryData>) => void;
 }
 
 export const useInquiryStore = create<InquiryStore>()(
   persist(
-    set => ({
+    (set) => ({
       inquiryList: [],
       setInquiryList: (inquiryList: Array<InquiryData>) => set({ inquiryList }),
     }),
@@ -742,7 +756,7 @@ export const useInquiryStore = create<InquiryStore>()(
       // skipHydration: true, // 서버 사이드 렌더링 시 하이드레이션 건너뛰기
     }
   )
-)
+);
 
 // login Data 통합
-export { useAccountStore } from './useAccountStore'
+export { useAccountStore } from './useAccountStore';

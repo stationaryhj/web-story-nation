@@ -5,8 +5,26 @@ import { extendTailwindMerge } from 'tailwind-merge';
 const customTwMerge = extendTailwindMerge({
   extend: {
     classGroups: {
-      'text-color': ['text-text-web-muted-color', 'text-text-primary', 'text-primary'],
-      'bg-color': ['bg-primary'],
+      'text-color': [
+        'text-text-web-muted-color',
+        'text-text-primary',
+        'text-text-muted',
+        'text-text-inverse',
+        'text-primary',
+        'text-brand',
+      ],
+      'bg-color': [
+        'bg-primary',
+        'bg-surface',
+        'bg-surface-sunken',
+        'bg-surface-elevated',
+        'bg-surface-elevated-hover',
+        'bg-brand',
+        'bg-brand-hover',
+        'bg-danger',
+        'bg-overlay',
+      ],
+      'border-color': ['border-border-default', 'border-brand'],
     },
   },
 });
