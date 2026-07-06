@@ -1,0 +1,31 @@
+---
+description: FSD 아키텍처·레이어 의존·경로 별칭 (src/ 신규 코드)
+globs: src/**/*
+alwaysApply: false
+---
+
+# FSD 아키텍처
+
+FSD 이행 중. **신규 코드는 `src/` FSD 우선.** 레퍼런스: `src/features/edit-character/`.
+
+## 레이어
+- `src/features/` — 기능 슬라이스 (`api/lib/model/ui` + `index.ts` 배럴)
+- `src/entities/` — 도메인 엔티티
+- `src/shared/` — 공용 UI·유틸·API
+- `src/widgets/` — 페이지 조합
+
+## 레거시 (공존)
+`views/`, `components/`, `store/`, `services/` — 기존 코드 다수. 작업 시 근처 사용처를 따르거나 한쪽으로 통일.
+
+## 의존 방향
+`features → entities → shared`. 하위가 상위 참조 금지.
+슬라이스 외부 import는 배럴(`@/features/<name>`)만.
+
+## 경로 별칭
+- `@/*` → 프로젝트 루트 (`@/components`, `@/store`, `@/views`)
+- `@/features/*`, `@/entities/*`, `@/shared/*`, `@/widgets/*` → `src/` 하위
+
+## 중복 레이어 주의
+`components/modal` ↔ `src/shared/ui/modal`, `services/api` ↔ `src/shared/api` — 작업 전 어느 쪽인지 확정.
+
+스캐폴딩: `.cursor/skills/fsd-feature/SKILL.md` 참고.

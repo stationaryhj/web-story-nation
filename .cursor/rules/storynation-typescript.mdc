@@ -1,0 +1,23 @@
+---
+description: TypeScript·Biome 네이밍·코드 스타일 컨벤션
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# TypeScript & Biome
+
+## 네이밍
+- 컴포넌트 파일: **PascalCase** (`ChatList.tsx`)
+- 그 외 파일: **camelCase** (`chatList.ts`)
+- 디렉토리: 소문자-대시 (`edit-character`)
+- 타입: `interface` 선호, `enum` 지양 (const map + `satisfies`)
+- props: `<Name>Props` · 핸들러 `handle*` · boolean `is/has*`
+
+## export
+named export 선호. ui는 `export default` + 배럴 재노출 혼재 → **주변 관행 따름**.
+
+## Biome
+single quote (jsx 포함), 2-space, 최대 100자, **세미콜론 필수**, `trailingCommas: es5`, import 자동 정렬.
+
+## 금액·수량
+부동소수 오차 회피 → **bignumber.js**.

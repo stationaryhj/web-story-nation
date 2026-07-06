@@ -1,0 +1,23 @@
+---
+description: React 19·Next.js 16 App Router·상태·데이터 페칭 패턴
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# React & Data
+
+## App Router
+- 서버 컴포넌트 우선. `'use client'`는 상호작용/훅/브라우저 API 필요 시만.
+- `cookies()`, `headers()`, `params`, `searchParams` → `await`.
+- 이미지: `next/image`. `useEffect` 의존성·cleanup 정확히.
+
+## 상태
+- **Zustand** (`store/`): 로컬·영속 상태. persist 예: `theme-storage`.
+- **TanStack Query**: 서버 상태 캐시. **서버 상태를 store에 중복 저장 금지.**
+- 페칭: **axios** (`services/api/storyNationApi.ts`). 신규는 커스텀 훅 방식 지향.
+
+## 스타일
+Tailwind 모바일 퍼스트. HEX 하드코딩 지양 → `tailwind.config.ts` 토큰/semantic 클래스.
+다크모드: `class` 전략 (`<html class="dark">`). 클래스 병합: `src/shared/lib/utils/cn.ts`.
+
+컴포넌트 생성: `.cursor/skills/component/SKILL.md` 참고.

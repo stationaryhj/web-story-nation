@@ -1,0 +1,33 @@
+---
+description: StoryNation 프로젝트 정체성, 스택, 명령어, 소통 규칙 (CLAUDE.md 정본)
+alwaysApply: true
+---
+
+# StoryNation Core
+
+**StoryNation** — AI 캐릭터 채팅 플랫폼. 작가(캐릭터 생성), 실시간 채팅(Nakama·호감도), 재화(펜/코인·TossPayments), 소셜 로그인, 성인 콘텐츠 모드.
+
+## 스택 (실제 버전)
+Next.js **16** · React **19** · TypeScript(strict) · Tailwind **3** · Zustand · TanStack Query · Axios · Biome
+
+> `README.md`·`.cursorrules`는 레거시 드리프트 가능. **`CLAUDE.md`와 이 규칙이 정본.**
+
+## 명령어 (npm — package-lock.json 기반)
+```bash
+npm run dev        # next dev --turbo
+npm run build
+npm run lint       # biome lint .
+npm run lint:fix
+npm run format
+npm run check      # biome check --write .
+npx tsc --noEmit
+```
+
+## 소통
+- **한국어** 응답. 긴 답변은 요약 먼저.
+- 성능 개선 시 **before/after** 코드 제시.
+- **커밋은 사용자가 명시 요청할 때만.**
+
+## 에이전트 워크플로
+비자명한 작업: `code-planner` → `docs/plan/` → `code-writer` → `code-reviewer` → `docs/review/`
+자명한 소규모 수정은 메인 Agent가 직접 처리.

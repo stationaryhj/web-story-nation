@@ -1,0 +1,15 @@
+---
+description: 결제·암호화·인증 관련 보안 규칙 (항상 적용)
+alwaysApply: true
+---
+
+# 보안 (결제·암호화·인증)
+
+- 개인키·시드·토큰·API 키 **클라이언트 노출/하드코딩 금지**. `NEXT_PUBLIC_` 오노출 주의.
+- TossPayments·crypto-js·인증 토큰 로직·토큰 흐름을 **함부로 변경하지 않는다**.
+- 금액·수량: **bignumber.js** 사용.
+
+## 알려진 리스크 (작업 시 주의)
+- `lib/utils/cryptoUtil.ts` — 하드코딩 AES 키
+- 401 인터셉터 비활성
+- 토큰 localStorage 평문 저장
