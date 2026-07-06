@@ -84,13 +84,13 @@ export default function CreateCharacterPage() {
   };
 
   return (
-    <div className='min-h-screen bg-secondary-50 dark:bg-dark-background pb-20'>
+    <div className='min-h-screen bg-surface pb-20'>
       <SectionTransition>
         <div className='container mx-auto px-4 py-8'>
-          <div className='bg-white dark:bg-dark-background-light rounded-xl shadow-sm overflow-hidden'>
+          <div className='bg-surface-elevated rounded-xl shadow-sm overflow-hidden'>
             {/* 상단 탭 네비게이션 */}
             <div
-              className='border-b border-secondary-200 dark:border-dark-secondary-200/10 flex'
+              className='border-b border-border-default flex'
               style={{
                 wordBreak: 'keep-all',
               }}
@@ -98,9 +98,7 @@ export default function CreateCharacterPage() {
               <button
                 type='button'
                 className={`flex-1 py-4 px-2 text-center ${
-                  activeTab === 'basic'
-                    ? 'bg-primary-50 dark:bg-dark-primary-900/10 text-primary-600 dark:text-dark-primary-500 font-medium'
-                    : 'text-secondary-500 dark:text-dark-secondary-500'
+                  activeTab === 'basic' ? 'bg-brand/10 text-brand font-medium' : 'text-text-muted'
                 }`}
                 onClick={() => setActiveTab('basic')}
               >
@@ -109,9 +107,7 @@ export default function CreateCharacterPage() {
               <button
                 type='button'
                 className={`flex-1 py-4 px-2 text-center ${
-                  activeTab === 'detail'
-                    ? 'bg-primary-50 dark:bg-dark-primary-900/10 text-primary-600 dark:text-dark-primary-500 font-medium'
-                    : 'text-secondary-500 dark:text-dark-secondary-500'
+                  activeTab === 'detail' ? 'bg-brand/10 text-brand font-medium' : 'text-text-muted'
                 }`}
                 onClick={() => setActiveTab('detail')}
               >
@@ -120,9 +116,7 @@ export default function CreateCharacterPage() {
               <button
                 type='button'
                 className={`flex-1 py-4 px-2 text-center ${
-                  activeTab === 'image'
-                    ? 'bg-primary-50 dark:bg-dark-primary-900/10 text-primary-600 dark:text-dark-primary-500 font-medium'
-                    : 'text-secondary-500 dark:text-dark-secondary-500'
+                  activeTab === 'image' ? 'bg-brand/10 text-brand font-medium' : 'text-text-muted'
                 }`}
                 onClick={() => setActiveTab('image')}
               >
@@ -131,9 +125,7 @@ export default function CreateCharacterPage() {
               <button
                 type='button'
                 className={`flex-1 py-4 px-2 text-center ${
-                  activeTab === 'last'
-                    ? 'bg-primary-50 dark:bg-dark-primary-900/10 text-primary-600 dark:text-dark-primary-500 font-medium'
-                    : 'text-secondary-500 dark:text-dark-secondary-500'
+                  activeTab === 'last' ? 'bg-brand/10 text-brand font-medium' : 'text-text-muted'
                 }`}
                 onClick={() => setActiveTab('last')}
               >
@@ -153,11 +145,11 @@ export default function CreateCharacterPage() {
             </div>
 
             {/* 하단 버튼 */}
-            <div className='p-6 border-t border-secondary-200 dark:border-dark-secondary-200/10 flex justify-between'>
+            <div className='p-6 border-t border-border-default flex justify-between'>
               <button
                 type='button'
                 onClick={() => router.back()}
-                className='px-6 py-3 bg-secondary-100 hover:bg-secondary-200 text-secondary-700 rounded-lg transition-colors dark:bg-dark-secondary-100/10 dark:hover:bg-dark-secondary-100/20 dark:text-dark-secondary-400'
+                className='px-6 py-3 border border-border-default bg-surface-elevated hover:bg-surface-elevated-hover text-text-primary rounded-lg transition-colors'
               >
                 취소
               </button>
@@ -167,8 +159,8 @@ export default function CreateCharacterPage() {
                 disabled={!isFormValid}
                 className={`px-6 py-3 rounded-lg transition-colors ${
                   isFormValid
-                    ? 'bg-primary-500 hover:bg-primary-600 text-white dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600'
-                    : 'bg-gray-200 text-gray-500 cursor-not-allowed dark:bg-gray-700 dark:text-gray-400'
+                    ? 'bg-brand hover:bg-brand-hover text-text-inverse'
+                    : 'bg-surface-elevated-hover text-text-muted cursor-not-allowed'
                 }`}
               >
                 {activeTab === 'last' ? '완료' : '다음'}

@@ -50,7 +50,7 @@ export default function AuthorCard({
     if (rank === 1) return 'bg-yellow-500'; // 1위: 금색
     if (rank === 2) return 'bg-gray-400'; // 2위: 은색
     if (rank === 3) return 'bg-amber-600'; // 3위: 동색
-    return 'bg-primary-500'; // 그 외
+    return 'bg-brand'; // 그 외
   };
 
   // 가로형 카드 레이아웃
@@ -58,7 +58,7 @@ export default function AuthorCard({
     return (
       <CardTransition index={index}>
         <div
-          className='group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-dark-background-light dark:border dark:border-dark-secondary-200/10 cursor-pointer flex mb-2'
+          className='group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-surface-elevated cursor-pointer flex mb-2'
           onClick={onClick}
         >
           {/* 프로필 이미지 영역 */}
@@ -68,7 +68,7 @@ export default function AuthorCard({
               <div
                 className={`absolute top-0 left-0 z-10 w-5 h-5 ${getRankBgColor(
                   rank
-                )} text-white flex items-center justify-center font-bold shadow-md text-xs`}
+                )} text-text-inverse flex items-center justify-center font-bold shadow-md text-xs`}
               >
                 {rank}
               </div>
@@ -84,14 +84,14 @@ export default function AuthorCard({
                   onError={handleImageError}
                 />
               ) : (
-                <div className='w-full h-full flex items-center justify-center text-secondary-400 dark:text-dark-secondary-500'>
+                <div className='w-full h-full flex items-center justify-center text-text-muted'>
                   <FontAwesomeIcon icon={faUser} className='text-2xl' />
                 </div>
               )}
             </div>
 
             {/* 캐릭터 수 표시 - 이미지 우측 하단으로 이동 */}
-            <div className='absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded-full flex items-center backdrop-blur-sm'>
+            <div className='absolute bottom-1 right-1 bg-overlay/70 text-text-inverse text-xs px-1.5 py-0.5 rounded-full flex items-center backdrop-blur-sm'>
               <FontAwesomeIcon icon={faUser} className='mr-1 text-xs' />
               <span>{characterCount}</span>
             </div>
@@ -100,11 +100,11 @@ export default function AuthorCard({
           {/* 콘텐츠 영역 */}
           <div className='flex-1 p-3'>
             <div className='flex items-center'>
-              <h3 className='font-semibold text-secondary-900 dark:text-dark-secondary-700 text-sm truncate'>
+              <h3 className='font-semibold text-text-primary text-sm truncate'>
                 {nickname || name}
               </h3>
               {isVerified && (
-                <span className='ml-1 text-primary-500 dark:text-dark-primary-500'>
+                <span className='ml-1 text-brand'>
                   <FontAwesomeIcon icon={faCheckCircle} className='text-xs' />
                 </span>
               )}
@@ -112,14 +112,14 @@ export default function AuthorCard({
 
             {/* 작가 설명 */}
             {description && (
-              <p className='text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 group-hover:text-secondary-800 dark:group-hover:text-dark-secondary-400 transition-colors min-h-[2.5rem] leading-[1.25rem]'>
+              <p className='text-xs text-text-muted line-clamp-2 group-hover:text-text-primary transition-colors min-h-[2.5rem] leading-[1.25rem]'>
                 {description}
               </p>
             )}
 
             {/* 태그 */}
             <div className='flex flex-wrap gap-1 mt-2'>
-              <span className='text-[10px] text-primary-500 dark:text-dark-primary-600 bg-primary-50 dark:bg-dark-primary-100/10 px-1.5 py-0.5 rounded-full'>
+              <span className='text-[10px] text-brand bg-brand/10 px-1.5 py-0.5 rounded-full'>
                 작가
               </span>
               {isVerified && (
@@ -138,7 +138,7 @@ export default function AuthorCard({
   return (
     <CardTransition index={index}>
       <div
-        className='flex flex-col relative rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-white dark:bg-dark-background-light dark:border dark:border-dark-secondary-200/10 cursor-pointer'
+        className='flex flex-col relative rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-surface-elevated cursor-pointer'
         onClick={onClick}
       >
         <div className={`${isSidebar ? 'flex gap-2 p-2' : 'p-4'}`}>
@@ -147,14 +147,14 @@ export default function AuthorCard({
             {/* 랭킹 표시 */}
             {hasRank && rank !== undefined && (
               <div
-                className={`absolute top-[-10px] left-[-10px] z-10 w-6 h-6 ${getRankBgColor(index + 1)} text-white flex items-center justify-center font-bold shadow-md rounded-full`}
+                className={`absolute top-[-10px] left-[-10px] z-10 w-6 h-6 ${getRankBgColor(index + 1)} text-text-inverse flex items-center justify-center font-bold shadow-md rounded-full`}
               >
                 {rank}
               </div>
             )}
 
             <div
-              className={`flex items-center justify-center ${isSidebar ? '' : 'border-b border-secondary-200 dark:border-dark-secondary-200 mb-3'}`}
+              className={`flex items-center justify-center ${isSidebar ? '' : 'border-b border-border-default mb-3'}`}
             >
               {/* 프로필 이미지 */}
               <div className='relative w-[60px] h-[60px] rounded-full overflow-hidden flex-shrink-0 mb-3'>
@@ -167,7 +167,7 @@ export default function AuthorCard({
                     onError={handleImageError}
                   />
                 ) : (
-                  <div className='w-full h-full flex items-center justify-center text-secondary-400 dark:text-dark-secondary-500'>
+                  <div className='w-full h-full flex items-center justify-center text-text-muted'>
                     <FontAwesomeIcon icon={faUser} className='text-xl' />
                   </div>
                 )}
@@ -183,7 +183,7 @@ export default function AuthorCard({
                 <div
                   className={`flex items-center w-full mb-2 ${isSidebar ? '' : 'justify-center'}`}
                 >
-                  <div className='font-bold text-[12px] text-secondary-900 dark:text-dark-secondary-200 truncate group-hover:text-primary-600 dark:group-hover:text-dark-primary-400 transition-colors'>
+                  <div className='font-bold text-[12px] text-text-primary truncate group-hover:text-brand-hover transition-colors'>
                     {nickname || name}
                   </div>
                 </div>
@@ -191,7 +191,7 @@ export default function AuthorCard({
             </div>
             <div className={`flex items-center w-full ${isSidebar ? '' : 'justify-center'}`}>
               {/* 작가 소개 */}
-              <p className='text-xs text-secondary-600 dark:text-dark-secondary-500 line-clamp-2 group-hover:text-secondary-800 dark:group-hover:text-dark-secondary-400 transition-colors min-h-[2.5rem] leading-[1.25rem]'>
+              <p className='text-xs text-text-muted line-clamp-2 group-hover:text-text-primary transition-colors min-h-[2.5rem] leading-[1.25rem]'>
                 {description}
               </p>
             </div>

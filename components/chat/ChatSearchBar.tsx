@@ -25,12 +25,12 @@ export default function ChatSearchBar({ onSearch, initialQuery = '' }: ChatSearc
           placeholder="캐릭터 이름으로 검색"
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          className="w-full py-2 px-4 pr-10 bg-secondary-50 dark:bg-dark-secondary-100/10 text-secondary-900 dark:text-dark-secondary-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500"
+          className="w-full py-2 px-4 pr-10 bg-surface-elevated text-text-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-brand"
           aria-label="검색어 입력"
         />
         <button
           type="submit"
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary-500 dark:text-dark-secondary-500 hover:text-primary-500 dark:hover:text-dark-primary-500 transition-colors"
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-brand transition-colors"
           aria-label="검색"
         >
           <FontAwesomeIcon icon={faSearch} />

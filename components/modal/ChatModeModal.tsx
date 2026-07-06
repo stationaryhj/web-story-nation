@@ -1,31 +1,37 @@
-'use client'
+'use client';
 
-import BaseModal from './BaseModal'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheckCircle, faPiggyBank, faBookOpen, faFire, faRocket } from '@fortawesome/free-solid-svg-icons'
-import { useChatModeStore } from '@/store/useStoreData'
-import { bridgeChatModeDataToChatMode } from '@/lib/utils/storyNationUtil'
-import Image from 'next/image'
+import {
+  faBookOpen,
+  faCheckCircle,
+  faFire,
+  faPiggyBank,
+  faRocket,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Image from 'next/image';
+import { bridgeChatModeDataToChatMode } from '@/lib/utils/storyNationUtil';
+import { useChatModeStore } from '@/store/useStoreData';
+import BaseModal from './BaseModal';
 
 export interface ChatMode {
-  id: number
-  name: string
-  description: string
-  penCost: number
-  ai: string
-  icon: any // 아이콘을 위한 프로퍼티 추가
-  discount: number
-  original_coin: number
-  isShow: boolean
-  isAdult: boolean
+  id: number;
+  name: string;
+  description: string;
+  penCost: number;
+  ai: string;
+  icon: any; // 아이콘을 위한 프로퍼티 추가
+  discount: number;
+  original_coin: number;
+  isShow: boolean;
+  isAdult: boolean;
 }
 
 interface ChatModeModalProps {
-  isOpen: boolean
-  onClose: () => void
-  currentModeId: number
-  nsfw: number
-  onSelectMode: (mode: ChatMode) => void
+  isOpen: boolean;
+  onClose: () => void;
+  currentModeId: number;
+  nsfw: number;
+  onSelectMode: (mode: ChatMode) => void;
 }
 
 const customChatModes: ChatMode[] = [
@@ -77,58 +83,67 @@ const customChatModes: ChatMode[] = [
     isShow: true,
     isAdult: true,
   },
-]
+];
 
-export default function ChatModeModal({ isOpen, onClose, currentModeId, nsfw, onSelectMode }: ChatModeModalProps) {
-  const { chatMode } = useChatModeStore()
-  const chatModes = chatMode.map((mode, index) => bridgeChatModeDataToChatMode(mode, customChatModes[index]))
-  console.log('nsfw :::: ', nsfw)
-  console.log(chatModes)
+export default function ChatModeModal({
+  isOpen,
+  onClose,
+  currentModeId,
+  nsfw,
+  onSelectMode,
+}: ChatModeModalProps) {
+  const { chatMode } = useChatModeStore();
+  const chatModes = chatMode.map((mode, index) =>
+    bridgeChatModeDataToChatMode(mode, customChatModes[index])
+  );
+  console.log('nsfw :::: ', nsfw);
+  console.log(chatModes);
 
   return (
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title="채팅 모드 선택"
-      size="lg"
-      contentClassName="p-0"
-      bodyClassName="p-0"
+      title='채팅 모드 선택'
+      size='lg'
+      contentClassName='p-0'
+      bodyClassName='p-0'
     >
-      <div className="py-4">
-        <p className="px-4 sm:px-6 pb-4 text-secondary-600 text-sm dark:text-dark-secondary-400 border-b border-secondary-100 dark:border-dark-secondary-800">
-          원하는 채팅 모드를 선택하세요. 각 모드는 대화 품질과 특성이 다르며, 소모되는 펜 개수가 다릅니다.
+      <div className='py-4'>
+        <p className='px-4 sm:px-6 pb-4 text-text-muted text-sm border-b border-border-default'>
+          원하는 채팅 모드를 선택하세요. 각 모드는 대화 품질과 특성이 다르며, 소모되는 펜 개수가
+          다릅니다.
         </p>
-        <ul className="divide-y divide-secondary-100 dark:divide-dark-secondary-800">
+        <ul className='divide-y divide-border-default'>
           {chatModes
-            .filter(mode => mode.isShow)
+            .filter((mode) => mode.isShow)
             .map((mode) => {
-              if(nsfw !== 1){
-                if(mode.id === 3 || mode.id === 4) return null
+              if (nsfw !== 1) {
+                if (mode.id === 3 || mode.id === 4) return null;
               }
               return (
                 <li
                   key={mode.id}
-                  className={`px-4 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-secondary-50 dark:hover:bg-dark-secondary-800/30 ${
-                    currentModeId === mode.id ? 'bg-primary-50 dark:bg-dark-primary-900/30' : ''
+                  className={`px-4 sm:px-6 py-3 sm:py-4 cursor-pointer hover:bg-surface-elevated ${
+                    currentModeId === mode.id ? 'bg-brand/10' : ''
                   }`}
                   onClick={() => onSelectMode(mode)}
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center">
+                  <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4'>
+                    <div className='flex-1'>
+                      <div className='flex items-center'>
                         <span
                           className={`flex items-center text-sm sm:text-base font-medium ${
-                            currentModeId === mode.id
-                              ? 'text-primary-700 dark:text-dark-primary-400'
-                              : 'text-secondary-900 dark:text-dark-secondary-200'
+                            currentModeId === mode.id ? 'text-brand' : 'text-text-primary'
                           }`}
                         >
                           <FontAwesomeIcon
                             icon={mode.icon}
-                            className="mr-2 text-xs sm:text-sm"
+                            className='mr-2 text-xs sm:text-sm'
                             style={{
                               color:
-                                currentModeId === mode.id ? 'var(--color-primary-600)' : 'var(--color-secondary-500)',
+                                currentModeId === mode.id
+                                  ? 'rgb(var(--color-brand))'
+                                  : 'rgb(var(--color-text-muted))',
                             }}
                           />
                           {mode.name}
@@ -136,34 +151,35 @@ export default function ChatModeModal({ isOpen, onClose, currentModeId, nsfw, on
                         {currentModeId === mode.id && (
                           <FontAwesomeIcon
                             icon={faCheckCircle}
-                            className="ml-2 text-primary-600 dark:text-dark-primary-500"
-                            size="sm"
+                            className='ml-2 text-brand'
+                            size='sm'
                           />
                         )}
                       </div>
-                      <p className="mt-1 text-xs sm:text-sm text-secondary-600 dark:text-dark-secondary-400">
-                        {mode.description}
-                      </p>
-                      <div className="mt-1 sm:mt-2 text-[10px] sm:text-xs text-secondary-500 dark:text-dark-secondary-500">
-                        <span className="mr-2">{mode.ai}</span>
+                      <p className='mt-1 text-xs sm:text-sm text-text-muted'>{mode.description}</p>
+                      <div className='mt-1 sm:mt-2 text-[10px] sm:text-xs text-text-muted'>
+                        <span className='mr-2'>{mode.ai}</span>
                       </div>
                     </div>
-                    <div className="flex-shrink-0 sm:ml-4">
-                      <div className="flex items-center bg-primary-100 dark:bg-dark-primary-900/60 px-2 sm:px-3 py-1 rounded-full">
-                        <span className="text-primary-700 dark:text-dark-primary-400 font-medium flex items-center text-xs sm:text-sm">
-                          <Image src="/images/pen/pen_primary.svg" alt="pen" width={11} height={11} className="mr-1" />
+                    <div className='flex-shrink-0 sm:ml-4'>
+                      <div className='flex items-center bg-brand/10 px-2 sm:px-3 py-1 rounded-full'>
+                        <span className='text-brand font-medium flex items-center text-xs sm:text-sm'>
+                          <Image
+                            src='/images/pen/pen_primary.svg'
+                            alt='pen'
+                            width={11}
+                            height={11}
+                            className='mr-1'
+                          />
                           {mode.penCost}
                         </span>
-                        <span className="ml-1 text-[10px] sm:text-xs text-primary-600 dark:text-dark-primary-500">
-                          {' '}
-                          / 메시지
-                        </span>
+                        <span className='ml-1 text-[10px] sm:text-xs text-brand'> / 메시지</span>
                         {mode.discount > 0 && (
-                          <div className="ml-1.5 flex items-center">
-                            <span className="text-[10px] sm:text-xs text-green-500 font-medium">
+                          <div className='ml-1.5 flex items-center'>
+                            <span className='text-[10px] sm:text-xs text-green-500 font-medium'>
                               {mode.discount}% 할인
                             </span>
-                            <span className="ml-1 text-[10px] sm:text-xs text-gray-400 line-through">
+                            <span className='ml-1 text-[10px] sm:text-xs text-gray-400 line-through'>
                               {mode.original_coin}
                             </span>
                           </div>
@@ -172,10 +188,10 @@ export default function ChatModeModal({ isOpen, onClose, currentModeId, nsfw, on
                     </div>
                   </div>
                 </li>
-              )
+              );
             })}
         </ul>
       </div>
     </BaseModal>
-  )
+  );
 }

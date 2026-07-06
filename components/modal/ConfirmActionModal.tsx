@@ -1,21 +1,21 @@
-'use client'
+'use client';
 
-import type { ReactNode } from 'react'
+import type { ReactNode } from 'react';
 
-import BaseModal from './BaseModal'
+import BaseModal from './BaseModal';
 
 interface ConfirmActionModalProps {
-  isOpen: boolean
-  onClose: () => void
-  title: string
-  description: ReactNode
-  confirmText?: string
-  cancelText?: string
-  onConfirm: () => void
-  onCancel?: () => void
-  className?: string
-  showCloseButton?: boolean
-  preventBackdropClose?: boolean
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  description: ReactNode;
+  confirmText?: string;
+  cancelText?: string;
+  onConfirm: () => void;
+  onCancel?: () => void;
+  className?: string;
+  showCloseButton?: boolean;
+  preventBackdropClose?: boolean;
 }
 
 export default function ConfirmActionModal({
@@ -32,21 +32,21 @@ export default function ConfirmActionModal({
   preventBackdropClose = false,
 }: ConfirmActionModalProps) {
   const footerContent = (
-    <div className="flex justify-end space-x-3">
+    <div className='flex justify-end space-x-3'>
       <button
         onClick={onCancel || onClose}
-        className="rounded-full bg-secondary-100 px-5 py-2 text-secondary-700 transition-colors hover:bg-secondary-200 dark:bg-dark-secondary-800 dark:text-dark-secondary-200 dark:hover:bg-dark-secondary-700"
+        className='rounded-full bg-surface-elevated px-5 py-2 text-text-primary transition-colors hover:bg-surface-elevated-hover'
       >
         {cancelText}
       </button>
       <button
         onClick={onConfirm}
-        className="rounded-full bg-primary-500 px-5 py-2 text-white transition-colors hover:bg-primary-600 dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600"
+        className='rounded-full bg-brand px-5 py-2 text-text-inverse transition-colors hover:bg-brand-hover'
       >
         {confirmText}
       </button>
     </div>
-  )
+  );
 
   return (
     <BaseModal
@@ -57,15 +57,17 @@ export default function ConfirmActionModal({
       showCloseButton={showCloseButton}
       preventBackdropClose={preventBackdropClose}
       footerContent={footerContent}
-      size="sm"
+      size='sm'
     >
       {typeof description === 'string' ? (
-        <div className="flex flex-col gap-2 justify-center items-center px-8 pb-4">
-          <p className="text-center text-secondary-800 dark:text-dark-secondary-200">{description}</p>
+        <div className='flex flex-col gap-2 justify-center items-center px-8 pb-4'>
+          <p className='text-center text-text-primary'>{description}</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-2 justify-center items-center px-8 pb-4 text-center">{description}</div>
+        <div className='flex flex-col gap-2 justify-center items-center px-8 pb-4 text-center'>
+          {description}
+        </div>
       )}
     </BaseModal>
-  )
+  );
 }

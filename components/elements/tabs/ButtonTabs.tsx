@@ -180,8 +180,8 @@ export default function ButtonTabs({
               className={cn(
                 'py-2 px-1 text-sm sm:text-sm md:text-lg font-bold whitespace-nowrap transition-colors relative',
                 activeTabId === tab.id
-                  ? 'text-primary-600 dark:text-dark-primary-500'
-                  : 'text-secondary-600 hover:text-primary-500 dark:text-dark-secondary-400 dark:hover:text-dark-primary-400'
+                  ? 'text-brand'
+                  : 'text-text-muted hover:text-brand'
               )}
               onClick={() => handleTabClick(tab.id)}
             >
@@ -191,7 +191,7 @@ export default function ButtonTabs({
         </div>
         {/* 하단 인디케이터 애니메이션 */}
         <motion.div
-          className="absolute bottom-0 h-0.5 bg-primary-500 dark:bg-dark-primary-500"
+          className="absolute bottom-0 h-0.5 bg-brand"
           initial={false}
           animate={{
             left: indicatorStyle.left,
@@ -210,8 +210,8 @@ export default function ButtonTabs({
               className={cn(
                 'px-3 py-1 rounded-full text-xs font-medium transition-colors',
                 selectedTags.includes(tag.id)
-                  ? 'bg-primary-100 text-primary-700 dark:bg-dark-primary-900/50 dark:text-dark-primary-300'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:text-dark-secondary-300 dark:hover:bg-dark-secondary-700'
+                  ? 'bg-brand/10 text-brand'
+                  : 'bg-surface-elevated text-text-muted hover:bg-surface-elevated-hover'
               )}
               onClick={() => handleTagClick(tag.id)}
             >

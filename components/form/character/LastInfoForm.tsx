@@ -104,10 +104,8 @@ export default function LastInfoForm({ setFormField }: LastInfoFormProps) {
         {/* 작가의 말 */}
         <div className='flex flex-col gap-4'>
           <div className='flex justify-between items-start'>
-            <h3 className='block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400'>
-              작가의 말
-            </h3>
-            <span className='text-xs text-secondary-500 dark:text-dark-secondary-500'>
+            <h3 className='block text-sm font-medium text-text-primary'>작가의 말</h3>
+            <span className='text-xs text-text-muted'>
               {formatTextLength(formData.writer_note.length, MAX_WRITER_NOTE_LENGTH)}
             </span>
           </div>
@@ -117,7 +115,7 @@ export default function LastInfoForm({ setFormField }: LastInfoFormProps) {
             onChange={handleWriterNoteChange}
             placeholder='독자에게 하고싶은 말을 자유롭게 입력해 보세요!'
             rows={4}
-            className='w-full px-4 py-3 rounded-lg text-sm sm:text-base border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none'
+            className='w-full px-4 py-3 rounded-lg text-sm sm:text-base border border-border-default bg-surface-elevated text-text-primary focus:outline-none focus:ring-2 focus:ring-brand resize-none'
             maxLength={MAX_WRITER_NOTE_LENGTH}
           />
         </div>

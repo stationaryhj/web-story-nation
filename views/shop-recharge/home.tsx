@@ -302,7 +302,7 @@ export default function ShopRecharge() {
         styleClass = 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
         modeText = '짜릿모드 2';
       } else {
-        styleClass = 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+        styleClass = 'bg-surface-elevated-hover text-text-primary';
         modeText = getContentText(transaction.content || '기타');
       }
 
@@ -329,18 +329,14 @@ export default function ShopRecharge() {
     return (
       <div
         key={index}
-        className='bg-white dark:bg-dark-background-light rounded-lg shadow p-3 mb-3 border border-gray-200 dark:border-gray-700'
+        className='bg-surface-elevated rounded-lg shadow p-3 mb-3 border border-border-default'
       >
         <div className='flex justify-between items-start mb-2'>
-          <div className='text-xs text-gray-500 dark:text-gray-400'>
-            {formatDate(transaction.create_dt)}
-          </div>
+          <div className='text-xs text-text-muted'>{formatDate(transaction.create_dt)}</div>
           {typeInfo}
         </div>
         <div className='flex justify-between items-center'>
-          <div className='text-sm text-gray-600 dark:text-gray-300'>
-            {getContentText(transaction.content)}
-          </div>
+          <div className='text-sm text-text-muted'>{getContentText(transaction.content)}</div>
           <div
             className={`font-medium ${
               transaction.coin > 0
@@ -358,50 +354,44 @@ export default function ShopRecharge() {
 
   return (
     <PageTransition>
-      <div className='min-h-screen bg-gray-50 dark:bg-dark-background pb-20'>
+      <div className='min-h-screen bg-surface pb-20'>
         {/* 헤더 */}
-        <div className='bg-white dark:bg-dark-background-light shadow-sm sticky top-0 z-10'>
+        <div className='bg-surface-elevated shadow-sm sticky top-0 z-10'>
           <div className='container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between'>
             <div className='flex items-center'>
               <button
                 onClick={() => router.back()}
-                className='mr-3 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400'
+                className='mr-3 text-text-muted hover:text-brand'
               >
                 <FontAwesomeIcon icon={faChevronLeft} className='h-5 w-5' />
               </button>
-              <h1 className='text-lg sm:text-xl font-bold text-gray-900 dark:text-white'>
-                펜 충전
-              </h1>
+              <h1 className='text-lg sm:text-xl font-bold text-text-primary'>펜 충전</h1>
             </div>
           </div>
 
           {/* 탭 메뉴 */}
-          <div className='container mx-auto px-4 border-b border-gray-200 dark:border-gray-700'>
+          <div className='container mx-auto px-4 border-b border-border-default'>
             <div className='flex'>
               <button
                 className={`flex-1 py-2 sm:py-3 text-sm sm:text-base font-medium text-center relative ${
-                  activeTab === 'recharge'
-                    ? 'text-primary-600 dark:text-primary-400'
-                    : 'text-gray-500 dark:text-gray-400'
+                  activeTab === 'recharge' ? 'text-brand' : 'text-text-muted'
                 }`}
                 onClick={() => setActiveTab('recharge')}
               >
                 펜 충전
                 {activeTab === 'recharge' && (
-                  <div className='absolute bottom-0 left-0 w-full h-0.5 bg-primary-500 dark:bg-primary-400'></div>
+                  <div className='absolute bottom-0 left-0 w-full h-0.5 bg-brand'></div>
                 )}
               </button>
               <button
                 className={`flex-1 py-2 sm:py-3 text-sm sm:text-base font-medium text-center relative ${
-                  activeTab === 'history'
-                    ? 'text-primary-600 dark:text-primary-400'
-                    : 'text-gray-500 dark:text-gray-400'
+                  activeTab === 'history' ? 'text-brand' : 'text-text-muted'
                 }`}
                 onClick={() => setActiveTab('history')}
               >
                 펜 사용 내역
                 {activeTab === 'history' && (
-                  <div className='absolute bottom-0 left-0 w-full h-0.5 bg-primary-500 dark:bg-primary-400'></div>
+                  <div className='absolute bottom-0 left-0 w-full h-0.5 bg-brand'></div>
                 )}
               </button>
             </div>
@@ -415,33 +405,29 @@ export default function ShopRecharge() {
             className={`${isMobile ? 'flex flex-col space-y-3' : 'flex flex-wrap gap-4'} mb-5 sm:mb-6`}
           >
             <div
-              className={`${isMobile ? 'w-full' : 'flex-1 min-w-[250px]'} bg-white dark:bg-dark-background-light rounded-lg shadow-sm p-3 sm:p-4 border border-gray-200 dark:border-gray-700`}
+              className={`${isMobile ? 'w-full' : 'flex-1 min-w-[250px]'} bg-surface-elevated rounded-lg shadow-sm p-3 sm:p-4 border border-border-default`}
             >
               <div className='flex items-center'>
-                <div className='bg-primary-100 dark:bg-dark-primary-900/30 p-2 sm:p-3 rounded-full mr-3 sm:mr-4'>
+                <div className='bg-brand/10 p-2 sm:p-3 rounded-full mr-3 sm:mr-4'>
                   <Image src='/images/pen/pen_primary.svg' alt='pen' width={24} height={24} />
                 </div>
                 <div>
-                  <p className='text-xs sm:text-sm text-gray-500 dark:text-gray-400'>유료 펜</p>
-                  <p className='text-xl sm:text-2xl font-bold text-gray-900 dark:text-white'>
-                    {paidPen}
-                  </p>
+                  <p className='text-xs sm:text-sm text-text-muted'>유료 펜</p>
+                  <p className='text-xl sm:text-2xl font-bold text-text-primary'>{paidPen}</p>
                 </div>
               </div>
             </div>
 
             <div
-              className={`${isMobile ? 'w-full' : 'flex-1 min-w-[250px]'} bg-white dark:bg-dark-background-light rounded-lg shadow-sm p-3 sm:p-4 border border-gray-200 dark:border-gray-700`}
+              className={`${isMobile ? 'w-full' : 'flex-1 min-w-[250px]'} bg-surface-elevated rounded-lg shadow-sm p-3 sm:p-4 border border-border-default`}
             >
               <div className='flex items-center'>
                 <div className='bg-yellow-100 dark:bg-yellow-900/30 p-2 sm:p-3 rounded-full mr-3 sm:mr-4'>
                   <Gift className='h-[25px] w-[25px] sm:h-6 sm:w-6 text-yellow-500' />
                 </div>
                 <div>
-                  <p className='text-xs sm:text-sm text-gray-500 dark:text-gray-400'>무료 펜</p>
-                  <p className='text-xl sm:text-2xl font-bold text-gray-900 dark:text-white'>
-                    {freePen}
-                  </p>
+                  <p className='text-xs sm:text-sm text-text-muted'>무료 펜</p>
+                  <p className='text-xl sm:text-2xl font-bold text-text-primary'>{freePen}</p>
                 </div>
               </div>
             </div>
@@ -450,7 +436,7 @@ export default function ShopRecharge() {
           {/* 충전 탭 콘텐츠 */}
           {activeTab === 'recharge' && (
             <div>
-              <h2 className='text-base sm:text-lg font-bold mb-3 sm:mb-4 text-gray-900 dark:text-white'>
+              <h2 className='text-base sm:text-lg font-bold mb-3 sm:mb-4 text-text-primary'>
                 펜 패키지
               </h2>
               <div className='grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4'>
@@ -463,22 +449,22 @@ export default function ShopRecharge() {
                         key={coin.coin_key}
                         whileHover={{ scale: isMobile ? 1.01 : 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        className='bg-white dark:bg-dark-background-light rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden cursor-pointer'
+                        className='bg-surface-elevated rounded-lg shadow-sm border border-border-default overflow-hidden cursor-pointer'
                         onClick={() => handlePackageClick(coin.coin_key, webPrice)}
                       >
                         <div className='p-3 sm:p-4'>
                           <div className='flex items-center justify-between mb-2 sm:mb-3'>
-                            <div className='bg-primary-100 dark:bg-dark-primary-900/30 px-2 sm:px-3 py-1 rounded-full'>
-                              <span className='text-xs sm:text-sm font-medium text-primary-600 dark:text-primary-400'>
+                            <div className='bg-brand/10 px-2 sm:px-3 py-1 rounded-full'>
+                              <span className='text-xs sm:text-sm font-medium text-brand'>
                                 {coin.cnt} 펜
                               </span>
                             </div>
-                            <span className='text-sm sm:text-lg font-bold text-gray-900 dark:text-white'>
+                            <span className='text-sm sm:text-lg font-bold text-text-primary'>
                               ₩ {webPrice.toLocaleString()}
                             </span>
                           </div>
-                          <div className='aspect-square relative bg-gray-100 dark:bg-dark-background-accent rounded-lg flex items-center justify-center'>
-                            <div className='text-center text-gray-500 dark:text-gray-400 text-xs sm:text-sm'>
+                          <div className='aspect-square relative bg-surface-elevated-hover rounded-lg flex items-center justify-center'>
+                            <div className='text-center text-text-muted text-xs sm:text-sm'>
                               <Image
                                 src={`/images/pen/coin_${coin.cnt}.png`}
                                 alt={`${coin.cnt}개 펜 이미지`}
@@ -498,7 +484,7 @@ export default function ShopRecharge() {
           {/* 사용 내역 탭 콘텐츠 */}
           {activeTab === 'history' && (
             <div>
-              <h2 className='text-base sm:text-lg font-bold mb-3 sm:mb-4 text-gray-900 dark:text-white'>
+              <h2 className='text-base sm:text-lg font-bold mb-3 sm:mb-4 text-text-primary'>
                 펜 사용 내역
               </h2>
 
@@ -511,29 +497,29 @@ export default function ShopRecharge() {
                 </div>
               ) : (
                 /* 데스크톱에서는 테이블 형태로 표시 */
-                <div className='bg-white dark:bg-dark-background-light rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden'>
+                <div className='bg-surface-elevated rounded-lg shadow-sm border border-border-default overflow-hidden'>
                   <div className='overflow-x-auto'>
-                    <table className='min-w-full divide-y divide-gray-200 dark:divide-gray-700'>
-                      <thead className='bg-gray-50 dark:bg-dark-background-accent'>
+                    <table className='min-w-full divide-y divide-border-default'>
+                      <thead className='bg-surface-elevated-hover'>
                         <tr>
-                          <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'>
+                          <th className='px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider'>
                             날짜
                           </th>
-                          <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'>
+                          <th className='px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider'>
                             유형
                           </th>
-                          <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'>
+                          <th className='px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider'>
                             양
                           </th>
-                          <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider'>
+                          <th className='px-6 py-3 text-left text-xs font-medium text-text-muted uppercase tracking-wider'>
                             상세
                           </th>
                         </tr>
                       </thead>
-                      <tbody className='bg-white dark:bg-dark-background-light divide-y divide-gray-200 dark:divide-gray-700'>
+                      <tbody className='bg-surface-elevated divide-y divide-border-default'>
                         {coinChargeUseHistoryDataList?.map((transaction, index) => (
                           <tr key={index}>
-                            <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300'>
+                            <td className='px-6 py-4 whitespace-nowrap text-sm text-text-primary'>
                               {formatDate(transaction.create_dt)}
                             </td>
                             <td className='px-6 py-4 whitespace-nowrap text-sm'>
@@ -564,8 +550,7 @@ export default function ShopRecharge() {
                                       'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
                                     modeText = '짜릿모드 2';
                                   } else {
-                                    styleClass =
-                                      'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400';
+                                    styleClass = 'bg-surface-elevated-hover text-text-primary';
                                     modeText = getContentText(transaction.content || '기타');
                                   }
 
@@ -603,7 +588,7 @@ export default function ShopRecharge() {
                               {transaction.coin > 0 ? '+' : ''}
                               {transaction.coin}
                             </td>
-                            <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400'>
+                            <td className='px-6 py-4 whitespace-nowrap text-sm text-text-muted'>
                               {getContentText(transaction.content)}
                             </td>
                           </tr>

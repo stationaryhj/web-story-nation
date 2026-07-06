@@ -288,21 +288,18 @@ export default function SignupModal({
     <div className='flex flex-col space-y-6'>
       {/* 닉네임 입력 */}
       <div className='space-y-2'>
-        <label
-          htmlFor='nickname'
-          className='block text-sm font-medium text-gray-700 dark:text-gray-300'
-        >
+        <label htmlFor='nickname' className='block text-sm font-medium text-text-muted'>
           닉네임
         </label>
         <div className='relative'>
           <input
             type='text'
             id='nickname'
-            className={`w-full rounded-lg border p-3 pr-20 focus:outline-none dark:bg-dark-background
+            className={`w-full rounded-lg border p-3 pr-20 focus:outline-none bg-surface
               ${
                 isNicknameChecked && !isNicknameValid
-                  ? 'border-red-500 focus:border-red-500 dark:border-red-500 dark:focus:border-red-500'
-                  : 'border-gray-300 focus:border-primary-500 dark:border-gray-600 dark:focus:border-primary-400'
+                  ? 'border-danger focus:border-danger'
+                  : 'border-border-default focus:border-brand'
               }`}
             placeholder='닉네임을 입력하세요. (20자 이내)'
             value={nickname}
@@ -316,7 +313,7 @@ export default function SignupModal({
           />
           <button
             type='button'
-            className='absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-primary-500 px-2 py-1 text-xs text-white hover:bg-primary-600 dark:bg-primary-600 dark:hover:bg-primary-700'
+            className='absolute right-2 top-1/2 -translate-y-1/2 rounded-md bg-brand px-2 py-1 text-xs text-text-inverse hover:bg-brand-hover'
             onClick={checkNickname}
             disabled={loading || isSubmitting}
           >
@@ -327,20 +324,17 @@ export default function SignupModal({
 
       {/* 생년월일 입력 */}
       <div className='space-y-2'>
-        <label
-          htmlFor='birthdate'
-          className='block text-sm font-medium text-gray-700 dark:text-gray-300'
-        >
+        <label htmlFor='birthdate' className='block text-sm font-medium text-text-muted'>
           생년월일
         </label>
         <input
           type='text'
           id='birthdate'
-          className={`w-full rounded-lg border p-3 focus:outline-none dark:bg-dark-background
+          className={`w-full rounded-lg border p-3 focus:outline-none bg-surface
             ${
               birthError
-                ? 'border-red-500 focus:border-red-500 dark:border-red-500 dark:focus:border-red-500'
-                : 'border-gray-300 focus:border-primary-500 dark:border-gray-600 dark:focus:border-primary-400'
+                ? 'border-danger focus:border-danger'
+                : 'border-border-default focus:border-brand'
             }`}
           placeholder='ex. 19970404 (숫자 8자리)'
           value={birthdate}
@@ -349,26 +343,24 @@ export default function SignupModal({
           maxLength={8}
           disabled={loading || isSubmitting}
         />
-        {birthError && <p className='text-sm text-red-500 dark:text-red-400'>{birthError}</p>}
+        {birthError && <p className='text-sm text-danger'>{birthError}</p>}
       </div>
 
       {/* 안내 문구 */}
-      <div className='text-sm text-gray-500 dark:text-gray-400'>
-        스토리네이션은 만 14세 이상 이용 가능합니다.
-      </div>
+      <div className='text-sm text-text-muted'>스토리네이션은 만 14세 이상 이용 가능합니다.</div>
 
       {/* 약관 동의 */}
-      <div className='space-y-3 border-t border-gray-200 pt-4 dark:border-gray-700'>
+      <div className='space-y-3 border-t border-border-default pt-4'>
         <div className='flex items-center'>
           <button
             type='button'
-            className='mr-2 text-gray-600 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400'
+            className='mr-2 text-text-muted hover:text-brand-hover'
             onClick={toggleAllAgreements}
             disabled={loading || isSubmitting}
           >
             <FontAwesomeIcon
               icon={allAgreed ? faCheckSquare : faSquare}
-              className={`h-5 w-5 ${allAgreed ? 'text-primary-500 dark:text-primary-400' : ''}`}
+              className={`h-5 w-5 ${allAgreed ? 'text-brand' : ''}`}
             />
           </button>
           <span className='font-medium'>모두 동의</span>
@@ -379,13 +371,13 @@ export default function SignupModal({
           <div className='flex items-center'>
             <button
               type='button'
-              className='mr-2 text-gray-600 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400'
+              className='mr-2 text-text-muted hover:text-brand-hover'
               onClick={() => setServiceAgreed(!serviceAgreed)}
               disabled={loading || isSubmitting}
             >
               <FontAwesomeIcon
                 icon={serviceAgreed ? faCheckSquare : faSquare}
-                className={`h-5 w-5 ${serviceAgreed ? 'text-primary-500 dark:text-primary-400' : ''}`}
+                className={`h-5 w-5 ${serviceAgreed ? 'text-brand' : ''}`}
               />
             </button>
             <span className='text-sm'>서비스 이용약관(필수)</span>
@@ -394,7 +386,7 @@ export default function SignupModal({
             href='/terms?tab=service'
             target='_blank'
             rel='noopener noreferrer'
-            className='text-sm text-primary-500 hover:underline dark:text-primary-400'
+            className='text-sm text-brand hover:underline'
           >
             보기
           </a>
@@ -405,13 +397,13 @@ export default function SignupModal({
           <div className='flex items-center'>
             <button
               type='button'
-              className='mr-2 text-gray-600 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400'
+              className='mr-2 text-text-muted hover:text-brand-hover'
               onClick={() => setPrivacyAgreed(!privacyAgreed)}
               disabled={loading || isSubmitting}
             >
               <FontAwesomeIcon
                 icon={privacyAgreed ? faCheckSquare : faSquare}
-                className={`h-5 w-5 ${privacyAgreed ? 'text-primary-500 dark:text-primary-400' : ''}`}
+                className={`h-5 w-5 ${privacyAgreed ? 'text-brand' : ''}`}
               />
             </button>
             <span className='text-sm'>개인정보 수집 및 이용(필수)</span>
@@ -420,7 +412,7 @@ export default function SignupModal({
             href='/terms?tab=privacy'
             target='_blank'
             rel='noopener noreferrer'
-            className='text-sm text-primary-500 hover:underline dark:text-primary-400'
+            className='text-sm text-brand hover:underline'
           >
             보기
           </a>
@@ -431,13 +423,13 @@ export default function SignupModal({
           <div className='flex items-center'>
             <button
               type='button'
-              className='mr-2 text-gray-600 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400'
+              className='mr-2 text-text-muted hover:text-brand-hover'
               onClick={() => setPaidServiceAgreed(!paidServiceAgreed)}
               disabled={loading || isSubmitting}
             >
               <FontAwesomeIcon
                 icon={paidServiceAgreed ? faCheckSquare : faSquare}
-                className={`h-5 w-5 ${paidServiceAgreed ? 'text-primary-500 dark:text-primary-400' : ''}`}
+                className={`h-5 w-5 ${paidServiceAgreed ? 'text-brand' : ''}`}
               />
             </button>
             <span className='text-sm'>유료 이용약관(필수)</span>
@@ -446,7 +438,7 @@ export default function SignupModal({
             href='/terms?tab=paid'
             target='_blank'
             rel='noopener noreferrer'
-            className='text-sm text-primary-500 hover:underline dark:text-primary-400'
+            className='text-sm text-brand hover:underline'
           >
             보기
           </a>
@@ -457,13 +449,13 @@ export default function SignupModal({
           <div className='flex items-center'>
             <button
               type='button'
-              className='mr-2 text-gray-600 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400'
+              className='mr-2 text-text-muted hover:text-brand-hover'
               onClick={() => setMarketingAgreed(!marketingAgreed)}
               disabled={loading || isSubmitting}
             >
               <FontAwesomeIcon
                 icon={marketingAgreed ? faCheckSquare : faSquare}
-                className={`h-5 w-5 ${marketingAgreed ? 'text-primary-500 dark:text-primary-400' : ''}`}
+                className={`h-5 w-5 ${marketingAgreed ? 'text-brand' : ''}`}
               />
             </button>
             <span className='text-sm'>마케팅 정보 수신 동의(선택)</span>
@@ -472,7 +464,7 @@ export default function SignupModal({
             href='/terms?tab=marketing'
             target='_blank'
             rel='noopener noreferrer'
-            className='text-sm text-primary-500 hover:underline dark:text-primary-400'
+            className='text-sm text-brand hover:underline'
           >
             보기
           </a>
@@ -485,19 +477,19 @@ export default function SignupModal({
   const completionContent = (
     <div className='flex flex-col items-center py-6 space-y-6'>
       {/* 제목 */}
-      <h1 className='text-2xl font-bold text-center text-gray-800 dark:text-white'>
+      <h1 className='text-2xl font-bold text-center text-text-primary'>
         가입완료!
         <br />
         30펜을 지급해 드렸어요
       </h1>
 
       {/* 펜 아이콘 */}
-      <div className='w-24 h-24 flex items-center justify-center rounded-full bg-primary-100 dark:bg-primary-900'>
+      <div className='w-24 h-24 flex items-center justify-center rounded-full bg-brand/10'>
         <Image src='/images/pen/pen_primary.svg' alt='pen' width={24} height={24} />
       </div>
 
       {/* 안내 메시지 */}
-      <p className='text-center text-gray-600 dark:text-gray-300'>
+      <p className='text-center text-text-muted'>
         스토리네이션에 오신 것을 환영합니다!
         <br />
         지급된 펜으로 캐릭터를 만들어보세요.
@@ -512,7 +504,7 @@ export default function SignupModal({
       title={isCompleted ? '' : '회원가입'}
       size='md'
       animation='none'
-      backdropColor='bg-black/70 backdrop-blur-sm'
+      backdropColor='bg-overlay/70 backdrop-blur-sm'
       showCloseButton={!isCompleted}
       preventBackdropClose={isCompleted || loading || isSubmitting}
       footerContent={

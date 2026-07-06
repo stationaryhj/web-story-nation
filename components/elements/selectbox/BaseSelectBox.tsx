@@ -72,14 +72,14 @@ export const BaseSelectBox = <T extends string | number>({
         'relative inline-block w-fit max-w-[150px] md:max-w-[220px] text-left'
       )}
     >
-      {label && <label className="block text-sm text-secondary-700 dark:text-dark-secondary-300 mb-2">{label}</label>}
+      {label && <label className="block text-sm text-text-primary mb-2">{label}</label>}
       <div
         className={cn(
-          'cursor-pointer flex items-center justify-between py-2 px-3 text-[11px] md:py-3 md:px-4 md:text-base text-gray-800 focus:outline-none w-full',
+          'cursor-pointer flex items-center justify-between py-2 px-3 text-[11px] md:py-3 md:px-4 md:text-base text-text-primary focus:outline-none w-full',
           sideRound ? 'rounded-l-xl rounded-r-none' : 'rounded-xl',
           isSidebar
-            ? 'bg-white hover:bg-gray-50 focus:border-primary-500 border border-gray-200'
-            : 'bg-white hover:bg-gray-50 border border-gray-200',
+            ? 'bg-surface-elevated hover:bg-surface-elevated-hover focus:border-brand border border-border-default'
+            : 'bg-surface-elevated hover:bg-surface-elevated-hover border border-border-default',
           selectClassName
         )}
         onClick={toggleDropdown}
@@ -94,14 +94,14 @@ export const BaseSelectBox = <T extends string | number>({
       </div>
 
       {isOpen && (
-        <div className="absolute z-50 mt-1 w-fit min-w-full max-w-[150px] md:max-w-[220px] origin-top-right rounded-lg bg-white shadow-lg focus:outline-none">
+        <div className="absolute z-50 mt-1 w-fit min-w-full max-w-[150px] md:max-w-[220px] origin-top-right rounded-lg bg-surface-elevated shadow-lg focus:outline-none">
           <div className="py-1 max-h-60 overflow-y-auto">
             {options.map(option => (
               <div
                 key={option.value.toString()}
                 className={cn(
-                  'block py-2 px-3 text-[11px] md:py-3 md:px-4 md:text-base cursor-pointer hover:bg-gray-100 whitespace-nowrap overflow-hidden text-ellipsis',
-                  selectedOption.value === option.value ? 'bg-violet-50 text-violet-700 font-medium' : 'text-gray-700',
+                  'block py-2 px-3 text-[11px] md:py-3 md:px-4 md:text-base cursor-pointer hover:bg-surface-elevated-hover whitespace-nowrap overflow-hidden text-ellipsis',
+                  selectedOption.value === option.value ? 'bg-brand/10 text-brand font-medium' : 'text-text-primary',
                   optionClassName
                 )}
                 onClick={() => handleOptionClick(option)}

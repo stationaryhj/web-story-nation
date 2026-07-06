@@ -160,7 +160,7 @@ export default function TagList({
             Array.from({ length: 5 }).map((_, index) => (
               <div
                 key={index}
-                className="px-4 py-2 rounded-full bg-gray-200 dark:bg-dark-secondary-800 animate-pulse h-8 w-20"
+                className="px-4 py-2 rounded-full bg-surface-elevated animate-pulse h-8 w-20"
               />
             ))}
         </div>
@@ -180,7 +180,7 @@ export default function TagList({
           return (
             <button
               key={tag.c_chrbot_tag_key}
-              className="h-7 px-3 sm:h-8 sm:px-3.5 md:h-9 md:px-4 rounded-full text-xs sm:text-sm whitespace-nowrap transition-colors bg-primary-100 text-primary-700 dark:bg-dark-primary-900/50 dark:text-dark-primary-300"
+              className="h-7 px-3 sm:h-8 sm:px-3.5 md:h-9 md:px-4 rounded-full text-xs sm:text-sm whitespace-nowrap transition-colors bg-brand/10 text-brand"
               onClick={() => handleTagClick(tag.c_chrbot_tag_key.toString())}
             >
               #{tag.tag}
@@ -212,8 +212,8 @@ export default function TagList({
               key={tag.c_chrbot_tag_key}
               className={`h-7 px-3 sm:h-8 sm:px-3.5 md:h-9 md:px-4 rounded-full text-xs sm:text-sm whitespace-nowrap transition-colors flex-shrink-0 ${
                 selectedTags.includes(tag.c_chrbot_tag_key.toString())
-                  ? 'bg-primary-100 text-primary-700 dark:bg-dark-primary-900/50 dark:text-dark-primary-300'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-dark-secondary-800 dark:text-dark-secondary-300 dark:hover:bg-dark-secondary-700'
+                  ? 'bg-brand/10 text-brand'
+                  : 'bg-surface-elevated text-text-muted hover:bg-surface-elevated-hover'
               }`}
               onClick={() => handleTagClick(tag.c_chrbot_tag_key.toString())}
             >

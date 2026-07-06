@@ -67,7 +67,7 @@ export default function ChatModeSelectModal({ onLimitError }: ChatModeSelectModa
           {modeList.map((mode) => (
             <div
               key={mode.mode}
-              className='group flex flex-col rounded-xl border overflow-hidden border-[#D9D9D9] cursor-pointer'
+              className='group flex flex-col rounded-xl border overflow-hidden border-border-default cursor-pointer'
               onClick={() => handleModeSelect(mode.mode)}
             >
               <div className='relative overflow-hidden aspect-[267/166]'>
@@ -78,9 +78,9 @@ export default function ChatModeSelectModal({ onLimitError }: ChatModeSelectModa
                   fill
                 />
               </div>
-              <div className='py-3 px-4 border-t border-[#D9D9D9] space-y-1'>
-                <h4 className='font-bold text-lg  group-hover:text-primary-600'>{mode.title}</h4>
-                <p className='text-[15px] font-medium text-[#636363] leading-[1.4] group-hover:text-black/70 '>
+              <div className='py-3 px-4 border-t border-border-default space-y-1'>
+                <h4 className='font-bold text-lg  group-hover:text-brand-hover'>{mode.title}</h4>
+                <p className='text-[15px] font-medium text-text-muted leading-[1.4] group-hover:text-text-primary/70 '>
                   {mode.description}
                 </p>
               </div>

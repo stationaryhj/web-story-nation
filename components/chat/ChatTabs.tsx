@@ -13,12 +13,12 @@ interface ChatTabsProps {
 
 export default function ChatTabs({ activeTab, onTabChange, onSortClick }: ChatTabsProps) {
   return (
-    <div className="flex mb-4 border-b border-secondary-100 dark:border-dark-secondary-200">
+    <div className="flex mb-4 border-b border-border-default">
       <button
         className={`py-2 px-4 font-medium text-sm transition-colors ${
           activeTab === 'all'
-            ? 'text-primary-600 dark:text-dark-primary-600 border-b-2 border-primary-500 dark:border-dark-primary-500'
-            : 'text-secondary-500 dark:text-dark-secondary-500 hover:text-secondary-700 dark:hover:text-dark-secondary-300'
+            ? 'text-brand border-b-2 border-brand'
+            : 'text-text-muted hover:text-text-primary'
         }`}
         onClick={() => onTabChange('all')}
         aria-pressed={activeTab === 'all'}
@@ -28,8 +28,8 @@ export default function ChatTabs({ activeTab, onTabChange, onSortClick }: ChatTa
       <button
         className={`py-2 px-4 font-medium text-sm transition-colors ${
           activeTab === 'favorites'
-            ? 'text-primary-600 dark:text-dark-primary-600 border-b-2 border-primary-500 dark:border-dark-primary-500'
-            : 'text-secondary-500 dark:text-dark-secondary-500 hover:text-secondary-700 dark:hover:text-dark-secondary-300'
+            ? 'text-brand border-b-2 border-brand'
+            : 'text-text-muted hover:text-text-primary'
         }`}
         onClick={() => onTabChange('favorites')}
         aria-pressed={activeTab === 'favorites'}
@@ -38,8 +38,8 @@ export default function ChatTabs({ activeTab, onTabChange, onSortClick }: ChatTa
       </button>
 
       <div className="ml-auto">
-        <button 
-          className="p-2 text-secondary-500 dark:text-dark-secondary-500 hover:text-primary-500 dark:hover:text-dark-primary-600 transition-colors"
+        <button
+          className="p-2 text-text-muted hover:text-brand transition-colors"
           onClick={onSortClick}
           aria-label="정렬 옵션"
         >

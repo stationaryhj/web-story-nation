@@ -67,8 +67,8 @@ export default function ChatDetailPage({ params }: { params: Promise<{ id: strin
 
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen w-100vw bg-neutral-100 dark:bg-dark-background-DEFAULT">
-      <div className="flex flex-col justify-center items-center h-screen max-w-[1280px] w-full bg-neutral-100 dark:bg-dark-background-DEFAULT">
+    <div className="flex flex-col justify-center items-center h-screen w-100vw bg-surface">
+      <div className="flex flex-col justify-center items-center h-screen max-w-[1280px] w-full bg-surface">
         <Suspense
           fallback={
             <div className="min-h-screen flex items-center justify-center">

@@ -1,30 +1,32 @@
-'use client'
+'use client';
 
-import PageTransition from '@/components/motion/PageTransition'
-import React, { useState, useEffect, useRef, useCallback } from 'react'
-import Header from '@/components/common/header'
-import SearchBar from '@/components/elements/searchBar/SearchBar'
-import CardGrid from '@/components/elements/card/CardGrid'
-import Dropdown from '@/components/elements/dropdown/Dropdown'
-import Pagination from '@/components/elements/pagination/Pagination'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useAccountStore } from '@/store/useAccountStore'
-import useModalStore from '@/shared/model/stores/useModalStore'
-import { useSearchStore } from '@/store/useSearchStore'
-import { useSettingsStore } from '@/store/useStoreSettings'
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import Header from '@/components/common/header';
+import CardGrid from '@/components/elements/card/CardGrid';
+import Dropdown from '@/components/elements/dropdown/Dropdown';
+import Pagination from '@/components/elements/pagination/Pagination';
+import SearchBar from '@/components/elements/searchBar/SearchBar';
+import PageTransition from '@/components/motion/PageTransition';
+import useModalStore from '@/shared/model/stores/useModalStore';
+import { useAccountStore } from '@/store/useAccountStore';
+import { useSearchStore } from '@/store/useSearchStore';
+import { useSettingsStore } from '@/store/useStoreSettings';
 
-type Props = {}
+type Props = {};
 
 export default function searchPage({}: Props) {
-  const router = useRouter()
-  const { isLogin } = useAccountStore()
-  const { openModal } = useModalStore()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const { isLogin } = useAccountStore();
+  const { openModal } = useModalStore();
+  const searchParams = useSearchParams();
 
   // URL 쿼리 파라미터 가져오기
-  const initialQuery = searchParams?.get('query') || ''
-  const initialOption = searchParams?.get('option') || 'character'
-  const initialPage = searchParams?.get('page') ? parseInt(searchParams.get('page') as string, 10) : 1
+  const initialQuery = searchParams?.get('query') || '';
+  const initialOption = searchParams?.get('option') || 'character';
+  const initialPage = searchParams?.get('page')
+    ? parseInt(searchParams.get('page') as string, 10)
+    : 1;
 
   // 스토어에서 필요한 상태와 메서드들 가져오기
   const {
@@ -42,157 +44,170 @@ export default function searchPage({}: Props) {
     search,
     loadMore,
     reset,
-  } = useSearchStore()
+  } = useSearchStore();
 
   // 모바일 모드 감지
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(false);
 
-  const { isAdultModeEnabled } = useSettingsStore()
+  const { isAdultModeEnabled } = useSettingsStore();
 
   // 무한 스크롤을 위한 옵저버 ref
-  const observerRef = useRef<IntersectionObserver | null>(null)
-  const loadMoreRef = useRef<HTMLDivElement | null>(null)
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   // 화면 크기 감지하여 모바일/PC 모드 설정
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
+      setIsMobile(window.innerWidth < 768);
+    };
 
     // 초기 실행
-    handleResize()
+    handleResize();
 
     // 리사이즈 이벤트 리스너 추가
-    window.addEventListener('resize', handleResize)
+    window.addEventListener('resize', handleResize);
 
     // 클린업
     return () => {
-      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('resize', handleResize);
       if (observerRef.current) {
-        observerRef.current.disconnect()
+        observerRef.current.disconnect();
       }
-    }
-  }, [])
+    };
+  }, []);
 
   // URL 쿼리 파라미터 초기화 및 변경 시 스토어 상태 업데이트
   useEffect(() => {
-    setSearchQuery(initialQuery)
-    setSearchOption(initialOption as 'character' | 'creator')
-    setCurrentPage(initialPage)
+    setSearchQuery(initialQuery);
+    setSearchOption(initialOption as 'character' | 'creator');
+    setCurrentPage(initialPage);
 
     // 초기 검색 쿼리가 있는 경우 검색 실행
     if (initialQuery) {
-      search()
+      search();
     }
-  }, [initialQuery, initialOption, initialPage, setSearchQuery, setSearchOption, setCurrentPage, search, isAdultModeEnabled])
+  }, [
+    initialQuery,
+    initialOption,
+    initialPage,
+    setSearchQuery,
+    setSearchOption,
+    setCurrentPage,
+    search,
+    isAdultModeEnabled,
+  ]);
 
   // URL 쿼리 파라미터 변경 함수
   const updateUrlParams = (query: string, option: string, page = 1) => {
     // 모바일 무한 스크롤에서는 URL에 페이지 정보를 포함하지 않음
     if (isMobile) {
-      const params = new URLSearchParams()
-      if (query) params.set('query', query)
-      if (option) params.set('option', option)
-      router.push(`/search?${params.toString()}`)
-      return
+      const params = new URLSearchParams();
+      if (query) params.set('query', query);
+      if (option) params.set('option', option);
+      router.push(`/search?${params.toString()}`);
+      return;
     }
 
     // PC 페이지네이션 URL 업데이트
-    const params = new URLSearchParams()
-    if (query) params.set('query', query)
-    if (option) params.set('option', option)
-    if (page > 1) params.set('page', page.toString())
+    const params = new URLSearchParams();
+    if (query) params.set('query', query);
+    if (option) params.set('option', option);
+    if (page > 1) params.set('page', page.toString());
 
     // URL 업데이트
-    router.push(`/search?${params.toString()}`)
-  }
+    router.push(`/search?${params.toString()}`);
+  };
 
   // 검색 핸들러
   const handleSearch = (query: string, option?: string) => {
-    const searchOpt = option || 'character'
-    setSearchQuery(query)
-    setSearchOption(searchOpt as 'character' | 'creator')
-    setCurrentPage(1) // 검색 시 첫 페이지로 리셋
+    const searchOpt = option || 'character';
+    setSearchQuery(query);
+    setSearchOption(searchOpt as 'character' | 'creator');
+    setCurrentPage(1); // 검색 시 첫 페이지로 리셋
 
     // URL 쿼리 파라미터 업데이트
-    updateUrlParams(query, searchOpt)
+    updateUrlParams(query, searchOpt);
 
     // 스토어의 검색 메서드 호출
-    search()
-  }
+    search();
+  };
 
   // 페이지 변경 핸들러
   const handlePageChange = (page: number) => {
     // 스토어의 페이지 업데이트
-    setCurrentPage(page)
+    setCurrentPage(page);
 
     // URL 쿼리 파라미터 업데이트
-    updateUrlParams(searchQuery, searchOption, page)
+    updateUrlParams(searchQuery, searchOption, page);
 
     // 스토어의 검색 메서드 호출하여 데이터 업데이트
-    search()
+    search();
 
     // 페이지 변경 시 스크롤을 상단으로 이동
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // 정렬 타입 변경 핸들러
   const handleSortTypeChange = (type: string) => {
     // 스토어의 정렬 타입 업데이트
-    setSortType(type === 'popularity' ? 1 : 2)
+    setSortType(type === 'popularity' ? 1 : 2);
 
     // 검색 실행하여 정렬된 데이터 가져오기
-    search()
-  }
+    search();
+  };
 
   // 무한 스크롤을 위한 더 불러오기 함수
   const loadMoreItems = useCallback(() => {
-    if (isLoading || !pagination.hasMore) return
+    if (isLoading || !pagination.hasMore) return;
 
     // 스토어의 더 불러오기 메서드 호출
-    loadMore()
-  }, [isLoading, pagination.hasMore, loadMore])
+    loadMore();
+  }, [isLoading, pagination.hasMore, loadMore]);
 
   // 무한 스크롤 옵저버 설정
   useEffect(() => {
-    if (!isMobile || !loadMoreRef.current) return
+    if (!isMobile || !loadMoreRef.current) return;
 
     observerRef.current = new IntersectionObserver(
-      entries => {
+      (entries) => {
         if (entries[0].isIntersecting && pagination.hasMore && !isLoading) {
-          loadMoreItems()
+          loadMoreItems();
         }
       },
       { threshold: 0.5 }
-    )
+    );
 
-    observerRef.current.observe(loadMoreRef.current)
+    observerRef.current.observe(loadMoreRef.current);
 
     return () => {
       if (observerRef.current) {
-        observerRef.current.disconnect()
+        observerRef.current.disconnect();
       }
-    }
-  }, [isMobile, loadMoreItems, pagination.hasMore, isLoading])
+    };
+  }, [isMobile, loadMoreItems, pagination.hasMore, isLoading]);
 
   // 캐릭터 생성 페이지로 이동하는 핸들러
   const handleCreateCharacter = () => {
     if (!isLogin) {
-      openModal({ type: 'socialLogin' })
-      return
+      openModal({ type: 'socialLogin' });
+      return;
     }
-    router.push('/my-characters/create')
-  }
+    router.push('/my-characters/create');
+  };
 
   return (
     <PageTransition>
       <Header />
 
-      <div className="container mx-auto px-4 pt-6 relative">
+      <div className='container mx-auto px-4 pt-6 relative'>
         <div>
-          <SearchBar onSearch={handleSearch} placeholder="캐릭터나 작가를 검색해보세요" initialValue={searchQuery} />
+          <SearchBar
+            onSearch={handleSearch}
+            placeholder='캐릭터나 작가를 검색해보세요'
+            initialValue={searchQuery}
+          />
         </div>
-        <div className="flex justify-end items-center py-4">
+        <div className='flex justify-end items-center py-4'>
           <div>
             <Dropdown
               value={sortType === 1 ? 'popularity' : 'latest'}
@@ -204,49 +219,56 @@ export default function searchPage({}: Props) {
             />
           </div>
         </div>
-        <div className="text-md md:text-2xl text-gray-700 font-bold dark:text-dark-gray-300 mt-2 mb-6 w-full flex items-center justify-center">
-          <div className="flex items-center text-gray-500 dark:text-dark-gray-500">
+        <div className='text-md md:text-2xl text-text-primary font-bold mt-2 mb-6 w-full flex items-center justify-center'>
+          <div className='flex items-center text-text-muted'>
             {searchQuery && (
-              <span className="text-primary-600 dark:text-dark-primary-400 mr-1 truncate inline-block max-w-[150px] md:max-w-[200px]">
+              <span className='text-brand mr-1 truncate inline-block max-w-[150px] md:max-w-[200px]'>
                 '{searchQuery}'{searchOption === 'creator' && ' 작가'}
               </span>
             )}
-            {pagination.totalItems > 0 ? `${pagination.totalItems}개의 검색결과` : '검색 결과가 없습니다'}
+            {pagination.totalItems > 0
+              ? `${pagination.totalItems}개의 검색결과`
+              : '검색 결과가 없습니다'}
           </div>
         </div>
         <div>
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center text-center h-[calc(100vh-300px)] min-h-[400px]">
-              <div className="w-12 h-12 rounded-full border-4 border-primary-500 border-t-transparent animate-spin mb-4"></div>
-              <p className="text-gray-600 dark:text-dark-gray-400">검색 결과를 불러오는 중입니다...</p>
+            <div className='flex flex-col items-center justify-center text-center h-[calc(100vh-300px)] min-h-[400px]'>
+              <div className='w-12 h-12 rounded-full border-4 border-brand border-t-transparent animate-spin mb-4'></div>
+              <p className='text-text-muted'>검색 결과를 불러오는 중입니다...</p>
             </div>
           ) : pagination.totalItems === 0 ? (
-            <div className="flex flex-col items-center justify-center text-center h-[calc(100vh-300px)] min-h-[400px]">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-dark-gray-200 mb-4">
+            <div className='flex flex-col items-center justify-center text-center h-[calc(100vh-300px)] min-h-[400px]'>
+              <h2 className='text-2xl font-bold text-text-primary mb-4'>
                 {searchOption === 'creator' ? '검색된 작가가 없어요' : '검색된 캐릭터가 없어요'}
               </h2>
-              <p className="text-gray-600 dark:text-dark-gray-400 mb-8">내가 원하는 캐릭터를 직접 만들어 보세요!</p>
+              <p className='text-text-muted mb-8'>내가 원하는 캐릭터를 직접 만들어 보세요!</p>
               <button
                 onClick={handleCreateCharacter}
-                className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+                className='px-6 py-3 bg-brand text-text-inverse rounded-lg hover:bg-brand-hover transition-colors'
               >
                 캐릭터 만들기
               </button>
             </div>
           ) : (
             <>
-              <CardGrid useSwiper={false} customData={characters} isLoading={isLoading} cardsPerRow={6} />
+              <CardGrid
+                useSwiper={false}
+                customData={characters}
+                isLoading={isLoading}
+                cardsPerRow={6}
+              />
 
               {/* 모바일: 무한 스크롤 로딩 표시 */}
               {isMobile && !isLoading && (
-                <div ref={loadMoreRef} className="py-4 text-center">
+                <div ref={loadMoreRef} className='py-4 text-center'>
                   {isLoading && (
-                    <div className="flex justify-center items-center py-4">
-                      <div className="w-8 h-8 rounded-full border-2 border-primary-500 border-t-transparent animate-spin"></div>
+                    <div className='flex justify-center items-center py-4'>
+                      <div className='w-8 h-8 rounded-full border-2 border-brand border-t-transparent animate-spin'></div>
                     </div>
                   )}
                   {!pagination.hasMore && characters.length > 0 && (
-                    <p className="text-gray-500 dark:text-dark-gray-400 py-4">더 이상 결과가 없습니다</p>
+                    <p className='text-text-muted py-4'>더 이상 결과가 없습니다</p>
                   )}
                 </div>
               )}
@@ -257,7 +279,7 @@ export default function searchPage({}: Props) {
                   currentPage={pagination.currentPage}
                   totalPages={pagination.totalPages}
                   onPageChange={handlePageChange}
-                  className="mb-6"
+                  className='mb-6'
                 />
               )}
             </>
@@ -265,5 +287,5 @@ export default function searchPage({}: Props) {
         </div>
       </div>
     </PageTransition>
-  )
+  );
 }

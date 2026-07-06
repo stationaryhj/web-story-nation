@@ -1,18 +1,18 @@
-'use client'
+'use client';
 
-import React from 'react'
-import Link from 'next/link'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSun, faMoon, faCog, faSignOutAlt, faUser } from '@fortawesome/free-solid-svg-icons'
-import { useAccountStore } from '@/store/useAccountStore'
-import BaseSidebar from './BaseSidebar'
-import { SocialLoginProvider } from '@/services/auth/types'
-import useNewModalStore from '@/shared/model/stores/useModalStore'
+import { faCog, faMoon, faSignOutAlt, faSun, faUser } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Link from 'next/link';
+import React from 'react';
+import { SocialLoginProvider } from '@/services/auth/types';
+import useNewModalStore from '@/shared/model/stores/useModalStore';
+import { useAccountStore } from '@/store/useAccountStore';
+import BaseSidebar from './BaseSidebar';
 
 interface NavLink {
-  href: string
-  label: string
-  requireLogin?: boolean
+  href: string;
+  label: string;
+  requireLogin?: boolean;
 }
 
 // useStoreModal에서 사용되는 ModalType 직접 정의
@@ -32,19 +32,19 @@ type ModalType =
   | 'adultVerification'
   | 'chatMode'
   | 'report'
-  | 'bankInfo'
+  | 'bankInfo';
 
 interface HeaderSidebarProps {
-  isOpen: boolean
-  onClose: () => void
-  navLinks: NavLink[]
-  activeLink: string
-  isLogin: boolean
-  isDarkMode: boolean
-  toggleDarkMode: () => void
-  openModal: (modalType: ModalType, props?: Record<string, any>) => void
-  setActiveLink: (href: string) => void
-  logout?: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  navLinks: NavLink[];
+  activeLink: string;
+  isLogin: boolean;
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+  openModal: (modalType: ModalType, props?: Record<string, any>) => void;
+  setActiveLink: (href: string) => void;
+  logout?: () => void;
 }
 
 export default function HeaderSidebar({
@@ -59,21 +59,21 @@ export default function HeaderSidebar({
   setActiveLink,
   logout,
 }: HeaderSidebarProps) {
-  const { loginType, guestLogin2 } = useAccountStore()
-  const { openModal: openNewModal } = useNewModalStore()
+  const { loginType, guestLogin2 } = useAccountStore();
+  const { openModal: openNewModal } = useNewModalStore();
 
-  const isGuestLogin = loginType === 'Guest' as SocialLoginProvider && isLogin
+  const isGuestLogin = loginType === ('Guest' as SocialLoginProvider) && isLogin;
 
   const handleTestGuestLogin = async () => {
-    const result = await guestLogin2('test_brix', 1)
-  }
-  
+    const result = await guestLogin2('test_brix', 1);
+  };
+
   const sidebarContent = (
     <>
-      <nav className="p-5">
-        <div className="">
-          <h3 className="text-sm font-semibold text-secondary-500 dark:text-dark-secondary-500 mb-4">설정</h3>
-          <ul className="space-y-4">
+      <nav className='p-5'>
+        <div className=''>
+          <h3 className='text-sm font-semibold text-text-muted mb-4'>설정</h3>
+          <ul className='space-y-4'>
             {/* <li>
               <button
                 onClick={toggleDarkMode}
@@ -92,47 +92,49 @@ export default function HeaderSidebar({
             {isLogin && (
               <li>
                 <Link
-                  href="/settings"
-                  className="flex items-center py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors"
-                  onClick={e => {
+                  href='/settings'
+                  className='flex items-center py-2 text-text-primary hover:text-brand-hover font-medium transition-colors'
+                  onClick={(e) => {
                     // if(!isLogin) {
                     //   e.preventDefault()
                     //   openModal('login')
                     //   return
                     // }
-                    onClose()
+                    onClose();
                   }}
                 >
-                  <FontAwesomeIcon icon={faUser} className="text-lg mr-3" />
+                  <FontAwesomeIcon icon={faUser} className='text-lg mr-3' />
                   <span>내정보</span>
                   {isGuestLogin && (
-                    <span className="text-xs text-red-500 bg-gray-100 rounded-full px-1 py-0.5 ml-2">Guest</span>
+                    <span className='text-xs text-danger bg-surface-elevated rounded-full px-1 py-0.5 ml-2'>
+                      Guest
+                    </span>
                   )}
                 </Link>
               </li>
             )}
-            
+
             <li>
               {isLogin ? (
                 <button
                   onClick={() => {
-                    if (logout) logout()
-                    onClose()
+                    if (logout) logout();
+                    onClose();
                   }}
-                  className="flex items-center w-full py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors"
+                  className='flex items-center w-full py-2 text-text-primary hover:text-brand-hover font-medium transition-colors'
                 >
-                  <FontAwesomeIcon icon={faSignOutAlt} className="text-lg mr-3" />
+                  <FontAwesomeIcon icon={faSignOutAlt} className='text-lg mr-3' />
                   로그아웃
                 </button>
               ) : (
                 <button
                   onClick={() => {
-                    openNewModal({ type: 'socialLogin' })
-                    onClose()
+                    openNewModal({ type: 'socialLogin' });
+                    onClose();
                   }}
-                  className="flex items-center w-full py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors"
+                  className='flex items-center w-full py-2 text-text-primary hover:text-brand-hover font-medium transition-colors'
                 >
-                  <FontAwesomeIcon icon={faSignOutAlt} className="text-lg mr-3" />
+                  <FontAwesomeIcon icon={faSignOutAlt} className='text-lg mr-3' />
                   로그인
                 </button>
               )}
@@ -147,11 +149,11 @@ export default function HeaderSidebar({
         </div>
       </nav>
     </>
-  )
+  );
 
   return (
-    <BaseSidebar isOpen={isOpen} onClose={onClose} title="메뉴" width="" side="right">
+    <BaseSidebar isOpen={isOpen} onClose={onClose} title='메뉴' width='' side='right'>
       {sidebarContent}
     </BaseSidebar>
-  )
+  );
 }

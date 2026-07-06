@@ -49,17 +49,17 @@ const RedirectBannerModal = ({ charboyKey }: { charboyKey: string }) => {
   return (
     <Modal className='pointer-events-none'>
       <motion.div
-        className='absolute cursor-pointer  pointer-events-auto translate-x-0 bottom-0 left-0 w-full bg-primary py-[11px] rounded-none'
+        className='absolute cursor-pointer  pointer-events-auto translate-x-0 bottom-0 left-0 w-full bg-brand py-[11px] rounded-none'
         onClick={handleClick}
         {...SLIDE_UP_ANIMATION}
       >
         <div className=' max-w-[1280px] w-full px-4 mx-auto flex items-center justify-between'>
           <div className='flex items-center justify-between gap-x-3'>
-            <span className='font-bold text-white'>방금 대화한 채팅방으로 이동하기</span>
-            <FontAwesomeIcon icon={faAngleRight} size='sm' className='text-white' />
+            <span className='font-bold text-text-inverse'>방금 대화한 채팅방으로 이동하기</span>
+            <FontAwesomeIcon icon={faAngleRight} size='sm' className='text-text-inverse' />
           </div>
           <Modal.Close onClick={(e: React.MouseEvent<HTMLButtonElement>) => handleClose(e)}>
-            <FontAwesomeIcon icon={faClose} size='lg' className='text-white' />
+            <FontAwesomeIcon icon={faClose} size='lg' className='text-text-inverse' />
           </Modal.Close>
         </div>
       </motion.div>

@@ -45,7 +45,7 @@ const SimpleToggle = ({
 }) => {
   return (
     <div className='flex items-center'>
-      <span className='hidden md:flex items-center py-2 text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 font-medium transition-colors mr-2'>
+      <span className='hidden md:flex items-center py-2 text-text-primary hover:text-brand-hover font-medium transition-colors mr-2'>
         세이프티 필터
       </span>
       <button
@@ -186,7 +186,7 @@ export default function Header() {
   return (
     <>
       <motion.header
-        className='sticky top-0 left-0 right-0 z-[50] bg-white dark:bg-dark-background-light shadow-sm dark:shadow-dark-primary-300/20'
+        className='sticky top-0 left-0 right-0 z-[50] bg-surface-sunken shadow-sm dark:shadow-dark-primary-300/20'
         initial={{ y: 0 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -195,7 +195,7 @@ export default function Header() {
           <div className='flex items-center'>
             <Link
               href='/'
-              className='text-xl font-bold text-primary-600 dark:text-dark-primary-600 mr-10'
+              className='text-xl font-bold text-brand-hover mr-10'
               onClick={(e) => {
                 // 메인 페이지로 이동 시 URL에서 tab 파라미터를 삭제하여 추천 탭으로 강제 이동
                 e.preventDefault();
@@ -217,10 +217,8 @@ export default function Header() {
                   key={link.href}
                   href={link.href}
                   onClick={(e) => handleNavLinkClick(e, link)}
-                  className={`text-sm font-medium transition-colors hover:text-primary-500 dark:hover:text-dark-primary-500 ${
-                    activeLink === link.href
-                      ? 'text-primary-500 dark:text-dark-primary-500'
-                      : 'text-secondary-700 dark:text-dark-secondary-400'
+                  className={`text-sm font-medium transition-colors hover:text-brand ${
+                    activeLink === link.href ? 'text-brand' : 'text-text-primary'
                   }`}
                 >
                   {link.label}
@@ -260,7 +258,7 @@ export default function Header() {
             <div className='hidden md:block'>
               <motion.button
                 onClick={onClickSettingLink}
-                className='text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 transition-colors'
+                className='text-text-primary hover:text-brand-hover transition-colors'
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -271,7 +269,7 @@ export default function Header() {
             {/* 장바구니 버튼 */}
             <Link href='/cart'>
               <motion.button
-                className='hidden sm:visible text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 transition-colors'
+                className='hidden sm:visible text-text-primary hover:text-brand-hover transition-colors'
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -283,7 +281,7 @@ export default function Header() {
               onClick={(e) => {
                 setIsSidebarOpen(true);
               }}
-              className='md:hidden text-secondary-700 hover:text-primary-600 dark:text-dark-secondary-400 dark:hover:text-dark-primary-600 transition-colors'
+              className='md:hidden text-text-primary hover:text-brand-hover transition-colors'
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
             >

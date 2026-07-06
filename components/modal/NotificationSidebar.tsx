@@ -152,14 +152,11 @@ const AnnouncementTab = () => {
         {Array(5)
           .fill(0)
           .map((_, index) => (
-            <div
-              key={`skeleton-${index}`}
-              className='border-b border-secondary-100 dark:border-dark-secondary-800 p-4'
-            >
-              <div className='w-16 h-5 bg-secondary-100 dark:bg-dark-secondary-800 rounded-full animate-pulse mb-2'></div>
-              <div className='w-3/4 h-5 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse mb-2'></div>
-              <div className='w-full h-4 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse mb-2'></div>
-              <div className='w-32 h-3 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse'></div>
+            <div key={`skeleton-${index}`} className='border-b border-border-default p-4'>
+              <div className='w-16 h-5 bg-surface-elevated rounded-full animate-pulse mb-2'></div>
+              <div className='w-3/4 h-5 bg-surface-elevated rounded animate-pulse mb-2'></div>
+              <div className='w-full h-4 bg-surface-elevated rounded animate-pulse mb-2'></div>
+              <div className='w-32 h-3 bg-surface-elevated rounded animate-pulse'></div>
             </div>
           ))}
       </div>
@@ -171,16 +168,13 @@ const AnnouncementTab = () => {
     return (
       <div className='flex flex-col items-center justify-center h-full p-6'>
         <div className='text-center space-y-4'>
-          <FontAwesomeIcon
-            icon={faExclamationCircle}
-            className='text-4xl text-red-500 dark:text-red-400 mb-2'
-          />
-          <p className='text-secondary-700 dark:text-dark-secondary-300 text-base'>
+          <FontAwesomeIcon icon={faExclamationCircle} className='text-4xl text-danger mb-2' />
+          <p className='text-text-muted text-base'>
             공지사항 불러오기 중 오류가 발생했습니다. 다시 시도해주세요.
           </p>
           <button
             onClick={() => initialize()}
-            className='px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors'
+            className='px-4 py-2 bg-brand hover:bg-brand-hover text-text-inverse rounded-md transition-colors'
           >
             다시 시도
           </button>
@@ -192,7 +186,7 @@ const AnnouncementTab = () => {
   // 공지사항이 없는 경우
   if (displayAnnouncements.length === 0) {
     return (
-      <div className='flex flex-col items-center justify-center h-full text-secondary-500 dark:text-dark-secondary-400 p-6'>
+      <div className='flex flex-col items-center justify-center h-full text-text-muted p-6'>
         <FontAwesomeIcon icon={faCheckCircle} className='text-3xl mb-2' />
         <p className='text-center'>등록된 공지사항이 없습니다.</p>
       </div>
@@ -231,19 +225,15 @@ const AnnouncementItem = ({
     <motion.li
       initial={{ opacity: 0.8 }}
       animate={{ opacity: 1 }}
-      className='border-b border-secondary-100 dark:border-dark-secondary-800'
+      className='border-b border-border-default'
     >
       <div className='p-5 relative'>
         <div className='flex justify-between items-start'>
           <div className='ml-0.5 flex-1'>
             {/* 제목 */}
-            <h3 className='text-base font-medium text-secondary-900 dark:text-dark-secondary-200'>
-              {item.title}
-            </h3>
+            <h3 className='text-base font-medium text-text-primary'>{item.title}</h3>
             {/* 날짜 */}
-            <p className='text-xs text-secondary-400 dark:text-dark-secondary-500 mt-1'>
-              {formatDate(item.date)}
-            </p>
+            <p className='text-xs text-text-muted mt-1'>{formatDate(item.date)}</p>
             {/* 메시지 내용 (확장 시에만 표시) */}
             <AnimatePresence>
               {isExpanded && (
@@ -252,7 +242,7 @@ const AnnouncementItem = ({
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
-                  className='text-sm text-secondary-600 dark:text-dark-secondary-400 mt-3'
+                  className='text-sm text-text-muted mt-3'
                 >
                   {item.message}
                 </motion.p>
@@ -262,7 +252,7 @@ const AnnouncementItem = ({
           {/* 확장/축소 버튼 */}
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className='ml-2 p-1 text-secondary-400 hover:text-secondary-600 dark:text-dark-secondary-500 dark:hover:text-dark-secondary-300'
+            className='ml-2 p-1 text-text-muted hover:text-text-primary'
             aria-label={isExpanded ? '공지사항 접기' : '공지사항 펼치기'}
           >
             <motion.svg
@@ -308,17 +298,12 @@ const NotificationTab = () => {
     return (
       <div className='flex flex-col items-center justify-center h-full p-6'>
         <div className='text-center space-y-4'>
-          <FontAwesomeIcon
-            icon={faCheckCircle}
-            className='text-4xl text-secondary-400 dark:text-dark-secondary-500 mb-2'
-          />
-          <p className='text-secondary-700 dark:text-dark-secondary-300 text-base'>
-            알림 기능을 이용하려면 로그인이 필요합니다.
-          </p>
+          <FontAwesomeIcon icon={faCheckCircle} className='text-4xl text-text-muted mb-2' />
+          <p className='text-text-muted text-base'>알림 기능을 이용하려면 로그인이 필요합니다.</p>
           <button
             type='button'
             onClick={() => openModal({ type: 'socialLogin' })}
-            className='px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors'
+            className='px-4 py-2 bg-brand hover:bg-brand-hover text-text-inverse rounded-md transition-colors'
           >
             로그인하기
           </button>
@@ -358,7 +343,7 @@ const NotificationTab = () => {
       case 'warning':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
       case 'error':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
+        return 'bg-danger/10 text-danger';
       case 'info':
       default:
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
@@ -370,9 +355,9 @@ const NotificationTab = () => {
     return (
       <>
         {/* 알림 관리 버튼 스켈레톤 */}
-        <div className='flex justify-end space-x-2 p-2 border-b border-secondary-100 dark:border-dark-secondary-800'>
-          <div className='w-16 h-6 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse'></div>
-          <div className='w-16 h-6 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse'></div>
+        <div className='flex justify-end space-x-2 p-2 border-b border-border-default'>
+          <div className='w-16 h-6 bg-surface-elevated rounded animate-pulse'></div>
+          <div className='w-16 h-6 bg-surface-elevated rounded animate-pulse'></div>
         </div>
 
         {/* 알림 목록 스켈레톤 */}
@@ -380,22 +365,19 @@ const NotificationTab = () => {
           {Array(5)
             .fill(0)
             .map((_, index) => (
-              <div
-                key={`skeleton-${index}`}
-                className='border-b border-secondary-100 dark:border-dark-secondary-800 p-4'
-              >
+              <div key={`skeleton-${index}`} className='border-b border-border-default p-4'>
                 <div className='flex justify-between'>
                   <div className='ml-0.5'>
-                    <div className='w-16 h-5 bg-secondary-100 dark:bg-dark-secondary-800 rounded-full animate-pulse mb-2'></div>
-                    <div className='w-32 h-5 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse mb-2'></div>
+                    <div className='w-16 h-5 bg-surface-elevated rounded-full animate-pulse mb-2'></div>
+                    <div className='w-32 h-5 bg-surface-elevated rounded animate-pulse mb-2'></div>
                   </div>
                   <div className='flex space-x-1'>
-                    <div className='w-6 h-6 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse'></div>
-                    <div className='w-6 h-6 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse'></div>
+                    <div className='w-6 h-6 bg-surface-elevated rounded animate-pulse'></div>
+                    <div className='w-6 h-6 bg-surface-elevated rounded animate-pulse'></div>
                   </div>
                 </div>
-                <div className='w-full h-4 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse mt-2'></div>
-                <div className='w-24 h-3 bg-secondary-100 dark:bg-dark-secondary-800 rounded animate-pulse mt-2'></div>
+                <div className='w-full h-4 bg-surface-elevated rounded animate-pulse mt-2'></div>
+                <div className='w-24 h-3 bg-surface-elevated rounded animate-pulse mt-2'></div>
               </div>
             ))}
         </div>
@@ -408,16 +390,13 @@ const NotificationTab = () => {
     return (
       <div className='flex flex-col items-center justify-center h-full p-6'>
         <div className='text-center space-y-4'>
-          <FontAwesomeIcon
-            icon={faExclamationCircle}
-            className='text-4xl text-red-500 dark:text-red-400 mb-2'
-          />
-          <p className='text-secondary-700 dark:text-dark-secondary-300 text-base'>
+          <FontAwesomeIcon icon={faExclamationCircle} className='text-4xl text-danger mb-2' />
+          <p className='text-text-muted text-base'>
             알림 불러오기 중 오류가 발생했습니다. 다시 시도해주세요.
           </p>
           <button
             onClick={() => initialize()}
-            className='px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-md transition-colors'
+            className='px-4 py-2 bg-brand hover:bg-brand-hover text-text-inverse rounded-md transition-colors'
           >
             다시 시도
           </button>
@@ -429,16 +408,16 @@ const NotificationTab = () => {
   return (
     <>
       {/* 알림 관리 버튼 */}
-      <div className='flex justify-end space-x-2 p-2 border-b border-secondary-100 dark:border-dark-secondary-800'>
+      <div className='flex justify-end space-x-2 p-2 border-b border-border-default'>
         <button
-          className='text-xs text-primary-600 hover:text-primary-700 dark:text-dark-primary-400 dark:hover:text-dark-primary-300 px-2 py-1'
+          className='text-xs text-brand hover:text-brand-hover px-2 py-1'
           onClick={markAllAsRead}
           disabled={unreadCount === 0}
         >
           모두 읽음
         </button>
         <button
-          className='text-xs text-secondary-600 hover:text-secondary-700 dark:text-dark-secondary-400 dark:hover:text-dark-secondary-300 px-2 py-1'
+          className='text-xs text-text-muted hover:text-text-primary px-2 py-1'
           onClick={deleteAllNotifications}
           disabled={notifications.length === 0}
         >
@@ -449,7 +428,7 @@ const NotificationTab = () => {
       {/* 알림 목록 */}
       <div className='flex-1 overflow-y-auto'>
         {notifications.length === 0 ? (
-          <div className='flex flex-col items-center justify-center h-full text-secondary-500 dark:text-dark-secondary-400 p-6'>
+          <div className='flex flex-col items-center justify-center h-full text-text-muted p-6'>
             <FontAwesomeIcon icon={faCheckCircle} className='text-3xl mb-2' />
             <p className='text-center'>새로운 알림이 없습니다.</p>
           </div>
@@ -461,14 +440,12 @@ const NotificationTab = () => {
                 initial={{ opacity: 0.8 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0, x: 100 }}
-                className={`border-b border-secondary-100 dark:border-dark-secondary-800 ${
-                  !item.isRead ? 'bg-primary-50 dark:bg-dark-primary-900/20' : ''
-                }`}
+                className={`border-b border-border-default ${!item.isRead ? 'bg-brand/10' : ''}`}
               >
                 <div className='p-4 relative'>
                   {/* 읽지 않은 표시 */}
                   {!item.isRead && (
-                    <div className='absolute left-0 top-0 w-1 h-full bg-primary-500 dark:bg-dark-primary-500'></div>
+                    <div className='absolute left-0 top-0 w-1 h-full bg-brand'></div>
                   )}
                   <div className='flex justify-between'>
                     <div className='ml-0.5'>
@@ -482,15 +459,13 @@ const NotificationTab = () => {
                         {item.type === 'error' && '오류'}
                       </span>
                       {/* 제목 */}
-                      <h3 className='text-sm font-medium text-secondary-900 dark:text-dark-secondary-200 mt-1'>
-                        {item.title}
-                      </h3>
+                      <h3 className='text-sm font-medium text-text-primary mt-1'>{item.title}</h3>
                     </div>
                     <div className='flex space-x-1'>
                       {/* 읽음 버튼 */}
                       {!item.isRead && (
                         <button
-                          className='text-secondary-400 hover:text-secondary-600 dark:text-dark-secondary-500 dark:hover:text-dark-secondary-300 p-1'
+                          className='text-text-muted hover:text-text-primary p-1'
                           onClick={() => markAsRead(item.id)}
                           aria-label='읽음 표시'
                         >
@@ -499,7 +474,7 @@ const NotificationTab = () => {
                       )}
                       {/* 삭제 버튼 */}
                       <button
-                        className='text-secondary-400 hover:text-secondary-600 dark:text-dark-secondary-500 dark:hover:text-dark-secondary-300 p-1'
+                        className='text-text-muted hover:text-text-primary p-1'
                         onClick={() => deleteNotification(item.id)}
                         aria-label='알림 삭제'
                       >
@@ -508,13 +483,9 @@ const NotificationTab = () => {
                     </div>
                   </div>
                   {/* 메시지 내용 */}
-                  <p className='text-sm text-secondary-600 dark:text-dark-secondary-400 mt-1'>
-                    {item.message}
-                  </p>
+                  <p className='text-sm text-text-muted mt-1'>{item.message}</p>
                   {/* 날짜 */}
-                  <p className='text-xs text-secondary-400 dark:text-dark-secondary-500 mt-1'>
-                    {formatDate(item.date)}
-                  </p>
+                  <p className='text-xs text-text-muted mt-1'>{formatDate(item.date)}</p>
                 </div>
               </motion.li>
             ))}
@@ -576,9 +547,7 @@ export default function NotificationSidebar() {
   const headerExtra =
     activeTab === 'notification' && unreadCount > 0 ? (
       <div className='flex items-center'>
-        <span className='text-sm font-medium text-primary-600 dark:text-dark-primary-400'>
-          {unreadCount}개 안 읽음
-        </span>
+        <span className='text-sm font-medium text-brand'>{unreadCount}개 안 읽음</span>
       </div>
     ) : null;
 
@@ -590,24 +559,24 @@ export default function NotificationSidebar() {
       headerExtra={headerExtra}
     >
       {/* 탭 메뉴 */}
-      <div className='flex border-b border-secondary-100 dark:border-dark-secondary-800'>
+      <div className='flex border-b border-border-default'>
         <button
           className={`flex-1 py-3 text-sm font-medium transition-colors relative ${
             activeTab === 'notification'
-              ? 'text-primary-600 dark:text-dark-primary-400'
-              : 'text-secondary-500 dark:text-dark-secondary-400 hover:text-secondary-700 dark:hover:text-dark-secondary-300'
+              ? 'text-brand'
+              : 'text-text-muted hover:text-secondary-700 dark:hover:text-dark-secondary-300'
           }`}
           onClick={() => setActiveTab('notification')}
         >
           알림
           {(unreadCount > 0 || hasNewNotification) && (
-            <span className='ml-1 px-1.5 py-0.5 text-xs font-medium rounded-full bg-primary-500 text-white'>
+            <span className='ml-1 px-1.5 py-0.5 text-xs font-medium rounded-full bg-brand text-text-inverse'>
               {unreadCount > 0 ? unreadCount : '새 알림'}
             </span>
           )}
           {activeTab === 'notification' && (
             <motion.div
-              className='absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 dark:bg-dark-primary-500'
+              className='absolute bottom-0 left-0 right-0 h-0.5 bg-brand'
               layoutId='tab-indicator'
             />
           )}
@@ -615,15 +584,15 @@ export default function NotificationSidebar() {
         <button
           className={`flex-1 py-3 text-sm font-medium transition-colors relative ${
             activeTab === 'announcement'
-              ? 'text-primary-600 dark:text-dark-primary-400'
-              : 'text-secondary-500 dark:text-dark-secondary-400 hover:text-secondary-700 dark:hover:text-dark-secondary-300'
+              ? 'text-brand'
+              : 'text-text-muted hover:text-secondary-700 dark:hover:text-dark-secondary-300'
           }`}
           onClick={() => setActiveTab('announcement')}
         >
           공지사항
           {activeTab === 'announcement' && (
             <motion.div
-              className='absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 dark:bg-dark-primary-500'
+              className='absolute bottom-0 left-0 right-0 h-0.5 bg-brand'
               layoutId='tab-indicator'
             />
           )}

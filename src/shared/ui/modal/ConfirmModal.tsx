@@ -26,13 +26,12 @@ const ConfirmModal = ({
       text: cancelText,
       onClick: onCancel,
       className:
-        'text-text-black active:bg-button-grayHover bg-button-gray hover:bg-button-grayHover',
+        'text-text-primary active:bg-button-grayHover bg-button-gray hover:bg-button-grayHover',
     },
     {
       text: confirmText,
       onClick: onConfirm,
-      className:
-        'text-white bg-button-primary active:bg-button-primaryHover hover:bg-button-primaryHover',
+      className: 'text-text-inverse bg-brand active:bg-brand-hover hover:bg-brand-hover',
     },
   ];
 
@@ -41,7 +40,7 @@ const ConfirmModal = ({
       <Modal.Backdrop className='pointer-events-none' />
       <Modal.Content
         className={cn(
-          'left-1/2 w-[calc(100vw-32px)] max-w-[343px] bg-white p-5 -translate-x-1/2 overflow-hidden rounded-xl'
+          'left-1/2 w-[calc(100vw-32px)] max-w-[343px] bg-surface-elevated p-5 -translate-x-1/2 overflow-hidden rounded-xl'
         )}
       >
         <div
@@ -51,13 +50,15 @@ const ConfirmModal = ({
         >
           <h3
             className={cn(
-              'text-lg leading-[1.4] p-2.5 font-bold break-keep whitespace-break-spaces text-black'
+              'text-lg leading-[1.4] p-2.5 font-bold break-keep whitespace-break-spaces text-text-primary'
             )}
           >
             {title}
           </h3>
           {description && (
-            <p className={cn('text-sm font-normal p-2.5 whitespace-break-spaces text-black')}>
+            <p
+              className={cn('text-sm font-normal p-2.5 whitespace-break-spaces text-text-primary')}
+            >
               {description}
             </p>
           )}

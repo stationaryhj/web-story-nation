@@ -25,7 +25,7 @@ const ModalBackDrop: React.FC<ModalBackdropProps> = ({
     }
   };
 
-  const modalBackdropCls = `fixed inset-0 z-[9999] bg-black/50 pointer-events-auto touch-none`;
+  const modalBackdropCls = `fixed inset-0 z-[9999] bg-overlay/50 pointer-events-auto touch-none`;
   return (
     <motion.div
       role='presentation'

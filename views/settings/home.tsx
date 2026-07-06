@@ -1,46 +1,60 @@
-'use client'
+'use client';
 
-import { faArrowLeft, faChevronRight, faCircleUser, faImage, faTrash } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Image from 'next/image'
-import { useRouter } from 'next/navigation'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import { useAccountStore } from '@/store/useStoreData'
-import { toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
-import { BaseButton } from '@/components/elements/button/BaseButton'
-import { useSettingsStore } from '@/store/useStoreSettings'
-import { contentApi } from '@/services/api/storyNationApi'
-import { useBankStore } from '@/store/useGlobalStore'
-import useModalStore from '@/shared/model/stores/useModalStore'
-import DeleteAccountModal from '@/components/modal/DeleteAccountModal'
-import DuplicateCheckModal from '@/components/modal/DuplicateCheckModal'
-import { getImageUri, getPlatform } from '@/lib/utils/storyNationUtil'
-import { SocialLoginProvider } from '@/services/auth/types'
-
+import {
+  faArrowLeft,
+  faChevronRight,
+  faCircleUser,
+  faImage,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
+import { useAccountStore } from '@/store/useStoreData';
+import 'react-toastify/dist/ReactToastify.css';
+import { BaseButton } from '@/components/elements/button/BaseButton';
+import DeleteAccountModal from '@/components/modal/DeleteAccountModal';
+import DuplicateCheckModal from '@/components/modal/DuplicateCheckModal';
+import { getImageUri, getPlatform } from '@/lib/utils/storyNationUtil';
+import { contentApi } from '@/services/api/storyNationApi';
+import { SocialLoginProvider } from '@/services/auth/types';
+import useModalStore from '@/shared/model/stores/useModalStore';
+import { useBankStore } from '@/store/useGlobalStore';
+import { useSettingsStore } from '@/store/useStoreSettings';
 
 export default function SettingsForm() {
-  const router = useRouter()
-  const [isEdited, setIsEdited] = useState(false)
-  const [isNicknameChanged, setIsNicknameChanged] = useState(false)
-  const [originalNickname, setOriginalNickname] = useState('')
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [showDuplicateCheckModal, setShowDuplicateCheckModal] = useState(false)
+  const router = useRouter();
+  const [isEdited, setIsEdited] = useState(false);
+  const [isNicknameChanged, setIsNicknameChanged] = useState(false);
+  const [originalNickname, setOriginalNickname] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDuplicateCheckModal, setShowDuplicateCheckModal] = useState(false);
 
-  const { settings } = useSettingsStore()
-  const { data: userInfo, writerInfo, loginType, isLogin, fetchWriterInfo, logout, getCoinSum, uploadProfileImage } = useAccountStore()
-  const { getBankList } = useBankStore()
-  const { openModal } = useModalStore()
-  
+  const { settings } = useSettingsStore();
+  const {
+    data: userInfo,
+    writerInfo,
+    loginType,
+    isLogin,
+    fetchWriterInfo,
+    logout,
+    getCoinSum,
+    uploadProfileImage,
+  } = useAccountStore();
+  const { getBankList } = useBankStore();
+  const { openModal } = useModalStore();
+
   // const isGuestLogin = loginType === 'Guest' as SocialLoginProvider && isLogin
 
-  const login_sns_state = localStorage.getItem('social_login_state') || ''
-  const miner = userInfo?.minor || 0
+  const login_sns_state = localStorage.getItem('social_login_state') || '';
+  const miner = userInfo?.minor || 0;
 
   // 사용자 정보 상태
   const [profile, setProfile] = useState({
     nickname: userInfo?.nick_nm || '',
-    platform: loginType,//getPlatform(JSON.parse(login_sns_state || '{}')?.snstype || 0) || '',
+    platform: loginType, //getPlatform(JSON.parse(login_sns_state || '{}')?.snstype || 0) || '',
     minor: userInfo?.minor || 0,
     intro: userInfo?.intro || '',
 
@@ -50,288 +64,298 @@ export default function SettingsForm() {
     accountHolder: writerInfo?.user_nm || '',
 
     language: settings.language || 'ko',
-  })
+  });
 
   // 페르소나 설정
   const [persona, setPersona] = useState({
     name: userInfo?.persona || '',
     gender: userInfo?.persona_gender || 1,
-  })
+  });
 
   // 이미지 업로드를 위한 참조
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const profileImage = getImageUri(userInfo?.profile_url) || null
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const profileImage = getImageUri(userInfo?.profile_url) || null;
 
   // 은행 리스트 가져오기
   useEffect(() => {
-    getBankList().catch(error => {
-      console.error('은행 리스트를 가져오는 중 오류 발생:', error)
-    })
-  }, [getBankList])
+    getBankList().catch((error) => {
+      console.error('은행 리스트를 가져오는 중 오류 발생:', error);
+    });
+  }, [getBankList]);
 
   // 닉네임이 원래 닉네임과 같은지 확인
   useEffect(() => {
-    console.log('@@ writerInfo :: ', writerInfo)
-    console.log('@@ userInfo :: ', userInfo)
-    console.log('@@ loginType :: ', loginType)
+    console.log('@@ writerInfo :: ', writerInfo);
+    console.log('@@ userInfo :: ', userInfo);
+    console.log('@@ loginType :: ', loginType);
 
-    if(writerInfo) {
-      setProfile(prev => ({ ...prev,
+    if (writerInfo) {
+      setProfile((prev) => ({
+        ...prev,
         email: writerInfo?.email || '',
         bank: writerInfo?.bank_nm || '',
         accountNumber: writerInfo?.account_no || '',
         accountHolder: writerInfo?.user_nm || '',
-      }))
+      }));
     }
 
-    if(userInfo) {
-      setProfile(prev => ({ ...prev,
+    if (userInfo) {
+      setProfile((prev) => ({
+        ...prev,
         minor: userInfo?.minor || 0,
         intro: userInfo?.intro || '',
-      }))
+      }));
 
-      setPersona(prev => ({ ...prev,
+      setPersona((prev) => ({
+        ...prev,
         name: userInfo?.persona || '',
         gender: userInfo?.persona_gender || 1,
-      }))
+      }));
     }
 
-    if(loginType) {
-      setProfile(prev => ({ ...prev, platform: loginType || 'Guest' as SocialLoginProvider }))
+    if (loginType) {
+      setProfile((prev) => ({ ...prev, platform: loginType || ('Guest' as SocialLoginProvider) }));
     }
 
     if (userInfo?.nick_nm) {
-      setOriginalNickname(userInfo.nick_nm)
-      setProfile(prev => ({ ...prev, nickname: userInfo.nick_nm }))
+      setOriginalNickname(userInfo.nick_nm);
+      setProfile((prev) => ({ ...prev, nickname: userInfo.nick_nm }));
     }
-  }, [userInfo, loginType, writerInfo])
+  }, [userInfo, loginType, writerInfo]);
 
   // 작가 정보 불러오기
   useEffect(() => {
     if (writerInfo) {
-      setProfile(prev => ({
+      setProfile((prev) => ({
         ...prev,
         bank: writerInfo.bank_nm || prev.bank,
         accountNumber: writerInfo.account_no || prev.accountNumber,
         accountHolder: writerInfo.user_nm || prev.accountHolder,
         email: writerInfo.email || prev.email,
-      }))
+      }));
     }
-  }, [userInfo?.writerchk, writerInfo, fetchWriterInfo])
+  }, [userInfo?.writerchk, writerInfo, fetchWriterInfo]);
 
   // 닉네임 변경 감지
   useEffect(() => {
     if (profile.nickname === originalNickname) {
       // setIsNicknameVerified(true)
-      setIsNicknameChanged(false)
+      setIsNicknameChanged(false);
     } else {
-      setIsNicknameChanged(true)
+      setIsNicknameChanged(true);
     }
-  }, [profile.nickname, originalNickname])
+  }, [profile.nickname, originalNickname]);
 
   // 닉네임 중복 체크 핸들러
   const handleDuplicateCheck = async () => {
     try {
       // 여기에 실제 API 호출 로직이 들어갈 수 있음
-      const isAvailable = Math.random() > 0.3 // 임시로 랜덤하게 결과 생성
+      const isAvailable = Math.random() > 0.3; // 임시로 랜덤하게 결과 생성
 
       if (isAvailable) {
-        setShowDuplicateCheckModal(true)
+        setShowDuplicateCheckModal(true);
         // setIsNicknameVerified(true)
       } else {
-        toast.error('사용할 수 없는 닉네임입니다.')
+        toast.error('사용할 수 없는 닉네임입니다.');
         // setIsNicknameVerified(false)
       }
     } catch (error) {
-      console.error('닉네임 중복 확인 중 오류:', error)
-      toast.error('닉네임 중복 확인 중 오류가 발생했습니다.')
+      console.error('닉네임 중복 확인 중 오류:', error);
+      toast.error('닉네임 중복 확인 중 오류가 발생했습니다.');
     }
-  }
+  };
 
   // 닉네임 변경 취소
   const handleNicknameCancel = () => {
-    setProfile(prev => ({
+    setProfile((prev) => ({
       ...prev,
       nickname: originalNickname,
-    }))
-    setIsNicknameChanged(false)
+    }));
+    setIsNicknameChanged(false);
     // setIsNicknameVerified(false)
-    setShowDuplicateCheckModal(false)
-  }
+    setShowDuplicateCheckModal(false);
+  };
 
   // 닉네임 저장 핸들러
   const handleNicknameSave = async () => {
     try {
       // 펜 잔액 확인 (임시로 100펜 이상 있다고 가정)
-      const hasEnoughPens = getCoinSum() >= 100 // 실제로는 펜 잔액 확인 로직 필요
+      const hasEnoughPens = getCoinSum() >= 100; // 실제로는 펜 잔액 확인 로직 필요
 
       if (!hasEnoughPens) {
-        toast.error('닉네임을 수정할 펜이 부족합니다.')
-        return
+        toast.error('닉네임을 수정할 펜이 부족합니다.');
+        return;
       }
 
       // API 호출 및 펜 차감 로직
-      const isSuccess = await useAccountStore.getState().editNickname(profile.nickname)
+      const isSuccess = await useAccountStore.getState().editNickname(profile.nickname);
 
       if (isSuccess) {
-        setOriginalNickname(profile.nickname)
+        setOriginalNickname(profile.nickname);
         // setIsNicknameVerified(true)
-        setIsNicknameChanged(false)
-        toast.success('닉네임이 성공적으로 저장되었습니다.')
+        setIsNicknameChanged(false);
+        toast.success('닉네임이 성공적으로 저장되었습니다.');
       } else {
-        throw new Error('닉네임 변경 실패')
+        throw new Error('닉네임 변경 실패');
       }
     } catch (error) {
-      console.error('닉네임 저장 중 오류:', error)
-      toast.error('닉네임 저장에 실패했습니다.')
+      console.error('닉네임 저장 중 오류:', error);
+      toast.error('닉네임 저장에 실패했습니다.');
     }
-  }
+  };
 
   // 입력 핸들러
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>, field: keyof typeof profile) => {
     // 계좌번호는 숫자만 입력 가능하도록 처리
     if (field === 'accountNumber' && !/^\d*$/.test(e.target.value)) {
-      return
+      return;
     }
 
     // 예금주는 한글만 입력 가능하도록 처리
     if (field === 'accountHolder' && !/^[가-힣]*$/.test(e.target.value)) {
-      return
+      return;
     }
 
     // 계좌번호는 최대 14자리
     if (field === 'accountNumber' && e.target.value.length > 14) {
-      return
+      return;
     }
 
     // 예금주는 최대 8자리
     if (field === 'accountHolder' && e.target.value.length > 8) {
-      return
+      return;
     }
 
-    setProfile(prev => ({ ...prev, [field]: e.target.value }))
-    setIsEdited(true)
-  }
+    setProfile((prev) => ({ ...prev, [field]: e.target.value }));
+    setIsEdited(true);
+  };
 
   // 페르소나 입력 핸들러
-  const handlePersonaChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>, field: keyof typeof persona) => {
+  const handlePersonaChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    field: keyof typeof persona
+  ) => {
     // if (field === 'name' && e.target.value.length > 25) {
     //   return
     // }
 
-    setPersona(prev => ({ ...prev, [field]: e.target.value }))
-    setIsEdited(true)
-  }
+    setPersona((prev) => ({ ...prev, [field]: e.target.value }));
+    setIsEdited(true);
+  };
 
   // 성별 변경 핸들러
   const handleGenderChange = (gender: 1 | 2 | 3) => {
-    setPersona(prev => ({ ...prev, gender }))
-    setIsEdited(true)
-  }
+    setPersona((prev) => ({ ...prev, gender }));
+    setIsEdited(true);
+  };
 
   // 페르소나 저장 핸들러
   const handleSavePersona = async () => {
     // 현재 페르소나 상태와 userInfo의 페르소나 데이터 출력
-    console.log('===== 페르소나 데이터 =====')
+    console.log('===== 페르소나 데이터 =====');
     console.log('현재 페르소나 상태:', {
       name: persona.name,
       gender: persona.gender,
       koreanGender: persona.gender === 1 ? 'male' : persona.gender === 2 ? 'female' : 'unknown',
       inputValue: userInfo?.persona || '페르소나 없음',
-    })
+    });
 
     // 성별 데이터 영문 변환
     const genderMap: Record<number, string> = {
       1: 'male',
       2: 'female',
       3: 'unknown',
-    }
+    };
 
     // 최종 저장될 페르소나 데이터 출력
     console.log('저장될 데이터:', {
       name: persona.name,
       gender: genderMap[persona.gender],
       updatedAt: new Date().toISOString(),
-    })
+    });
 
     try {
       // API 호출 - persona(문자열)와 persona_gender(숫자)를 전달
-      const response = await contentApi.ChangePersonaName(persona.name, persona.gender)
-      console.log('API 응답:', response)
+      const response = await contentApi.ChangePersonaName(persona.name, persona.gender);
+      console.log('API 응답:', response);
 
       // 서버 응답이 성공적이면 useAccountStore의 setPersona 호출하여 상태 업데이트
       if (response.data && response.data.result && response.data.result.err === 0) {
         // useAccountStore의 setPersona 함수를 호출하여 상태 업데이트
-        useAccountStore.getState().setPersona(persona.name, persona.gender)
+        useAccountStore.getState().setPersona(persona.name, persona.gender);
 
         // 토스트 메시지 표시
-        toast.success('페르소나 데이터를 저장했습니다.')
+        toast.success('페르소나 데이터를 저장했습니다.');
       } else {
-        toast.error('페르소나 저장에 실패했습니다.')
+        toast.error('페르소나 저장에 실패했습니다.');
       }
     } catch (error) {
-      console.error('페르소나 저장 중 오류 발생:', error)
-      toast.error('페르소나 저장 중 오류가 발생했습니다.')
+      console.error('페르소나 저장 중 오류 발생:', error);
+      toast.error('페르소나 저장 중 오류가 발생했습니다.');
     }
-  }
+  };
 
   // 이미지를 아마존에 업로드
   const handleImageUpS3 = async (file: File, reader: FileReader) => {
-    const extension = file.name.split('.').pop()?.toLowerCase()
-    const contentType = file.type
+    const extension = file.name.split('.').pop()?.toLowerCase();
+    const contentType = file.type;
 
     if (!contentType.startsWith('image/')) {
-      toast.error('이미지 파일만 업로드할 수 있습니다')
-      return
+      toast.error('이미지 파일만 업로드할 수 있습니다');
+      return;
     }
 
-    const presignedResponse = await contentApi.GetPresignedUrl(file.name, `.${extension || 'jpg'}`, 5)
+    const presignedResponse = await contentApi.GetPresignedUrl(
+      file.name,
+      `.${extension || 'jpg'}`,
+      5
+    );
     if (presignedResponse.data.result.err !== 0 || !presignedResponse.data.presignedUrl) {
-      throw new Error('이미지 업로드를 위한 URL을 받아오지 못했습니다')
+      throw new Error('이미지 업로드를 위한 URL을 받아오지 못했습니다');
     }
 
-    const presignedUrl = presignedResponse.data.presignedUrl
-    const s3FilePath = presignedResponse.data.path
+    const presignedUrl = presignedResponse.data.presignedUrl;
+    const s3FilePath = presignedResponse.data.path;
 
     // upload
-    const img = new window.Image()
-    img.src = reader.result as string
+    const img = new window.Image();
+    img.src = reader.result as string;
 
     img.onload = async () => {
-      const canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
 
       // 이미지 최대 크기 설정 (가로/세로 최대 1024px)
-      const MAX_SIZE = 1024
-      let width = img.width
-      let height = img.height
+      const MAX_SIZE = 1024;
+      let width = img.width;
+      let height = img.height;
 
       if (width > height && width > MAX_SIZE) {
-        height = Math.round((height * MAX_SIZE) / width)
-        width = MAX_SIZE
+        height = Math.round((height * MAX_SIZE) / width);
+        width = MAX_SIZE;
       } else if (height > MAX_SIZE) {
-        width = Math.round((width * MAX_SIZE) / height)
-        height = MAX_SIZE
+        width = Math.round((width * MAX_SIZE) / height);
+        height = MAX_SIZE;
       }
 
-      canvas.width = width
-      canvas.height = height
-      ctx?.drawImage(img, 0, 0, width, height)
+      canvas.width = width;
+      canvas.height = height;
+      ctx?.drawImage(img, 0, 0, width, height);
 
       // 압축된 이미지를 Blob으로 변환
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.8)
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
 
       // Base64 데이터 URL에서 바이너리 데이터 추출
-      const base64Data = dataUrl.split(',')[1]
-      const binaryData = atob(base64Data)
-      const arrayBuffer = new ArrayBuffer(binaryData.length)
-      const uint8Array = new Uint8Array(arrayBuffer)
+      const base64Data = dataUrl.split(',')[1];
+      const binaryData = atob(base64Data);
+      const arrayBuffer = new ArrayBuffer(binaryData.length);
+      const uint8Array = new Uint8Array(arrayBuffer);
 
       for (let i = 0; i < binaryData.length; i++) {
-        uint8Array[i] = binaryData.charCodeAt(i)
+        uint8Array[i] = binaryData.charCodeAt(i);
       }
 
-      const blob = new Blob([uint8Array], { type: 'image/jpeg' })
+      const blob = new Blob([uint8Array], { type: 'image/jpeg' });
 
       // S3에 이미지 업로드
       try {
@@ -341,217 +365,221 @@ export default function SettingsForm() {
           headers: {
             'Content-Type': 'image/jpeg',
           },
-        })
+        });
 
-        uploadProfileImage(s3FilePath)
-        toast.success('이미지가 성공적으로 업로드되었습니다')
+        uploadProfileImage(s3FilePath);
+        toast.success('이미지가 성공적으로 업로드되었습니다');
       } catch (error) {
-        console.error('이미지 업로드 중 오류:', error)
-        toast.error('이미지 업로드 중 오류가 발생했습니다')
+        console.error('이미지 업로드 중 오류:', error);
+        toast.error('이미지 업로드 중 오류가 발생했습니다');
       }
-    }
-  }
+    };
+  };
 
   // 이미지 업로드 핸들러
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onloadend = async () => {
         // upload
-        await handleImageUpS3(file, reader)
+        await handleImageUpS3(file, reader);
 
         // const imageUrl = reader.result as string
         // setProfile(prev => ({ ...prev, profileImage: imageUrl }))
-        setIsEdited(true)
-      }
-      reader.readAsDataURL(file)
+        setIsEdited(true);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   // 이미지 삭제 핸들러
   const handleDeleteImage = () => {
-    uploadProfileImage('')
-    setIsEdited(true)
-  }
+    uploadProfileImage('');
+    setIsEdited(true);
+  };
 
   // 로그아웃 핸들러
   const handleLogout = () => {
     // 여기에 실제 로그아웃 로직이 들어갈 수 있음
-    logout()
-    router.push('/')
-  }
+    logout();
+    router.push('/');
+  };
 
   // 회원탈퇴
   const handleExit = () => {
-    setShowDeleteModal(true)
-  }
+    setShowDeleteModal(true);
+  };
 
   // 뒤로가기 핸들러
   const handleBack = () => {
     if (isEdited) {
-      const confirm = window.confirm('변경 사항이 저장되지 않았습니다. 그래도 나가시겠습니까?')
+      const confirm = window.confirm('변경 사항이 저장되지 않았습니다. 그래도 나가시겠습니까?');
       if (confirm) {
-        router.push('/')
+        router.push('/');
       }
     } else {
-      router.push('/')
+      router.push('/');
     }
-  }
+  };
 
   // 탭 변경 핸들러
   const handleTabChange = (tab: 'support' | 'terms' | 'privacy' | 'paid' | 'policy') => {
     // 각 탭에 따라 다른 페이지로 이동
     switch (tab) {
       case 'support':
-        window.open('https://pf.kakao.com/_lMJmb', '_blank')
-        break
+        window.open('https://pf.kakao.com/_lMJmb', '_blank');
+        break;
       case 'terms':
-        window.open('/terms?tab=terms', '_blank')
-        break
+        window.open('/terms?tab=terms', '_blank');
+        break;
       case 'privacy':
-        window.open('/terms?tab=privacy', '_blank')
-        break
+        window.open('/terms?tab=privacy', '_blank');
+        break;
       case 'paid':
-        window.open('/terms?tab=paid', '_blank')
-        break
+        window.open('/terms?tab=paid', '_blank');
+        break;
       case 'policy':
-        window.open('/terms?tab=policy', '_blank')
-        break
+        window.open('/terms?tab=policy', '_blank');
+        break;
     }
-  }
+  };
 
   // 본인 인증 핸들러
   const handleAdultVerification = async () => {
     try {
-      if(!loginType || loginType === 'Guest' as SocialLoginProvider) {
-        openModal({ type: 'socialLogin' })
+      if (!loginType || loginType === ('Guest' as SocialLoginProvider)) {
+        openModal({ type: 'socialLogin' });
         return;
       }
       // useAccountStore의 verifyIdentity 함수 사용
-      const { verifyIdentity } = useAccountStore.getState()
-      const result = await verifyIdentity()
+      const { verifyIdentity } = useAccountStore.getState();
+      const result = await verifyIdentity();
 
       if (result.success) {
-        toast.success(result.message)
+        toast.success(result.message);
       } else {
-        toast.error(result.message)
+        toast.error(result.message);
       }
     } catch (error) {
-      console.error('본인 인증 중 오류 발생:', error)
-      toast.error('본인 인증 중 오류가 발생했습니다.')
+      console.error('본인 인증 중 오류 발생:', error);
+      toast.error('본인 인증 중 오류가 발생했습니다.');
     }
-  }
+  };
 
   return (
     <>
-      <div className="flex flex-col min-h-screen bg-slate-50">
+      <div className='flex flex-col min-h-screen bg-surface'>
         {/* 헤더 */}
-        <div className="bg-white shadow-sm px-4 py-3 flex items-center justify-between sticky top-0 z-10">
-          <div className="max-w-[1300px] mx-auto w-full flex items-center justify-between">
-            <div className="flex items-center">
+        <div className='bg-surface-elevated shadow-sm px-4 py-3 flex items-center justify-between sticky top-0 z-10'>
+          <div className='max-w-[1300px] mx-auto w-full flex items-center justify-between'>
+            <div className='flex items-center'>
               <button
                 onClick={handleBack}
-                className="w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-100 rounded-full mr-2"
+                className='w-10 h-10 flex items-center justify-center text-text-muted hover:bg-surface-elevated-hover rounded-full mr-2'
               >
                 <FontAwesomeIcon icon={faArrowLeft} />
               </button>
-              <h1 className="text-xl font-semibold">내 정보</h1>
+              <h1 className='text-xl font-semibold text-text-primary'>내 정보</h1>
             </div>
           </div>
         </div>
 
         {/* 메인 콘텐츠 */}
-        <div className="max-w-[1300px] mx-auto w-full p-4 pb-16">
+        <div className='max-w-[1300px] mx-auto w-full p-4 pb-16'>
           {/* 프로필 이미지 섹션 */}
-          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold">프로필</h2>
+          <div className='bg-surface-elevated rounded-2xl shadow-sm p-6 mb-6'>
+            <div className='flex items-center justify-between mb-6'>
+              <h2 className='text-lg font-semibold text-text-primary'>프로필</h2>
               <button
                 onClick={async () => {
-                  const result = await useAccountStore.getState().updateIntro(profile.intro)
+                  const result = await useAccountStore.getState().updateIntro(profile.intro);
                   if (result.success) {
-                    toast.success(result.message)
+                    toast.success(result.message);
                   } else {
-                    toast.error(result.message)
+                    toast.error(result.message);
                   }
                 }}
-                className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600"
+                className='px-4 py-2 bg-brand text-text-inverse rounded-lg hover:bg-brand-hover'
               >
                 저장
               </button>
             </div>
-            <div className="flex flex-col items-center">
-              <div className="relative mb-4">
-                <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
+            <div className='flex flex-col items-center'>
+              <div className='relative mb-4'>
+                <div className='w-24 h-24 rounded-full overflow-hidden bg-surface-elevated-hover flex items-center justify-center'>
                   {profileImage ? (
                     <Image
                       src={profileImage}
-                      alt="프로필"
+                      alt='프로필'
                       width={96}
                       height={96}
-                      className="object-cover w-full h-full"
+                      className='object-cover w-full h-full'
                     />
                   ) : (
-                    <FontAwesomeIcon icon={faCircleUser} className="text-5xl text-gray-400" />
+                    <FontAwesomeIcon icon={faCircleUser} className='text-5xl text-text-muted' />
                   )}
                 </div>
-                <div className="absolute bottom-0 right-0 flex space-x-1">
+                <div className='absolute bottom-0 right-0 flex space-x-1'>
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center shadow-md hover:bg-primary-700"
+                    className='w-8 h-8 rounded-full bg-brand text-text-inverse flex items-center justify-center shadow-md hover:bg-brand-hover'
                   >
-                    <FontAwesomeIcon icon={faImage} className="text-sm" />
+                    <FontAwesomeIcon icon={faImage} className='text-sm' />
                   </button>
                   {profileImage && (
                     <button
                       onClick={handleDeleteImage}
-                      className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shadow-md hover:bg-red-600"
+                      className='w-8 h-8 rounded-full bg-danger text-text-inverse flex items-center justify-center shadow-md hover:bg-danger/90'
                     >
-                      <FontAwesomeIcon icon={faTrash} className="text-sm" />
+                      <FontAwesomeIcon icon={faTrash} className='text-sm' />
                     </button>
                   )}
                 </div>
                 <input
-                  type="file"
+                  type='file'
                   ref={fileInputRef}
-                  className="hidden"
-                  accept="image/*"
+                  className='hidden'
+                  accept='image/*'
                   onChange={handleImageUpload}
                 />
               </div>
-              <div className="w-full max-w-md">
-                <label className="block text-sm font-medium text-gray-700 mb-2">한줄 소개</label>
-                <div className="relative">
+              <div className='w-full max-w-md'>
+                <label className='block text-sm font-medium text-text-primary mb-2'>
+                  한줄 소개
+                </label>
+                <div className='relative'>
                   <textarea
                     value={profile.intro || ''}
-                    onChange={e => {
+                    onChange={(e) => {
                       if (e.target.value.length <= 50) {
-                        setProfile(prev => ({ ...prev, intro: e.target.value }))
-                        setIsEdited(true)
+                        setProfile((prev) => ({ ...prev, intro: e.target.value }));
+                        setIsEdited(true);
                       }
                     }}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white resize-none min-h-[100px] shadow-sm transition-all duration-200 ease-in-out hover:border-primary-300"
-                    placeholder="자신을 한 줄로 소개해주세요 (최대 50자)"
+                    className='w-full px-4 py-3 border border-border-default rounded-lg focus:outline-none focus:ring-2 focus:ring-brand bg-surface resize-none min-h-[100px] shadow-sm transition-all duration-200 ease-in-out hover:border-brand/50'
+                    placeholder='자신을 한 줄로 소개해주세요 (최대 50자)'
                     rows={3}
                     maxLength={50}
                   />
-                  <div className="absolute bottom-2 right-2 text-xs text-gray-500">{profile.intro?.length || 0}/50</div>
+                  <div className='absolute bottom-2 right-2 text-xs text-text-muted'>
+                    {profile.intro?.length || 0}/50
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* 계정 정보 섹션 */}
-          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">계정 정보</h2>
+          <div className='bg-surface-elevated rounded-2xl shadow-sm p-6 mb-6'>
+            <div className='flex items-center justify-between mb-4'>
+              <h2 className='text-lg font-semibold text-text-primary'>계정 정보</h2>
               <button
                 onClick={handleAdultVerification}
                 className={`sm:flex-shrink-0 px-4 py-3 rounded-lg whitespace-nowrap ${
-                  miner === 0 ? 'bg-primary-500 text-white hover:bg-primary-700' :
-                  'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  
+                  miner === 0
+                    ? 'bg-brand text-text-inverse hover:bg-brand-hover'
+                    : 'bg-surface-elevated-hover text-text-muted cursor-not-allowed'
                 }`}
                 disabled={miner > 0}
               >
@@ -559,41 +587,47 @@ export default function SettingsForm() {
               </button>
             </div>
 
-            <div className="space-y-5">
+            <div className='space-y-5'>
               {/* 연동된 플랫폼 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">연동된 플랫폼</label>
-                <div className="px-4 py-3 bg-gray-100 rounded-lg text-gray-700">{profile.platform}</div>
+                <label className='block text-sm font-medium text-text-primary mb-2'>
+                  연동된 플랫폼
+                </label>
+                <div className='px-4 py-3 bg-surface-elevated-hover rounded-lg text-text-primary'>
+                  {profile.platform}
+                </div>
               </div>
 
               {/* 닉네임 */}
               <div>
-                <div className="flex flex-row gap-2 items-center mb-2">
-                  <label className="block text-sm font-medium text-gray-700">닉네임</label>
-                  <div className="text-sm text-[#ff7f00] font-bold">* 수정 시 100펜 소모</div>
+                <div className='flex flex-row gap-2 items-center mb-2'>
+                  <label className='block text-sm font-medium text-text-primary'>닉네임</label>
+                  <div className='text-sm text-[#ff7f00] font-bold'>* 수정 시 100펜 소모</div>
                 </div>
-                <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
+                <div className='flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0'>
                   <input
-                    type="text"
+                    type='text'
                     value={profile.nickname}
-                    onChange={e => handleInputChange(e, 'nickname')}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
-                    placeholder="닉네임을 입력하세요"
+                    onChange={(e) => handleInputChange(e, 'nickname')}
+                    className='w-full px-4 py-3 border border-border-default rounded-lg focus:outline-none focus:ring-2 focus:ring-brand bg-surface'
+                    placeholder='닉네임을 입력하세요'
                   />
                   <button
                     onClick={handleDuplicateCheck}
                     disabled={!isNicknameChanged}
                     className={`sm:flex-shrink-0 px-4 py-3 rounded-lg whitespace-nowrap ${
                       isNicknameChanged
-                        ? 'bg-primary-500 text-white hover:bg-primary-700'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        ? 'bg-brand text-text-inverse hover:bg-brand-hover'
+                        : 'bg-surface-elevated-hover text-text-muted cursor-not-allowed'
                     }`}
                   >
                     닉네임 변경
                   </button>
                 </div>
-                <div className="mt-2">
-                  {isNicknameChanged && <span className="text-red-500 text-sm">중복 확인이 필요합니다</span>}
+                <div className='mt-2'>
+                  {isNicknameChanged && (
+                    <span className='text-danger text-sm'>중복 확인이 필요합니다</span>
+                  )}
                 </div>
               </div>
 
@@ -620,79 +654,87 @@ export default function SettingsForm() {
           </div>
 
           {/* 정산 정보 섹션 */}
-          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-            <h2 className="text-lg font-semibold mb-4">정산 정보</h2>
-            <div className="space-y-5">
+          <div className='bg-surface-elevated rounded-2xl shadow-sm p-6 mb-6'>
+            <h2 className='text-lg font-semibold mb-4 text-text-primary'>정산 정보</h2>
+            <div className='space-y-5'>
               {/* 은행 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">은행</label>
-                <div className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50">
-                  <span className="text-gray-700">{profile.bank || '등록된 은행 정보가 없습니다'}</span>
+                <label className='block text-sm font-medium text-text-primary mb-2'>은행</label>
+                <div className='w-full px-4 py-3 border border-border-default rounded-lg bg-surface-elevated-hover'>
+                  <span className='text-text-primary'>
+                    {profile.bank || '등록된 은행 정보가 없습니다'}
+                  </span>
                 </div>
               </div>
 
               {/* 계좌번호 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">계좌번호</label>
-                <div className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50">
-                  <span className="text-gray-700">{profile.accountNumber || '등록된 계좌번호가 없습니다'}</span>
+                <label className='block text-sm font-medium text-text-primary mb-2'>계좌번호</label>
+                <div className='w-full px-4 py-3 border border-border-default rounded-lg bg-surface-elevated-hover'>
+                  <span className='text-text-primary'>
+                    {profile.accountNumber || '등록된 계좌번호가 없습니다'}
+                  </span>
                 </div>
               </div>
 
               {/* 예금주 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">예금주</label>
-                <div className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50">
-                  <span className="text-gray-700">{profile.accountHolder || '등록된 예금주가 없습니다'}</span>
+                <label className='block text-sm font-medium text-text-primary mb-2'>예금주</label>
+                <div className='w-full px-4 py-3 border border-border-default rounded-lg bg-surface-elevated-hover'>
+                  <span className='text-text-primary'>
+                    {profile.accountHolder || '등록된 예금주가 없습니다'}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* 페르소나 설정 섹션 */}
-          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold mb-4">페르소나 설정</h2>
-              <BaseButton color="primary" onClick={handleSavePersona}>
+          <div className='bg-surface-elevated rounded-2xl shadow-sm p-6 mb-6'>
+            <div className='flex items-center justify-between'>
+              <h2 className='text-lg font-semibold mb-4 text-text-primary'>페르소나 설정</h2>
+              <BaseButton color='primary' onClick={handleSavePersona}>
                 저장
               </BaseButton>
             </div>
-            <div className="space-y-5">
+            <div className='space-y-5'>
               {/* 페르소나 이름 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">이름 (최대 25자)</label>
+                <label className='block text-sm font-medium text-text-primary mb-2'>
+                  이름 (최대 25자)
+                </label>
                 <input
-                  type="text"
+                  type='text'
                   value={persona.name}
-                  onChange={e => handlePersonaChange(e, 'name')}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
-                  placeholder="페르소나 이름"
+                  onChange={(e) => handlePersonaChange(e, 'name')}
+                  className='w-full px-4 py-3 border border-border-default rounded-lg focus:outline-none focus:ring-2 focus:ring-brand bg-surface'
+                  placeholder='페르소나 이름'
                   maxLength={25}
                 />
               </div>
 
               {/* 페르소나 성별 - BaseButton 사용 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">성별</label>
-                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                <label className='block text-sm font-medium text-text-primary mb-2'>성별</label>
+                <div className='flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3'>
                   <BaseButton
                     onClick={() => handleGenderChange(1)}
-                    color="primary"
-                    className={`w-full sm:w-auto ${persona.gender === 1 ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
+                    color='primary'
+                    className={`w-full sm:w-auto ${persona.gender === 1 ? '!bg-brand !text-text-inverse !border-brand' : ''}`}
                   >
                     남성
                   </BaseButton>
                   <BaseButton
                     onClick={() => handleGenderChange(2)}
-                    color="primary"
-                    className={`w-full sm:w-auto ${persona.gender === 2 ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
+                    color='primary'
+                    className={`w-full sm:w-auto ${persona.gender === 2 ? '!bg-brand !text-text-inverse !border-brand' : ''}`}
                   >
                     여성
                   </BaseButton>
                   <BaseButton
                     onClick={() => handleGenderChange(3)}
-                    color="primary"
-                    className={`w-full sm:w-auto ${persona.gender === 3 ? '!bg-primary-500 !text-white !border-primary-500' : ''}`}
+                    color='primary'
+                    className={`w-full sm:w-auto ${persona.gender === 3 ? '!bg-brand !text-text-inverse !border-brand' : ''}`}
                   >
                     알 수 없음
                   </BaseButton>
@@ -702,54 +744,54 @@ export default function SettingsForm() {
           </div>
 
           {/* 고객 지원 및 법적 정보 섹션 */}
-          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-            <h2 className="text-lg font-semibold mb-4">고객 지원 및 약관</h2>
+          <div className='bg-surface-elevated rounded-2xl shadow-sm p-6 mb-6'>
+            <h2 className='text-lg font-semibold mb-4 text-text-primary'>고객 지원 및 약관</h2>
 
             {/* 세로 버튼 목록으로 변경 */}
-            <div className="space-y-3">
+            <div className='space-y-3'>
               <button
                 onClick={() => handleTabChange('support')}
-                className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
+                className='w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-surface-elevated-hover text-text-primary hover:bg-brand/10 border border-border-default focus:outline-none'
               >
                 <span>카카오톡 문의</span>
-                <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+                <FontAwesomeIcon icon={faChevronRight} className='text-text-muted' />
               </button>
               <button
                 onClick={() => handleTabChange('terms')}
-                className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
+                className='w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-surface-elevated-hover text-text-primary hover:bg-brand/10 border border-border-default focus:outline-none'
               >
                 <span>서비스 이용약관</span>
-                <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+                <FontAwesomeIcon icon={faChevronRight} className='text-text-muted' />
               </button>
               <button
                 onClick={() => handleTabChange('privacy')}
-                className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
+                className='w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-surface-elevated-hover text-text-primary hover:bg-brand/10 border border-border-default focus:outline-none'
               >
                 <span>개인정보 처리방침</span>
-                <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+                <FontAwesomeIcon icon={faChevronRight} className='text-text-muted' />
               </button>
               <button
                 onClick={() => handleTabChange('paid')}
-                className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
+                className='w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-surface-elevated-hover text-text-primary hover:bg-brand/10 border border-border-default focus:outline-none'
               >
                 <span>유료 서비스 이용약관</span>
-                <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+                <FontAwesomeIcon icon={faChevronRight} className='text-text-muted' />
               </button>
               <button
                 onClick={() => handleTabChange('policy')}
-                className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-secondary-50 text-gray-700 hover:bg-secondary-100 border border-primary-50 focus:outline-none"
+                className='w-full text-left px-4 py-3 rounded-lg flex items-center justify-between bg-surface-elevated-hover text-text-primary hover:bg-brand/10 border border-border-default focus:outline-none'
               >
                 <span>운영 정책</span>
-                <FontAwesomeIcon icon={faChevronRight} className="text-gray-500" />
+                <FontAwesomeIcon icon={faChevronRight} className='text-text-muted' />
               </button>
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className='space-y-3'>
             {/* 로그아웃 버튼 */}
             <button
               onClick={handleLogout}
-              className="w-full py-3 text-accent-dark font-medium border border-accent-light rounded-lg bg-white hover:bg-red-200/40 focus:outline-none"
+              className='w-full py-3 text-danger font-medium border border-danger/40 rounded-lg bg-surface hover:bg-danger/10 focus:outline-none'
             >
               로그아웃
             </button>
@@ -757,7 +799,7 @@ export default function SettingsForm() {
             {/* 회원탈퇴 버튼 */}
             <button
               onClick={handleExit}
-              className="w-full py-3 text-border-[#484554] font-medium border border-[#484554] rounded-lg bg-white hover:bg-[#ada9bb]/40 focus:outline-none"
+              className='w-full py-3 text-text-muted font-medium border border-border-default rounded-lg bg-surface hover:bg-surface-elevated-hover focus:outline-none'
             >
               회원탈퇴
             </button>
@@ -781,5 +823,5 @@ export default function SettingsForm() {
         originalNickname={originalNickname}
       />
     </>
-  )
+  );
 }

@@ -1,19 +1,19 @@
-'use client'
+'use client';
 
-import React, { useEffect, useRef, useState } from 'react'
-import { faPlus, faUser, faRobot, faTrashCan } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import type { ChangeEvent } from 'react'
-import { ConversationExample, useCreateCharacterData } from '@/store/useCreateCharacterData'
-import Tutorial from '@/components/tutorial/Tutorial'
-import BaseModal from '@/components/modal/BaseModal'
-import { toast } from 'react-toastify'
-import { exampleDatas } from '@/lib/utils/storyNationUtil'
+import { faPlus, faRobot, faTrashCan, faUser } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import type { ChangeEvent } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
+import BaseModal from '@/components/modal/BaseModal';
+import Tutorial from '@/components/tutorial/Tutorial';
+import { exampleDatas } from '@/lib/utils/storyNationUtil';
+import { ConversationExample, useCreateCharacterData } from '@/store/useCreateCharacterData';
 
-import LikeForm from './components/detail/like-form'
+import LikeForm from './components/detail/like-form';
 
-const MAX_CONTENT_LENGTH = 5000
-const MAX_REMAINING_LENGTH = 1500
+const MAX_CONTENT_LENGTH = 5000;
+const MAX_REMAINING_LENGTH = 1500;
 
 const createCharacterScenario = {
   storageKey: 'detail-info-tutorial-completed',
@@ -62,22 +62,22 @@ const createCharacterScenario = {
       textPosition: 'top' as const,
     },
   ],
-}
+};
 
 interface DetailInfoFormProps {
-  addConversationExample: () => void
-  updateConversationExample: (data: exampleDatas) => void
-  removeConversationExample: (id: number) => void
-  updateConversationExampleTitle: (id: number, title: string) => void
-  onValidationChange?: (isValid: boolean) => void
+  addConversationExample: () => void;
+  updateConversationExample: (data: exampleDatas) => void;
+  removeConversationExample: (id: number) => void;
+  updateConversationExampleTitle: (id: number, title: string) => void;
+  onValidationChange?: (isValid: boolean) => void;
 }
 
 // 대화 예시에 title 프로퍼티가 존재하도록 TypeScript 인터페이스 타입을 지정
 // 참고: 실제 ConversationExample 타입은 다른 파일에 정의되어 있으므로
 // 여기서는 타입 확장(Type Assertion)으로 처리합니다
 type EnhancedConversationExample = ConversationExample & {
-  title?: string
-}
+  title?: string;
+};
 
 export default function DetailInfoForm({
   addConversationExample,
@@ -86,144 +86,150 @@ export default function DetailInfoForm({
   updateConversationExampleTitle,
   onValidationChange,
 }: DetailInfoFormProps) {
-  const { isVaild, formData, setFormField } = useCreateCharacterData()
+  const { isVaild, formData, setFormField } = useCreateCharacterData();
 
   // 현재 선택된 입력 필드 (user 또는 character)
-  const [activeField, setActiveField] = useState<{ id: number; field: 'user' | 'character' } | null>(null)
-  const [showTutorial, setShowTutorial] = useState(false)
-  const [totalMessageLength, setTotalMessageLength] = useState(0) // 전체 메시지 길이
-  const [remainingChars, setRemainingChars] = useState(MAX_REMAINING_LENGTH) // 남은 글자 수
+  const [activeField, setActiveField] = useState<{
+    id: number;
+    field: 'user' | 'character';
+  } | null>(null);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [totalMessageLength, setTotalMessageLength] = useState(0); // 전체 메시지 길이
+  const [remainingChars, setRemainingChars] = useState(MAX_REMAINING_LENGTH); // 남은 글자 수
 
-  const [totalContentChars, setTotalContentChars] = useState(0)
-  const [contentChars, setContentChars] = useState(MAX_CONTENT_LENGTH)
+  const [totalContentChars, setTotalContentChars] = useState(0);
+  const [contentChars, setContentChars] = useState(MAX_CONTENT_LENGTH);
 
   // 튜토리얼이 이미 표시된 적이 있는지 추적
-  const tutorialShownRef = useRef(false)
+  const tutorialShownRef = useRef(false);
   // toast 알림 디바운스를 위한 타임아웃 참조
-  const toastDebounceRef = useRef<NodeJS.Timeout | null>(null)
+  const toastDebounceRef = useRef<NodeJS.Timeout | null>(null);
 
   // 삭제 확인 모달 상태
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [deleteTargetId, setDeleteTargetId] = useState<number>(0)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<number>(0);
 
-  const exampleDatas = formData.conversationExamples
+  const exampleDatas = formData.conversationExamples;
 
   // 디바운스된 토스트 알림 함수
   const showDebouncedToast = (message: string) => {
     if (toastDebounceRef.current) {
-      clearTimeout(toastDebounceRef.current)
+      clearTimeout(toastDebounceRef.current);
     }
 
     toastDebounceRef.current = setTimeout(() => {
-      toast.error(message)
-      toastDebounceRef.current = null
-    }, 500) // 500ms 디바운스 딜레이
-  }
+      toast.error(message);
+      toastDebounceRef.current = null;
+    }, 500); // 500ms 디바운스 딜레이
+  };
 
   // 전체 메시지 길이 계산 함수
   const calculateTotalMessageLength = () => {
-    let total = 0
+    let total = 0;
 
     if (exampleDatas.length === 0) {
-      return 0
+      return 0;
     }
 
     exampleDatas.forEach((data: exampleDatas) => {
-      total += data.textLength
-    })
+      total += data.textLength;
+    });
 
-    return total
-  }
+    return total;
+  };
 
   // 전체 메시지 길이 업데이트
   useEffect(() => {
-    const total = calculateTotalMessageLength()
-    setTotalMessageLength(total)
-    setRemainingChars(MAX_REMAINING_LENGTH - total)
-  }, [formData.conversationExamples])
+    const total = calculateTotalMessageLength();
+    setTotalMessageLength(total);
+    setRemainingChars(MAX_REMAINING_LENGTH - total);
+  }, [formData.conversationExamples]);
 
   useEffect(() => {
-    const total = formData.content.length + formData.content_public.length
-    setTotalContentChars(total)
-    setContentChars(MAX_CONTENT_LENGTH - total)
-  }, [formData.content, formData.content_public])
+    const total = formData.content.length + formData.content_public.length;
+    setTotalContentChars(total);
+    setContentChars(MAX_CONTENT_LENGTH - total);
+  }, [formData.content, formData.content_public]);
 
   // 스크롤 후 튜토리얼 표시 함수
   const scrollAndShowTutorial = () => {
     // 스크롤 이전 위치 저장
-    const startPosition = window.scrollY
+    const startPosition = window.scrollY;
 
     // 스크롤 대상 찾기: conversation-examples
-    const conversationExamples = document.getElementById('scrollRef')
-    const targetElement = conversationExamples || document.body
+    const conversationExamples = document.getElementById('scrollRef');
+    const targetElement = conversationExamples || document.body;
 
     // 스크롤 실행
-    targetElement.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    targetElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
     // 스크롤 완료 확인 함수
     const checkScrollComplete = () => {
-      const currentPosition = window.scrollY
-      const documentHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
-      const viewportHeight = window.innerHeight
-      const isAtBottom = currentPosition + viewportHeight >= documentHeight - 50 // 50px 오차 허용
+      const currentPosition = window.scrollY;
+      const documentHeight = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight
+      );
+      const viewportHeight = window.innerHeight;
+      const isAtBottom = currentPosition + viewportHeight >= documentHeight - 50; // 50px 오차 허용
 
       // 데스크탑에서는 위치 변화가 작을 수 있으므로 임계값 낮춤
-      const isMobile = window.innerWidth < 768
-      const scrollThreshold = isMobile ? 200 : 50
+      const isMobile = window.innerWidth < 768;
+      const scrollThreshold = isMobile ? 200 : 50;
 
       if (isAtBottom || Math.abs(currentPosition - startPosition) > scrollThreshold) {
         // 스크롤이 완료되었거나 충분히 이동했으면 튜토리얼 표시
-        setShowTutorial(true)
-        tutorialShownRef.current = true
-        return true
+        setShowTutorial(true);
+        tutorialShownRef.current = true;
+        return true;
       }
-      return false
-    }
+      return false;
+    };
 
     // 스크롤 이벤트 핸들러 등록
-    let scrollTimeout: NodeJS.Timeout
+    let scrollTimeout: NodeJS.Timeout;
     const handleScroll = () => {
       // 이전 타임아웃 취소
-      clearTimeout(scrollTimeout)
+      clearTimeout(scrollTimeout);
 
       // 0.3초 디바운싱
       scrollTimeout = setTimeout(() => {
         if (checkScrollComplete()) {
-          window.removeEventListener('scroll', handleScroll)
+          window.removeEventListener('scroll', handleScroll);
         }
-      }, 300)
-    }
+      }, 300);
+    };
 
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll);
 
     // 초기 체크 (스크롤이 발생하지 않을 경우 대비)
     setTimeout(() => {
       if (checkScrollComplete()) {
-        window.removeEventListener('scroll', handleScroll)
+        window.removeEventListener('scroll', handleScroll);
       }
-    }, 300)
+    }, 300);
 
     // 2초 타임아웃 (최종 안전장치) - 데스크탑에서 스크롤 이벤트가 발생하지 않는 경우 대비
     setTimeout(() => {
-      setShowTutorial(true)
-      tutorialShownRef.current = true
-      window.removeEventListener('scroll', handleScroll)
-    }, 400)
-  }
+      setShowTutorial(true);
+      tutorialShownRef.current = true;
+      window.removeEventListener('scroll', handleScroll);
+    }, 400);
+  };
 
   // 대화 예시 추가 핸들러
   const handleAddConversationExample = () => {
     // 대화 예시 추가
-    addConversationExample()
+    addConversationExample();
 
     // 튜토리얼 조건을 더 걸어놔야 할것같음.. 현재는 다시 추가할때마다 투토리얼이 표시됨
     // 현재 조건은 튜토리얼 다시보지 않기를 했을 시에만 !! 혹은 튜토리얼을 보고 언마운트가 안되어있을 경우에만 !!
 
     // 약간의 지연 후 스크롤 및 튜토리얼 표시 (DOM 업데이트 대기)
     setTimeout(() => {
-      const conversationExamples = document.getElementById('conversation-examples')
+      const conversationExamples = document.getElementById('conversation-examples');
       if (conversationExamples) {
-        conversationExamples.scrollIntoView({ behavior: 'smooth', block: 'end' })
+        conversationExamples.scrollIntoView({ behavior: 'smooth', block: 'end' });
       }
       // const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
 
@@ -236,20 +242,21 @@ export default function DetailInfoForm({
       //     conversationExamples.scrollIntoView({ behavior: 'smooth', block: 'end' })
       //   }
       // }
-    }, 300)
-  }
+    }, 300);
+  };
 
   // 첫 대화 예시가 추가될 때 튜토리얼 표시
   useEffect(() => {
     if (exampleDatas.length === 1 && !tutorialShownRef.current) {
       setTimeout(() => {
-        const tutorialCompleted = localStorage.getItem(createCharacterScenario.storageKey) === 'true'
+        const tutorialCompleted =
+          localStorage.getItem(createCharacterScenario.storageKey) === 'true';
         if (!tutorialCompleted) {
-          scrollAndShowTutorial()
+          scrollAndShowTutorial();
         }
-      }, 500)
+      }, 500);
     }
-  }, [exampleDatas])
+  }, [exampleDatas]);
 
   // 유효성 검사
   useEffect(() => {
@@ -258,257 +265,248 @@ export default function DetailInfoForm({
       // const isValid = !!formData.bioDetail?.trim()
       // onValidationChange(isValid)
     }
-  }, [formData, onValidationChange])
+  }, [formData, onValidationChange]);
 
   // 대화 예시 공개 여부 선택 핸들러
   const handleExamplesVisibilitySelect = (visibility: 'public' | 'private') => {
     // 대화 예시 전체의 공개 여부를 설정
-    setFormField('examplesVisibility', visibility)
-  }
+    setFormField('examplesVisibility', visibility);
+  };
 
   const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value
-    let totalContentLength = formData.content.length + formData.content_public.length
-    totalContentLength -= formData.content.length
+    const value = e.target.value;
+    let totalContentLength = formData.content.length + formData.content_public.length;
+    totalContentLength -= formData.content.length;
 
     if (totalContentLength + value.length > MAX_CONTENT_LENGTH) {
-      showDebouncedToast(`전체 상세 설명 글자수는 ${MAX_CONTENT_LENGTH}자를 초과할 수 없습니다.`)
-      return
+      showDebouncedToast(`전체 상세 설명 글자수는 ${MAX_CONTENT_LENGTH}자를 초과할 수 없습니다.`);
+      return;
     }
 
-    setFormField('content', value)
-  }
+    setFormField('content', value);
+  };
 
   const handleContentPublicChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value
-    let totalContentLength = formData.content.length + formData.content_public.length
-    totalContentLength -= formData.content_public.length
+    const value = e.target.value;
+    let totalContentLength = formData.content.length + formData.content_public.length;
+    totalContentLength -= formData.content_public.length;
 
     if (totalContentLength + value.length > MAX_CONTENT_LENGTH) {
-      showDebouncedToast(`전체 상세 설명 글자수는 ${MAX_CONTENT_LENGTH}자를 초과할 수 없습니다.`)
-      return
+      showDebouncedToast(`전체 상세 설명 글자수는 ${MAX_CONTENT_LENGTH}자를 초과할 수 없습니다.`);
+      return;
     }
 
-    setFormField('content_public', value)
-  }
+    setFormField('content_public', value);
+  };
 
   // 대화 예시 제목 변경 핸들러
   const handleExampleTitleChange = (id: number, title: string) => {
-    updateConversationExampleTitle(id, title)
-  }
+    updateConversationExampleTitle(id, title);
+  };
 
   // 대화 예시 텍스트 변경 핸들러 - new
   const handleMessageChange = (id: number, msg: string, isUser: boolean) => {
-    let totalMsgLength = 0
+    let totalMsgLength = 0;
     formData.conversationExamples.map((data: exampleDatas) => {
-      totalMsgLength += data.userMsg.length + data.characterMsg.length
-    })
+      totalMsgLength += data.userMsg.length + data.characterMsg.length;
+    });
 
-    const findData = formData.conversationExamples.find((find: exampleDatas) => find.index === id)
+    const findData = formData.conversationExamples.find((find: exampleDatas) => find.index === id);
     if (!findData) {
-      return
+      return;
     }
 
     if (isUser) {
-      totalMsgLength -= findData.userMsg.length
+      totalMsgLength -= findData.userMsg.length;
     } else {
-      totalMsgLength -= findData.characterMsg.length
+      totalMsgLength -= findData.characterMsg.length;
     }
 
     if (totalMsgLength + msg.length > MAX_REMAINING_LENGTH) {
-      showDebouncedToast(`전체 대화 예시는 ${MAX_REMAINING_LENGTH}자를 초과할 수 없습니다.`)
-      return
+      showDebouncedToast(`전체 대화 예시는 ${MAX_REMAINING_LENGTH}자를 초과할 수 없습니다.`);
+      return;
     }
 
     if (isUser) {
-      findData.userMsg = msg
+      findData.userMsg = msg;
     } else {
-      findData.characterMsg = msg
+      findData.characterMsg = msg;
     }
-    findData.textLength = findData.userMsg.length + findData.characterMsg.length
-    updateConversationExample(findData)
-  }
+    findData.textLength = findData.userMsg.length + findData.characterMsg.length;
+    updateConversationExample(findData);
+  };
 
   // 커서 관련 공통 함수
   const handleSpecialTagInsert = (field: 'user' | 'character', id: number, tag: string) => {
-    console.log('handleSpecialTagInsert >> ', field, id, tag)
+    console.log('handleSpecialTagInsert >> ', field, id, tag);
 
-    if (id === undefined) return
+    if (id === undefined) return;
 
-    const inputId = field === 'user' ? `user-message-${id}` : `character-message-${id}`
-    const input = document.getElementById(inputId) as HTMLTextAreaElement
+    const inputId = field === 'user' ? `user-message-${id}` : `character-message-${id}`;
+    const input = document.getElementById(inputId) as HTMLTextAreaElement;
 
-    console.log('inputId >> ', inputId)
+    console.log('inputId >> ', inputId);
 
     if (input) {
-      const startPos = input.selectionStart || 0
-      const endPos = input.selectionEnd || 0
-      const newText = input.value.substring(0, startPos) + tag + input.value.substring(endPos)
+      const startPos = input.selectionStart || 0;
+      const endPos = input.selectionEnd || 0;
+      const newText = input.value.substring(0, startPos) + tag + input.value.substring(endPos);
 
       if (field === 'user') {
-        handleMessageChange(id, newText, true)
+        handleMessageChange(id, newText, true);
       } else {
-        handleMessageChange(id, newText, false)
+        handleMessageChange(id, newText, false);
       }
 
       // 커서 위치 업데이트
       setTimeout(() => {
-        input.focus()
-        const newCursorPos = startPos + tag.length
-        input.selectionStart = input.selectionEnd = newCursorPos
-      }, 0)
+        input.focus();
+        const newCursorPos = startPos + tag.length;
+        input.selectionStart = input.selectionEnd = newCursorPos;
+      }, 0);
     }
-  }
+  };
 
   // 상황 설명 버튼 클릭 핸들러
   const handleContextInfoClick = () => {
-    console.log('handleContextInfoClick >> ', activeField?.field, activeField?.id)
+    console.log('handleContextInfoClick >> ', activeField?.field, activeField?.id);
 
-    if (!activeField) return
-    handleSpecialTagInsert(activeField.field, activeField.id, '**')
-  }
+    if (!activeField) return;
+    handleSpecialTagInsert(activeField.field, activeField.id, '**');
+  };
 
   // 캐릭터 이름 버튼 클릭 핸들러
   const handleCharacterNameClick = () => {
-    if (!activeField) return
-    handleSpecialTagInsert(activeField.field, activeField.id, '{{char}}')
-  }
+    if (!activeField) return;
+    handleSpecialTagInsert(activeField.field, activeField.id, '{{char}}');
+  };
 
   // 사용자 이름 버튼 클릭 핸들러
   const handleUserNameClick = () => {
-    if (!activeField) return
-    handleSpecialTagInsert(activeField.field, activeField.id, '{{user}}')
-  }
+    if (!activeField) return;
+    handleSpecialTagInsert(activeField.field, activeField.id, '{{user}}');
+  };
 
   // 대화 예시 삭제 버튼 핸들러
   const handleDeleteExample = (id: number) => {
-    setDeleteTargetId(id)
-    setIsDeleteModalOpen(true)
-  }
+    setDeleteTargetId(id);
+    setIsDeleteModalOpen(true);
+  };
 
   // 대화 예시 삭제 확인
   const confirmDeleteExample = () => {
     if (deleteTargetId !== undefined) {
-      removeConversationExample(deleteTargetId)
+      removeConversationExample(deleteTargetId);
 
       // 모달 닫기
-      setIsDeleteModalOpen(false)
-      setDeleteTargetId(0)
+      setIsDeleteModalOpen(false);
+      setDeleteTargetId(0);
     }
-  }
+  };
 
   // 텍스트 길이 표시 형식
   const formatTextLength = (current: number, max: number) => {
-    return `${current}/${max}`
-  }
+    return `${current}/${max}`;
+  };
 
   return (
     <>
-      <div className="space-y-8">
+      <div className='space-y-8'>
         {/* <RatingSelect rating={formData.rating} onRatingSelect={handleRatingSelect} showRequired={false} /> */}
 
         {/* 상세 설명 */}
         <div>
-          <div className="mb-6 flex items-start justify-between">
+          <div className='mb-6 flex items-start justify-between'>
             <div>
-              <h3 className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">상세 설명</h3>
-              <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-                성격, 외모, 상황 등의 정보를 알려주세요!
-              </p>
+              <h3 className='block text-sm font-medium text-text-primary'>상세 설명</h3>
+              <p className='text-xs text-text-muted'>성격, 외모, 상황 등의 정보를 알려주세요!</p>
             </div>
           </div>
 
           {/* 공개설명 */}
-          <div className="flex flex-col gap-4">
+          <div className='flex flex-col gap-4'>
             <div>
-              <div className="mb-2 flex items-start justify-between">
+              <div className='mb-2 flex items-start justify-between'>
                 <div>
-                  <h3 className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-                    공개 설명
-                  </h3>
+                  <h3 className='block text-sm font-medium text-text-primary'>공개 설명</h3>
                 </div>
-                <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
+                <span className='text-xs text-text-muted'>
                   {formatTextLength(formData.content_public.length, MAX_CONTENT_LENGTH)}
                 </span>
               </div>
               <textarea
-                id="content-public"
+                id='content-public'
                 value={formData.content_public}
                 onChange={handleContentPublicChange}
-                placeholder="독자에게 공개되고 AI에게 전송되는 프롬프트에요 :) 캐릭터를 자세히 설명해 주세요!"
+                placeholder='독자에게 공개되고 AI에게 전송되는 프롬프트에요 :) 캐릭터를 자세히 설명해 주세요!'
                 rows={4}
-                className="w-full resize-none rounded-lg border border-secondary-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-400 dark:focus:ring-dark-primary-500 sm:text-base"
+                className='w-full resize-none rounded-lg border border-border-default bg-surface-elevated px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand sm:text-base'
               />
             </div>
 
             {/* 비공개설명 */}
             <div>
-              <div className="mb-2 flex items-start justify-between">
+              <div className='mb-2 flex items-start justify-between'>
                 <div>
-                  <h3 className="block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-                    비공개 설명
-                  </h3>
+                  <h3 className='block text-sm font-medium text-text-primary'>비공개 설명</h3>
                 </div>
-                <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
+                <span className='text-xs text-text-muted'>
                   {formatTextLength(formData.content.length, MAX_CONTENT_LENGTH)}
                 </span>
               </div>
               <textarea
-                id="content"
+                id='content'
                 value={formData.content}
                 onChange={handleContentChange}
-                placeholder="AI에게만 전송되는 비밀 프롬프트에요 :) 작가님만의 비법 프롬프트를 입력해 보세요!"
+                placeholder='AI에게만 전송되는 비밀 프롬프트에요 :) 작가님만의 비법 프롬프트를 입력해 보세요!'
                 rows={4}
-                className="w-full resize-none rounded-lg border border-secondary-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-400 dark:focus:ring-dark-primary-500 sm:text-base"
+                className='w-full resize-none rounded-lg border border-border-default bg-surface-elevated px-4 py-3 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand sm:text-base'
               />
             </div>
           </div>
 
-          <div className="mt-4 flex items-center justify-end">
-            <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-              전체 상세 설명 글자수: {totalContentChars}/{MAX_CONTENT_LENGTH}(남은 글자 수: {contentChars}자)
+          <div className='mt-4 flex items-center justify-end'>
+            <span className='text-xs text-text-muted'>
+              전체 상세 설명 글자수: {totalContentChars}/{MAX_CONTENT_LENGTH}(남은 글자 수:{' '}
+              {contentChars}자)
               {/* 전체 대화 예시 글자 수: {totalMessageLength}/1500 (남은 글자 수: {remainingChars}자) */}
             </span>
           </div>
         </div>
 
         {/* 구분선 */}
-        <hr className="border-secondary-200 dark:border-dark-secondary-200/10" />
+        <hr className='border-border-default' />
 
         {exampleDatas.length === 0 ? (
           ''
         ) : (
-          <div id="conversation-examples">
-            <div className="mb-4">
-              <div className="flex items-center justify-between">
+          <div id='conversation-examples'>
+            <div className='mb-4'>
+              <div className='flex items-center justify-between'>
                 <div>
-                  <h3 className="text-sm font-medium text-secondary-700 dark:text-dark-secondary-400">
-                    대화 예시(최대 3개)
-                  </h3>
-                  <p className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-                    캐릭터의 말투가 채팅에 반영될 거에요!
-                  </p>
+                  <h3 className='text-sm font-medium text-text-primary'>대화 예시(최대 3개)</h3>
+                  <p className='text-xs text-text-muted'>캐릭터의 말투가 채팅에 반영될 거에요!</p>
                 </div>
               </div>
 
               {/* 대화 예시 공개/비공개 선택 버튼 */}
-              <div className="mt-4 grid w-full grid-cols-2 gap-2 sm:w-1/2 sm:gap-4 md:w-1/3">
+              <div className='mt-4 grid w-full grid-cols-2 gap-2 sm:w-1/2 sm:gap-4 md:w-1/3'>
                 <button
-                  type="button"
+                  type='button'
                   className={`w-full rounded-lg px-2 py-1.5 text-center text-sm transition-colors sm:px-3 sm:py-2 sm:text-base ${
                     formData.examplesVisibility === 'private'
-                      ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                      : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                      ? 'bg-brand text-text-inverse'
+                      : 'bg-secondary-100 text-text-muted'
                   }`}
                 >
                   대화 예시 비공개
                 </button>
                 <button
-                  type="button"
+                  type='button'
                   className={`w-full rounded-lg px-2 py-1.5 text-center text-sm transition-colors sm:px-3 sm:py-2 sm:text-base ${
                     formData.examplesVisibility === 'public'
-                      ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                      : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                      ? 'bg-brand text-text-inverse'
+                      : 'bg-secondary-100 text-text-muted'
                   }`}
                 >
                   대화 예시 공개
@@ -531,14 +529,14 @@ export default function DetailInfoForm({
           )}
           */}
             {/* 대화 예시 목록 */}
-            <div className="space-y-6">
+            <div className='space-y-6'>
               {exampleDatas.map((data: exampleDatas) => (
                 <div
                   key={data.index}
-                  className="relative rounded-lg border border-secondary-200 bg-secondary-50 p-3 dark:border-dark-secondary-200/10 dark:bg-dark-secondary-800/5 sm:p-4"
+                  className='relative rounded-lg border border-border-default bg-surface-elevated p-3 sm:p-4'
                 >
-                  <div className="mb-3 flex items-center justify-between sm:mb-4">
-                    <h4 className="text-xs font-medium text-secondary-700 dark:text-dark-secondary-400 sm:text-sm"></h4>
+                  <div className='mb-3 flex items-center justify-between sm:mb-4'>
+                    <h4 className='text-xs font-medium text-text-primary sm:text-sm'></h4>
                     {/* <div className="flex space-x-1 sm:space-x-2">
                       <div className="flex gap-2">
                         <button
@@ -582,16 +580,16 @@ export default function DetailInfoForm({
                   </div>
 
                   {/* 대화 예시 제목 입력 필드 */}
-                  <div className="mb-3 sm:mb-4">
-                    <div className="mb-1 flex items-center justify-between">
-                      <label className="block text-xs font-medium text-secondary-700 dark:text-dark-secondary-400">
+                  <div className='mb-3 sm:mb-4'>
+                    <div className='mb-1 flex items-center justify-between'>
+                      <label className='block text-xs font-medium text-text-primary'>
                         대화 예시 제목
                       </label>
-                      <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
+                      <span className='text-xs text-text-muted'>
                         {formatTextLength((data.title || '').length, 25)}
                       </span>
                     </div>
-                    <div className="w-full rounded-lg border border-secondary-200 bg-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-400 dark:focus:ring-dark-primary-500 sm:px-4 sm:py-3">
+                    <div className='w-full rounded-lg border border-border-default bg-surface-elevated px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand sm:px-4 sm:py-3'>
                       <p>{data.title}</p>
                     </div>
                     {/* <input
@@ -606,16 +604,14 @@ export default function DetailInfoForm({
                   </div>
 
                   {/* 사용자 메시지 */}
-                  <div id="user-message-container" className="mb-3 sm:mb-4">
-                    <div className="mb-1 flex items-center justify-between">
-                      <label className="block text-xs font-medium text-secondary-700 dark:text-dark-secondary-400">
-                        <FontAwesomeIcon icon={faUser} className="mr-1" /> 유저 메시지
+                  <div id='user-message-container' className='mb-3 sm:mb-4'>
+                    <div className='mb-1 flex items-center justify-between'>
+                      <label className='block text-xs font-medium text-text-primary'>
+                        <FontAwesomeIcon icon={faUser} className='mr-1' /> 유저 메시지
                       </label>
-                      <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-                        {data.userMsg?.length || 0}자
-                      </span>
+                      <span className='text-xs text-text-muted'>{data.userMsg?.length || 0}자</span>
                     </div>
-                    <div className="w-full resize-none rounded-lg border border-secondary-200 bg-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-400 dark:focus:ring-dark-primary-500 sm:px-4 sm:py-3">
+                    <div className='w-full resize-none rounded-lg border border-border-default bg-surface-elevated px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand sm:px-4 sm:py-3'>
                       <p>{data.userMsg || ''}</p>
                     </div>
                     {/*   <textarea
@@ -630,16 +626,16 @@ export default function DetailInfoForm({
                   </div>
 
                   {/* 캐릭터 메시지 */}
-                  <div id="character-message-container">
-                    <div className="mb-1 flex items-center justify-between">
-                      <label className="block text-xs font-medium text-secondary-700 dark:text-dark-secondary-400">
-                        <FontAwesomeIcon icon={faRobot} className="mr-1" /> 캐릭터 메시지
+                  <div id='character-message-container'>
+                    <div className='mb-1 flex items-center justify-between'>
+                      <label className='block text-xs font-medium text-text-primary'>
+                        <FontAwesomeIcon icon={faRobot} className='mr-1' /> 캐릭터 메시지
                       </label>
-                      <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
+                      <span className='text-xs text-text-muted'>
                         {data.characterMsg?.length || 0}자
                       </span>
                     </div>
-                    <div className="w-full resize-none rounded-lg border border-secondary-200 bg-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-400 dark:focus:ring-dark-primary-500 sm:px-4 sm:py-3">
+                    <div className='w-full resize-none rounded-lg border border-border-default bg-surface-elevated px-3 py-2 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand sm:px-4 sm:py-3'>
                       <p>{data.characterMsg || ''}</p>
                     </div>
                     {/*  <textarea
@@ -657,9 +653,10 @@ export default function DetailInfoForm({
             </div>
 
             {/* 전체 대화 예시 글자 수 표시 */}
-            <div className="mt-4 flex items-center justify-end">
-              <span className="text-xs text-secondary-500 dark:text-dark-secondary-500">
-                전체 대화 예시 글자 수: {totalMessageLength}/{MAX_REMAINING_LENGTH} (남은 글자 수: {remainingChars}자)
+            <div className='mt-4 flex items-center justify-end'>
+              <span className='text-xs text-text-muted'>
+                전체 대화 예시 글자 수: {totalMessageLength}/{MAX_REMAINING_LENGTH} (남은 글자 수:{' '}
+                {remainingChars}자)
               </span>
             </div>
           </div>
@@ -671,28 +668,31 @@ export default function DetailInfoForm({
       <Tutorial
         isOpen={showTutorial}
         onClose={() => {
-          setShowTutorial(false)
+          setShowTutorial(false);
         }}
         config={createCharacterScenario}
         {...{
           beforeOpen: () => {
             // 튜토리얼이 열리기 전에 페이지 하단으로 스크롤
-            const conversationExamples = document.getElementById('conversation-examples')
+            const conversationExamples = document.getElementById('conversation-examples');
             if (conversationExamples) {
-              conversationExamples.scrollIntoView({ behavior: 'smooth', block: 'end' })
+              conversationExamples.scrollIntoView({ behavior: 'smooth', block: 'end' });
               // 요소 위치까지 스크롤된 후 약간의 지연 시간을 두고 추가로 100px 더 스크롤
               setTimeout(() => {
                 window.scrollBy({
                   top: 100,
                   behavior: 'smooth',
-                })
-              }, 500)
+                });
+              }, 500);
             } else {
-              const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
+              const docHeight = Math.max(
+                document.body.scrollHeight,
+                document.documentElement.scrollHeight
+              );
               window.scrollTo({
                 top: docHeight - 200, // 약간의 여백을 두고 스크롤
                 behavior: 'smooth',
-              })
+              });
             }
           },
         }}
@@ -702,29 +702,33 @@ export default function DetailInfoForm({
       <BaseModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        title="대화 예시 삭제"
-        size="sm"
-        animation="scale"
+        title='대화 예시 삭제'
+        size='sm'
+        animation='scale'
         footerContent={
-          <div className="flex w-full justify-end gap-2">
+          <div className='flex w-full justify-end gap-2'>
             <button
               onClick={() => setIsDeleteModalOpen(false)}
-              className="rounded-lg bg-gray-100 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-200"
+              className='rounded-lg bg-surface-elevated px-4 py-2 text-text-primary transition-colors hover:bg-surface-elevated-hover'
             >
               취소
             </button>
             <button
               onClick={confirmDeleteExample}
-              className="rounded-lg bg-red-500 px-4 py-2 text-white transition-colors hover:bg-red-600"
+              className='rounded-lg bg-danger px-4 py-2 text-text-inverse transition-colors hover:bg-danger/90'
             >
               삭제
             </button>
           </div>
         }
       >
-        <p className="my-4 text-center">정말로 이 대화 예시를 삭제하시겠습니까?</p>
-        <p className="mb-4 text-center text-sm text-gray-500">삭제한 대화 예시는 복구할 수 없습니다.</p>
+        <p className='my-4 text-center text-text-primary'>
+          정말로 이 대화 예시를 삭제하시겠습니까?
+        </p>
+        <p className='mb-4 text-center text-sm text-text-muted'>
+          삭제한 대화 예시는 복구할 수 없습니다.
+        </p>
       </BaseModal>
     </>
-  )
+  );
 }

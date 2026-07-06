@@ -239,7 +239,7 @@ export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalPr
   const handleGuestLogin = async (nickname: string) => {
     try {
       setLoading(true);
-      let isSuccess = await guestLogin(nickname);
+      const isSuccess = await guestLogin(nickname);
       if (isSuccess) {
         onClose();
 
@@ -366,7 +366,7 @@ export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalPr
             <div>
               <Image src='/images/logo.png' alt='logo' width={250} height={100} />
             </div>
-            <div className='text-md text-gray-500'>함께 만드는 세계관 & 캐릭터</div>
+            <div className='text-md text-text-muted'>함께 만드는 세계관 & 캐릭터</div>
           </div>
           <div className='mt-2'>
             <SpeechBubble text='3초만에 가입하고 30펜 받으세요!' position='center' />
@@ -438,7 +438,7 @@ export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalPr
           {/*   <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} /> */}
           {/* 신규 가입 모드일 때만 약관 동의 문구 표시 */}
 
-          <div className='text-center text-sm text-gray-500 dark:text-gray-400 mt-6 px-4'>
+          <div className='text-center text-sm text-text-muted mt-6 px-4'>
             <p>계속 진행하면 이용약관 및 개인정보 처리방침에 동의하는 것으로 간주됩니다.</p>
           </div>
         </div>

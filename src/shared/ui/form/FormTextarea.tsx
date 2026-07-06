@@ -1,28 +1,27 @@
-import type { TextareaHTMLAttributes } from 'react'
-import { forwardRef, useCallback, useEffect, useRef } from 'react'
+import type { TextareaHTMLAttributes } from 'react';
+import { forwardRef, useCallback, useEffect, useRef } from 'react';
+import { autoResize as autoResizeUtil } from '@/shared/lib/utils/autoResize';
+import { cn } from '@/shared/lib/utils/cn';
 
-import { cn } from '@/shared/lib/utils/cn'
-import { autoResize as autoResizeUtil } from '@/shared/lib/utils/autoResize'
-
-import FormFieldHeader from './FormFieldHeader'
+import FormFieldHeader from './FormFieldHeader';
 
 interface FormTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label?: string
-  required?: boolean
-  description?: string
-  errorMessage?: string
-  showCount?: boolean
-  wrapperClassName?: string
-  autoResize?: { maxRows?: number }
+  label?: string;
+  required?: boolean;
+  description?: string;
+  errorMessage?: string;
+  showCount?: boolean;
+  wrapperClassName?: string;
+  autoResize?: { maxRows?: number };
 }
 
 const textareaBase =
-  'w-full resize-none rounded-[10px] border bg-white px-3.5 py-[13px] text-sm text-secondary-900 placeholder:text-[#909090] placeholder-secondary-400 focus:outline-none focus:ring-0.5 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-400 dark:focus:ring-dark-primary-500'
+  'w-full resize-none rounded-[10px] border bg-surface px-3.5 py-[13px] text-sm text-text-primary placeholder:text-[#909090] placeholder-secondary-400 focus:outline-none focus:ring-0.5';
 
 const textareaVariants = {
-  default: 'border-[#A6A6A6] focus:border-primary-500 focus:ring-primary-500',
-  error: 'border-red-500 focus:border-red-500 focus:ring-red-500',
-}
+  default: 'border-border-default focus:border-brand focus:ring-brand',
+  error: 'border-danger focus:border-danger focus:ring-danger',
+};
 
 const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
   (
@@ -43,43 +42,43 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
     },
     ref
   ) => {
-    const internalRef = useRef<HTMLTextAreaElement | null>(null)
-    const autoResizeRef = useRef(autoResize)
-    autoResizeRef.current = autoResize
-    const currentLength = typeof value === 'string' ? value.length : 0
+    const internalRef = useRef<HTMLTextAreaElement | null>(null);
+    const autoResizeRef = useRef(autoResize);
+    autoResizeRef.current = autoResize;
+    const currentLength = typeof value === 'string' ? value.length : 0;
 
     const handleRef = useCallback(
       (el: HTMLTextAreaElement | null) => {
-        internalRef.current = el
-        if (typeof ref === 'function') ref(el)
-        else if (ref) ref.current = el
+        internalRef.current = el;
+        if (typeof ref === 'function') ref(el);
+        else if (ref) ref.current = el;
       },
       [ref]
-    )
+    );
 
     // value 변경 시 높이 맞추기
     useEffect(() => {
-      const opts = autoResizeRef.current
-      if (!opts || !internalRef.current) return
-      autoResizeUtil(internalRef.current, opts)
-    }, [value])
+      const opts = autoResizeRef.current;
+      if (!opts || !internalRef.current) return;
+      autoResizeUtil(internalRef.current, opts);
+    }, [value]);
 
     // 입력 시 높이 맞추기
     const handleChange = useCallback(
       (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const opts = autoResizeRef.current
+        const opts = autoResizeRef.current;
         if (opts) {
-          autoResizeUtil(e.target, opts)
+          autoResizeUtil(e.target, opts);
         }
-        onChange?.(e)
+        onChange?.(e);
       },
       [onChange]
-    )
+    );
 
     return (
       <div className={wrapperClassName}>
         {label && <FormFieldHeader label={label} required={required} description={description} />}
-        <div className="flex flex-col items-end gap-y-2">
+        <div className='flex flex-col items-end gap-y-2'>
           <textarea
             ref={handleRef}
             value={value}
@@ -87,23 +86,27 @@ const FormTextarea = forwardRef<HTMLTextAreaElement, FormTextareaProps>(
             maxLength={maxLength}
             spellCheck={false}
             onChange={handleChange}
-            className={cn(textareaBase, errorMessage ? textareaVariants.error : textareaVariants.default, className)}
+            className={cn(
+              textareaBase,
+              errorMessage ? textareaVariants.error : textareaVariants.default,
+              className
+            )}
             {...rest}
           />
-          <div className="flex w-full items-center justify-between">
-            {errorMessage ? <span className="text-sm text-v2-red">{errorMessage}</span> : <span />}
+          <div className='flex w-full items-center justify-between'>
+            {errorMessage ? <span className='text-sm text-danger'>{errorMessage}</span> : <span />}
             {showCount && maxLength !== undefined && (
-              <span className="text-sm text-[#6B7280] max-md:text-[12px]">
+              <span className='text-sm text-text-muted max-md:text-[12px]'>
                 {currentLength}/{maxLength}
               </span>
             )}
           </div>
         </div>
       </div>
-    )
+    );
   }
-)
+);
 
-FormTextarea.displayName = 'FormTextarea'
+FormTextarea.displayName = 'FormTextarea';
 
-export default FormTextarea
+export default FormTextarea;

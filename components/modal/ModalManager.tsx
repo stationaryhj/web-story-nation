@@ -1,28 +1,27 @@
-'use client'
+'use client';
 
-import { useModalStore } from '@/store/useStoreModal'
-import CharactorModal from './CharactorModal'
-import LoginModal from './LoginModal'
-import SignupModal from './SignupModal'
-import ConfirmActionModal from './ConfirmActionModal'
-import NotificationSidebar from './NotificationSidebar'
-
-import AdultVerificationModal from './AdultVerificationModal'
-import ChatModeModal from './ChatModeModal'
-import BankInfoModal from './BankInfoModal'
-import GalleryModal from './GalleryModal'
+import { useModalStore } from '@/store/useStoreModal';
+import AdultVerificationModal from './AdultVerificationModal';
+import BankInfoModal from './BankInfoModal';
+import CharactorModal from './CharactorModal';
+import ChatModeModal from './ChatModeModal';
+import ConfirmActionModal from './ConfirmActionModal';
+import GalleryModal from './GalleryModal';
+import LoginModal from './LoginModal';
+import NotificationSidebar from './NotificationSidebar';
+import SignupModal from './SignupModal';
 
 // import CharactorOpenModal from './CharactorOpenModal'
 
 export default function ModalManager() {
-  const { isOpen, modalType, closeModal, modalProps } = useModalStore()
+  const { isOpen, modalType, closeModal, modalProps } = useModalStore();
 
   if (!isOpen) {
-    return null
+    return null;
   }
 
   if (modalType === 'character') {
-    return <CharactorModal isOpen={isOpen} onClose={closeModal} {...modalProps} />
+    return <CharactorModal isOpen={isOpen} onClose={closeModal} {...modalProps} />;
   }
 
   // if (modalType === 'characterOpen') {
@@ -30,11 +29,11 @@ export default function ModalManager() {
   // }
 
   if (modalType === 'login') {
-    return <LoginModal isOpen={isOpen} onClose={closeModal} {...modalProps} />
+    return <LoginModal isOpen={isOpen} onClose={closeModal} {...modalProps} />;
   }
 
   if (modalType === 'signup') {
-    return <SignupModal isOpen={isOpen} onClose={closeModal} {...modalProps} state={'signup'} />
+    return <SignupModal isOpen={isOpen} onClose={closeModal} {...modalProps} state={'signup'} />;
   }
 
   if (modalType === 'confirmAction') {
@@ -47,15 +46,15 @@ export default function ModalManager() {
         onConfirm={modalProps?.onConfirm || (() => {})}
         {...modalProps}
       />
-    )
+    );
   }
 
   if (modalType === 'notification') {
-    return <NotificationSidebar />
+    return <NotificationSidebar />;
   }
 
   if (modalType === 'adultVerification') {
-    return <AdultVerificationModal isOpen={isOpen} onClose={closeModal} />
+    return <AdultVerificationModal isOpen={isOpen} onClose={closeModal} />;
   }
 
   if (modalType === 'chatMode') {
@@ -67,7 +66,7 @@ export default function ModalManager() {
         currentModeId={modalProps?.currentModeId || 1}
         onSelectMode={modalProps?.onSelectMode || (() => {})}
       />
-    )
+    );
   }
 
   if (modalType === 'bankInfo') {
@@ -78,12 +77,12 @@ export default function ModalManager() {
         bankInfo={modalProps?.bankInfo || { bank: '', accountNumber: '', accountHolder: '' }}
         onBankInfoChange={modalProps?.onBankInfoChange || (() => {})}
       />
-    )
+    );
   }
 
   if (modalType === 'charactorgallery') {
-    return <GalleryModal isOpen={isOpen} onClose={closeModal} />
+    return <GalleryModal isOpen={isOpen} onClose={closeModal} />;
   }
 
-  return null
+  return null;
 }

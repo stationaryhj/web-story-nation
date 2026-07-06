@@ -105,13 +105,11 @@ export default function MyCharacterPage() {
     <SectionTransition>
       <div className='container mx-auto px-4 py-8'>
         <div className='flex justify-between items-center mb-6'>
-          <h1 className='text-2xl font-bold text-secondary-900 dark:text-dark-secondary-700'>
-            내 캐릭터
-          </h1>
+          <h1 className='text-2xl font-bold text-text-primary'>내 캐릭터</h1>
           <button
             type='button'
             onClick={handleCreateCharacter}
-            className='flex items-center gap-2 px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700'
+            className='flex items-center gap-2 px-4 py-2 bg-brand hover:bg-brand-hover text-text-inverse rounded-lg transition-colors'
           >
             <FontAwesomeIcon icon={faPlus} />
             <span>캐릭터 생성</span>
@@ -122,7 +120,7 @@ export default function MyCharacterPage() {
           <div className='flex flex-col items-center justify-center space-y-4 py-12'>
             <button
               type='button'
-              className='flex items-center space-x-2 rounded-lg bg-primary-500 px-6 py-3 text-white transition-colors hover:bg-primary-600 dark:bg-dark-primary-500 dark:hover:bg-dark-primary-600'
+              className='flex items-center space-x-2 rounded-lg bg-brand px-6 py-3 text-text-inverse transition-colors hover:bg-brand-hover'
               onClick={handleCreateCharacter}
             >
               <FontAwesomeIcon icon={faPlus} />

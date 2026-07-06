@@ -1,40 +1,40 @@
-'use client'
+'use client';
 
-import { useRouter } from 'next/navigation'
-import BaseModal from './BaseModal'
-import { BaseButton } from '@/components/elements/button/BaseButton'
+import { useRouter } from 'next/navigation';
+import { BaseButton } from '@/components/elements/button/BaseButton';
+import BaseModal from './BaseModal';
 
 interface LimitCharacterModalProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export default function LimitCharacterModal({ isOpen, onClose }: LimitCharacterModalProps) {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleConfirm = () => {
-    onClose()
-  }
+    onClose();
+  };
 
   return (
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      size="md"
-      animation="fade"
-      backdropColor="bg-black/70 backdrop-blur-sm"
+      size='md'
+      animation='fade'
+      backdropColor='bg-overlay/70 backdrop-blur-sm'
       showCloseButton={false}
       preventBackdropClose={true}
       footerContent={
-        <div className="flex justify-center">
-          <BaseButton color="gradient" onClick={handleConfirm}>
+        <div className='flex justify-center'>
+          <BaseButton color='gradient' onClick={handleConfirm}>
             확인
           </BaseButton>
         </div>
       }
     >
-      <div className="flex flex-col items-center py-6 space-y-4">
-        <p className="text-center text-gray-800 dark:text-gray-200 text-lg leading-relaxed">
+      <div className='flex flex-col items-center py-6 space-y-4'>
+        <p className='text-center text-text-primary text-lg leading-relaxed'>
           임시 저장 한도에 도달하여,
           <br />
           캐릭터 생성이 불가능합니다.
@@ -45,5 +45,5 @@ export default function LimitCharacterModal({ isOpen, onClose }: LimitCharacterM
         </p>
       </div>
     </BaseModal>
-  )
+  );
 }

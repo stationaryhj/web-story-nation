@@ -37,8 +37,8 @@ const AlertModal = ({ message, icons, duration = 3000 }: AlertModalProps) => {
         {...MODAL_ANIMATION}
         className='pointer-events-auto fixed top-[90px] left-1/2 min-h-[65px] w-[calc(100vw-40px)] max-w-[400px] -translate-x-1/2 overflow-hidden '
       >
-        <div className='w-full rounded-[10px] bg-black/80 py-5 text-center'>
-          <div className='flex w-full items-center justify-center gap-2 px-5 text-white'>
+        <div className='w-full rounded-[10px] bg-overlay/80 py-5 text-center'>
+          <div className='flex w-full items-center justify-center gap-2 px-5 text-text-inverse'>
             {icons && <span className='flex-shrink-0'>{icons}</span>}
             <p className='text-sm font-semibold break-keep'>{message}</p>
           </div>

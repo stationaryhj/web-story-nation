@@ -52,12 +52,12 @@ export default function ChatList({ chats, onSearch }: ChatListProps) {
 
   return (
     <motion.div
-      className="bg-white dark:bg-dark-background-light rounded-xl shadow-sm p-4 w-full mx-auto"
+      className="bg-surface-elevated rounded-xl shadow-sm p-4 w-full mx-auto"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <h2 className="text-xl font-bold mb-4 text-secondary-900 dark:text-dark-secondary-700">대화</h2>
+      <h2 className="text-xl font-bold mb-4 text-text-primary">대화</h2>
 
       {/* 탭 컴포넌트 */}
       <ChatTabs activeTab={activeTab} onTabChange={setActiveTab} onSortClick={handleSortToggle} />
@@ -71,13 +71,13 @@ export default function ChatList({ chats, onSearch }: ChatListProps) {
           sortedChats.map(chat => <ChatItem key={chat.id} {...chat} />)
         ) : (
           <div className="py-20 text-center">
-            <p className="text-secondary-500 dark:text-dark-secondary-500 mb-4">
+            <p className="text-text-muted mb-4">
               {searchQuery ? '검색 결과가 없습니다.' : '아직 대화를 시작한 캐릭터가 없습니다.'}
             </p>
             {!searchQuery && (
               <Link
                 href="/my-characters/create"
-                className="inline-flex items-center px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors dark:bg-dark-primary-600 dark:hover:bg-dark-primary-700"
+                className="inline-flex items-center px-4 py-2 bg-brand hover:bg-brand-hover text-text-inverse rounded-lg transition-colors"
               >
                 <span className="mr-1">+</span> 첫캐릭터 만들기
               </Link>

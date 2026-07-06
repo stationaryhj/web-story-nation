@@ -50,7 +50,7 @@ export default function List({
 
   const listClasses = `
     overflow-hidden
-    ${bordered ? 'border border-secondary-200 dark:border-dark-secondary-700' : ''}
+    ${bordered ? 'border border-border-default' : ''}
     ${rounded ? 'rounded-lg' : ''}
     ${sizeClasses[size]}
     ${className}
@@ -65,9 +65,9 @@ export default function List({
         const itemClasses = `
           flex items-center justify-between
           ${paddingClasses[size]}
-          ${hoverable && !item.disabled ? 'hover:bg-secondary-50 dark:hover:bg-dark-secondary-800/50 cursor-pointer' : ''}
+          ${hoverable && !item.disabled ? 'hover:bg-surface-elevated-hover cursor-pointer' : ''}
           ${item.disabled ? 'opacity-60 cursor-not-allowed' : ''}
-          ${divided && !isLast && item.divider !== false ? 'border-b border-secondary-100 dark:border-dark-secondary-800' : ''}
+          ${divided && !isLast && item.divider !== false ? 'border-b border-border-default' : ''}
           ${itemClassName}
         `
 
@@ -76,9 +76,9 @@ export default function List({
             <div className="flex items-center flex-1">
               {item.leading && <div className="mr-3 flex-shrink-0">{item.leading}</div>}
               <div className="flex-1 min-w-0">
-                <div className="text-secondary-900 dark:text-dark-secondary-200 truncate">{item.content}</div>
+                <div className="text-text-primary truncate">{item.content}</div>
                 {item.secondaryContent && (
-                  <div className="text-secondary-500 dark:text-dark-secondary-400 text-sm mt-0.5">
+                  <div className="text-text-muted text-sm mt-0.5">
                     {item.secondaryContent}
                   </div>
                 )}

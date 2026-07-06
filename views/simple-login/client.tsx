@@ -84,7 +84,7 @@ export default function SimpleLogin() {
 
   const baseStyles =
     'flex items-center justify-center rounded-full font-medium transition-all duration-300';
-  const primaryStyles = 'text-gray-700 shadow-sm';
+  const primaryStyles = 'text-text-primary shadow-sm';
 
   return (
     <BaseModal
@@ -106,7 +106,7 @@ export default function SimpleLogin() {
         </div>
 
         {/* content */}
-        <div className='flex flex-col items-start justify-start w-full border-b border-gray-200 pb-4 gap-4'>
+        <div className='flex flex-col items-start justify-start w-full border-b border-border-default pb-4 gap-4'>
           {/* name */}
           <div className='flex flex-col items-start justify-start w-full gap-2 mt-4'>
             <span className='font-bold text-sm'>이름 *</span>
@@ -114,14 +114,14 @@ export default function SimpleLogin() {
             <div className='w-full'>
               <input
                 type='text'
-                className='w-full rounded-lg border border-gray-200 p-3 my-2'
+                className='w-full rounded-lg border border-border-default p-3 my-2'
                 placeholder='이름을 입력해 주세요.'
                 value={name}
                 onChange={(e) => setName(e.target.value.slice(0, 25))}
                 maxLength={25}
               />
 
-              <div className='text-right text-sm text-gray-500'>{name.length} / 25</div>
+              <div className='text-right text-sm text-text-muted'>{name.length} / 25</div>
             </div>
           </div>
 
@@ -135,7 +135,9 @@ export default function SimpleLogin() {
                   baseStyles,
                   primaryStyles,
                   'w-full rounded-lg py-2 text-base',
-                  gender === Gender.MALE ? 'bg-[#432DF1] text-white' : 'bg-[#F1F2F2] opacity-50'
+                  gender === Gender.MALE
+                    ? 'bg-brand text-text-inverse'
+                    : 'bg-surface-elevated-hover opacity-50'
                 )}
                 onClick={() => handleChangeGendeer(Gender.MALE)}
               >
@@ -147,7 +149,9 @@ export default function SimpleLogin() {
                   baseStyles,
                   primaryStyles,
                   'w-full rounded-lg py-2 text-base',
-                  gender === Gender.FEMALE ? 'bg-[#432DF1] text-white' : 'bg-[#F1F2F2] opacity-50'
+                  gender === Gender.FEMALE
+                    ? 'bg-brand text-text-inverse'
+                    : 'bg-surface-elevated-hover opacity-50'
                 )}
                 color='primary'
                 onClick={() => handleChangeGendeer(Gender.FEMALE)}
@@ -160,7 +164,9 @@ export default function SimpleLogin() {
                   baseStyles,
                   primaryStyles,
                   'w-full rounded-lg py-2 text-base',
-                  gender === Gender.UNKNOWN ? 'bg-[#432DF1] text-white' : 'bg-[#F1F2F2] opacity-50'
+                  gender === Gender.UNKNOWN
+                    ? 'bg-brand text-text-inverse'
+                    : 'bg-surface-elevated-hover opacity-50'
                 )}
                 color='primary'
                 onClick={() => handleChangeGendeer(Gender.UNKNOWN)}
@@ -177,8 +183,8 @@ export default function SimpleLogin() {
                 className={cn(
                   'w-full rounded-lg py-2 px-4 text-base',
                   !name || !gender
-                    ? 'bg-[#E9EAEB] opacity-50'
-                    : 'bg-[#432DF1] text-[#FFFFFF] opacity-100'
+                    ? 'bg-surface-elevated-hover opacity-50'
+                    : 'bg-brand text-text-inverse opacity-100'
                 )}
                 color='primary'
                 onClick={handleChatClick}
@@ -192,7 +198,7 @@ export default function SimpleLogin() {
 
         {/* footer */}
         <div className='flex flex-col items-start justify-start gap-1 mt-4'>
-          <span className=' text-gray-500 text-sm'>이미 스토리네이션 계정이 있다면?</span>
+          <span className=' text-text-muted text-sm'>이미 스토리네이션 계정이 있다면?</span>
           <button
             onClick={handleSocialLoginClick}
             className='flex flex-row items-center justify-center gap-2'

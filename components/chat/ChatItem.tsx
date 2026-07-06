@@ -21,9 +21,9 @@ export default function ChatItem({ id, characterId, name, lastMessage, time, ima
     <motion.div
       key={id}
       className={`flex items-center p-3 rounded-lg cursor-pointer ${
-        isSelected 
-          ? 'bg-primary-50 dark:bg-dark-primary-900/20' 
-          : 'hover:bg-secondary-50 dark:hover:bg-dark-secondary-100/10'
+        isSelected
+          ? 'bg-brand/10'
+          : 'hover:bg-surface-elevated-hover'
       }`}
       whileHover={{ scale: 1.02 }}
       onClick={() => router.push(`/chat/${id}`)}
@@ -39,14 +39,14 @@ export default function ChatItem({ id, characterId, name, lastMessage, time, ima
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-center mb-1">
-          <h3 className="font-medium text-secondary-900 dark:text-dark-secondary-700 truncate">
+          <h3 className="font-medium text-text-primary truncate">
             {name}
           </h3>
-          <span className="text-xs text-secondary-500 dark:text-dark-secondary-500 whitespace-nowrap ml-2">
+          <span className="text-xs text-text-muted whitespace-nowrap ml-2">
             {time}
           </span>
         </div>
-        <p className="text-sm text-secondary-600 dark:text-dark-secondary-500 truncate">
+        <p className="text-sm text-text-muted truncate">
           {lastMessage}
         </p>
       </div>

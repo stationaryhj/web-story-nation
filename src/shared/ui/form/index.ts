@@ -1,5 +1,5 @@
-export { default as FormButtonGroup } from './FormButtonGroup'
-export { default as FormFieldHeader } from './FormFieldHeader'
-export { default as FormImageUpload } from './FormImageUpload'
-export { default as FormInput } from './FormInput'
-export { default as FormTextarea } from './FormTextarea'
+export { default as FormButtonGroup } from './FormButtonGroup';
+export { default as FormFieldHeader } from './FormFieldHeader';
+export { default as FormImageUpload } from './FormImageUpload';
+export { default as FormInput } from './FormInput';
+export { default as FormTextarea } from './FormTextarea';

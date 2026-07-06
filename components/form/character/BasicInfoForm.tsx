@@ -225,16 +225,12 @@ export default function BasicInfoForm({
           {/* 기본이미지 */}
           <div className='flex flex-col justify-center w-full'>
             <RequiredLabel>
-              <label className='block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400'>
-                기본 이미지
-              </label>
+              <label className='block text-sm font-medium text-text-primary'>기본 이미지</label>
             </RequiredLabel>
 
             <div
-              className={`relative aspect-[3/4] rounded-lg overflow-hidden border-2 border-primary-500 dark:border-dark-primary-500 w-full md:max-w-[300px] mx-auto ${
-                isVaild && !formData.imgUrl
-                  ? 'border-red-500 bg-red-50 dark:border-red-500/70 dark:bg-red-950/20'
-                  : ''
+              className={`relative aspect-[3/4] rounded-lg overflow-hidden border-2 border-brand w-full md:max-w-[300px] mx-auto ${
+                isVaild && !formData.imgUrl ? 'border-danger bg-danger/10' : ''
               }`}
             >
               {/* 이미지 표시 */}
@@ -258,9 +254,9 @@ export default function BasicInfoForm({
                 <label
                   className={`relative aspect-[3/4] rounded-lg overflow-hidden w-full md:max-w-[300px] mx-auto
                     ${
-                      'border-red-500 bg-red-50 dark:border-red-500/70 dark:bg-red-950/20'
+                      'border-danger bg-danger/10'
                       // isVaild ?
-                      // 'border-red-500 bg-red-50 dark:border-red-500/70 dark:bg-red-950/20' :
+                      // 'border-danger bg-danger/10' :
                       // 'border-secondary-300 dark:border-dark-secondary-300/20'
                     }
                   cursor-pointer`}
@@ -271,7 +267,7 @@ export default function BasicInfoForm({
                     onChange={(e) => handleImageUpload(e)}
                     className='hidden'
                   />
-                  <div className='h-full flex flex-col items-center justify-center text-secondary-500 dark:text-dark-secondary-500 p-2 text-center'>
+                  <div className='h-full flex flex-col items-center justify-center text-text-muted p-2 text-center'>
                     <FontAwesomeIcon
                       icon={faUpload}
                       className='w-5 h-5 sm:w-6 sm:h-6 mb-1 sm:mb-2'
@@ -285,7 +281,7 @@ export default function BasicInfoForm({
             </div>
 
             <div className='flex justify-center items-center'>
-              <span className='text-xs text-secondary-500 dark:text-dark-secondary-500 mt-2'>
+              <span className='text-xs text-text-muted mt-2'>
                 *초상권, 저작권 침해 이미지는 통보 없이 삭제될 수 있습니다.
               </span>
             </div>
@@ -294,9 +290,7 @@ export default function BasicInfoForm({
           {/* 이름 */}
           <div>
             <RequiredLabel>
-              <label className='block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400'>
-                캐릭터 이름
-              </label>
+              <label className='block text-sm font-medium text-text-primary'>캐릭터 이름</label>
             </RequiredLabel>
             <input
               type='text'
@@ -306,9 +300,9 @@ export default function BasicInfoForm({
               placeholder='캐릭터의 이름을 입력하세요'
               className={`mt-1 block w-full rounded-lg border ${
                 isVaild && !formData.name
-                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                  : 'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
-              } px-4 py-3 text-secondary-900 placeholder-secondary-400 focus:outline-none focus:ring-1 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500`}
+                  ? 'border-danger focus:border-danger focus:ring-danger'
+                  : 'border-border-default focus:border-brand focus:ring-brand'
+              } px-4 py-3 bg-surface-elevated text-text-primary placeholder-text-muted focus:outline-none focus:ring-1`}
               maxLength={25}
             />
           </div>
@@ -317,9 +311,11 @@ export default function BasicInfoForm({
           <div>
             <div className='flex items-center gap-1'>
               <div className='flex items-center gap-1'>
-                <div className='text-sm font-medium text-secondary-700 dark:text-dark-secondary-400'>
+                <div className='text-sm font-medium text-text-primary'>
                   <p className='font-bold'>제목(선택)</p>
-                  <p className='text-xs text-secondary-400 dark:text-dark-secondary-400'>캐릭터 목록에서 이름 대신 출력되는 제목이에요!</p>
+                  <p className='text-xs text-text-muted'>
+                    캐릭터 목록에서 이름 대신 출력되는 제목이에요!
+                  </p>
                 </div>
               </div>
             </div>
@@ -329,7 +325,7 @@ export default function BasicInfoForm({
               value={formData.subject}
               onChange={handleInputChange}
               placeholder='제목을 입력하세요. 예) 영화관 데이트'
-              className={`mt-1 block w-full rounded-lg border border-secondary-200 focus:border-primary-500 focus:ring-primary-500 px-4 py-3 text-secondary-900 placeholder-secondary-400 focus:outline-none focus:ring-1 dark:border-dark-secondary-200/10 dark:bg-dark-background-light dark:text-dark-secondary-200 dark:placeholder-dark-secondary-500`}
+              className={`mt-1 block w-full rounded-lg border border-border-default focus:border-brand focus:ring-brand px-4 py-3 bg-surface-elevated text-text-primary placeholder-text-muted focus:outline-none focus:ring-1`}
               maxLength={25}
             />
           </div>
@@ -337,9 +333,7 @@ export default function BasicInfoForm({
           {/* 성별 */}
           <div>
             <RequiredLabel>
-              <label className='block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400'>
-                성별
-              </label>
+              <label className='block text-sm font-medium text-text-primary'>성별</label>
             </RequiredLabel>
             <div className='mt-2 grid grid-cols-3 gap-4'>
               <button
@@ -347,8 +341,8 @@ export default function BasicInfoForm({
                 onClick={() => handleGenderSelect('male')}
                 className={`rounded-lg px-4 py-3 text-center transition-colors text-xs sm:text-base ${
                   formData.gender === 'male'
-                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                    ? 'bg-brand text-text-inverse'
+                    : 'bg-secondary-100 text-text-muted'
                 }`}
               >
                 남성
@@ -358,8 +352,8 @@ export default function BasicInfoForm({
                 onClick={() => handleGenderSelect('female')}
                 className={`rounded-lg px-4 py-3 text-center transition-colors text-xs sm:text-base ${
                   formData.gender === 'female'
-                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                    ? 'bg-brand text-text-inverse'
+                    : 'bg-secondary-100 text-text-muted'
                 }`}
               >
                 여성
@@ -369,8 +363,8 @@ export default function BasicInfoForm({
                 onClick={() => handleGenderSelect('unspecified')}
                 className={`rounded-lg px-4 py-3 text-center transition-colors text-xs sm:text-base ${
                   formData.gender === 'unspecified'
-                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                    ? 'bg-brand text-text-inverse'
+                    : 'bg-secondary-100 text-text-muted'
                 }`}
               >
                 알 수 없음
@@ -383,13 +377,11 @@ export default function BasicInfoForm({
             <div className='flex flex-col gap-2'>
               <div>
                 <RequiredLabel>
-                  <label className='block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400'>
-                    게시 범위
-                  </label>
+                  <label className='block text-sm font-medium text-text-primary'>게시 범위</label>
                 </RequiredLabel>
               </div>
               <div>
-                <p className='text-md dark:text-dark-secondary-500 mb-2'>
+                <p className='text-md text-text-muted mb-2'>
                   생성 가능한 비공개 캐릭터 {3 - privateOpenCharacterCount} / 3
                 </p>
               </div>
@@ -400,8 +392,8 @@ export default function BasicInfoForm({
                 onClick={() => handleVisibilitySelect('private')}
                 className={`rounded-lg px-4 py-3 text-center transition-colors text-xs sm:text-base ${
                   formData.visibility === 'private'
-                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                    ? 'bg-brand text-text-inverse'
+                    : 'bg-secondary-100 text-text-muted'
                 }`}
               >
                 비공개
@@ -411,8 +403,8 @@ export default function BasicInfoForm({
                 onClick={() => handleVisibilitySelect('public')}
                 className={`rounded-lg px-4 py-3 text-center transition-colors text-xs sm:text-base ${
                   formData.visibility === 'public'
-                    ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                    : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                    ? 'bg-brand text-text-inverse'
+                    : 'bg-secondary-100 text-text-muted'
                 }`}
               >
                 공개
@@ -420,41 +412,37 @@ export default function BasicInfoForm({
             </div>
 
             {/* 게시 범위 설명 */}
-            <div className='mt-4 rounded-lg bg-secondary-50 p-4 dark:bg-dark-secondary-800/10'>
-              <h4 className='text-md font-bold text-secondary-800 dark:text-dark-secondary-200 mb-2 '>
+            <div className='mt-4 rounded-lg bg-surface-elevated p-4'>
+              <h4 className='text-md font-bold text-text-primary mb-2 '>
                 게시 범위에 따라 무엇이 달라지나요?
               </h4>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <div>
-                  <h5 className='text-sm font-medium text-primary-600 dark:text-primary-400 mb-1'>
-                    공개
-                  </h5>
-                  <ul className='text-xs space-y-1 text-secondary-600 dark:text-dark-secondary-400'>
+                  <h5 className='text-sm font-medium text-brand mb-1'>공개</h5>
+                  <ul className='text-xs space-y-1 text-text-muted'>
                     <li className='flex items-start'>
-                      <span className='text-primary-500 mr-1 mt-0.5'>•</span>
+                      <span className='text-brand mr-1 mt-0.5'>•</span>
                       <span>모든 유저가 캐릭터와 대화할 수 있어요.</span>
                     </li>
                     <li className='flex items-start'>
-                      <span className='text-red-500 mr-1 mt-0.5'>•</span>
+                      <span className='text-danger mr-1 mt-0.5'>•</span>
                       <span>생성한 공개 캐릭터는 비공개로 바꿀 수 없어요.</span>
                     </li>
                   </ul>
                 </div>
                 <div>
-                  <h5 className='text-sm font-medium text-primary-600 dark:text-primary-400 mb-1'>
-                    비공개
-                  </h5>
-                  <ul className='text-xs space-y-1 text-secondary-600 dark:text-dark-secondary-400'>
+                  <h5 className='text-sm font-medium text-brand mb-1'>비공개</h5>
+                  <ul className='text-xs space-y-1 text-text-muted'>
                     <li className='flex items-start'>
-                      <span className='text-primary-500 mr-1 mt-0.5'>•</span>
+                      <span className='text-brand mr-1 mt-0.5'>•</span>
                       <span>나만 캐릭터와 대화할 수 있어요.</span>
                     </li>
                     <li className='flex items-start'>
-                      <span className='text-primary-500 mr-1 mt-0.5'>•</span>
+                      <span className='text-brand mr-1 mt-0.5'>•</span>
                       <span>캐릭터가 검색되지 않아요.</span>
                     </li>
                     <li className='flex items-start'>
-                      <span className='text-primary-500 mr-1 mt-0.5'>•</span>
+                      <span className='text-brand mr-1 mt-0.5'>•</span>
                       <span>최대 3개만 보유할 수 있어요.</span>
                     </li>
                   </ul>
@@ -467,15 +455,13 @@ export default function BasicInfoForm({
           <div>
             <div className='flex justify-between items-center mb-2'>
               <RequiredLabel>
-                <label htmlFor='bio' className='block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400'>
+                <label htmlFor='bio' className='block text-sm font-medium text-text-primary'>
                   한줄 소개
                 </label>
               </RequiredLabel>
-              <span className='text-xs text-secondary-500 dark:text-dark-secondary-500'>{formData.bio.length}/80</span>
+              <span className='text-xs text-text-muted'>{formData.bio.length}/80</span>
             </div>
-            <p className='text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2'>
-              내 캐릭터를 간단히 소개해 보세요!
-            </p>
+            <p className='text-xs text-text-muted mb-2'>내 캐릭터를 간단히 소개해 보세요!</p>
             <textarea
               id='bio'
               name='bio'
@@ -485,9 +471,9 @@ export default function BasicInfoForm({
               rows={2}
               className={`w-full px-4 py-3 rounded-lg border ${
                 isVaild && !formData.bio
-                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                  : 'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
-              } dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none`}
+                  ? 'border-danger focus:border-danger focus:ring-danger'
+                  : 'border-border-default focus:border-brand focus:ring-brand'
+              } bg-surface-elevated focus:outline-none focus:ring-2 text-text-primary resize-none`}
               maxLength={80}
             />
           </div>
@@ -496,15 +482,18 @@ export default function BasicInfoForm({
           <div>
             <div className='flex justify-between items-center mb-2'>
               <RequiredLabel>
-                <label htmlFor='firstMessage' className='block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400'>
+                <label
+                  htmlFor='firstMessage'
+                  className='block text-sm font-medium text-text-primary'
+                >
                   첫 메세지
                 </label>
               </RequiredLabel>
-              <span className='text-xs text-secondary-500 dark:text-dark-secondary-500'>
+              <span className='text-xs text-text-muted'>
                 {formData.firstMessage.length}/{MAX_FIRST_MESSAGE_LENGTH}
               </span>
             </div>
-            <p className='text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2'>
+            <p className='text-xs text-text-muted mb-2'>
               재미있는 선톡으로 유저의 답장을 이끌어내 보세요!
             </p>
             <textarea
@@ -516,9 +505,9 @@ export default function BasicInfoForm({
               rows={2}
               className={`w-full px-4 py-3 rounded-lg border ${
                 isVaild && !formData.firstMessage
-                  ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
-                  : 'border-secondary-200 focus:border-primary-500 focus:ring-primary-500'
-              } dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-2 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400 resize-none`}
+                  ? 'border-danger focus:border-danger focus:ring-danger'
+                  : 'border-border-default focus:border-brand focus:ring-brand'
+              } bg-surface-elevated focus:outline-none focus:ring-2 text-text-primary resize-none`}
               maxLength={MAX_FIRST_MESSAGE_LENGTH}
             />
           </div>
@@ -527,35 +516,29 @@ export default function BasicInfoForm({
           <div>
             <div className='flex justify-between items-center mb-2'>
               <RequiredLabel>
-                <label className='block text-sm font-medium text-secondary-700 dark:text-dark-secondary-400'>
-                  캐릭터 태그
-                </label>
+                <label className='block text-sm font-medium text-text-primary'>캐릭터 태그</label>
               </RequiredLabel>
-              <span className='text-xs text-secondary-500 dark:text-dark-secondary-500'>
-                {formData.hashtags.length}/7
-              </span>
+              <span className='text-xs text-text-muted'>{formData.hashtags.length}/7</span>
             </div>
-            <p className='text-xs text-secondary-500 dark:text-dark-secondary-500 mb-2'>
-              내 캐릭터를 태그로 설명한다면? (최대7개)
-            </p>
+            <p className='text-xs text-text-muted mb-2'>내 캐릭터를 태그로 설명한다면? (최대7개)</p>
             <div className='relative w-full'>
               <div
                 className={`flex flex-wrap gap-1.5 items-center w-full px-3 py-2 min-h-[52px] rounded-lg border ${
                   isVaild && formData.hashtags.length === 0
-                    ? 'border-red-500 focus-within:border-red-500 focus-within:ring-red-500'
-                    : 'border-secondary-200 focus-within:border-primary-500 focus-within:ring-primary-500'
-                } dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light`}
+                    ? 'border-danger focus-within:border-danger focus-within:ring-danger'
+                    : 'border-border-default focus-within:border-brand focus-within:ring-brand'
+                } bg-surface-elevated`}
               >
                 {formData.hashtags.length > 0 ? (
                   formData.hashtags.map((tag: string) => (
                     <div
                       key={tag}
-                      className='inline-flex items-center px-2.5 py-1 rounded-full text-xs bg-primary-100 text-primary-700 dark:bg-dark-primary-900/20 dark:text-dark-primary-400'
+                      className='inline-flex items-center px-2.5 py-1 rounded-full text-xs bg-brand/10 text-brand'
                     >
                       <span>{tag}</span>
                       <button
                         type='button'
-                        className='ml-1.5 text-primary-500 hover:text-primary-700 dark:text-dark-primary-400 dark:hover:text-dark-primary-300'
+                        className='ml-1.5 text-brand hover:text-brand-hover'
                         onClick={() => handleHashtagToggle(tag)}
                       >
                         ×
@@ -563,7 +546,7 @@ export default function BasicInfoForm({
                     </div>
                   ))
                 ) : (
-                  <span className='text-secondary-400 dark:text-dark-secondary-600'>
+                  <span className='text-text-muted'>
                     캐릭터의 특징을 나타내는 태그를 선택하세요!
                   </span>
                 )}
@@ -572,7 +555,7 @@ export default function BasicInfoForm({
 
             <div className='flex flex-wrap gap-2 mt-3'>
               {isLoadingTags ? (
-                <div className='w-full py-4 text-center text-secondary-500 dark:text-dark-secondary-400'>
+                <div className='w-full py-4 text-center text-text-muted'>
                   태그 목록을 불러오는 중...
                 </div>
               ) : allAvailableTags.length > 0 ? (
@@ -583,8 +566,8 @@ export default function BasicInfoForm({
                     onClick={() => handleHashtagToggle(tagItem.tag)}
                     className={`px-3 py-1.5 rounded-full text-xs transition-colors ${
                       formData.hashtags.includes(tagItem.tag)
-                        ? 'bg-primary-500 text-white dark:bg-dark-primary-500'
-                        : 'bg-secondary-100 text-secondary-700 dark:bg-dark-secondary-100/10 dark:text-dark-secondary-400'
+                        ? 'bg-brand text-text-inverse'
+                        : 'bg-secondary-100 text-text-muted'
                     }`}
                   >
                     {tagItem.tag}
@@ -594,31 +577,31 @@ export default function BasicInfoForm({
                   </button>
                 ))
               ) : (
-                <div className='w-full py-4 text-center text-secondary-500 dark:text-dark-secondary-400'>
+                <div className='w-full py-4 text-center text-text-muted'>
                   사용 가능한 태그가 없습니다.
                 </div>
               )}
             </div>
 
             {/* 사용자 정의 태그 입력 */}
-            <div className='mt-3 flex border-t border-secondary-200 dark:border-dark-secondary-200/10 pt-3 text-xs sm:text-base'>
+            <div className='mt-3 flex border-t border-border-default pt-3 text-xs sm:text-base'>
               <input
                 type='text'
                 value={customTagInput}
                 onChange={handleCustomTagInputChange}
                 onKeyPress={handleCustomTagKeyPress}
                 placeholder='직접 태그 입력'
-                className='flex-1 px-4 py-2 rounded-l-lg border border-secondary-200 dark:border-dark-secondary-200/10 bg-white dark:bg-dark-background-light focus:outline-none focus:ring-1 focus:ring-primary-500 dark:focus:ring-dark-primary-500 dark:text-dark-secondary-400'
+                className='flex-1 px-4 py-2 rounded-l-lg border border-border-default bg-surface-elevated text-text-primary focus:outline-none focus:ring-1 focus:ring-brand'
                 maxLength={20}
               />
               <button
                 type='button'
                 onClick={handleAddCustomTag}
                 disabled={formData.hashtags.length >= 7}
-                className={`px-4 py-2 rounded-r-lg bg-primary-500 text-white dark:bg-dark-primary-500 flex items-center justify-center ${
+                className={`px-4 py-2 rounded-r-lg bg-brand text-text-inverse flex items-center justify-center ${
                   formData.hashtags.length >= 7
                     ? 'opacity-50 cursor-not-allowed'
-                    : 'hover:bg-primary-600 dark:hover:bg-dark-primary-600'
+                    : 'hover:bg-brand-hover'
                 }`}
               >
                 <FontAwesomeIcon icon={faPlus} className='mr-1' />

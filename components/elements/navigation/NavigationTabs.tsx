@@ -54,7 +54,7 @@ export default function NavigationTabs({ onCategoryChange, onSearch, className =
   return (
     <FadeIn delay={0.1}>
       <nav
-        className={`bg-white dark:bg-dark-background-light shadow-sm dark:shadow-dark-primary-300/10 py-2 sticky top-16 z-40 ${className}`}
+        className={`bg-surface-sunken shadow-sm dark:shadow-dark-primary-300/10 py-2 sticky top-16 z-40 ${className}`}
       >
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center">
@@ -70,8 +70,8 @@ export default function NavigationTabs({ onCategoryChange, onSearch, className =
                   className={cn(
                     'py-2 px-1 text-sm font-medium whitespace-nowrap transition-colors relative',
                     activeCategory === category.id
-                      ? 'text-primary-600 dark:text-dark-primary-500 border-b-2 border-primary-500 dark:border-dark-primary-500'
-                      : 'text-secondary-600 hover:text-primary-500 dark:text-dark-secondary-500 dark:hover:text-dark-primary-600'
+                      ? 'text-brand border-b-2 border-brand'
+                      : 'text-text-muted hover:text-brand'
                   )}
                   onClick={() => handleCategoryClick(category.id)}
                   whileHover={{ scale: 1.05 }}
