@@ -77,10 +77,10 @@ FSD(Feature-Sliced Design)로 이행 중이며 레거시와 공존한다.
 ## 워크플로 (에이전트 · 문서)
 이 프로젝트는 전용 서브에이전트 3종으로 작업한다:
 - 🟠 **code-planner**(opus) — 구현 전 계획 수립 → `docs/plan/plan-<날짜>-<대상>.md` 저장.
-- 🟢 **code-writer**(sonnet) — 계획을 근거로 구현. 계획 범위·"범위 밖"을 준수.
+- 🟢 **code-writer**(sonnet) — 계획을 근거로 구현 → `docs/write/write-<날짜>-<대상>.md` 저장. 계획 범위·"범위 밖"을 준수.
 - 🔵 **code-reviewer**(sonnet) — 변경 리뷰 → `docs/review/review-<날짜>-<대상>.md` 저장.
 
-권장 흐름: **비자명한 작업은 plan → build → review** 순. 계획/리뷰 산출물은 `docs/plan/`·`docs/review/`에 남긴다.
+권장 흐름: **비자명한 작업은 plan → build → review** 순. 산출물은 `docs/plan/`·`docs/write/`·`docs/review/`에 남긴다.
 
 ## 소통 규칙
 - **한국어**로 응답. 긴 응답은 요약을 먼저.
