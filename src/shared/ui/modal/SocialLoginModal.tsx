@@ -11,6 +11,7 @@ import { getChatRoomEncryptData, getPlatform } from '@/lib/utils/storyNationUtil
 import { authService } from '@/services/auth';
 import { SocialLoginProvider } from '@/services/auth/types';
 import { CENTER_FADE_EXPAND_ANIMATION } from '@/shared/config/animations';
+import { GUEST_LOGIN_ENABLED } from '@/shared/config/features';
 import useModalStore from '@/shared/model/stores/useModalStore';
 import Modal from '@/shared/ui/modal/base/Modal';
 import { useAccountStore } from '@/store/useAccountStore';
@@ -459,7 +460,10 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
 						</div>
 					</div> */}
 
-          {/*     <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} /> */}
+          {/* 닉네임(게스트) 로그인 폼 — .env NEXT_PUBLIC_ENABLE_GUEST_LOGIN=true 일 때만 노출 */}
+          {GUEST_LOGIN_ENABLED && (
+            <GuestLoginForm onSubmit={handleGuestLogin} disabled={loading} />
+          )}
           {/* 신규 가입 모드일 때만 약관 동의 문구 표시 */}
         </div>
       </Modal.Content>
