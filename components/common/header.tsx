@@ -203,10 +203,11 @@ export default function Header() {
               }}
             >
               <Image
-                src={`${isDarkMode ? '/images/logo.png' : '/images/logo.png'}`}
+                src='/images/logo.svg'
                 alt='스토리네이션'
-                width={143}
-                height={100}
+                width={49}
+                height={49}
+                className='h-10 w-auto'
               />
             </Link>
 

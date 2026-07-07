@@ -24,7 +24,7 @@
 - `header.tsx:198` — 로고 링크(a11y 텍스트) `text-primary-600 dark:text-dark-primary-600` → `text-brand-hover`
 - `header.tsx:220-222` — 네비 링크 active/inactive `hover:text-primary-500.../text-primary-500.../text-secondary-700...` → `hover:text-brand`(inactive hover) / `text-brand`(active) / `text-text-primary`(inactive)
 - `header.tsx:261,272,284` — 설정/장바구니/모바일 메뉴 버튼 3곳 동일 패턴 `text-secondary-700 hover:text-primary-600 dark:...` → `text-text-primary hover:text-brand-hover`
-- `useThemeStore`(`isDarkMode`/`toggleDarkMode`), `isDarkMode ? '/images/logo.png' : '/images/logo.png'` 분기, 성인모드 토글 로직·이벤트 핸들러 **무변경**
+- `useThemeStore`(`isDarkMode`/`toggleDarkMode`), `isDarkMode ? '/images/logo.svg' : '/images/logo.svg'` 분기, 성인모드 토글 로직·이벤트 핸들러 **무변경**
 
 ### `components/common/footer.tsx`
 - `footer.tsx:29` — 푸터 배경/보더 `bg-white dark:bg-dark-background-light border-t border-secondary-100 dark:border-dark-secondary-200` → `bg-surface-sunken border-t border-border-default`

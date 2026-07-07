@@ -417,7 +417,7 @@ const SocialLoginModal = ({ chrbot_key }: { chrbot_key?: string | null }) => {
         </Modal.Close>
         <div className='mx-auto flex w-full max-w-[320px] flex-col items-start gap-y-[100px]'>
           <div className='flex w-full flex-col items-center justify-center gap-y-3'>
-            <Image src='/images/logo.png' alt='logo' width={220} height={100} />
+            <Image src='/images/logo.svg' alt='logo' width={49} height={49} />
             <div className='text-sm font-medium text-text-primary'>함께 만드는 세계관 & 캐릭터</div>
           </div>
 

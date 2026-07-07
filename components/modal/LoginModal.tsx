@@ -364,7 +364,7 @@ export default function LoginModal({ isOpen, onClose, chrbot_key }: LoginModalPr
 
           <div className='flex flex-col justify-center items-center gap-4 mb-4 mt-6'>
             <div>
-              <Image src='/images/logo.png' alt='logo' width={250} height={100} />
+              <Image src='/images/logo.svg' alt='logo' width={49} height={49} />
             </div>
             <div className='text-md text-text-muted'>함께 만드는 세계관 & 캐릭터</div>
           </div>

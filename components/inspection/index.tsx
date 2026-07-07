@@ -11,10 +11,10 @@ export default function InspectionPage() {
       {/* 로고 */}
       <div className="mb-8">
           <Image 
-          src="/images/logo.png" 
+          src="/images/logo.svg" 
           alt="Story Nation" 
-          width={200} 
-          height={40}
+          width={49} 
+          height={49}
           priority
           />
       </div>
