@@ -1,11 +1,22 @@
-version: "3.8"
-
 services:
   web:
-    image: storynation-frontend-live-v0.3.8
-    container_name: storynation-frontend
+    # image: storynation-frontend-live-v0.3.8
+    # container_name: storynation-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile_Release
+    image: lovechat-live:${IMAGE_TAG:-latest}
+    container_name: lovechat-live
     ports:
-      - "3201:3000"
+      - "8050:3000"
     environment:
       - NODE_ENV=production
+    networks:
+      sn-network:
+        # ipv4_address: 192.168.1.100 # Storynation Live
+        # ipv4_address: 192.168.1.101 # Storynation QA
+        ipv4_address: 192.168.1.102 # Lovechat Live
     restart: always
+networks:
+  sn-network:
+    external: true
