@@ -26,6 +26,7 @@ description: >-
 ## 3. 구현 규칙
 - **'use client'** 는 상호작용/훅/브라우저 API가 필요할 때만 추가한다. 순수 표시용이면 서버 컴포넌트로 둔다.
 - **스타일**: Tailwind. 하드코딩 HEX 금지, **semantic/토큰 클래스 사용**. 다크모드는 `class` 전략(색상은 CSS 변수 토큰으로 자동 스왑되게 — 진행 중인 테마 토큰화 계획을 따른다). 클래스 병합이 필요하면 `src/shared/lib/utils/cn.ts`의 `cn()` 사용.
+- **반응형 (⚠️ 필수)**: 모바일 퍼스트로 작성하고 모바일 웹·웹뷰에서 정상 동작해야 한다. 고정 px 폭/높이 지양(`w-full`·`max-w-*`·flex/grid), `sm→md→lg` 확장, 탭 대상 ≥44px, `hover` 전용 인터랙션 금지, 높이는 `100dvh`. 360/768/1280px에서 깨짐·가로 스크롤 없어야 함. 자세한 규칙은 `CLAUDE.md`의 "반응형 / 모바일·웹뷰" 참고.
 - **접근성**: 의미 있는 요소, `aria-*`, 키보드 조작, 이미지 `alt`. 클릭 가능한 것은 `button`.
 - **이미지**: `next/image` 사용.
 - Biome: single quote, jsx single quote, 2-space, 최대 100자, 세미콜론 필수, `trailingCommas: es5`.

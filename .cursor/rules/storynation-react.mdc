@@ -20,4 +20,15 @@ alwaysApply: false
 Tailwind 모바일 퍼스트. HEX 하드코딩 지양 → `tailwind.config.ts` 토큰/semantic 클래스.
 다크모드: `class` 전략 (`<html class="dark">`). 클래스 병합: `src/shared/lib/utils/cn.ts`.
 
+## 반응형 / 모바일·웹뷰 (⚠️ 필수)
+**모든 UI는 반응형 + 모바일 웹·웹뷰(WebView)에서 정상 동작해야 한다.** 예외 없음.
+- 모바일 퍼스트: 기본=모바일, `sm→md→lg→xl`로 확장. 데스크톱 고정폭 레이아웃 금지.
+- 고정 px 폭/높이 지양 → `%`·`rem`·`max-w-*`·`w-full`·flex/grid. 가로 스크롤 금지.
+- 터치: 탭 대상 ≥44px, `hover` 전용 인터랙션 금지, `active:`/포커스 상태 제공.
+- 뷰포트: `100vh` 대신 `100dvh`, 노치 `env(safe-area-inset-*)`. viewport 확대 차단 지양.
+- 웹뷰 제약: `position:fixed`+키보드, `window.open`/새 창·파일·클립보드 제약 고려. 새 창 대신 인앱 라우팅.
+- 채팅 등 입력창: 모바일 키보드에 가려지지 않게. `inputmode`/`type` 적절히.
+- 미디어: `next/image` + `sizes`, 텍스트 `clamp()`/반응형 유틸.
+- 검증: 360 / 768 / 1280px 폭에서 깨짐·가로 스크롤·잘림 없어야 함.
+
 컴포넌트 생성: `.cursor/skills/component/SKILL.md` 참고.
