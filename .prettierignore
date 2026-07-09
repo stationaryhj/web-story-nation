@@ -1,9 +1,0 @@
-node_modules
-.next
-build
-dist
-.git
-.vscode
-*.log
-*.lock
-tsconfig.tsbuildinfo 

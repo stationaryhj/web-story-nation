@@ -209,8 +209,6 @@ store/
     "@types/react-dom": "19.0.3",
     "autoprefixer": "^10.4.17",
     "postcss": "^8.4.33",
-    "prettier": "^3.2.5",
-    "prettier-plugin-tailwindcss": "^0.5.11",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3"
   }
