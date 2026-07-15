@@ -10,7 +10,6 @@ import type { FormEvent } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import Footer from '@/components/common/footer';
-import Header from '@/components/common/header';
 import { BaseSelectBox } from '@/components/elements/selectbox/BaseSelectBox';
 import DeleteConfirmModal from '@/components/modal/DeleteConfirmModal';
 import PageTransition from '@/components/motion/PageTransition';
@@ -400,8 +399,6 @@ export default function ChatListPage() {
   return (
     <PageTransition>
       <div className='flex flex-col min-h-screen'>
-        <Header />
-
         <main className='flex-grow'>
           <div className='container mx-auto px-4 py-6'>
             <div className='flex flex-col'>

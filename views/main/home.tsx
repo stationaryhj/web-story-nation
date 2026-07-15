@@ -3,7 +3,6 @@
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Footer from '@/components/common/footer';
-import Header from '@/components/common/header';
 import SearchBar from '@/components/elements/searchBar/SearchBar';
 import AuthorRankingSidebar from '@/components/elements/sidebar/AuthorRankingSidebar';
 import CharacterRankingSidebar from '@/components/elements/sidebar/CharacterRankingSidebar';
@@ -69,16 +68,19 @@ export default function Home() {
 
   return (
     <PageTransition>
-      <main className='min-h-screen pb-24 md:pb-20 bg-surface'>
-        <Header />
-
+      {/* 2xl 이상: 셸의 레일 오프셋(md:pl-20)을 상쇄해 콘텐츠를 뷰포트 기준 중앙 정렬(caveduck식 대칭 여백). 그 이하 폭·다른 페이지는 영향 없음. */}
+      <main className='min-h-screen pb-24 md:pb-20 bg-surface 2xl:-ml-20 2xl:w-[calc(100%+5rem)]'>
         {/* 검색바 */}
-        <div className='container mx-auto px-4 pt-6 relative'>
+        {/* home 전용 콘텐츠 폭(캐브덕 참조): 1920px≈좌우 100px, 2560px≈좌우 270px 마진.
+            전역 `.container`(tailwind.config container.screens, 다른 페이지 공용) 대신
+            홈 전용 max-width+padding 조합을 직접 사용해 다른 페이지에 영향 없이 스코프.
+            근거: docs/plan/plan-20260710-caveduck-shell-layout.md, docs/publish/publish-20260710-home-margins-logo.md */}
+        <div className='mx-auto w-full max-w-[2200px] px-4 2xl:px-[100px] pt-6 relative'>
           <SearchBar onSearch={handleSearch} placeholder='캐릭터나 작가를 검색해보세요' />
         </div>
 
         {/* 네비게이션 탭 */}
-        <div className='container px-4 mt-8 mx-auto flex justify-center w-full'>
+        <div className='mx-auto w-full max-w-[2200px] px-4 2xl:px-[100px] mt-8 flex justify-center'>
           <ButtonTabs
             tabs={navigationTabs}
             defaultTabId={tabParam}

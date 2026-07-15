@@ -11,12 +11,17 @@ import { CharbotInprogressResponse } from '@/types/api';
 import Modal from './base/Modal';
 
 interface ChatModeSelectModalProps {
-  onLimitError: () => void;
+  /**
+   * 한도 초과(err===4) 시 호출되는 선택적 콜백. 전역 `limitCharacter` 모달(GlobalModalHost)이
+   * 항상 열리므로 필수는 아니며, 호출부(예: views/my-characters/home.tsx)가 별도 처리를
+   * 원할 때만 추가로 넘긴다.
+   */
+  onLimitError?: () => void;
 }
 
 export default function ChatModeSelectModal({ onLimitError }: ChatModeSelectModalProps) {
   const router = useRouter();
-  const { closeModal } = useModalStore();
+  const { closeModal, openModal } = useModalStore();
   const modeList = [
     {
       title: '캐릭터',
@@ -39,7 +44,8 @@ export default function ChatModeSelectModal({ onLimitError }: ChatModeSelectModa
     if (data?.result.err === 4) {
       console.log('에러터짐');
       closeModal();
-      onLimitError();
+      onLimitError?.();
+      openModal({ type: 'limitCharacter' });
       return;
     }
 

@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import CardGrid from '@/components/elements/card/CardGrid';
 import DeleteConfirmModal from '@/components/modal/DeleteConfirmModal';
-import LimitCharacterModal from '@/components/modal/LimitCharacterModal';
 import { SectionTransition } from '@/components/motion/PageTransition';
 import { bridgeCharbotGetListMineDataToCharacter } from '@/lib/utils/storyNationUtil';
 import { createApi } from '@/services/api/storyNationApi';
@@ -19,7 +18,6 @@ import { CharbotInprogressResponse } from '@/types/api';
 export default function MyCharacterPage() {
   const router = useRouter();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
   const [characterToDelete, setCharacterToDelete] = useState<Character | null>(null);
   const { openModal } = useModalStore();
   const myNickName = useAccountStore.getState().data?.nick_nm;
@@ -30,11 +28,12 @@ export default function MyCharacterPage() {
     50
   );
 
+  // 임시저장 목록 로드 기반 프리체크. 전역 `limitCharacter` 모달(GlobalModalHost)로 안내한다.
   useEffect(() => {
     if (inProgressData?.result.err === 4) {
-      setIsLimitModalOpen(true);
+      openModal({ type: 'limitCharacter' });
     }
-  }, [inProgressData?.result.err]);
+  }, [inProgressData?.result.err, openModal]);
 
   const myCharacters = bridgeCharbotGetListMineDataToCharacter(
     inProgressData?.chrbotList.data || []
@@ -89,17 +88,10 @@ export default function MyCharacterPage() {
       setCharacterToDelete(null);
     }
   };
-  const handleLimitError = () => {
-    setIsLimitModalOpen(true);
-  };
-
   const handleCreateCharacter = async () => {
-    openModal({
-      type: 'chatModeSelect',
-      props: {
-        onLimitError: handleLimitError,
-      },
-    });
+    // 한도 초과 안내는 ChatModeSelectModal이 자체적으로 전역 `limitCharacter` 모달을 연다
+    // (src/shared/ui/modal/ChatModeSelectModal.tsx handleModeSelect, err===4 분기).
+    openModal({ type: 'chatModeSelect' });
   };
   return (
     <SectionTransition>
@@ -144,8 +136,6 @@ export default function MyCharacterPage() {
           entityName={characterToDelete?.name}
           onConfirm={confirmDelete}
         />
-
-        <LimitCharacterModal isOpen={isLimitModalOpen} onClose={() => setIsLimitModalOpen(false)} />
       </div>
     </SectionTransition>
   );

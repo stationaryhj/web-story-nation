@@ -74,7 +74,8 @@ const CharacterRankingSection = memo(() => {
   return (
     <section className='pt-10 pb-20'>
       {/* 제목과 탭 영역 - 좌우 여백 유지 */}
-      <div className='container mx-auto px-4'>
+      {/* home 전용 콘텐츠 폭(캐브덕 참조) — docs/publish/publish-20260710-home-margins-logo.md */}
+      <div className='mx-auto w-full max-w-[2200px] px-4 2xl:px-[100px]'>
         {/* 캐릭터 랭킹 탭 */}
         <div className='mb-6'>
           <div className='flex justify-between items-center mb-4 z-[1000]'>
@@ -108,8 +109,8 @@ const CharacterRankingSection = memo(() => {
         </div>
       </div>
 
-      {/* 카드 그리드 영역 - 오른쪽 여백 제거 */}
-      <div className='container mx-auto pl-4 pr-0'>
+      {/* 카드 그리드 영역 - 오른쪽 여백 제거(스와이퍼가 우측으로 자연스럽게 벗어나도록 pr-0 유지) */}
+      <div className='mx-auto w-full max-w-[2200px] pl-4 2xl:pl-[100px] pr-0'>
         <SectionTransition>
           <div className='w-full'>
             <CardGrid

@@ -20,6 +20,9 @@ const config: Config = {
       'max-md': { max: '767px' },
       'max-lg': { max: '1023px' },
       'max-xl': { max: '1279px' },
+      /* 객체형(max-*) 항목과 혼재하면 min-[...] 임의 변형이 비활성화되므로
+         480px 구간은 named 스크린으로 제공한다 */
+      xs: '480px',
       sm: '640px',
       md: '768px',
       lg: '1024px',

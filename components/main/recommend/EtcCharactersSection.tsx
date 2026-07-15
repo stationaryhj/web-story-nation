@@ -14,7 +14,8 @@ const EtcCharactersSection = memo(() => {
     <div>
       {modules_sum.map((module, idx) => (
         <section className='pt-10 sm:py-20' key={idx}>
-          <div className='container mx-auto px-4'>
+          {/* home 전용 콘텐츠 폭(캐브덕 참조) — docs/publish/publish-20260710-home-margins-logo.md */}
+          <div className='mx-auto w-full max-w-[2200px] px-4 2xl:px-[100px]'>
             <div className='flex justify-between items-center mb-4'>
               <h2 className='text-2xl font-bold text-text-primary relative inline-block'>
                 {moduleForTitleData[module.module_id].title}

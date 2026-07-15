@@ -302,9 +302,72 @@ body {
   padding-bottom: 30px;
 }
 
+/* 슬라이드 높이 통일: 기본값 height:100%는 래퍼가 auto라 콘텐츠 높이로 계산됨.
+   auto로 바꿔 flex stretch로 가장 높은 슬라이드에 맞춘다 */
+.card-grid-swiper .swiper-slide {
+  height: auto;
+}
+
 /* 작가 그리드 스와이퍼 스타일 */
 .author-grid-swiper .swiper-wrapper {
   padding-bottom: 30px;
+}
+
+/*
+ * content-visibility 유틸 — 오프스크린 카드의 페인트 + 이미지 디코딩 스킵.
+ * (계획: docs/plan/plan-20260710-card-animated-webp-perf.md 1단계)
+ *
+ * - contain-intrinsic-size는 반드시 함께 지정한다. 이 속성을 빼면 화면 밖 요소가
+ *   높이 0으로 접혀(placeholder) 렌더링되어, 스크롤 중 실제 콘텐츠가 나타날 때
+ *   레이아웃이 갑자기 늘어나며 스크롤바 위치가 튀는 문제가 생긴다.
+ * - 값(320px / 128px)은 카드 폭이 반응형이라 실측치가 아닌 대략치다.
+ *   실제 렌더 높이와 차이가 크면 스크롤 점프가 남을 수 있으므로,
+ *   360/768/1280px 검증 후 필요 시 보정한다(TODO: 실측 보정).
+ * - `auto`(마지막 렌더 크기 기억) 키워드는 쓰지 않는다: 카드 등고(h-full +
+ *   .swiper-slide flex stretch)와 결합하면, 리사이즈 이전 폭에서 기억된 큰 높이를
+ *   스킵된 슬라이드가 계속 보고 → 줄 전체가 그 높이로 늘어남 → 보이는 카드가
+ *   늘어난 높이를 다시 기억하는 피드백 루프로 카드가 영구히 비대해진다.
+ * - 미지원 브라우저(iOS Safari / WKWebView 15.4 미만 등)에서는
+ *   content-visibility/contain-intrinsic-size가 단순히 무시되고
+ *   기존 렌더링 방식으로 자연 폴백되므로 별도 폴백 코드는 필요 없다.
+ */
+@layer utilities {
+  /* 세로형 카드(default, my-character 카드): aspect-[3/4] 이미지 + 하단 텍스트
+     영역(p-2.5 내 제목/태그(1줄)/설명/작가 정보)을 합친 근사 높이.
+     ⚠️ 추정치는 반드시 실제 최소 카드 높이보다 작아야 한다 — 크면 아직 렌더되지
+     않은(스킵된) 슬라이드가 등고 스트레치로 줄 전체를 부풀렸다가, 스와이프로
+     렌더되는 순간 줄 높이가 줄어드는 출렁임이 생긴다(실측: 모바일 최소 ~276px). */
+  .cv-card {
+    content-visibility: auto;
+    contain-intrinsic-size: 250px;
+  }
+
+  /* 데스크톱은 카드가 넓어 자연 높이가 커지므로(lg+ 실측 최소 ~337px)
+     스크롤 점프 완화를 위해 추정치를 한 단계 올린다 */
+  @media (min-width: 1024px) {
+    .cv-card {
+      contain-intrinsic-size: 300px;
+    }
+  }
+
+  /* 가로형 카드(horizontal variant): 이미지가 w-32 h-32(128px) 고정이고
+     콘텐츠 영역이 이미지와 같은 높이로 flex 정렬되어 카드 전체 높이가
+     대략 128px에 근접한다. */
+  .cv-card-h {
+    content-visibility: auto;
+    contain-intrinsic-size: 128px;
+  }
+
+  /* 리사이즈 중에는 스킵을 잠시 해제(providers.tsx의 resize 핸들러가 클래스 토글).
+     Chrome은 content-visibility:auto 요소에 '마지막 렌더 크기'를 항상 사용하며
+     contain-intrinsic-size에서 auto 키워드를 빼도 비활성화되지 않는다(실측 확인).
+     스킵된 카드가 리사이즈 이전 폭의 큰 높이를 계속 보고하면 등고 스트레치
+     (h-full + .swiper-slide flex stretch)가 줄 전체를 그 높이로 부풀리므로,
+     리사이즈 동안 전부 렌더시켜 기억 크기를 현재 폭 기준으로 갱신한다. */
+  html.viewport-resizing .cv-card,
+  html.viewport-resizing .cv-card-h {
+    content-visibility: visible;
+  }
 }
 
 /* 카드 그리드 네비게이션 버튼 스타일 (brand 토큰, .dark 자동 스왑) */

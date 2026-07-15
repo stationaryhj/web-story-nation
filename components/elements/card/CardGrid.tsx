@@ -8,6 +8,7 @@ import { Navigation, Pagination } from 'swiper/modules';
 // Swiper 관련 임포트 추가
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { FadeIn } from '@/components/motion/PageTransition';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import type { Character } from '@/store/useStoreData';
 import { useStoreData } from '@/store/useStoreData';
 import { useModalStore } from '@/store/useStoreModal';
@@ -18,6 +19,16 @@ import Card from './Card';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
+
+interface SlidesPerViewMap {
+  default: number;
+  xs?: number; // 480px~ (tailwind.config의 xs 스크린과 동일 경계)
+  sm?: number;
+  md?: number;
+  lg?: number;
+  xl?: number;
+  '2xl'?: number;
+}
 
 interface CardGridProps {
   title?: string | null;
@@ -69,25 +80,8 @@ export default function CardGrid({
   const [localLoading, setLocalLoading] = useState(true);
   const [reachedEnd, setReachedEnd] = useState(false);
   const [reachedBeginning, setReachedBeginning] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const swiperRef = useRef<SwiperType | null>(null);
-
-  // 화면 크기에 따른 모바일 여부 체크
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    // 초기 체크
-    checkMobile();
-
-    // 화면 크기 변경 시 체크
-    window.addEventListener('resize', checkMobile);
-
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-    };
-  }, []);
 
   // 데이터 길이와 화면 크기에 따른 showNavigation 자동 결정
   const shouldShowNavigation = isMobile ? characters.length > 2 : characters.length > 5;
@@ -160,7 +154,9 @@ export default function CardGrid({
   };
 
   // 브레이크포인트에 따른 한 번에 보이는 슬라이드 수 설정
-  const getSlidesPerView = () => {
+  // 최저(기본) 2장 → 브레이크포인트마다 1장씩 증가 → 최대(2xl) 7장.
+  // .5는 다음 카드 반쪽 미리보기(peek)로 스와이프 가능함을 암시.
+  const getSlidesPerView = (): number | SlidesPerViewMap => {
     switch (cardsPerRow) {
       case 1:
         return 2.5;
@@ -169,9 +165,9 @@ export default function CardGrid({
       case 3:
         return { default: 2.5, sm: 2.5, md: 3.5 };
       case 4:
-        return { default: 2.5, sm: 2.5, md: 3.5, lg: 4.5 };
+        return { default: 2.5, xs: 3.5, sm: 3.5, md: 4.5, lg: 5.5, xl: 6.5, '2xl': 7.5 };
       default:
-        return { default: 2.5, sm: 2.5, md: 3.5, lg: 4.5 };
+        return { default: 2.5, xs: 3.5, sm: 3.5, md: 4.5, lg: 5.5, xl: 6.5, '2xl': 7.5 };
     }
   };
 
@@ -184,10 +180,17 @@ export default function CardGrid({
       slidesPerView: typeof slidesPerView === 'object' ? slidesPerView.default : slidesPerView,
       slidesPerGroup: 1,
     },
+    480: {
+      slidesPerView:
+        typeof slidesPerView === 'object'
+          ? slidesPerView.xs || slidesPerView.default
+          : slidesPerView,
+      slidesPerGroup: 1,
+    },
     640: {
       slidesPerView:
         typeof slidesPerView === 'object'
-          ? slidesPerView.sm || slidesPerView.default
+          ? slidesPerView.sm || slidesPerView.xs || slidesPerView.default
           : slidesPerView,
       slidesPerGroup: 1,
     },
@@ -205,6 +208,24 @@ export default function CardGrid({
           : slidesPerView,
       slidesPerGroup: 1,
     },
+    1280: {
+      slidesPerView:
+        typeof slidesPerView === 'object'
+          ? slidesPerView.xl || slidesPerView.lg || slidesPerView.md || slidesPerView.default
+          : slidesPerView,
+      slidesPerGroup: 1,
+    },
+    1536: {
+      slidesPerView:
+        typeof slidesPerView === 'object'
+          ? slidesPerView['2xl'] ||
+            slidesPerView.xl ||
+            slidesPerView.lg ||
+            slidesPerView.md ||
+            slidesPerView.default
+          : slidesPerView,
+      slidesPerGroup: 1,
+    },
   };
 
   // 한 줄에 표시할 카드 수에 따른 그리드 클래스 (스와이퍼를 사용하지 않을 때 사용)
@@ -217,9 +238,9 @@ export default function CardGrid({
       case 3:
         return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3';
       case 4:
-        return 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
+        return 'grid-cols-2 xs:grid-cols-3 md:grid-cols-3 lg:grid-cols-4';
       default:
-        return 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5';
+        return 'grid-cols-2 xs:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7';
     }
   };
 
@@ -337,7 +358,7 @@ export default function CardGrid({
               }, 100);
             }}
             modules={[Navigation]}
-            spaceBetween={16}
+            spaceBetween={12}
             loop={false}
             slidesPerGroup={1}
             navigation={{
@@ -356,7 +377,7 @@ export default function CardGrid({
         </div>
       ) : (
         <div
-          className={`grid ${getGridColumns()} ${variant === 'horizontal' ? 'gap-2' : 'gap-4 md:gap-6'}`}
+          className={`grid ${getGridColumns()} ${variant === 'horizontal' ? 'gap-2' : 'gap-3 md:gap-4'}`}
         >
           {isDataLoading
             ? Array(cardsPerRow)

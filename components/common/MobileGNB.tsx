@@ -1,29 +1,22 @@
 'use client';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { HandCoins, Home, MessageCircle, Store, UserRoundPlus } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
-import { SocialLoginProvider } from '@/services/auth/types';
+import type { MouseEvent } from 'react';
+import { useEffect, useState } from 'react';
 import useModalStore from '@/shared/model/stores/useModalStore';
 import { useAccountStore } from '@/store/useStoreData';
+import { getActiveKey, type NavConfigItem, navConfig } from './navConfig';
 
 export default function MobileGNB() {
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
-  const [activeLink, setActiveLink] = useState('/');
   const { openModal } = useModalStore();
-  const { isLogin, loginType } = useAccountStore();
+  const { isLogin } = useAccountStore();
 
   // 컴포넌트가 마운트되었는지 확인
   useEffect(() => {
     setMounted(true);
-
-    // 현재 경로 확인
-    if (pathname) {
-      setActiveLink(pathname);
-    }
 
     // 페이지 하단에 패딩 추가
     const addBottomPadding = () => {
@@ -41,56 +34,23 @@ export default function MobileGNB() {
   if (!mounted || (pathname && pathname.startsWith('/chat/') && pathname !== '/chat-list'))
     return null;
 
-  // 네비게이션 링크 (아이콘 추가)
-  const navLinks = [
-    { href: '/', label: '홈', requireLogin: false, icon: Home, loginTypeCheck: false },
-    {
-      href: '/chat-list',
-      label: '대화',
-      requireLogin: true,
-      icon: MessageCircle,
-      loginTypeCheck: false,
-    },
-    {
-      href: '/my-characters',
-      label: '만들기',
-      requireLogin: true,
-      icon: UserRoundPlus,
-      loginTypeCheck: true,
-    },
-    {
-      href: '/my-account',
-      label: '수익 관리',
-      requireLogin: true,
-      icon: HandCoins,
-      loginTypeCheck: true,
-    },
-    {
-      href: '/shop-recharge',
-      label: '상점',
-      requireLogin: true,
-      icon: Store,
-      loginTypeCheck: false,
-    },
-  ];
+  const activeKey = getActiveKey(pathname);
 
-  const isDisabled = '/guest'.includes(pathname || '');
-
-  // 로그인 필요한 링크 체크 핸들러
-  const handleNavLinkClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    link: (typeof navLinks)[0]
+  // 게이팅 + 액션 분기 핸들러. route/action 항목 모두 동일 규칙(DesktopSideNav와 동일)을 적용한다.
+  const handleNavItemClick = (
+    e: MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
+    item: NavConfigItem
   ) => {
-    if (link.requireLogin && !isLogin) {
+    // 게이팅: 미로그인만 차단한다. 로그인 상태면 게스트 포함 진행(DesktopSideNav와 동일 정책).
+    if (item.requireLogin && !isLogin) {
       e.preventDefault();
       openModal({ type: 'socialLogin' });
+      return;
     }
 
-    if (link.loginTypeCheck) {
-      if (!loginType || loginType === ('Guest' as SocialLoginProvider)) {
-        e.preventDefault();
-        openModal({ type: 'socialLogin' });
-      }
+    if (item.kind === 'action' && item.action === 'chatModeSelect') {
+      e.preventDefault();
+      openModal({ type: 'chatModeSelect' });
     }
   };
 
@@ -111,21 +71,37 @@ export default function MobileGNB() {
       }}
     >
       <div className='grid grid-cols-5 h-full'>
-        {navLinks.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            onClick={(e) => handleNavLinkClick(e, link)}
-            className={`flex flex-col items-center justify-center ${
-              activeLink === link.href ? 'text-brand' : 'text-text-muted'
-            }`}
-          >
-            {React.createElement(link.icon, {
-              className: `w-5 h-5 ${activeLink === link.href ? 'text-brand' : 'text-text-muted'}`,
-            })}
-            <span className='text-[10px] mt-1'>{link.label}</span>
-          </Link>
-        ))}
+        {navConfig.map((item) => {
+          const isActive = item.key === activeKey;
+          const Icon = item.icon;
+          const colorClassName = isActive ? 'text-brand' : 'text-text-muted';
+
+          if (item.kind === 'route') {
+            return (
+              <Link
+                key={item.key}
+                href={item.href}
+                onClick={(e) => handleNavItemClick(e, item)}
+                className={`flex flex-col items-center justify-center ${colorClassName}`}
+              >
+                <Icon className={`w-5 h-5 ${colorClassName}`} />
+                <span className='text-[10px] mt-1'>{item.label}</span>
+              </Link>
+            );
+          }
+
+          return (
+            <button
+              key={item.key}
+              type='button'
+              onClick={(e) => handleNavItemClick(e, item)}
+              className={`flex flex-col items-center justify-center ${colorClassName}`}
+            >
+              <Icon className={`w-5 h-5 ${colorClassName}`} />
+              <span className='text-[10px] mt-1'>{item.label}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import AlertModal from './AlertModal';
 import CharacterMediaModal from './CharacterMediaModal';
 import ChatModeSelectModal from './ChatModeSelectModal';
 import ConfirmModal from './ConfirmModal';
+import GlobalLimitCharacterModal from './GlobalLimitCharacterModal';
 import RedirectBannerModal from './RedirectBannerModal';
 import SignupModal from './SignupModal';
 import SocialLoginModal from './SocialLoginModal';
@@ -35,6 +36,7 @@ const MODAL_COMPONENTS: Record<string, ModalConfig> = {
   redirectBanner: { component: RedirectBannerModal },
   chatModeSelect: { component: ChatModeSelectModal },
   characterMedia: { component: CharacterMediaModal },
+  limitCharacter: { component: GlobalLimitCharacterModal },
 };
 
 export default function GlobalModalHost() {

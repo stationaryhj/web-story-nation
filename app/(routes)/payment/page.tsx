@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Footer from '@/components/common/footer';
-import Header from '@/components/common/header';
 import PaymentModal from '@/components/modal/PaymentModal';
 import PageTransition from '@/components/motion/PageTransition';
 
@@ -34,8 +33,6 @@ export default function PaymentTestPage() {
   return (
     <PageTransition>
       <main className='min-h-screen pb-20'>
-        <Header />
-
         <div className='container mx-auto px-4 py-12'>
           <div className='max-w-lg mx-auto'>
             <div className='p-4 bg-surface-elevated rounded-xl shadow-md'>

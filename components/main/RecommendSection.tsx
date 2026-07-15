@@ -38,7 +38,8 @@ export default function RecommendSection({ onSearchTrigger }: RecommendSectionPr
 
       {/* 앱 다운로드 섹션 */}
       <div className='bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-dark-primary-900/50 dark:to-dark-secondary-900/50 py-12 md:py-16'>
-        <div className='container mx-auto px-4'>
+        {/* home 전용 콘텐츠 폭(캐브덕 참조) — docs/publish/publish-20260710-home-margins-logo.md */}
+        <div className='mx-auto w-full max-w-[2200px] px-4 2xl:px-[100px]'>
           <div className='flex flex-col items-center text-center'>
             <h2 className='text-2xl md:text-3xl font-bold text-text-primary mb-4'>
               스토리네이션 앱 설치하기

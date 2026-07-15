@@ -1,6 +1,5 @@
 'use client'
 
-import Header from '@/components/common/header'
 import { useAccountStore } from '@/store/useStoreData'
 import { useEffect } from 'react'
 import MyProfileView from '@/views/my-profile/home'
@@ -22,10 +21,5 @@ export default function MyEarningsPage() {
     return <div className="flex justify-center items-center min-h-screen">로그인 확인 중...</div>
   }
 
-  return (
-    <>
-      <Header />
-      <MyProfileView />
-    </>
-  )
+  return <MyProfileView />
 }

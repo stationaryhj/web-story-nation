@@ -71,7 +71,8 @@ const AuthorRankingSection = memo(() => {
 
   return (
     <section className='py-10 bg-surface'>
-      <div className='container mx-auto px-4'>
+      {/* home 전용 콘텐츠 폭(캐브덕 참조) — docs/publish/publish-20260710-home-margins-logo.md */}
+      <div className='mx-auto w-full max-w-[2200px] px-4 2xl:px-[100px]'>
         {/* 작가 랭킹 탭 */}
         <div className='mb-6'>
           <div className='flex justify-between items-center mb-4'>

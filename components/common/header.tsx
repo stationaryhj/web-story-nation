@@ -4,15 +4,11 @@
 import {
   faBars,
   faBell,
-  faChartLine,
   faCog,
-  faComment,
   faFire,
-  faHome,
   faMoon,
   faShoppingBag,
   faSignOutAlt,
-  faStore,
   faSun,
   faTimes,
   faUser,
@@ -27,114 +23,25 @@ import { useEffect, useState } from 'react';
 import HeaderSidebar from '@/components/elements/sidebar/HeaderSidebar';
 import NotificationButton from '@/components/elements/sidebar/NotificationButton';
 import { FadeIn } from '@/components/motion/PageTransition';
-import { SocialLoginProvider } from '@/services/auth/types';
 import useNewModalStore from '@/shared/model/stores/useModalStore';
 import { useAccountStore, useThemeStore } from '@/store/useStoreData';
 import { useModalStore } from '@/store/useStoreModal';
-import { useSettingsStore } from '../../store/useStoreSettings';
-
-// 토글 스위치 컴포넌트 수정
-const SimpleToggle = ({
-  isOn,
-  onToggle,
-  isSidebar = false,
-}: {
-  isOn: boolean;
-  onToggle: () => void;
-  isSidebar?: boolean;
-}) => {
-  return (
-    <div className='flex items-center'>
-      <span className='hidden md:flex items-center py-2 text-text-primary hover:text-brand-hover font-medium transition-colors mr-2'>
-        세이프티 필터
-      </span>
-      <button
-        onClick={onToggle}
-        className={`w-20 relative flex items-center justify-between rounded-full bg-black transition-colors focus:outline-none p-1`}
-      >
-        {!isOn ? (
-          <>
-            <span className='text-white font-bold text-md mr-2 ml-2'>ON</span>
-            <div className='w-6 h-6 rounded-full bg-white flex items-center justify-center'>
-              <img src='/images/sft_icon_on.png' alt='Safety On' className='w-4 h-4' />
-            </div>
-          </>
-        ) : (
-          <>
-            <div className='w-6 h-6 rounded-full bg-[#636363] flex items-center justify-center'>
-              <img src='/images/sft_icon_off.png' alt='Safety Off' className='w-4 h-4' />
-            </div>
-            <span className='text-[#636363] font-bold text-md mr-2 ml-2'>OFF</span>
-          </>
-        )}
-      </button>
-    </div>
-  );
-};
 
 export default function Header() {
   const { isDarkMode, toggleDarkMode } = useThemeStore();
-  const { isAdultModeEnabled, changeAdultMode } = useSettingsStore();
   const [mounted, setMounted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
   const [activeLink, setActiveLink] = useState('/');
   const { openModal } = useModalStore();
   const { openModal: openNewModal } = useNewModalStore();
-  const { isLogin, logout, isAdult, loginType } = useAccountStore();
+  const { isLogin, logout } = useAccountStore();
   const router = useRouter();
 
-  // 네비게이션 링크 (아이콘 추가)
-  const navLinks = [
-    { href: '/', label: '홈', requireLogin: false, icon: faHome, loginTypeCheck: false },
-    {
-      href: '/chat-list',
-      label: '대화',
-      requireLogin: true,
-      icon: faComment,
-      loginTypeCheck: false,
-    },
-    {
-      href: '/my-characters',
-      label: '캐릭터 만들기',
-      requireLogin: true,
-      icon: faUser,
-      loginTypeCheck: true,
-    },
-    // { href: '/live', label: 'Live', requireLogin: true, icon: faVideo },
-    {
-      href: '/my-account',
-      label: '수익 관리',
-      requireLogin: true,
-      icon: faChartLine,
-      loginTypeCheck: true,
-    },
-    {
-      href: '/shop-recharge',
-      label: '상점',
-      requireLogin: true,
-      icon: faStore,
-      loginTypeCheck: false,
-    },
-  ];
-
-  // 로그인 필요한 링크 체크 핸들러
-  const handleNavLinkClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    link: (typeof navLinks)[0]
-  ) => {
-    if (link.requireLogin && !isLogin) {
-      e.preventDefault();
-      openNewModal({ type: 'socialLogin' });
-    }
-
-    /*    if (link.loginTypeCheck) {
-      if (!loginType || loginType === ('Guest' as SocialLoginProvider)) {
-        e.preventDefault();
-        openNewModal({ type: 'socialLogin' });
-      }
-    } */
-  };
+  // 데스크톱 nav는 좌측 사이드바(DesktopSideNav)로 이전되어 제거됨. 이 배열은
+  // HeaderSidebar(모바일 사이드바) prop 타입 호환을 위해 유지하되 렌더에는 쓰지 않는다.
+  // (HeaderSidebar.tsx:53/71-152 — navLinks는 실제 렌더에 사용되지 않음)
+  const navLinks: { href: string; label: string; requireLogin?: boolean }[] = [];
 
   // 컴포넌트가 마운트되었는지 확인
   useEffect(() => {
@@ -166,23 +73,6 @@ export default function Header() {
     }
   };
 
-  const handleAdultModeToggle = async () => {
-    if (isLogin) {
-      if (!loginType || loginType === ('Guest' as SocialLoginProvider)) {
-        openNewModal({ type: 'socialLogin' });
-        return;
-      }
-
-      if (isAdult()) {
-        await changeAdultMode();
-      } else {
-        openModal('adultVerification');
-      }
-    } else {
-      openNewModal({ type: 'socialLogin' });
-    }
-  };
-
   return (
     <>
       <motion.header
@@ -191,8 +81,11 @@ export default function Header() {
         animate={{ y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
       >
-        <div className='container mx-auto px-4 py-3 flex items-center justify-between'>
+        <div className='w-full px-4 md:pl-20 py-3 flex items-center justify-between'>
           <div className='flex items-center'>
+            {/* 로고는 Header 전용(전 화면 크기 노출). 데스크톱 좌측 사이드바(DesktopSideNav)는
+                caveduck 리디자인으로 로고를 갖지 않고 nav 항목만 담당한다.
+                근거: docs/plan/plan-20260710-sidebar-caveduck-redesign.md (3단계, 담당: writer) */}
             <Link
               href='/'
               className='text-xl font-bold text-brand-hover mr-10'
@@ -210,32 +103,9 @@ export default function Header() {
                 className='h-10 w-auto'
               />
             </Link>
-
-            {/* 데스크탑 네비게이션 - 태블릿 이상에서는 숨김 */}
-            <nav className='hidden md:flex items-center gap-8'>
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => handleNavLinkClick(e, link)}
-                  className={`text-sm font-medium transition-colors hover:text-brand ${
-                    activeLink === link.href ? 'text-brand' : 'text-text-primary'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
           </div>
 
           <div className='flex items-center md:space-x-4 gap-1'>
-            {/* 짜릿모드 토글 - 모든 화면에서 표시 */}
-            {mounted && (
-              <div>
-                <SimpleToggle isOn={isAdultModeEnabled} onToggle={handleAdultModeToggle} />
-              </div>
-            )}
-
             {/* 다크모드 토글 버튼 - 모바일에서는 숨김 */}
             {/* {mounted && (
               <motion.button

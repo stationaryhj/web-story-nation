@@ -7,6 +7,7 @@ import './globals.css';
 import { Plus } from 'lucide-react';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
+import AppShell from '@/components/common/AppShell';
 import MobileGNB from '@/components/common/MobileGNB';
 import DraggableButton from '@/components/elements/button/DraggableButton';
 import { ToastPortal } from '@/components/elements/toast/ToastPortal';
@@ -105,9 +106,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       >
         <Providers>
           <div className='flex min-h-screen flex-col md:pb-0'>
-            <div className='flex-1' id='main-content'>
-              {children}
-            </div>
+            <AppShell>{children}</AppShell>
           </div>
         </Providers>
 

@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import Footer from '@/components/common/footer';
-import Header from '@/components/common/header';
 import PageTransition from '@/components/motion/PageTransition';
 
 // 실제 콘텐츠를 처리하는 컴포넌트
@@ -92,8 +91,6 @@ export default function PaymentFailPage() {
   return (
     <PageTransition>
       <main className='min-h-screen pb-20'>
-        <Header />
-
         <div className='container mx-auto px-4 py-12'>
           <h1 className='text-3xl font-bold mb-8 text-center text-text-primary'>결제 실패</h1>
 

@@ -11,7 +11,6 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { trackEvent } from '@/app/firebase';
 import Footer from '@/components/common/footer';
-import Header from '@/components/common/header';
 import PageTransition from '@/components/motion/PageTransition';
 import { settlementApi } from '@/services/api/storyNationApi';
 import { useAccountStore } from '@/store/useAccountStore';
@@ -178,8 +177,6 @@ export default function PaymentSuccessPage() {
   return (
     <PageTransition>
       <main className='min-h-screen pb-20'>
-        <Header />
-
         <div className='container mx-auto px-4 py-12'>
           <h1 className='text-3xl font-bold mb-8 text-center text-text-primary'>결제 완료</h1>
 

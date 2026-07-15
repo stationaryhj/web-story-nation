@@ -2,7 +2,6 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import Header from '@/components/common/header';
 import CardGrid from '@/components/elements/card/CardGrid';
 import Dropdown from '@/components/elements/dropdown/Dropdown';
 import Pagination from '@/components/elements/pagination/Pagination';
@@ -197,8 +196,6 @@ export default function searchPage({}: Props) {
 
   return (
     <PageTransition>
-      <Header />
-
       <div className='container mx-auto px-4 pt-6 relative'>
         <div>
           <SearchBar

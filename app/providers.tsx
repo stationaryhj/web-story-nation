@@ -131,6 +131,81 @@ export default function Providers({ children }: { children: ReactNode }) {
     }
   }, [chrbotKey]);
 
+  // 768px 경계에서 스크롤러가 교체(데스크톱: body ↔ 모바일: .mobile-scroll-container,
+  // globals.css의 max-width:767px 미디어 쿼리)되면서 스크롤 위치가 0으로 소실되는 문제 보정.
+  // 경계 통과 시점에는 이전 스크롤러의 scrollTop이 이미 클램프됐을 수 있어,
+  // 스크롤 중 마지막 위치를 계속 추적해 두었다가 새 스크롤러에 복원한다.
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const getContainer = () => document.querySelector<HTMLElement>('.mobile-scroll-container');
+    let lastY = 0;
+
+    const readY = () => {
+      const msc = getContainer();
+      return Math.max(
+        document.body.scrollTop,
+        document.documentElement.scrollTop,
+        msc ? msc.scrollTop : 0
+      );
+    };
+
+    const handleScroll = (e: Event) => {
+      const t = e.target;
+      // 페이지 스크롤러의 스크롤만 추적 (모달·스와이퍼 등 내부 스크롤은 제외)
+      if (
+        t === document ||
+        t === document.body ||
+        t === document.documentElement ||
+        t === getContainer()
+      ) {
+        lastY = readY();
+      }
+    };
+
+    const handleBreakpointChange = () => {
+      const y = lastY;
+      // 미디어 쿼리 적용 → 레이아웃 반영 이후에 복원 (rAF 2회로 스타일/레이아웃 안정화 대기)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (mq.matches) {
+            getContainer()?.scrollTo(0, y);
+          } else {
+            document.body.scrollTop = y;
+            document.documentElement.scrollTop = y;
+          }
+        });
+      });
+    };
+
+    lastY = readY();
+    window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
+    mq.addEventListener('change', handleBreakpointChange);
+    return () => {
+      window.removeEventListener('scroll', handleScroll, { capture: true });
+      mq.removeEventListener('change', handleBreakpointChange);
+    };
+  }, []);
+
+  // 리사이즈 중 카드 content-visibility 스킵 잠금 해제 (globals.css의
+  // html.viewport-resizing 규칙과 세트). 스킵된 카드가 이전 폭에서 기억한 높이로
+  // 카드 줄을 부풀리는 것을 막는다 — 리사이즈 동안 렌더시켜 기억 크기를 갱신.
+  useEffect(() => {
+    let timer: number | undefined;
+    const handleResize = () => {
+      document.documentElement.classList.add('viewport-resizing');
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        document.documentElement.classList.remove('viewport-resizing');
+      }, 300);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.clearTimeout(timer);
+      document.documentElement.classList.remove('viewport-resizing');
+    };
+  }, []);
+
   // 테마는 APP_THEME 상수로 <html>에 정적 적용되므로 런타임 클래스 동기화가 불필요하다.
 
   // 스켈레톤 테마 색상 설정 (APP_THEME 상수 기준)

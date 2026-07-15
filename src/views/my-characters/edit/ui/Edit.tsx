@@ -2,7 +2,6 @@
 
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
-import Header from '@/components/common/header';
 import { useCharacterInProgress } from '@/shared/api/queries/useCharacterInProgress';
 import { EditDm, EditStory } from '@/src/features/edit-character';
 import { bridgeCharacterInProgressToCharacter } from '@/src/features/edit-character/lib/dmFormBridge';
@@ -38,10 +37,5 @@ export default function Edit() {
     return <EditDm data={bridgedData!} />;
   }
 
-  return (
-    <>
-      <Header />
-      <EditStory />
-    </>
-  );
+  return <EditStory />;
 }

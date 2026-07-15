@@ -13,8 +13,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import { CardTransition } from '@/components/motion/PageTransition';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { getChangeNameTag } from '@/lib/utils/storyNationUtil';
 import { contentApi, createApi } from '@/services/api/storyNationApi';
 import type { Character } from '@/store/useStoreData';
@@ -49,7 +50,7 @@ export default function Card({
   const { name, subject, description, imageUrl, commentCount, hashtags, isAdult, creator } =
     character;
   const { openModal, setSelectedCharacter } = useModalStore();
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const [imageError, setImageError] = React.useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -81,22 +82,6 @@ export default function Card({
     setSelectedCharacter(character);
     openModal('character');
   };
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-
-    // 초기 체크
-    checkMobile();
-
-    // 화면 크기 변경 시 체크
-    window.addEventListener('resize', checkMobile);
-
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-    };
-  }, []);
 
   // 실제 카드 클릭 핸들러
   const handleCardClick = () => {
@@ -135,14 +120,14 @@ export default function Card({
   // 가로형 카드 렌더링
   if (variant === 'horizontal') {
     return (
-      <CardTransition index={Math.min(index, 5)}>
+      <CardTransition index={Math.min(index, 5)} className='h-full'>
         <div
-          className='group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-surface-elevated cursor-pointer flex mb-2'
+          className='cv-card-h group relative h-full overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-surface-elevated cursor-pointer flex mb-2'
           onClick={handleCardClick}
           onMouseEnter={handlePrefetch}
         >
           {/* 이미지 영역 */}
-          <div className='relative w-32 h-32 overflow-hidden'>
+          <div className='relative w-32 h-32 shrink-0 overflow-hidden'>
             {/* 랭킹 표시 */}
             {hasRank && rank !== undefined && (
               <div
@@ -181,7 +166,7 @@ export default function Card({
           </div>
 
           {/* 콘텐츠 영역 */}
-          <div className='flex-1 px-3 pt-2'>
+          <div className='flex flex-1 flex-col px-3 py-2'>
             <h3 className='font-bold text-text-primary text-base truncate'>{subject || name}</h3>
 
             {/* 캐릭터 설명 - 최대 2줄 */}
@@ -189,18 +174,19 @@ export default function Card({
               {getChangeNameTag(description || '', name)}
             </p>
 
-            <div className='flex flex-wrap gap-1 my-1.5'>
+            {/* 태그는 한 줄 고정 — 넘치면 말줄임(…) 처리해 카드 높이 편차를 차단 */}
+            <div className='my-1.5 overflow-hidden text-ellipsis whitespace-nowrap'>
               {hashtags?.slice(0, 2).map((tag, index) => (
                 <span
                   key={`${character.id}-tag-${tag}-${index}`}
-                  className='text-xs text-brand bg-brand/10 px-1.5 py-0.5 rounded-full'
+                  className='mr-1 inline-block text-xs text-brand bg-brand/10 px-1.5 py-0.5 rounded-full'
                 >
                   {tag}
                 </span>
               ))}
             </div>
 
-            <div className='flex items-center mt-1.5'>
+            <div className='mt-auto flex items-center pt-1.5'>
               <div className='w-5 h-5 rounded-full bg-surface-elevated flex items-center justify-center overflow-hidden'>
                 {creator?.profileImageUrl ? (
                   <Image
@@ -254,22 +240,22 @@ export default function Card({
 
   if (variant === 'my-character') {
     return (
-      <CardTransition index={Math.min(index, 5)}>
+      <CardTransition index={Math.min(index, 5)} className='h-full'>
         <div
-          className='group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-surface-elevated cursor-pointer'
+          className='cv-card group relative h-full overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-surface-elevated cursor-pointer'
           onClick={handleCardClick}
           onMouseEnter={handlePrefetch}
         >
-          <div className='block'>
-            <div className='relative aspect-[3/4] overflow-hidden rounded-t-xl'>
+          <div className='flex h-full flex-col'>
+            <div className='relative aspect-[3/4] shrink-0 overflow-hidden rounded-t-xl'>
               {/* 성인 컨텐츠 표시 */}
               {isAdult && !isSidebar && (
                 <div className='absolute top-2 right-2 md:top-[15px] md:right-[15px] z-[40] flex items-center justify-center'>
                   <Image
                     src='/images/flames.png'
                     alt='성인인증'
-                    width={isMobile ? 18.5 : 27.7}
-                    height={isMobile ? 23 : 35.3}
+                    width={isMobile ? 18.5 : 22}
+                    height={isMobile ? 23 : 28}
                   />
                 </div>
               )}
@@ -300,23 +286,24 @@ export default function Card({
               )}
             </div>
 
-            <div className='p-4'>
-              <h3 className='font-bold text-text-primary mb-1 truncate group-hover:text-brand-hover transition-colors'>
+            <div className='flex flex-1 flex-col p-2.5'>
+              <h3 className='text-sm font-bold text-text-primary mb-1 truncate group-hover:text-brand-hover transition-colors'>
                 {subject || name}
               </h3>
 
-              <div className='mb-2 flex flex-wrap gap-1'>
+              {/* 태그는 한 줄 고정 — 넘치면 말줄임(…) 처리해 카드 높이 편차를 차단 */}
+              <div className='mb-1 overflow-hidden text-ellipsis whitespace-nowrap'>
                 {hashtags?.slice(0, 3).map((tag, index) => (
                   <span
                     key={`${character.id}-tag-${tag}-${index}`}
-                    className='text-xs text-brand bg-brand/10 px-2 py-0.5 rounded-full'
+                    className='mr-1 inline-block text-[11px] text-brand bg-brand/10 px-1.5 py-0.5 rounded-full'
                   >
                     {tag}
                   </span>
                 ))}
               </div>
 
-              <p className='text-xs text-text-muted mb-1 line-clamp-2 h-8 group-hover:text-text-primary transition-colors'>
+              <p className='text-[11px] text-text-muted mb-1 line-clamp-1 h-auto group-hover:text-text-primary transition-colors'>
                 {getChangeNameTag(description || '', name)}
               </p>
 
@@ -342,17 +329,17 @@ export default function Card({
                 </span>
               </div> */}
 
-              <div className='grid grid-cols-2 gap-2 mt-2'>
+              <div className='grid grid-cols-2 gap-1.5 mt-auto pt-1.5'>
                 <button
                   onClick={handleEditClick}
-                  className='py-1.5 px-2 bg-surface-elevated hover:bg-surface-elevated-hover text-text-primary text-xs rounded flex items-center justify-center transition-colors'
+                  className='py-1 px-1.5 bg-surface-elevated hover:bg-surface-elevated-hover text-text-primary text-[11px] rounded flex items-center justify-center transition-colors'
                 >
                   <FontAwesomeIcon icon={faPencilAlt} className='mr-1' />
                   수정
                 </button>
                 <button
                   onClick={handleDeleteClick}
-                  className='py-1.5 px-2 bg-danger/10 hover:bg-danger/20 text-danger text-xs rounded flex items-center justify-center transition-colors'
+                  className='py-1 px-1.5 bg-danger/10 hover:bg-danger/20 text-danger text-[11px] rounded flex items-center justify-center transition-colors'
                 >
                   <FontAwesomeIcon icon={faTrash} className='mr-1' />
                   삭제
@@ -367,17 +354,17 @@ export default function Card({
 
   // 기존 카드 렌더링 (세로형)
   return (
-    <CardTransition index={Math.min(index, 5)}>
+    <CardTransition index={Math.min(index, 5)} className='h-full'>
       <div
-        className='group relative overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-surface-elevated cursor-pointer'
+        className='cv-card group relative h-full overflow-hidden rounded-xl shadow-sm hover:shadow-md transition-all duration-300 bg-surface-elevated cursor-pointer'
         onClick={handleCardClick}
       >
-        <div className='block'>
-          <div className='relative aspect-[3/4] overflow-hidden rounded-t-xl'>
+        <div className='flex h-full flex-col'>
+          <div className='relative aspect-[3/4] shrink-0 overflow-hidden rounded-t-xl'>
             {/* 랭킹 표시 */}
             {hasRank && rank !== undefined && (
               <div
-                className={`absolute top-0 left-0 z-[40] w-8 h-8 ${getRankBgColor(rank)} text-text-inverse flex items-center justify-center font-bold shadow-md`}
+                className={`absolute top-0 left-0 z-[40] w-7 h-7 ${getRankBgColor(rank)} text-text-inverse flex items-center justify-center font-bold shadow-md`}
               >
                 {rank}
               </div>
@@ -389,8 +376,8 @@ export default function Card({
                 <Image
                   src='/images/flames.png'
                   alt='성인인증'
-                  width={isMobile ? 18.5 : 27.7}
-                  height={isMobile ? 23 : 35.3}
+                  width={isMobile ? 18.5 : 22}
+                  height={isMobile ? 23 : 28}
                 />
               </div>
             )}
@@ -411,8 +398,8 @@ export default function Card({
               {/* 갤러리 아이콘 */}
               {character.multi_image_count > 0 && (
                 <div className='flex items-center justify-center gap-1'>
-                  <FontAwesomeIcon icon={faImage} className='text-[14px] md:text-[20px]' />
-                  <span className='text-[14px] md:text-[20px]'>
+                  <FontAwesomeIcon icon={faImage} className='text-[12px] md:text-[14px]' />
+                  <span className='text-[12px] md:text-[14px]'>
                     {character.multi_image_count || 0}
                   </span>
                 </div>
@@ -424,10 +411,10 @@ export default function Card({
                   <Image
                     src='/images/icons/like_icon_white.png'
                     alt='레벨 아이콘'
-                    width={isMobile ? 14 : 20}
-                    height={isMobile ? 14 : 20}
+                    width={isMobile ? 12 : 16}
+                    height={isMobile ? 12 : 16}
                   />
-                  <span className='text-[14px] md:text-[20px]'>
+                  <span className='text-[12px] md:text-[14px]'>
                     Lv.{character.likeability_max_lv || 0}
                   </span>
                 </div>
@@ -440,41 +427,42 @@ export default function Card({
                 <Image
                   src='/images/comment_black.png'
                   alt='댓글 아이콘'
-                  width={isMobile ? 12 : 22}
-                  height={isMobile ? 11 : 22}
+                  width={isMobile ? 12 : 16}
+                  height={isMobile ? 11 : 16}
                 />
-                <span className='text-[14px] md:text-[20px]'>{commentCount}</span>
+                <span className='text-[12px] md:text-[14px]'>{commentCount}</span>
               </div>
             )}
           </div>
 
-          <div className='p-4'>
-            <h3 className='font-bold text-text-primary mb-1 truncate group-hover:text-brand-hover transition-colors'>
+          <div className='flex flex-1 flex-col p-2.5'>
+            <h3 className='text-sm font-bold text-text-primary mb-1 truncate group-hover:text-brand-hover transition-colors'>
               {subject || name}
             </h3>
 
-            <div className='mb-2 flex flex-wrap gap-1'>
+            {/* 태그는 한 줄 고정 — 넘치면 말줄임(…) 처리해 카드 높이 편차를 차단 */}
+            <div className='mb-1 overflow-hidden text-ellipsis whitespace-nowrap'>
               {hashtags?.slice(0, 3).map((tag, index) => (
                 <span
                   key={`${character.id}-tag-${tag}-${index}`}
-                  className='text-xs text-brand bg-brand/10 px-2 py-0.5 rounded-full'
+                  className='mr-1 inline-block text-[11px] text-brand bg-brand/10 px-1.5 py-0.5 rounded-full'
                 >
                   {tag}
                 </span>
               ))}
             </div>
 
-            <p className='text-xs text-text-muted mb-1 line-clamp-2 h-8 group-hover:text-text-primary transition-colors'>
+            <p className='text-[11px] text-text-muted mb-1 line-clamp-1 h-auto group-hover:text-text-primary transition-colors'>
               {getChangeNameTag(description || '', name)}
             </p>
-            <div className='flex items-center'>
-              <div className='w-5 h-5 rounded-full bg-surface-elevated flex items-center justify-center overflow-hidden'>
+            <div className='mt-auto flex items-center pt-1'>
+              <div className='w-4 h-4 rounded-full bg-surface-elevated flex items-center justify-center overflow-hidden'>
                 {creator?.profileImageUrl ? (
                   <Image
                     src={creator.profileImageUrl}
                     alt={`${creator.nickname} 프로필 이미지`}
-                    width={20}
-                    height={20}
+                    width={16}
+                    height={16}
                     className='object-cover'
                   />
                 ) : (
@@ -483,7 +471,7 @@ export default function Card({
                   </span>
                 )}
               </div>
-              <span className='ml-1 text-xs text-text-muted truncate max-w-[80px]'>
+              <span className='ml-1 text-[11px] text-text-muted truncate max-w-[80px]'>
                 {creator?.nickname || '익명'}
               </span>
             </div>
