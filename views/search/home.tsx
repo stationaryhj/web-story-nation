@@ -197,7 +197,7 @@ export default function searchPage({}: Props) {
   return (
     <PageTransition>
       <div className='container mx-auto px-4 pt-6 relative'>
-        <div>
+        <div className='md:hidden'>
           <SearchBar
             onSearch={handleSearch}
             placeholder='캐릭터나 작가를 검색해보세요'

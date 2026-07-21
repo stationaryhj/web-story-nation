@@ -23,6 +23,8 @@ interface ButtonTabsProps {
   hashTags?: Record<string, HashTagItem[]>
   onTagSelect?: (tagIds: string[]) => void
   onTabChange?: (tabId: string) => void
+  /** 'underline': 텍스트+하단 인디케이터(기본), 'chip': 알약형 칩(Figma 홈 Top 메뉴) */
+  variant?: 'underline' | 'chip'
 }
 
 export default function ButtonTabs({
@@ -32,6 +34,7 @@ export default function ButtonTabs({
   hashTags = {},
   onTagSelect,
   onTabChange,
+  variant = 'underline',
 }: ButtonTabsProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -60,8 +63,10 @@ export default function ButtonTabs({
     width: 0,
   })
 
-  // 활성 탭이 변경될 때 인디케이터 위치 업데이트
+  // 활성 탭이 변경될 때 인디케이터 위치 업데이트 (chip variant는 인디케이터 없음)
   useEffect(() => {
+    if (variant !== 'underline') return
+
     const updateIndicator = () => {
       const activeIndex = tabs.findIndex(tab => tab.id === activeTabId)
       if (activeIndex >= 0 && tabsRef.current[activeIndex]) {
@@ -91,7 +96,7 @@ export default function ButtonTabs({
     // 윈도우 크기가 변경될 때도 인디케이터 위치 업데이트
     window.addEventListener('resize', updateIndicator)
     return () => window.removeEventListener('resize', updateIndicator)
-  }, [activeTabId, tabs])
+  }, [activeTabId, tabs, variant])
 
   // URL 파라미터 업데이트
   const updateUrlParams = (tabId: string, tags: string[]) => {
@@ -167,7 +172,7 @@ export default function ButtonTabs({
     <div className={cn('', className)}>
       {/* 탭 네비게이션 */}
       <div className="relative flex overflow-x-auto hide-scrollbar">
-        <div className="flex space-x-4 md:space-x-8">
+        <div className={cn(variant === 'chip' ? 'flex gap-[14px]' : 'flex space-x-4 md:space-x-8')}>
           {tabs.map((tab, index) => (
             <button
               key={tab.id}
@@ -178,27 +183,39 @@ export default function ButtonTabs({
                 }
               }}
               className={cn(
-                'py-2 px-1 text-sm sm:text-sm md:text-lg font-bold whitespace-nowrap transition-colors relative',
-                activeTabId === tab.id
-                  ? 'text-brand'
-                  : 'text-text-muted hover:text-brand'
+                variant === 'chip'
+                  ? [
+                      'inline-flex h-[45px] min-w-[119px] shrink-0 items-center justify-center whitespace-nowrap rounded-full px-4 text-sm md:text-base font-medium transition-colors',
+                      activeTabId === tab.id
+                        ? 'bg-brand text-white'
+                        : 'bg-surface-elevated text-text-muted hover:bg-surface-elevated-hover',
+                    ]
+                  : [
+                      'py-2 px-1 text-sm sm:text-sm md:text-lg font-bold whitespace-nowrap transition-colors relative',
+                      activeTabId === tab.id
+                        ? 'text-brand'
+                        : 'text-text-muted hover:text-brand',
+                    ]
               )}
+              aria-pressed={variant === 'chip' ? activeTabId === tab.id : undefined}
               onClick={() => handleTabClick(tab.id)}
             >
               <span>{tab.label}</span>
             </button>
           ))}
         </div>
-        {/* 하단 인디케이터 애니메이션 */}
-        <motion.div
-          className="absolute bottom-0 h-0.5 bg-brand"
-          initial={false}
-          animate={{
-            left: indicatorStyle.left,
-            width: indicatorStyle.width,
-          }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        />
+        {/* 하단 인디케이터 애니메이션 (underline variant 전용) */}
+        {variant === 'underline' && (
+          <motion.div
+            className="absolute bottom-0 h-0.5 bg-brand"
+            initial={false}
+            animate={{
+              left: indicatorStyle.left,
+              width: indicatorStyle.width,
+            }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          />
+        )}
       </div>
 
       {/* 해시태그 영역 */}

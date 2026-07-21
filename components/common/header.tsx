@@ -20,6 +20,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import HeaderSearch from '@/components/common/HeaderSearch';
 import HeaderSidebar from '@/components/elements/sidebar/HeaderSidebar';
 import NotificationButton from '@/components/elements/sidebar/NotificationButton';
 import { FadeIn } from '@/components/motion/PageTransition';
@@ -104,6 +105,8 @@ export default function Header() {
               />
             </Link>
           </div>
+
+          <HeaderSearch />
 
           <div className='flex items-center md:space-x-4 gap-1'>
             {/* 다크모드 토글 버튼 - 모바일에서는 숨김 */}

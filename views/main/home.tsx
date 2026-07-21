@@ -75,16 +75,18 @@ export default function Home() {
             전역 `.container`(tailwind.config container.screens, 다른 페이지 공용) 대신
             홈 전용 max-width+padding 조합을 직접 사용해 다른 페이지에 영향 없이 스코프.
             근거: docs/plan/plan-20260710-caveduck-shell-layout.md, docs/publish/publish-20260710-home-margins-logo.md */}
-        <div className='mx-auto w-full max-w-[2200px] px-4 2xl:px-[100px] pt-6 relative'>
+        <div className='md:hidden mx-auto w-full max-w-[2200px] px-4 2xl:px-[100px] pt-6 relative'>
           <SearchBar onSearch={handleSearch} placeholder='캐릭터나 작가를 검색해보세요' />
         </div>
 
-        {/* 네비게이션 탭 */}
+        {/* 네비게이션 탭 — Figma 홈 Top 메뉴 칩 형태 (docs/publish/publish-20260709-home-demo.md) */}
         <div className='mx-auto w-full max-w-[2200px] px-4 2xl:px-[100px] mt-8 flex justify-center'>
           <ButtonTabs
             tabs={navigationTabs}
             defaultTabId={tabParam}
             onTabChange={handleCategoryChange}
+            variant='chip'
+            className='max-w-full'
           />
         </div>
 
