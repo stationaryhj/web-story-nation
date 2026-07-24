@@ -93,8 +93,7 @@ export default function CharacterGridSection({
   if (isLoading && characters.length === 0) {
     return (
       <SectionTransition className='py-12 bg-surface'>
-        {/* home 전용 콘텐츠 폭(캐브덕 참조) — docs/publish/publish-20260710-home-margins-logo.md */}
-        <div className='mx-auto w-full max-w-[2200px] px-4 2xl:px-[100px]'>
+        <div className='container mx-auto px-4'>
           {/* <h2 className="text-2xl font-bold mb-6">{categoryName}</h2> */}
           {/* 필터 컨트롤은 항상 보여줌 */}
           <FilterControls categoryId={categoryId} />
@@ -115,8 +114,7 @@ export default function CharacterGridSection({
   if (error && characters.length === 0) {
     return (
       <SectionTransition className='py-12 bg-surface'>
-        {/* home 전용 콘텐츠 폭(캐브덕 참조) — docs/publish/publish-20260710-home-margins-logo.md */}
-        <div className='mx-auto w-full max-w-[2200px] px-4 2xl:px-[100px]'>
+        <div className='container mx-auto px-4'>
           {/* <h2 className="text-2xl font-bold mb-6">{categoryName}</h2> */}
           <FilterControls categoryId={categoryId} />
           <div className='mt-8 py-12 text-center'>
@@ -137,8 +135,7 @@ export default function CharacterGridSection({
   if ((isEmpty || characters.length === 0) && !isLoading) {
     return (
       <SectionTransition className='py-12 bg-surface'>
-        {/* home 전용 콘텐츠 폭(캐브덕 참조) — docs/publish/publish-20260710-home-margins-logo.md */}
-        <div className='mx-auto w-full max-w-[2200px] px-4 2xl:px-[100px]'>
+        <div className='container mx-auto px-4'>
           {/* <h2 className="text-2xl font-bold mb-6">{categoryName}</h2> */}
           <FilterControls categoryId={categoryId} />
           <div className='mt-12 py-12 text-center'>
@@ -171,8 +168,7 @@ export default function CharacterGridSection({
   // 정상 데이터 표시
   return (
     <SectionTransition className='py-12 bg-surface'>
-      {/* home 전용 콘텐츠 폭(캐브덕 참조) — docs/publish/publish-20260710-home-margins-logo.md */}
-      <div className='mx-auto w-full max-w-[2200px] px-4 2xl:px-[100px]'>
+      <div className='container mx-auto px-4'>
         {/* 필터 컨트롤 */}
         <FilterControls categoryId={categoryId} />
 

@@ -165,9 +165,9 @@ export default function CardGrid({
       case 3:
         return { default: 2.5, sm: 2.5, md: 3.5 };
       case 4:
-        return { default: 2.5, xs: 3.5, sm: 3.5, md: 4.5, lg: 5.5, xl: 6.5, '2xl': 7.5 };
+        return { default: 2.5, sm: 2.5, md: 3.5, lg: 4.5 };
       default:
-        return { default: 2.5, xs: 3.5, sm: 3.5, md: 4.5, lg: 5.5, xl: 6.5, '2xl': 7.5 };
+        return { default: 2.5, sm: 2.5, md: 3.5, lg: 4.5 };
     }
   };
 
@@ -238,9 +238,9 @@ export default function CardGrid({
       case 3:
         return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3';
       case 4:
-        return 'grid-cols-2 xs:grid-cols-3 md:grid-cols-3 lg:grid-cols-4';
+        return 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
       default:
-        return 'grid-cols-2 xs:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7';
+        return 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5';
     }
   };
 

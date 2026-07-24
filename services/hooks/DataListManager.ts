@@ -156,6 +156,22 @@ export const ReqGetTags = (categoryType: number) => {
   return { data, isLoading, error };
 };
 
+// 홈 태그 랭킹 탭 목록 — type:0(전체) (docs/plan/plan-20260722-home-tag-ranking-tabs.md)
+// 탭 개수는 NEXT_PUBLIC_HOME_TAG_TAB_COUNT로 조정 (미설정/잘못된 값이면 10)
+const HOME_TAG_TAB_COUNT = Number(process.env.NEXT_PUBLIC_HOME_TAG_TAB_COUNT) || 10;
+
+export const ReqTagRankingTabs = () => {
+  const { data, isLoading, error } = useQuery<TagRankingListResponse>({
+    queryKey: ['tagRankingTabs', HOME_TAG_TAB_COUNT],
+    queryFn: async () => {
+      const response = await contentApi.GetTagRankingList(0, HOME_TAG_TAB_COUNT);
+      return response.data as TagRankingListResponse;
+    },
+  });
+
+  return { data, isLoading, error };
+};
+
 export const ReqGetChatList = (paginate: number, page: number) => {
   const { data, isLoading, error, refetch } = useQuery<CharbotChatListResponse>({
     queryKey: ['chatList', paginate, page],

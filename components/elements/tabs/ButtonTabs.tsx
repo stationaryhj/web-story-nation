@@ -25,6 +25,8 @@ interface ButtonTabsProps {
   onTabChange?: (tabId: string) => void
   /** 'underline': 텍스트+하단 인디케이터(기본), 'chip': 알약형 칩(Figma 홈 Top 메뉴) */
   variant?: 'underline' | 'chip'
+  /** true면 URL(`?tab=`)을 읽거나 갱신하지 않는다(서브탭 등 상위 URL을 침범하면 안 되는 경우, 기본 false) */
+  disableUrlSync?: boolean
 }
 
 export default function ButtonTabs({
@@ -35,6 +37,7 @@ export default function ButtonTabs({
   onTagSelect,
   onTabChange,
   variant = 'underline',
+  disableUrlSync = false,
 }: ButtonTabsProps) {
   const router = useRouter()
   const pathname = usePathname()
@@ -44,8 +47,10 @@ export default function ButtonTabs({
   const tabParam = searchParams?.get('tab')
   const tagsParam = searchParams?.get('tags')
 
-  // 초기 상태 설정
-  const initialTabId = tabParam || defaultTabId || tabs[0]?.id || ''
+  // 초기 상태 설정 (disableUrlSync면 상위 URL의 tab을 오독하지 않도록 defaultTabId만 사용)
+  const initialTabId = disableUrlSync
+    ? defaultTabId || tabs[0]?.id || ''
+    : tabParam || defaultTabId || tabs[0]?.id || ''
   const [activeTabId, setActiveTabId] = useState(initialTabId)
   const [selectedTags, setSelectedTags] = useState<string[]>(tagsParam ? tagsParam.split('&') : [])
 
@@ -128,8 +133,10 @@ export default function ButtonTabs({
     // 탭이 변경될 때 선택된 태그를 초기화
     setSelectedTags([])
 
-    // URL 업데이트
-    updateUrlParams(tabId, [])
+    // URL 업데이트 (disableUrlSync면 상위 URL 파라미터를 건드리지 않음)
+    if (!disableUrlSync) {
+      updateUrlParams(tabId, [])
+    }
 
     // 태그 선택 이벤트 핸들러 호출
     if (onTagSelect) {
@@ -168,42 +175,66 @@ export default function ButtonTabs({
   const activeHashTags = hashTags[activeTabId] || []
   const showHashTags = activeHashTags.length > 0
 
+  // 탭 버튼 렌더링 (variant별 구조는 다르지만 버튼 마크업/로직은 공유)
+  const renderTabButton = (tab: TabItem, index: number) => (
+    <button
+      key={tab.id}
+      type="button"
+      ref={element => {
+        // React 19 방식으로 ref 설정
+        if (element) {
+          tabsRef.current[index] = element
+        }
+      }}
+      className={cn(
+        variant === 'chip'
+          ? [
+              'inline-flex h-[45px] md:min-w-[119px] shrink-0 items-center justify-center whitespace-nowrap rounded-full px-4 text-sm md:text-base font-medium transition-colors',
+              activeTabId === tab.id
+                ? 'bg-brand text-white'
+                : 'bg-surface-elevated text-text-muted hover:bg-surface-elevated-hover',
+            ]
+          : [
+              'py-2 px-1 text-sm sm:text-sm md:text-lg font-bold whitespace-nowrap transition-colors relative',
+              activeTabId === tab.id
+                ? 'text-brand'
+                : 'text-text-muted hover:text-brand',
+            ]
+      )}
+      aria-pressed={variant === 'chip' ? activeTabId === tab.id : undefined}
+      onClick={() => handleTabClick(tab.id)}
+    >
+      <span>{tab.label}</span>
+    </button>
+  )
+
   return (
     <div className={cn('', className)}>
-      {/* 탭 네비게이션 */}
-      <div className="relative flex overflow-x-auto hide-scrollbar">
-        <div className={cn(variant === 'chip' ? 'flex gap-[14px]' : 'flex space-x-4 md:space-x-8')}>
-          {tabs.map((tab, index) => (
-            <button
-              key={tab.id}
-              ref={element => {
-                // React 19 방식으로 ref 설정
-                if (element) {
-                  tabsRef.current[index] = element
-                }
-              }}
-              className={cn(
-                variant === 'chip'
-                  ? [
-                      'inline-flex h-[45px] min-w-[119px] shrink-0 items-center justify-center whitespace-nowrap rounded-full px-4 text-sm md:text-base font-medium transition-colors',
-                      activeTabId === tab.id
-                        ? 'bg-brand text-white'
-                        : 'bg-surface-elevated text-text-muted hover:bg-surface-elevated-hover',
-                    ]
-                  : [
-                      'py-2 px-1 text-sm sm:text-sm md:text-lg font-bold whitespace-nowrap transition-colors relative',
-                      activeTabId === tab.id
-                        ? 'text-brand'
-                        : 'text-text-muted hover:text-brand',
-                    ]
-              )}
-              aria-pressed={variant === 'chip' ? activeTabId === tab.id : undefined}
-              onClick={() => handleTabClick(tab.id)}
-            >
-              <span>{tab.label}</span>
-            </button>
-          ))}
-        </div>
+      {/* 탭 네비게이션
+          - chip: `md`(768px) 미만은 1행 전체 나열 + 바깥 컨테이너 가로 스크롤(내부 폭 제약 없음, w-max로
+            콘텐츠 폭만큼 늘어남). `md` 이상은 폭 기준 자동 개행(flex-wrap) — 한 줄을 최대한 채우고 넘치는
+            칩만 다음 줄로 넘어간다(줄 수는 탭 개수/폭에 따라 가변, 행 우선 순서는 flex-wrap 기본 동작으로 보장).
+            md+ 블록은 `md:w-full`로 부모(overflow-x-auto flex 아이템) 폭에 맞춰 개행되도록 강제 —
+            flex 아이템은 기본적으로 max-content로 계산돼 폭 제약이 없으면 flex-wrap이 걸려도 개행되지 않는다.
+            개행되면 내부 가로 스크롤은 자연히 발생하지 않는다(바깥 overflow-x-auto는 모바일 1행용).
+          - underline: 기존과 동일하게 가로 스크롤(overflow-x-auto) 유지 */}
+      <div className="relative flex overflow-x-auto hide-scrollbar [-webkit-overflow-scrolling:touch]">
+        {variant === 'chip' ? (
+          <>
+            {/* md 미만: 1행 전체 나열 */}
+            <div className="flex md:hidden w-max gap-[14px]">
+              {tabs.map((tab, index) => renderTabButton(tab, index))}
+            </div>
+            {/* md 이상: 폭 기준 자동 개행 */}
+            <div className="hidden md:flex md:w-full flex-wrap justify-start gap-[14px]">
+              {tabs.map((tab, index) => renderTabButton(tab, index))}
+            </div>
+          </>
+        ) : (
+          <div className="flex space-x-4 md:space-x-8">
+            {tabs.map((tab, index) => renderTabButton(tab, index))}
+          </div>
+        )}
         {/* 하단 인디케이터 애니메이션 (underline variant 전용) */}
         {variant === 'underline' && (
           <motion.div

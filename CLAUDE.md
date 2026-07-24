@@ -94,6 +94,8 @@ FSD(Feature-Sliced Design)로 이행 중이며 레거시와 공존한다.
 
 권장 흐름: **비자명한 작업은 plan → build/publish → review** 순. **code-writer·code-publisher 모두 예외 없이 `code-planner`의 계획(`docs/plan/`)을 근거로, 자신에게 배정된 담당 단계만** 실행한다.
 
+> ⛔ **계획 후 정지(사용자 승인 게이트)**: 계획(`docs/plan/`) 수립이 끝나면 **구현으로 넘어가지 말고 반드시 멈춰서 사용자의 진행 명령을 기다린다.** 사용자가 진행을 지시하면 그 지시 내용대로만 실행한다(지시에 계획과 다른 조정이 있으면 지시가 우선).
+
 > **역할 분담(겹침 방지)**: React라 한 `.tsx`에 마크업·로직이 섞이므로 **관심사(레이어)로 나눈다** — publisher=프레젠테이션(view), writer=컨테이너/로직. **같은 파일을 두 에이전트가 동시에 수정하지 않는다**(한 파일 한 담당). 얽히면 planner가 표시용/컨테이너로 파일을 분리하고 publisher가 정의할 props/callback 연결 지점을 계획에 명시한다. 산출물은 `docs/plan/`·`docs/write/`·`docs/publish/`·`docs/review/`에 남긴다.
 
 ## 소통 규칙

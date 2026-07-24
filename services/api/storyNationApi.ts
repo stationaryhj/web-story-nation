@@ -434,11 +434,16 @@ export const contentApi = {
 
   /**
    * 태그 랭킹 리스트
-   * @param type 타입 ( 1: 남자, 2: 여자, 3: 모름 )
+   * @param type 타입 ( 0: 전체, 1: 남자, 2: 여자, 3: 모름 )
+   * @param count 조회 개수 (미전달 시 서버 기본값)
    */
-  GetTagRankingList: async (type: number): Promise<ApiResponse<TagRankingListResponse>> => {
+  GetTagRankingList: async (
+    type: number,
+    count?: number
+  ): Promise<ApiResponse<TagRankingListResponse>> => {
     return api.post('/api/charbot/tagranking/get', {
       type,
+      ...(count != null ? { count } : {}),
     })
   },
 
