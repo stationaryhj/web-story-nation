@@ -21,15 +21,15 @@ export const moduleForTitleData: { [key: number]: ModuleTitle } = {
   },
   2: {
     title: `최신 오리지널 캐릭터!`,
-    subTitle: '스네가 직접 만든 고퀄 캐릭터를 만나보세요 :)',
+    subTitle: '러브챗이 직접 만든 고퀄 캐릭터를 만나보세요 :)',
   },
   3: {
     title: '화제의 캐릭터와 대화 해 보세요!',
     subTitle: '어디에서도 할 수 없었던 대화를 나눠보세요!',
   },
   4: {
-    title: '스네Pick 캐릭터를 만나보세요!',
-    subTitle: '재미보장! 스네가 선정한 캐릭터를 만나보세요!',
+    title: '러브챗Pick 캐릭터를 만나보세요!',
+    subTitle: '재미보장! 러브챗이 선정한 캐릭터를 만나보세요!',
   },
   5: {
     title: '짜릿한 대화를 즐겨보세요!',
@@ -331,7 +331,7 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
   // LatestCharacters
   UpdateLatestCharactersPaging: async (
     ranking_type: number,
-    gender: number,
+    _gender: number,
     page: number,
     pageSize: number
   ) => {
@@ -468,7 +468,7 @@ export const useRecommendSectionStoreData = create<MainStoreData>((set, get) => 
       });
 
       if (data?.modules) {
-        let modulesSumData: Array<sumCharacterData> = [];
+        const modulesSumData: Array<sumCharacterData> = [];
         const excludedModules = [8, 9, 10];
 
         // data.order 배열을 순회하면서 모듈 데이터 수집
