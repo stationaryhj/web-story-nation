@@ -198,7 +198,7 @@ export default function SimpleLogin() {
 
         {/* footer */}
         <div className='flex flex-col items-start justify-start gap-1 mt-4'>
-          <span className=' text-text-muted text-sm'>이미 스토리네이션 계정이 있다면?</span>
+          <span className=' text-text-muted text-sm'>이미 러브챗 계정이 있다면?</span>
           <button
             onClick={handleSocialLoginClick}
             className='flex flex-row items-center justify-center gap-2'

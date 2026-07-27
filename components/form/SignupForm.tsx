@@ -157,7 +157,7 @@ export default function SignupForm({ onSubmit, disabled = false }: SignupFormPro
           maxLength={8}
         />
         {errors.birthday && <p className="text-sm text-red-500">{errors.birthday}</p>}
-        <p className="text-xs text-gray-500">스토리네이션은 만14세 이상 이용 가능합니다.</p>
+        <p className="text-xs text-gray-500">러브챗은 만14세 이상 이용 가능합니다.</p>
       </div>
 
       <div className="space-y-4">

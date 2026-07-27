@@ -67,7 +67,7 @@ export default function LoginPage() {
         <div className='w-full max-w-md space-y-8'>
           <div className='text-center'>
             <h1 className='text-3xl font-bold text-text-primary'>로그인</h1>
-            <p className='mt-2 text-sm text-text-muted'>스토리네이션에 오신 것을 환영합니다</p>
+            <p className='mt-2 text-sm text-text-muted'>러브챗에 오신 것을 환영합니다</p>
           </div>
 
           {error && (

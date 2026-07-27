@@ -347,7 +347,7 @@ export default function SignupModal({
       </div>
 
       {/* 안내 문구 */}
-      <div className='text-sm text-text-muted'>스토리네이션은 만 14세 이상 이용 가능합니다.</div>
+      <div className='text-sm text-text-muted'>러브챗은 만 14세 이상 이용 가능합니다.</div>
 
       {/* 약관 동의 */}
       <div className='space-y-3 border-t border-border-default pt-4'>
@@ -490,7 +490,7 @@ export default function SignupModal({
 
       {/* 안내 메시지 */}
       <p className='text-center text-text-muted'>
-        스토리네이션에 오신 것을 환영합니다!
+        러브챗에 오신 것을 환영합니다!
         <br />
         지급된 펜으로 캐릭터를 만들어보세요.
       </p>

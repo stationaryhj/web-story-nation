@@ -70,7 +70,7 @@ export default function NoticeModal({ isOpen, notice, onClose }: NoticeModalProp
             <div className='relative'>
               <Image
                 src={imgUrl}
-                alt='스토리네이션 공지사항'
+                alt='러브챗 공지사항'
                 width={500}
                 height={800}
                 className='w-full h-auto'

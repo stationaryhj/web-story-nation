@@ -153,7 +153,7 @@ export default function RewardModal({ isOpen, onClose, isAfterSignup = false }: 
                   <p>
                     {isAfterSignup ? (
                       <>
-                        스토리네이션에 오신 것을 환영합니다!
+                        러브챗에 오신 것을 환영합니다!
                         <br />
                         지급된 펜으로 캐릭터를 만들어보세요.
                       </>

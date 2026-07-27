@@ -29,7 +29,7 @@ const CreateCharacterSection = memo(() => {
           내가 원하는 캐릭터를 만들어 보세요!
         </h2>
         <p className='text-sm md:text-lg text-text-muted max-w-2xl mx-auto mb-8'>
-          당신만의 독특한 캐릭터를 만들고 다른 사용자들과 공유해보세요. 스토리네이션은 당신의
+          당신만의 독특한 캐릭터를 만들고 다른 사용자들과 공유해보세요. 러브챗은 당신의
           창의력을 펼칠 수 있는 완벽한 공간입니다.
         </p>
         <button

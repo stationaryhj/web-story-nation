@@ -68,7 +68,7 @@ export default function TermsPage() {
 
   return (
     <div className='mx-auto max-w-4xl py-8 px-4 sm:px-6 lg:px-8'>
-      <h1 className='mb-8 text-center text-3xl font-bold text-text-primary'>스토리네이션 약관</h1>
+      <h1 className='mb-8 text-center text-3xl font-bold text-text-primary'>러브챗 약관</h1>
 
       <div className='mb-6 flex space-x-1 rounded-lg bg-surface-elevated-hover p-1'>
         {tabs.map((tab) => (

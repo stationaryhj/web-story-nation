@@ -98,7 +98,7 @@ export default function Header() {
             >
               <Image
                 src='/images/logo.svg'
-                alt='스토리네이션'
+                alt='러브챗'
                 width={49}
                 height={49}
                 className='h-10 w-auto'

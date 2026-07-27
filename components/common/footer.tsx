@@ -30,7 +30,7 @@ export default function Footer() {
         <div className='container mx-auto px-4'>
           <div className='flex flex-col md:flex-row justify-between'>
             <div className='mb-6 md:mb-0'>
-              <h3 className='text-lg font-bold text-brand-hover mb-2'>스토리네이션</h3>
+              <h3 className='text-lg font-bold text-brand-hover mb-2'>러브챗</h3>
               <p className='text-text-muted font-bold mb-4'>주식회사 우주문방구</p>
               <ul className='text-sm text-text-muted/80 space-y-2'>
                 <li>경기도 부천시 원미구 길주로 17 웹툰융합센터 606호 607호</li>
@@ -157,7 +157,7 @@ export default function Footer() {
           </div>
 
           <div className='mt-8 pt-8 border-t border-border-default text-center text-sm text-text-muted'>
-            &copy; {new Date().getFullYear()} 스토리네이션. All rights reserved.
+            &copy; {new Date().getFullYear()} 러브챗. All rights reserved.
           </div>
         </div>
       </footer>

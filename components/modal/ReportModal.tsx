@@ -87,7 +87,7 @@ function ReportModalContent({ onSubmit, onClose, submitted, reportType }: Report
       <div className='p-6'>
         <div className='bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 mb-6'>
           <p className='text-text-muted text-sm leading-relaxed'>
-            {reportTypeText} 신고는 스토리네이션 운영정책에 따라 처리됩니다. 신고된 {reportTypeText}
+            {reportTypeText} 신고는 러브챗 운영정책에 따라 처리됩니다. 신고된 {reportTypeText}
             는 관리자 검토 후 운영정책에 따라 적절한 조치가 취해질 예정입니다. 신중한 신고
             부탁드립니다.
           </p>
@@ -95,7 +95,7 @@ function ReportModalContent({ onSubmit, onClose, submitted, reportType }: Report
 
         <div className='bg-danger/10 rounded-lg p-4 mb-6'>
           <p className='text-danger text-sm font-medium'>
-            신고사유와 무관한 내용을 반복 접수하면 스토리네이션 이용에 제한을 받으실 수 있습니다.
+            신고사유와 무관한 내용을 반복 접수하면 러브챗 이용에 제한을 받으실 수 있습니다.
           </p>
         </div>
 
