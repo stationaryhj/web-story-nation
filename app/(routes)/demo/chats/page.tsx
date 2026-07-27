@@ -138,8 +138,7 @@ export default function DemoChatsPage() {
       <main className='relative z-10 mx-auto min-w-0 w-full max-w-3xl flex-1 px-4 pb-24 pt-6 md:mx-0 md:px-8 md:pb-8'>
         {/* 상단 태그라인 */}
         <h1 className='mb-5 text-lg font-bold leading-snug md:mb-6 md:text-2xl'>
-          오직 성인 남성만을 위한,
-          <br className='sm:hidden' /> 상상하는 모든것이 이뤄지는 AI파라다이스
+          상상하는 모든것이 이뤄지는 AI파라다이스
         </h1>
 
         {/* 검색바 — Figma 316×33 흰색 라운드, 모바일은 풀폭 */}

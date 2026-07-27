@@ -129,8 +129,7 @@ export default function DemoHomePage() {
       <main className='min-w-0 flex-1 px-4 pb-24 pt-6 md:px-8 md:pb-8'>
         {/* 상단 태그라인 */}
         <h1 className='mb-5 text-lg font-bold leading-snug md:mb-6 md:text-2xl'>
-          오직 성인 남성만을 위한,
-          <br className='sm:hidden' /> 상상하는 모든것이 이뤄지는 AI파라다이스
+          상상하는 모든것이 이뤄지는 AI파라다이스
         </h1>
 
         {/* 카테고리 칩 — Figma 균일 크기(119×45), 텍스트 넘칠 때만 확장. 모바일 가로 스크롤, 데스크톱 wrap */}

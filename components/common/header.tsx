@@ -3,16 +3,8 @@
 
 import {
   faBars,
-  faBell,
-  faCog,
-  faFire,
-  faMoon,
   faShoppingBag,
-  faSignOutAlt,
-  faSun,
-  faTimes,
   faUser,
-  faVideo,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -23,7 +15,6 @@ import { useEffect, useState } from 'react';
 import HeaderSearch from '@/components/common/HeaderSearch';
 import HeaderSidebar from '@/components/elements/sidebar/HeaderSidebar';
 import NotificationButton from '@/components/elements/sidebar/NotificationButton';
-import { FadeIn } from '@/components/motion/PageTransition';
 import useNewModalStore from '@/shared/model/stores/useModalStore';
 import { useAccountStore, useThemeStore } from '@/store/useStoreData';
 import { useModalStore } from '@/store/useStoreModal';
@@ -104,6 +95,10 @@ export default function Header() {
                 className='h-10 w-auto'
               />
             </Link>
+            {/* 서비스 태그라인 — 모바일에선 검색창과 겹쳐 숨기고 lg부터 노출 */}
+            <p className='hidden lg:block text-base font-semibold text-text-primary whitespace-nowrap truncate max-w-[38rem]'>
+              상상하는 모든것이 이뤄지는 AI파라다이스
+            </p>
           </div>
 
           <HeaderSearch />

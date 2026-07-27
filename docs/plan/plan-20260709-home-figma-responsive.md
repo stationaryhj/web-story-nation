@@ -133,7 +133,7 @@
 
 ### 4. 상단 태그라인(View) `[담당: publisher]`
 - 파일(신규): `components/main/HomeTagline.tsx` (또는 HomeLayout 내부).
-- 정적 텍스트 "오직 성인 남성만을 위한, 상상하는 모든것이 이뤄지는 AI파라다이스", `text-text-primary` bold, 반응형 폰트(`text-lg md:text-2xl`). 순수 표시.
+- 정적 텍스트 "상상하는 모든것이 이뤄지는 AI파라다이스", `text-text-primary` bold, 반응형 폰트(`text-lg md:text-2xl`). 순수 표시.
 
 ### 5. 카드 그리드 6열 확장(View) `[담당: publisher]`
 - 파일(수정): `components/elements/card/CardGrid.tsx` — `getGridColumns()`(`:211`)에 6열 케이스 추가 및 기본 그리드 반응형을 확인5 열 수(2→3→4→5→6)로 조정. `cardsPerRow` prop로 제어하거나 신규 분기.

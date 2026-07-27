@@ -8,10 +8,10 @@ import type { Character } from '@/store/useStoreData';
 import { useSettingsStore } from '@/store/useStoreSettings';
 import type { ModuleCharacter } from '@/types/api';
 
-// /api/charbot/getlist — type=0(전체), nsfw=1(성인). order·chrbot_tag_keys는 탭별로 다름
+// /api/charbot/getlist — type=0(전체). order·chrbot_tag_keys는 탭별로 다름
 // (1=인기, 2=생성순 / 태그 탭은 chrbot_tag_keys로 필터링)
+// nsfw는 성인모드 여부에 따라 1(짜릿모드 가능)/2(전체 이용가)로 결정.
 const LIST_TYPE = '0';
-const NSFW = 1;
 // 남/여 탭(useCharacterGridStoreData.GetList paginate)과 동일
 const PAGE_SIZE = 10;
 
@@ -86,6 +86,8 @@ export default function GetListGridSection({
   emptyTitle,
 }: GetListGridSectionProps) {
   const { isAdultModeEnabled } = useSettingsStore();
+  // 1: 짜릿모드 가능, 2: 전체 이용가 (store/useCharacterGridStoreData.ts Filter 정의와 동일)
+  const nsfw = isAdultModeEnabled ? 1 : 2;
 
   const requestIdRef = useRef(0);
   const [characters, setCharacters] = useState<Character[]>([]);
@@ -99,7 +101,7 @@ export default function GetListGridSection({
     setPage(1);
 
     contentApi
-      .GetList(LIST_TYPE, tagKeys, NSFW, order, 1, PAGE_SIZE)
+      .GetList(LIST_TYPE, tagKeys, nsfw, order, 1, PAGE_SIZE)
       .then((response) => {
         if (requestId !== requestIdRef.current) return;
         const list = response?.data?.chrbotList;
@@ -113,7 +115,7 @@ export default function GetListGridSection({
         if (requestId !== requestIdRef.current) return;
         setIsLoading(false);
       });
-  }, [isAdultModeEnabled, order, tagKeys]);
+  }, [nsfw, order, tagKeys]);
 
   const handleLoadMore = useCallback(() => {
     const requestId = ++requestIdRef.current;
@@ -121,7 +123,7 @@ export default function GetListGridSection({
     setIsLoading(true);
 
     contentApi
-      .GetList(LIST_TYPE, tagKeys, NSFW, order, nextPage, PAGE_SIZE)
+      .GetList(LIST_TYPE, tagKeys, nsfw, order, nextPage, PAGE_SIZE)
       .then((response) => {
         if (requestId !== requestIdRef.current) return;
         const list = response?.data?.chrbotList;
@@ -137,7 +139,7 @@ export default function GetListGridSection({
         if (requestId !== requestIdRef.current) return;
         setIsLoading(false);
       });
-  }, [characters, page, order, tagKeys]);
+  }, [characters, page, nsfw, order, tagKeys]);
 
   return (
     <ListGridSectionView
