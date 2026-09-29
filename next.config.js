@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   images: {
     domains: [
       'universestationery.s3.amazonaws.com',
@@ -14,7 +15,7 @@ const nextConfig = {
     return [
       {
         source: '/nakama/:path*',
-        destination: 'http://qauschat.storynation.io:443/:path*',
+        destination: 'https://chat.universestationery.com/:path*',
       },
       {
         source: '/callback',
