@@ -13,6 +13,9 @@ interface NewCharacterSidebarProps {
   moduleId: number
 }
 
+// 진짜 DM처럼(1), 최신 오리지널(2), 화제의 캐릭터(3), 스네Pick(4), 2D 남주모음(6)
+const GRID_LAYOUT_MODULE_IDS = [1, 2, 3, 4, 6]
+
 export default function EtcCharacterSidebar({ isOpen, onClose, moduleId }: NewCharacterSidebarProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState<string>('')
@@ -92,13 +95,18 @@ export default function EtcCharacterSidebar({ isOpen, onClose, moduleId }: NewCh
       }
     >
       <div ref={contentRef} className="h-full overflow-y-auto px-4 py-6">
-        <CardGrid
-          customData={etcCharactersSlide}
-          cardsPerRow={1}
-          useSwiper={false}
-          variant="horizontal"
-          isSidebar={true}
-        />
+        {/* 아래 모듈은 '지금 막 올라온 캐릭터' 더보기와 같은 레이아웃 */}
+        {GRID_LAYOUT_MODULE_IDS.includes(moduleId) ? (
+          <CardGrid customData={etcCharactersSlide} cardsPerRow={2} useSwiper={false} isSidebar={true} />
+        ) : (
+          <CardGrid
+            customData={etcCharactersSlide}
+            cardsPerRow={1}
+            useSwiper={false}
+            variant="horizontal"
+            isSidebar={true}
+          />
+        )}
       </div>
 
       {/* 맨 위로 스크롤 버튼 */}

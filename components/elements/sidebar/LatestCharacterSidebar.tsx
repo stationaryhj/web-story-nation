@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowUp, faRotate } from '@fortawesome/free-solid-svg-icons'
-import { useRecommendSectionStoreData, moduleForTitleData } from '@/store/useMainStoreData'
+import { useRecommendSectionStoreData } from '@/store/useMainStoreData'
 import CardGrid from '@/components/elements/card/CardGrid'
 import BaseSidebar from './BaseSidebar'
 
@@ -80,7 +80,7 @@ export default function LatestCharacterSidebar({ isOpen, onClose, moduleId }: Ne
     <BaseSidebar
       isOpen={isOpen}
       onClose={onClose}
-      title={moduleForTitleData[moduleId]?.title}
+      title="🌱지금 막 올라온 캐릭터🌱"
       headerExtra={
         <div className="flex items-center space-x-4">
           {headerExtra}
