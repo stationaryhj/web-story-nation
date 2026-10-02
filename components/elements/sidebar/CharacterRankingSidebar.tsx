@@ -88,7 +88,7 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
   }
 
   return (
-    <BaseSidebar isOpen={isOpen} onClose={onClose} title="캐릭터 랭킹" width="600px">
+    <BaseSidebar isOpen={isOpen} onClose={onClose} title="캐릭터 랭킹">
       {/* 필터 영역 */}
       <div className="px-6 py-4 border-b dark:border-dark-secondary-200/10 space-y-4">
         <div className="w-full flex items-center justify-between">
@@ -112,17 +112,15 @@ export default function CharacterRankingSidebar({ isOpen, onClose }: CharacterRa
         </div>
     </div>
 
-      {/* 컨텐츠 영역 */}
+      {/* 컨텐츠 영역 — '화제의 캐릭터' 더보기와 같은 2열 카드 그리드 */}
       <div className="px-4 py-6">
         <CardGrid
           customData={rankingCharactersSlide.slice(0, 50)}
-          cardsPerRow={1}
+          cardsPerRow={2}
           hasRanking={true}
           isLoading={isLoading}
-          subtitle={`${selectedGender.label} · ${rankingTabs.find(tab => tab.id === activeTab)?.label || ''} 랭킹`}
           useSwiper={false}
-          variant="horizontal"
-          isCharacterRankingSidebar={true}
+          isSidebar={true}
         />
       </div>
     </BaseSidebar>
