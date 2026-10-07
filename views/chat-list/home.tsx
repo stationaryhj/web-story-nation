@@ -327,10 +327,9 @@ export default function ChatListPage() {
         </button>
 
         {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-          // 현재 페이지를 중심으로 최대 5개의 페이지 번호를 표시
-          let pageNum = currentPage - 2 + i
-          if (pageNum < 1) pageNum += 5
-          if (pageNum > totalPages) return null
+          // 현재 페이지를 중심으로 최대 5개의 페이지 번호를 오름차순으로 표시 (양 끝에서는 범위를 안쪽으로 당김)
+          const startPage = Math.max(1, Math.min(currentPage - 2, totalPages - 4))
+          const pageNum = startPage + i
 
           return (
             <button
