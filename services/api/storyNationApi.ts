@@ -501,7 +501,8 @@ export const contentApi = {
     paginate: number,
     page: number
   ): Promise<ApiResponse<GetSearchResponse>> => {
-    const safety = useSettingsStore.getState().isAdultModeEnabled ? 0 : 1
+    // 이름 검색은 19세 캐릭터도 결과에 보여준다. 대화 시작 시 로그인·성인인증으로 막는다.
+    const safety = 0
     return api.post('/api/charbot/search', {
       search,
       order,

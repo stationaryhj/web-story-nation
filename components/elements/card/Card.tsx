@@ -13,6 +13,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { getChangeNameTag } from '@/lib/utils/storyNationUtil'
 import { contentApi, createApi } from '@/services/api/storyNationApi'
 import type { CharbotResponse } from '@/types/api'
+import { useAccountStore } from '@/store/useAccountStore'
 
 interface CardProps {
   character: Character
@@ -45,6 +46,9 @@ export default function Card({
   const [imageError, setImageError] = React.useState(false)
   const router = useRouter()
   const queryClient = useQueryClient()
+  const userIsAdult = useAccountStore(state => state.isAdult())
+  // 성인 캐릭터는 성인인증 전까지 이미지를 흐리게 표시
+  const blurClass = isAdult && !userIsAdult ? ' blur-md scale-110' : ''
 
   const isTemp = character.finish_yn == 0
   const isLocked = character.show_yn == 0
@@ -149,7 +153,7 @@ export default function Card({
               alt={`${name} 캐릭터 이미지`}
               fill
               sizes="(max-width: 640px) 25vw, 128px"
-              className="object-cover"
+              className={`object-cover${blurClass}`}
               onError={handleImageError}
             />
 
@@ -264,7 +268,7 @@ export default function Card({
                 alt={`${name} 캐릭터 이미지`}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                className={`object-cover transition-transform duration-500 group-hover:scale-110${blurClass}`}
                 onError={handleImageError}
               />
   
@@ -385,7 +389,7 @@ export default function Card({
               alt={`${name} 캐릭터 이미지`}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
+              className={`object-cover transition-transform duration-500 group-hover:scale-110${blurClass}`}
               onError={handleImageError}
             />
 
